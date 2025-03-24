@@ -1,7 +1,7 @@
--generate-meta-for-package coq-metacoq-pcuic
+-generate-meta-for-package coq-metarocq-pcuic
 -I src
--Q src MetaCoq.PCUIC
--R theories MetaCoq.PCUIC
+-Q src MetaRocq.PCUIC
+-R theories MetaRocq.PCUIC
 
 # From Equations
 src/classes0.mli
@@ -71,4 +71,4 @@ src/pCUICPretty.ml
 # src/pCUICSafeLemmata.ml
 src/templateToPCUIC.mli
 src/templateToPCUIC.ml
-src/metacoq_pcuic_plugin.mlpack
+src/metarocq_pcuic_plugin.mlpack

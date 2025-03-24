@@ -41,7 +41,7 @@
     - Well-bounded global references?
     - Using vectors and fin for fixpoint bodies lists and index (no ill-formed
     fixpoints by construction)
-  - Develop a proof mode for MetaCoq typing, à la Iris proof mode 
+  - Develop a proof mode for MetaRocq typing, à la Iris proof mode 
 
 - Refine the longest-simple-path algorithm on universes with the 
   Bender & al algorithm used in Coq, extended with edges of negative weight.

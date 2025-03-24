@@ -1,9 +1,9 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Universes.
-From MetaCoq.Template Require Import Loader.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTyping PCUICSN PCUICLiftSubst.
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICWfEnvImpl PCUICTypeChecker PCUICSafeChecker.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Universes.
+From MetaRocq.Template Require Import Loader.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTyping PCUICSN PCUICLiftSubst.
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICWfEnvImpl PCUICTypeChecker PCUICSafeChecker.
 From Equations Require Import Equations.
 
 Import MCMonadNotation.

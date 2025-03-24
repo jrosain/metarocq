@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Environment uGraph.
-From MetaCoq.Template Require Import Ast AstUtils LiftSubst UnivSubst Typing.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Environment uGraph.
+From MetaRocq.Template Require Import Ast AstUtils LiftSubst UnivSubst Typing.
 Import MCMonadNotation.
 
 (** * Coq type-checker for kernel terms

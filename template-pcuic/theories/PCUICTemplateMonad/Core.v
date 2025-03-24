@@ -1,11 +1,11 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import Ast AstUtils Common.
-From MetaCoq.Template.TemplateMonad Require Export Core.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import Ast AstUtils Common.
+From MetaRocq.Template.TemplateMonad Require Export Core.
 
 Set Warnings "-notation-overridden".
-From MetaCoq.PCUIC Require Import PCUICAst.
-From MetaCoq.TemplatePCUIC Require Import TemplateMonadToPCUIC TemplateToPCUIC PCUICToTemplate.
+From MetaRocq.PCUIC Require Import PCUICAst.
+From MetaRocq.TemplatePCUIC Require Import TemplateMonadToPCUIC TemplateToPCUIC PCUICToTemplate.
 Set Warnings "+notation-overridden".
 
 Local Set Universe Polymorphism.

@@ -9,7 +9,7 @@ Global Instance string_eqdec : EqDec string := string_dec.
 Derive NoConfusion for ascii string.
 Derive NoConfusion EqDec for positive Z.
 
-Declare Scope metacoq_scope.
+Declare Scope metarocq_scope.
 
 (** We cannot use ssrbool currently as it breaks extraction. *)
 Coercion is_true : bool >-> Sortclass.
@@ -19,7 +19,7 @@ Notation "'eta_compose'" := (fun g f x => g (f x)).
 (* \circ *)
 Notation "g ∘ f" := (eta_compose g f) (at level 40, left associativity).
 
-Notation " ! " := (@False_rect _ _) : metacoq_scope.
+Notation " ! " := (@False_rect _ _) : metarocq_scope.
 
 (* Use \sum to input ∑ in Company Coq (it is not a sigma Σ). *)
 Notation "'∑' x .. y , p" := (sigT (fun x => .. (sigT (fun y => p%type)) ..))

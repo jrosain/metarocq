@@ -1,5 +1,5 @@
-From MetaCoq.Quotation.ToPCUIC Require Import Stdlib.Init.
-From MetaCoq.Utils Require Import MCOption MCRelations.
+From MetaRocq.Quotation.ToPCUIC Require Import Stdlib.Init.
+From MetaRocq.Utils Require Import MCOption MCRelations.
 
 #[local] Hint Extern 0 => reflexivity : typeclass_instances.
 

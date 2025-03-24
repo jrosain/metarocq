@@ -1,9 +1,9 @@
-From MetaCoq.Common Require Import BasicAst Environment EnvironmentTyping Universes.
-From MetaCoq.Quotation.ToTemplate Require Import Init.
-From MetaCoq.Quotation.ToTemplate Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.ssr.
-From MetaCoq.Quotation.ToTemplate.Utils Require Import (hints) All_Forall MCOption.
-From MetaCoq.Quotation.ToTemplate.Common Require Import (hints) config BasicAst Kernames Universes Environment.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Common Require Import Environment.Sig EnvironmentTyping.Sig.
+From MetaRocq.Common Require Import BasicAst Environment EnvironmentTyping Universes.
+From MetaRocq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.ssr.
+From MetaRocq.Quotation.ToTemplate.Utils Require Import (hints) All_Forall MCOption.
+From MetaRocq.Quotation.ToTemplate.Common Require Import (hints) config BasicAst Kernames Universes Environment.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Common Require Import Environment.Sig EnvironmentTyping.Sig.
 From Equations.Prop Require Import EqDecInstances.
 
 Module QuoteLookup (Import T : Term) (Import E : EnvironmentSig T) (Import L : LookupSig T E) (Import EDec : EnvironmentDecide T E) (Import qE : QuotationOfEnvironment T E) (Import qL : QuotationOfLookup T E L) (Import qEDec : QuotationOfEnvironmentDecide T E EDec) (Import QuoteE : QuoteEnvironmentSig T E) <: QuoteLookupSig T E L.

@@ -1,4 +1,4 @@
--R theories MetaCoq.Utils
+-R theories MetaRocq.Utils
 
 # canonical tries library
 theories/canonicaltries/String2pos.v

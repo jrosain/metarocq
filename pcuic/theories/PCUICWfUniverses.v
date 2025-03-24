@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Morphisms.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICInduction
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICInduction
      PCUICLiftSubst PCUICSigmaCalculus PCUICTyping PCUICWeakeningEnv PCUICWeakeningEnvTyp
      PCUICWeakeningConv PCUICWeakeningTyp
      PCUICSubstitution PCUICReduction PCUICCumulativity PCUICGeneration
@@ -12,7 +12,7 @@ From Equations Require Import Equations.
 From Equations.Prop Require Import DepElim.
 From Stdlib Require Import ssreflect ssrbool.
 
-From MetaCoq.PCUIC Require Import PCUICInduction.
+From MetaRocq.PCUIC Require Import PCUICInduction.
 
 Lemma test_primu_mapu {term term'} pu pt fu (ft : term -> term') p :
   test_primu pu pt (mapu_prim fu ft p) =

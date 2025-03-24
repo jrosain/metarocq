@@ -1,26 +1,26 @@
 From Stdlib Require Import Recdef.
-From MetaCoq.Utils Require Import bytestring.
-From MetaCoq.Template Require Import TemplateMonad Loader.
-(* From MetaCoq.SafeChecker Require Import SafeTemplateChecker. *)
-From MetaCoq.PCUIC Require Import PCUICEquality PCUICAst PCUICReflect PCUICSafeLemmata PCUICTyping PCUICNormal PCUICAstUtils PCUICSN.
-From MetaCoq.TemplatePCUIC Require Import TemplateToPCUIC PCUICToTemplate.
+From MetaRocq.Utils Require Import bytestring.
+From MetaRocq.Template Require Import TemplateMonad Loader.
+(* From MetaRocq.SafeChecker Require Import SafeTemplateChecker. *)
+From MetaRocq.PCUIC Require Import PCUICEquality PCUICAst PCUICReflect PCUICSafeLemmata PCUICTyping PCUICNormal PCUICAstUtils PCUICSN.
+From MetaRocq.TemplatePCUIC Require Import TemplateToPCUIC PCUICToTemplate.
 From Stdlib Require Import String.
 Local Open Scope string_scope.
 
-From MetaCoq.Utils Require Import utils bytestring.
-From MetaCoq.Common Require Import config.
+From MetaRocq.Utils Require Import utils bytestring.
+From MetaRocq.Common Require Import config.
 
 Import MCMonadNotation.
-Unset MetaCoq Debug.
+Unset MetaRocq Debug.
 (* We're doing erasure assuming no Prop <= Type rule and lets can appear in constructor types. *)
 #[local] Existing Instance extraction_checker_flags.
 
-From MetaCoq.TestSuite Require hott_example.
+From MetaRocq.TestSuite Require hott_example.
 
-(* MetaCoq Quote Recursively Definition qequiv_adjointify := @isequiv_adjointify. *)
+(* MetaRocq Quote Recursively Definition qequiv_adjointify := @isequiv_adjointify. *)
 
-From MetaCoq.SafeChecker Require Import PCUICEqualityDec PCUICWfReduction PCUICErrors PCUICSafeReduce PCUICTypeChecker PCUICSafeChecker PCUICWfEnv PCUICWfEnvImpl PCUICSafeConversion.
-From MetaCoq.SafeCheckerPlugin Require Import SafeTemplateChecker.
+From MetaRocq.SafeChecker Require Import PCUICEqualityDec PCUICWfReduction PCUICErrors PCUICSafeReduce PCUICTypeChecker PCUICSafeChecker PCUICWfEnv PCUICWfEnvImpl PCUICSafeConversion.
+From MetaRocq.SafeCheckerPlugin Require Import SafeTemplateChecker.
 
 #[local,program] Instance fake_abstract_guard_impl : PCUICWfEnvImpl.abstract_guard_impl :=
   {
@@ -51,7 +51,7 @@ Definition dummy (n : nat) : nat := match n with 0 => 1 | S n => n end.
 
 Set Primitive Projections.
 
-MetaCoq Quote Recursively Definition foo :=
+MetaRocq Quote Recursively Definition foo :=
   @hott_example.isequiv_adjointify.
 (* plus. *)
 (* (fun n m => n + m). *)
@@ -70,8 +70,8 @@ Defined.
 
 Time Definition bar := Eval lazy in @typecheck_template default_normal foo.
 
-Unset MetaCoq Strict Unquote Universe Mode.
-MetaCoq Unquote Definition unbar := (PCUICToTemplate.trans bar).
+Unset MetaRocq Strict Unquote Universe Mode.
+MetaRocq Unquote Definition unbar := (PCUICToTemplate.trans bar).
 
 Program Definition eval_compute (cf := default_checker_flags)
 (nor : normalizing_flags)
@@ -107,4 +107,4 @@ Program Definition eval_compute_cheat (cf := default_checker_flags)
 
 Time Definition bar'' := Eval lazy in eval_compute default_normal foo Monomorphic_ctx.
 
-MetaCoq Unquote Definition bar''' := (match bar'' with inl x => x | inr  _ => todo "" end).
+MetaRocq Unquote Definition bar''' := (match bar'' with inl x => x | inr  _ => todo "" end).

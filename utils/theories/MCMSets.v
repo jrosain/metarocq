@@ -1,6 +1,6 @@
 From Stdlib.Structures Require Import Orders.
 From Stdlib.MSets Require Import MSetInterface MSetList MSetAVL MSetFacts MSetProperties MSetDecide.
-From MetaCoq.Utils Require Import MCReflect.
+From MetaRocq.Utils Require Import MCReflect.
 From Equations.Prop Require Import Classes.
 
 Module Type IsLeibniz (Import T : Eq).

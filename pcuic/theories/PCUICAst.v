@@ -1,9 +1,9 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool Morphisms.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Export Primitive Universes BasicAst Environment Reflect.
-From MetaCoq.Common Require EnvironmentTyping.
-From MetaCoq.PCUIC Require Export PCUICPrimitive.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Export Primitive Universes BasicAst Environment Reflect.
+From MetaRocq.Common Require EnvironmentTyping.
+From MetaRocq.PCUIC Require Export PCUICPrimitive.
 From Equations Require Import Equations.
 (** * AST of the Polymorphic Cumulative Calculus of Inductive Constructions
 

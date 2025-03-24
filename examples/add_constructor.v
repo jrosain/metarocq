@@ -1,6 +1,6 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All.
 
 Import MCMonadNotation.
 
@@ -94,7 +94,7 @@ Polymorphic Definition add_constructor (tm : Ast.term)
 (** * Examples *)
 Local Open Scope bs_scope.
 (** Here we add a silly constructor to bool. *)
-MetaCoq Run (
+MetaRocq Run (
     add_constructor <% bool %> "foo" <% (fun x : Type => nat -> x -> bool -> x) %>).
 (* Inductive bool' : Set := *)
 (*     true' : bool' *)
@@ -109,7 +109,7 @@ Inductive tm :=
 | lam : tm -> tm
 | app : tm -> tm -> tm.
 
-MetaCoq Run (add_constructor <%tm%> "letin" <% (fun tm' => tm' -> tm' -> tm') %>).
+MetaRocq Run (add_constructor <%tm%> "letin" <% (fun tm' => tm' -> tm' -> tm') %>).
 
 Definition test2 := letin.
 (* Inductive tm' : Type := *)
@@ -119,13 +119,13 @@ Definition test2 := letin.
 (*   | letin : tm' -> tm' -> tm' *)
 
 
-MetaCoq Run (add_constructor <%@eq%> "foo'"
+MetaRocq Run (add_constructor <%@eq%> "foo'"
                     <% (fun (eq':forall A, A -> A -> Type) => forall A x y, nat -> eq' A x x -> bool -> eq' A x y) %>).
 Definition test3 := foo'.
-MetaCoq Run (add_constructor <%@Nat.Odd_alt%> "foo''"
+MetaRocq Run (add_constructor <%@Nat.Odd_alt%> "foo''"
                     <%(fun (even' odd':nat -> Prop) => odd' 0)%>).
 Definition test4 := foo''.
 Module A.
-MetaCoq Run (add_constructor <%@Nat.Even_alt%> "foo'"
+MetaRocq Run (add_constructor <%@Nat.Even_alt%> "foo'"
                     <%(fun (even' odd':nat -> Prop) => even' 0)%>).
 End A.

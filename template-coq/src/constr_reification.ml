@@ -63,51 +63,51 @@ struct
   let resolve_ref (tm : string) : Names.GlobRef.t Lazy.t =
     lazy (Rocqlib.lib_ref tm)
 
-  let ast s = resolve ("metacoq.ast." ^ s)
-  let template s = resolve ("metacoq.template." ^ s)
-  let template_ref s = resolve_ref ("metacoq.template." ^ s)
+  let ast s = resolve ("metarocq.ast." ^ s)
+  let template s = resolve ("metarocq.template." ^ s)
+  let template_ref s = resolve_ref ("metarocq.template." ^ s)
 
-  let tBsString = resolve "metacoq.string.cons"
-  let tBsEmptyString = resolve "metacoq.string.nil"
-  let tO = resolve "metacoq.nat.zero"
-  let tS = resolve "metacoq.nat.succ"
-  let tnat = resolve "metacoq.nat.type"
-  let bool_type = resolve "metacoq.bool.type"
-  let ttrue = resolve "metacoq.bool.true"
-  let tfalse = resolve "metacoq.bool.false"
-  let option_type = resolve "metacoq.option.type"
-  let cSome = resolve "metacoq.option.some"
-  let cNone = resolve "metacoq.option.none"
+  let tBsString = resolve "metarocq.string.cons"
+  let tBsEmptyString = resolve "metarocq.string.nil"
+  let tO = resolve "metarocq.nat.zero"
+  let tS = resolve "metarocq.nat.succ"
+  let tnat = resolve "metarocq.nat.type"
+  let bool_type = resolve "metarocq.bool.type"
+  let ttrue = resolve "metarocq.bool.true"
+  let tfalse = resolve "metarocq.bool.false"
+  let option_type = resolve "metarocq.option.type"
+  let cSome = resolve "metarocq.option.some"
+  let cNone = resolve "metarocq.option.none"
 
-  let tZ = resolve "metacoq.Z.type"
-  let cZ0 = resolve "metacoq.Z.zero"
-  let cZpos = resolve "metacoq.Z.pos"
-  let cZneg = resolve "metacoq.Z.neg"
+  let tZ = resolve "metarocq.Z.type"
+  let cZ0 = resolve "metarocq.Z.zero"
+  let cZpos = resolve "metarocq.Z.pos"
+  let cZneg = resolve "metarocq.Z.neg"
 
-  let tpos = resolve "metacoq.pos.type"
-  let cposzero = resolve "metacoq.pos.xH"
-  let cposI = resolve "metacoq.pos.xI"
-  let cposO = resolve "metacoq.pos.xO"
+  let tpos = resolve "metarocq.pos.type"
+  let cposzero = resolve "metarocq.pos.xH"
+  let cposI = resolve "metarocq.pos.xI"
+  let cposO = resolve "metarocq.pos.xO"
 
-  let cSome_instance = resolve_ref "metacoq.option_instance.some"
-  let cNone_instance = resolve_ref "metacoq.option_instance.none"
+  let cSome_instance = resolve_ref "metarocq.option_instance.some"
+  let cNone_instance = resolve_ref "metarocq.option_instance.none"
 
-  let unit_tt = resolve "metacoq.unit.intro"
+  let unit_tt = resolve "metarocq.unit.intro"
 
-  let tByte = resolve "metacoq.byte.type"
-  let tlist = resolve "metacoq.list.type"
-  let c_nil = resolve "metacoq.list.nil"
-  let c_cons = resolve "metacoq.list.cons"
+  let tByte = resolve "metarocq.byte.type"
+  let tlist = resolve "metarocq.list.type"
+  let c_nil = resolve "metarocq.list.nil"
+  let c_cons = resolve "metarocq.list.cons"
 
-  let prod_type = resolve "metacoq.prod.type"
-  let c_pair = resolve "metacoq.prod.intro"
+  let prod_type = resolve "metarocq.prod.type"
+  let c_pair = resolve "metarocq.prod.intro"
 
-  let sum_type = resolve "metacoq.sum.type"
-  let cInl = resolve "metacoq.sum.inl"
-  let cInr = resolve "metacoq.sum.inr"
+  let sum_type = resolve "metarocq.sum.type"
+  let cInl = resolve "metarocq.sum.inl"
+  let cInr = resolve "metarocq.sum.inr"
 
-  let texistT = resolve "metacoq.sigma.intro"
-  let texistT_typed_term = resolve_ref "metacoq.sigma.typed_term"
+  let texistT = resolve "metarocq.sigma.intro"
+  let texistT_typed_term = resolve_ref "metarocq.sigma.typed_term"
 
   let constr_mkApp (h, a) = Constr.mkApp (Lazy.force h, a)
   let constr_mkAppl (h, a) = Constr.mkApp (Lazy.force h, Array.map Lazy.force a)

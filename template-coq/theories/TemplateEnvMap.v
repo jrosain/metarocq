@@ -1,8 +1,8 @@
 From Stdlib Require Import ssreflect ssrbool.
 From Equations Require Import Equations.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames EnvMap.
-From MetaCoq.Template Require Import Ast Typing.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames EnvMap.
+From MetaRocq.Template Require Import Ast Typing.
 Import MCMonadNotation.
 
 Lemma fresh_globals_cons_inv {Σ : global_declarations} {d} : EnvMap.fresh_globals (d :: Σ) -> EnvMap.fresh_globals Σ.

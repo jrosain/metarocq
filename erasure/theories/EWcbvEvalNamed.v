@@ -1,12 +1,12 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8 Program.
-From MetaCoq.Common Require Import config BasicAst.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.PCUIC Require PCUICWcbvEval.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils ELiftSubst ECSubst EReflect EGlobalEnv
+From MetaRocq.Common Require Import config BasicAst.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.PCUIC Require PCUICWcbvEval.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils ELiftSubst ECSubst EReflect EGlobalEnv
   EWellformed EWcbvEval.
-From MetaCoq.Utils Require Import bytestring MCString.
-From MetaCoq.Erasure Require Import EWcbvEvalCstrsAsBlocksFixLambdaInd.
+From MetaRocq.Utils Require Import bytestring MCString.
+From MetaRocq.Erasure Require Import EWcbvEvalCstrsAsBlocksFixLambdaInd.
 From Stdlib Require Import BinaryString.
 Import String.
 

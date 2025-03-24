@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8 Program.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames BasicAst EnvMap.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils EInduction EArities
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames BasicAst EnvMap.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils EInduction EArities
     ELiftSubst ESpineView EGlobalEnv EWellformed EEnvMap
     EWcbvEval EEtaExpanded ECSubst EWcbvEvalEtaInd EProgram.
 
@@ -806,7 +806,7 @@ Proof.
   eapply transform_wellformed; tea.
 Qed.
 
-From MetaCoq.Erasure Require Import EGenericMapEnv.
+From MetaRocq.Erasure Require Import EGenericMapEnv.
 
 Lemma transform_blocks_extends {efl : EEnvFlags} :
   has_tApp ->
@@ -864,7 +864,7 @@ Proof.
   eapply H0.
 Qed.
 
-From MetaCoq.Erasure Require Import EGenericGlobalMap.
+From MetaRocq.Erasure Require Import EGenericGlobalMap.
 
 #[local]
 Instance GT : GenTransform := { gen_transform := transform_blocks; gen_transform_inductive_decl := id }.

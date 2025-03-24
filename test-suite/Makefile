@@ -8,8 +8,8 @@ bugs: Makefile.coq
 Makefile.coq: Makefile _CoqProject
 	rocq makefile -f _CoqProject -o Makefile.coq
 
-_CoqProject: _CoqProject.in metacoq-config
-	cat metacoq-config > _CoqProject
+_CoqProject: _CoqProject.in metarocq-config
+	cat metarocq-config > _CoqProject
 	cat _CoqProject.in >> _CoqProject
 
 clean: Makefile.coq
@@ -42,6 +42,6 @@ TEST_SUITE_BLACKLIST_SED:=\($(subst $(space),\|,$(strip $(TEST_SUITE_BLACKLIST))
 
 .PHONY: update-_CoqProject.in
 update-_CoqProject.in:
-	{ printf '%s\n\n%s\n\n' '-R . MetaCoq.TestSuite' '# list obtained with `git ls-files "*.v"`'; \
+	{ printf '%s\n\n%s\n\n' '-R . MetaRocq.TestSuite' '# list obtained with `git ls-files "*.v"`'; \
 	  { git ls-files "*.v" || ls -1 *.v; } | env LC_COLLATE=C sort | sed 's,^$(TEST_SUITE_BLACKLIST_SED)$$,# \1,g'; \
 	} > _CoqProject.in

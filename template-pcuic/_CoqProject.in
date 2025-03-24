@@ -1,4 +1,4 @@
--R theories MetaCoq.TemplatePCUIC
+-R theories MetaRocq.TemplatePCUIC
 
 theories/TemplateToPCUIC.v
 theories/PCUICToTemplate.v

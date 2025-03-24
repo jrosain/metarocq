@@ -5,7 +5,7 @@
 The easiest way to get all packages is through [`opam`](http://opam.ocaml.org).
 See [Coq's opam documentation](https://coq.inria.fr/opam-using.html)
 for installing an `opam` switch for Coq.
-See [releases](https://github.com/MetaCoq/metacoq/releases) and
+See [releases](https://github.com/MetaRocq/metarocq/releases) and
 [Coq's Package Index](https://coq.inria.fr/opam/www/) for information on
 the available releases and opam packages.
 
@@ -19,25 +19,25 @@ To update the list of available packages at any point use:
 
 Then, simply issue:
 
-    # opam install coq-metacoq
+    # opam install coq-metarocq
 
-MetaCoq is split into multiple packages that get all installed using the
-`coq-metacoq` meta-package:
+MetaRocq is split into multiple packages that get all installed using the
+`coq-metarocq` meta-package:
 
- - `coq-metacoq-utils` for a general library used by all MetaCoq packages
- - `coq-metacoq-common` for definitions used both by Template-Coq and PCUIC packages
- - `coq-metacoq-template` for the Template Monad and quoting plugin
- - `coq-metacoq-pcuic` for the PCUIC metatheory development
- - `coq-metacoq-template-pcuic` for the verified Template-Coq <-> PCUIC translations
- - `coq-metacoq-safechecker` for the verified checker on PCUIC terms
- - `coq-metacoq-safechecker-plugin` for the extracted verified checker plugin
- - `coq-metacoq-erasure` for the verifed erasure from PCUIC to
+ - `coq-metarocq-utils` for a general library used by all MetaRocq packages
+ - `coq-metarocq-common` for definitions used both by Template-Coq and PCUIC packages
+ - `coq-metarocq-template` for the Template Monad and quoting plugin
+ - `coq-metarocq-pcuic` for the PCUIC metatheory development
+ - `coq-metarocq-template-pcuic` for the verified Template-Coq <-> PCUIC translations
+ - `coq-metarocq-safechecker` for the verified checker on PCUIC terms
+ - `coq-metarocq-safechecker-plugin` for the extracted verified checker plugin
+ - `coq-metarocq-erasure` for the verifed erasure from PCUIC to
    untyped lambda-calculus.
- - `coq-metacoq-erasure-plugin` for the extracted verifed erasure plugin
- - `coq-metacoq-translations` for example translations from type theory
+ - `coq-metarocq-erasure-plugin` for the extracted verifed erasure plugin
+ - `coq-metarocq-translations` for example translations from type theory
    to type theory: e.g. variants of parametricity.
- - `coq-metacoq-quotation` for a quotation library, allowing to
-   quote MetaCoq terms and typing derivations as MetaCoq terms,
+ - `coq-metarocq-quotation` for a quotation library, allowing to
+   quote MetaRocq terms and typing derivations as MetaRocq terms,
    with a work-in-progress proof of Löb's theorem.
 
 There are also `.dev` packages available in the `extra-dev` repository
@@ -58,14 +58,14 @@ To compile the library, you need:
 - `OCaml` (tested with `4.14.0`)
 - [`Equations 1.3`](http://mattam82.github.io/Coq-Equations/)
 
-The recommended way to build a development environment for MetaCoq is
+The recommended way to build a development environment for MetaRocq is
 to have a dedicated `opam` switch (see below).
 
 ### Getting the sources
 
 To get the source code:
 
-    # git clone https://github.com/MetaCoq/metacoq.git
+    # git clone https://github.com/MetaRocq/metarocq.git
     # git checkout -b coq-8.20 origin/coq-8.20
     # git status
 
@@ -114,8 +114,8 @@ Then use:
   You can also selectively build each target.
 
 - `make install` to install the plugins in `Coq`'s `user-contrib` local
-  library. Then the `MetaCoq` namespace can be used for `Require
-  Import` statements, e.g. `From MetaCoq.Template Require Import All.`.
+  library. Then the `MetaRocq` namespace can be used for `Require
+  Import` statements, e.g. `From MetaRocq.Template Require Import All.`.
 
 - `make uninstall` to undo the last line.
 

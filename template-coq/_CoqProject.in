@@ -1,5 +1,5 @@
 -I src
--R theories MetaCoq.Template
+-R theories MetaRocq.Template
 -I .
 
 # Basic Ast files
@@ -31,7 +31,7 @@ theories/TemplateMonad/Extractable.v
 # Extra Template monad
 theories/MonadAst.v
 
-# Bindings of Coq terms to the "metacoq.*" names
+# Bindings of Coq terms to the "metarocq.*" names
 theories/Constants.v
 
 # Extract the extractable monad, built by _PluginProject

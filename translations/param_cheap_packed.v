@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All Checker.
-From MetaCoq.Translations Require Import translation_utils sigma.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All Checker.
+From MetaRocq.Translations Require Import translation_utils sigma.
 
 Import MCMonadNotation.
 Local Existing Instance config.default_checker_flags.
@@ -243,12 +243,12 @@ Notation "'El' A" := (sigma (π1 A) (π2 A)) (at level 20).
 Definition ty := nat -> nat.
 Definition to := Type.
 
-MetaCoq Run (Translate emptyTC "nat" >>= tmDebug).
+MetaRocq Run (Translate emptyTC "nat" >>= tmDebug).
 
 Require Vector.
 
 Unset Universe Checking.
-MetaCoq Run (Translate emptyTC "list" >>= tmDebug).
+MetaRocq Run (Translate emptyTC "list" >>= tmDebug).
 Check (listᵗ : forall (A : TYPE), list A.1 -> Type).
 Check (nilᵗ : forall (A : TYPE), listᵗ A nil).
 Check (consᵗ : forall (A : TYPE) (x : El A) (lH : ∃ l, listᵗ A l),
@@ -407,11 +407,11 @@ Check (consᵗ : forall (A : TYPE) (x : El A) (lH : ∃ l, listᵗ A l),
 
 (* Definition tat := Type -> Type. *)
 
-(* MetaCoq Run (tTranslate tsl_param ([],[]) "tat" *)
+(* MetaRocq Run (tTranslate tsl_param ([],[]) "tat" *)
 (*                                         >>= tmPrint). *)
 (* About tatᵗ. *)
 
-(* MetaCoq Run (tImplement tsl_param ([], []) "tu" (Type -> Type) >>= tmPrint). *)
+(* MetaRocq Run (tImplement tsl_param ([], []) "tu" (Type -> Type) >>= tmPrint). *)
 (* Next Obligation. *)
 (*   exists id. exact (fun _ _ => True). *)
 (* Defined. *)
@@ -419,43 +419,43 @@ Check (consᵗ : forall (A : TYPE) (x : El A) (lH : ∃ l, listᵗ A l),
 
 
 (* Definition nat_entryT := Eval vm_compute in match tsl_mind_entry ([], []) "Stdlib.Init.Datatypes.nat" nat_entry with | Success (_, [e]) => e | _ => todo end. *)
-(* MetaCoq Unquote Inductive nat_entryT. *)
+(* MetaRocq Unquote Inductive nat_entryT. *)
 (* Check (natᵗ : nat -> Set). *)
 (* Check (Oᵗ : natᵗ O). *)
 (* Check (Sᵗ : forall (N : exists n, natᵗ n), natᵗ (S N.1)). *)
 
-(* MetaCoq Quote Recursively Definition bool_prog := bool. *)
+(* MetaRocq Quote Recursively Definition bool_prog := bool. *)
 (* Definition bool_entry := Eval compute in *)
 (*       (mind_body_to_entry (option_get todo (extract_mind_body_from_program "Stdlib.Init.Datatypes.bool" bool_prog) )). *)
 (* Definition bool_entryT := Eval vm_compute in match tsl_mind_entry ([], []) "Stdlib.Init.Datatypes.bool" bool_entry with | Success (_, [e]) => e | _ => todo end. *)
-(* MetaCoq Unquote Inductive bool_entryT. *)
+(* MetaRocq Unquote Inductive bool_entryT. *)
 
 
 (* (* Inductive t (A : Set) : nat -> Set := *) *)
 (* (*   vnil : t A 0 | vcons : A -> forall n : nat, t A n -> t A (S n). *) *)
-(* (* MetaCoq Quote Recursively Definition vect_prog := t. *) *)
+(* (* MetaRocq Quote Recursively Definition vect_prog := t. *) *)
 (* (* Definition vect_decl := Eval compute in *) *)
 (* (*       extract_mind_body_from_program "Top.t" vect_prog. *) *)
 (* (* Definition vect_entry := Eval compute in *) *)
 (* (*       (mind_body_to_entry (option_get todo vect_decl)). *) *)
-(* (* (* MetaCoq Quote Definition tnatT := (nat; natᵗ). *) *) *)
-(* (* (* MetaCoq Quote Definition tOT := Oᵗ. *) *) *)
-(* (* (* MetaCoq Quote Definition tST := Sᵗ. *) *) *)
+(* (* (* MetaRocq Quote Definition tnatT := (nat; natᵗ). *) *) *)
+(* (* (* MetaRocq Quote Definition tOT := Oᵗ. *) *) *)
+(* (* (* MetaRocq Quote Definition tST := Sᵗ. *) *) *)
 (* (* Definition vect_entryT := Eval vm_compute in match tsl_mind_entry ([InductiveDecl "Stdlib.Init.Datatypes.nat" nat_decl], [(IndRef (mkInd "Stdlib.Init.Datatypes.nat" 0), tnatT); (ConstructRef (mkInd "Stdlib.Init.Datatypes.nat" 0) O, tOT); (ConstructRef (mkInd "Stdlib.Init.Datatypes.nat" 0) 1, tST)]) "Top.t" vect_entry *) *)
 (* (*                                              with | Success (_, [e]) => e | _ => todo end. *) *)
 (* (* (* Definition vect_entryT' := . *) *) *)
-(* (* MetaCoq Unquote Inductive vect_entryT. *) *)
+(* (* MetaRocq Unquote Inductive vect_entryT. *) *)
 
 (* (* (* Require Vectors.VectorDef. *) *) *)
-(* (* (* MetaCoq Quote Recursively Definition vect_prog := Vectors.VectorDef.t. *) *) *)
+(* (* (* MetaRocq Quote Recursively Definition vect_prog := Vectors.VectorDef.t. *) *) *)
 (* (* (* Definition vect_decl := Eval compute in *) *) *)
 (* (* (*       extract_mind_body_from_program "Stdlib.Vectors.VectorDef.t" vect_prog. *) *) *)
 (* (* (* Definition vect_entry := Eval compute in *) *) *)
 (* (* (*       (mind_body_to_entry (option_get todo_coq vect_decl)). *) *) *)
-(* (* (* (* MetaCoq Unquote Inductive vect_entry. *) *) *) *)
+(* (* (* (* MetaRocq Unquote Inductive vect_entry. *) *) *) *)
 (* (* (* Definition vect_entryT := Eval vm_compute in tsl_mind_entry [InductiveDecl "Stdlib.Init.Datatypes.nat" nat_decl] [(IndRef (mkInd "Stdlib.Init.Datatypes.nat" 0), tnatT); (ConstructRef (mkInd "Stdlib.Init.Datatypes.nat" 0) O, tOT); (ConstructRef (mkInd "Stdlib.Init.Datatypes.nat" 0) 1, tST)] "Stdlib.Vectors.VectorDef.t" vect_entry. *) *) *)
 (* (* (* (* Definition vect_entryT' := . *) *) *) *)
-(* (* (* MetaCoq Unquote Inductive vect_entryT. *) *) *)
+(* (* (* MetaRocq Unquote Inductive vect_entryT. *) *) *)
 (* (* Check tᵗ : forall (A : exists A : Set, A -> Set) (N : exists n, natᵗ n), t A.1 N.1 -> Set. *) *)
 
 
@@ -463,20 +463,20 @@ Check (consᵗ : forall (A : TYPE) (x : El A) (lH : ∃ l, listᵗ A l),
 (* (* Definition eq'_entry := Eval compute in *) *)
 (* (*       (mind_body_to_entry (option_get todo_coq eq'_decl)). *) *)
 (* (* Definition eq'_entryT := Eval vm_compute in tsl_mind_entry [] [] "Top.eq'" eq'_entry. *) *)
-(* (* MetaCoq Unquote Inductive eq'_entryT. *) *)
+(* (* MetaRocq Unquote Inductive eq'_entryT. *) *)
 (* (* Check eq'ᵗ : forall (A : exists A : Set, A -> Set) (x y : El A), eq' A.1 x.1 y.1 -> Prop. *) *)
 (* (* Check eq_refl'ᵗ : forall (A : exists A : Set, A -> Set) (x : El A), *) *)
 (* (*     eq'ᵗ A x x (eq_refl' A.1 x.1). *) *)
 
 (* (* Inductive list (A : Set) : Set := *) *)
 (* (*     nil : list A | cons : A -> list A -> list A. *) *)
-(* (* MetaCoq Quote Recursively Definition list_prog := @list. *) *)
+(* (* MetaRocq Quote Recursively Definition list_prog := @list. *) *)
 (* (* Definition list_entry := Eval compute in  *) *)
 (* (*       (mind_body_to_entry *) *)
 (* (*          (option_get todo_coq *) *)
 (* (*                      (extract_mind_body_from_program "Top.list" list_prog))). *) *)
 (* (* Definition list_entryT := Eval vm_compute in tsl_mind_entry [] [] "Top.list" list_entry. *) *)
-(* (* MetaCoq Unquote Inductive list_entryT. *) *)
+(* (* MetaRocq Unquote Inductive list_entryT. *) *)
 (* (* Check listᵗ : forall (A : exists A : Set, A -> Set), list A.1 -> Type. *) *)
 (* (* Check nilᵗ : forall (A : exists A : Set, A -> Set), listᵗ A (nil A.1). *) *)
 (* (* Check consᵗ : forall (A : exists A : Set, A -> Set) (X : El A) (L : exists l : list A.1, listᵗ A l), *) *)
@@ -484,18 +484,18 @@ Check (consᵗ : forall (A : TYPE) (x : El A) (lH : ∃ l, listᵗ A l),
 
 
 (* (* Require Import Even. *) *)
-(* (* MetaCoq Quote Recursively Definition even_prog := even. *) *)
+(* (* MetaRocq Quote Recursively Definition even_prog := even. *) *)
 (* (* Definition even_entry := Eval compute in  *) *)
 (* (*       (mind_body_to_entry *) *)
 (* (*          (option_get todo_coq *) *)
 (* (*                      (extract_mind_body_from_program "Stdlib.Arith.Even.even" even_prog) *) *)
 (* (*       )). *) *)
-(* (* (* MetaCoq Unquote Inductive even_entry. *) *) *)
+(* (* (* MetaRocq Unquote Inductive even_entry. *) *) *)
 (* (* (* Inductive even : nat -> Prop := *) *) *)
 (* (* (*     even_O : even 0 | even_S : forall n : nat, odd n -> even (S n) *) *) *)
 (* (* (*   with odd : nat -> Prop :=  odd_S : forall n : nat, even n -> odd (S n) *) *) *)
 (* (* Definition even_entryT := Eval vm_compute in tsl_mind_entry [InductiveDecl "Stdlib.Init.Datatypes.nat" nat_decl] [(IndRef (mkInd "Stdlib.Init.Datatypes.nat" 0), tnatT); (ConstructRef (mkInd "Stdlib.Init.Datatypes.nat" 0) O, tOT); (ConstructRef (mkInd "Stdlib.Init.Datatypes.nat" 0) 1, tST)] "Stdlib.Arith.Even.even" even_entry. *) *)
-(* (* MetaCoq Unquote Inductive even_entryT. *) *)
+(* (* MetaRocq Unquote Inductive even_entryT. *) *)
 (* (* Check evenᵗ : forall (N : exists n, natᵗ n), even N.1 -> Prop. *) *)
 (* (* Check oddᵗ : forall (N : exists n, natᵗ n), odd N.1 -> Prop. *) *)
 (* (* Check even_Sᵗ : forall (N : exists n, natᵗ n) (P : exists p, oddᵗ N p), *) *)

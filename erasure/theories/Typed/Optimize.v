@@ -1,11 +1,11 @@
 From Stdlib Require Import List.
-From MetaCoq.Erasure.Typed Require Import ClosedAux.
-From MetaCoq.Erasure.Typed Require Import ExAst.
-From MetaCoq.Erasure.Typed Require Import Transform.
-From MetaCoq.Erasure.Typed Require Import ResultMonad.
-From MetaCoq.Erasure.Typed Require Import Utils.
-From MetaCoq.Erasure Require Import EPrimitive ELiftSubst.
-From MetaCoq.Utils Require Import utils.
+From MetaRocq.Erasure.Typed Require Import ClosedAux.
+From MetaRocq.Erasure.Typed Require Import ExAst.
+From MetaRocq.Erasure.Typed Require Import Transform.
+From MetaRocq.Erasure.Typed Require Import ResultMonad.
+From MetaRocq.Erasure.Typed Require Import Utils.
+From MetaRocq.Erasure Require Import EPrimitive ELiftSubst.
+From MetaRocq.Utils Require Import utils.
 
 Import Kernames.
 

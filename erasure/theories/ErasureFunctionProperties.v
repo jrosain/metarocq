@@ -2,17 +2,17 @@
 From Stdlib Require Import Program ssreflect ssrbool.
 From Equations Require Import Equations.
 Set Equations Transparent.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames uGraph.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames uGraph.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive
   PCUICReduction PCUICReflect PCUICWeakeningEnv PCUICWeakeningEnvTyp PCUICCasesContexts
   PCUICWeakeningConv PCUICWeakeningTyp PCUICContextConversionTyp PCUICTyping PCUICGlobalEnv PCUICInversion PCUICGeneration
   PCUICConfluence PCUICConversion PCUICUnivSubstitutionTyp PCUICCumulativity PCUICSR PCUICSafeLemmata PCUICNormalization
   PCUICValidity PCUICPrincipality PCUICElimination PCUICOnFreeVars PCUICWellScopedCumulativity PCUICSN PCUICEtaExpand
   PCUICFirstorder.
 
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICSafeReduce PCUICSafeRetyping PCUICRetypingEnvIrrelevance.
-From MetaCoq.Erasure Require Import EPrimitive EAstUtils ELiftSubst EArities Extract Prelim EDeps ErasureProperties ErasureCorrectness ErasureFunction.
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICSafeReduce PCUICSafeRetyping PCUICRetypingEnvIrrelevance.
+From MetaRocq.Erasure Require Import EPrimitive EAstUtils ELiftSubst EArities Extract Prelim EDeps ErasureProperties ErasureCorrectness ErasureFunction.
 
 Local Open Scope string_scope.
 Set Asymmetric Patterns.
@@ -1241,7 +1241,7 @@ Proof.
       eapply IHdecls => //.
 Qed.
 
-From MetaCoq.Erasure Require Import EEtaExpandedFix.
+From MetaRocq.Erasure Require Import EEtaExpandedFix.
 
 Lemma erase_brs_eq X_type X {normalization_in : forall Σ, wf_ext Σ -> Σ ∼_ext X -> NormalizationIn Σ} Γ p ts wt :
   erase_brs X_type X Γ p ts wt =
@@ -2074,7 +2074,7 @@ Proof.
   induction t0 in f |- *; econstructor; eauto; econstructor; eauto.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICProgress.
+From MetaRocq.PCUIC Require Import PCUICProgress.
 
 Lemma firstorder_erases_deterministic X_type (X : X_type.π1)
   univs wfext {v t' i u args}

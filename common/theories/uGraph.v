@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool OrderedTypeAlt MSetAVL MSetFacts MSetProperties MSetDecide Morphisms.
-From MetaCoq.Utils Require Import utils wGraph.
-From MetaCoq.Common Require Import config Universes.
+From MetaRocq.Utils Require Import utils wGraph.
+From MetaRocq.Common Require Import config Universes.
 From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
 Import ConstraintType.
@@ -3247,7 +3247,7 @@ Proof.
   unfold is_consistent. by move=> /on_SomeP [? [-> <-]].
 Qed.
 
-From MetaCoq.Utils Require Import MCUtils.
+From MetaRocq.Utils Require Import MCUtils.
 
 Lemma global_uctx_invariants_union_or lvls1 lvls2 cs
   : global_uctx_invariants (lvls1, cs) \/ global_uctx_invariants (lvls2, cs)

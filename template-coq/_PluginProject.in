@@ -1,7 +1,7 @@
 -I gen-src
--Q gen-src MetaCoq.Template
--R theories MetaCoq.Template
-META.coq-metacoq-template-ocaml
+-Q gen-src MetaRocq.Template
+-R theories MetaRocq.Template
+META.coq-metarocq-template-ocaml
 -I .
 
 # Generated Code by `ls -1 gen-src/*.ml gen-src/*.mli` in `template-coq/` after having compiled `Extraction.v`
@@ -239,6 +239,6 @@ gen-src/universes0.mli
 gen-src/wf.ml
 gen-src/wf.mli
 
-gen-src/metacoq_template_plugin.mlpack
+gen-src/metarocq_template_plugin.mlpack
 
 theories/ExtractableLoader.v

@@ -3,9 +3,9 @@ Import ListNotations.
 From Equations Require Import Equations.
 Set Equations Transparent.
 
-From MetaCoq.PCUIC Require Import PCUICAstUtils.
-From MetaCoq.Utils Require Import MCList bytestring utils monad_utils.
-From MetaCoq.Erasure Require Import EProgram EPrimitive EAst ESpineView EEtaExpanded EInduction ERemoveParams Erasure EGlobalEnv
+From MetaRocq.PCUIC Require Import PCUICAstUtils.
+From MetaRocq.Utils Require Import MCList bytestring utils monad_utils.
+From MetaRocq.Erasure Require Import EProgram EPrimitive EAst ESpineView EEtaExpanded EInduction ERemoveParams Erasure EGlobalEnv
   EAstUtils ELiftSubst EWellformed ECSubst EWcbvEval.
 
 Import Kernames.
@@ -1397,7 +1397,7 @@ Proof.
     rewrite eqb_refl. rewrite hnth. reflexivity.
 Qed.
 
-From MetaCoq.Erasure Require Import EEtaExpanded.
+From MetaRocq.Erasure Require Import EEtaExpanded.
 
 Lemma optimize_expanded {Σ m} t :
   wf_inductives_mapping Σ m -> expanded Σ t -> expanded (reorder_env m Σ) (reorder m t).
@@ -1443,7 +1443,7 @@ Proof.
   now destruct decl.
 Qed.
 
-From MetaCoq.Erasure Require Import EEtaExpandedFix.
+From MetaRocq.Erasure Require Import EEtaExpandedFix.
 
 Lemma optimize_expanded_fix {Σ Γ m} t :
   wf_inductives_mapping Σ m -> expanded Σ Γ t -> expanded (reorder_env m Σ) Γ (reorder m t).
@@ -1549,7 +1549,7 @@ Proof.
     now apply H0.
 Qed.
 
-From MetaCoq.Erasure Require Import EProgram.
+From MetaRocq.Erasure Require Import EProgram.
 
 Definition reorder_program_wf {efl : EEnvFlags} {wca : cstr_as_blocks = false} (p : eprogram) m (wfm : wf_inductives_mapping p.1 m) :
   wf_eprogram efl p -> wf_eprogram efl (reorder_program m p).

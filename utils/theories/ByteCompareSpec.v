@@ -1,5 +1,5 @@
 From Stdlib Require Import Strings.Byte NArith Eqdep_dec.
-From MetaCoq.Utils Require Import ReflectEq ByteCompare.
+From MetaRocq.Utils Require Import ReflectEq ByteCompare.
 From Equations Require Import Equations.
 
 Derive NoConfusion for comparison.
@@ -40,7 +40,7 @@ Proof.
   - constructor. now rewrite <- eq.
 Qed.
 
-From MetaCoq Require Import MCCompare.
+From MetaRocq Require Import MCCompare.
 
 Definition lt x y := compare x y = Lt.
 

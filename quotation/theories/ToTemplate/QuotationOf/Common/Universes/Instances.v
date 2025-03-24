@@ -1,5 +1,5 @@
-From MetaCoq.Quotation.ToTemplate Require Import Init.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Common.Universes Require Export
+From MetaRocq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Common.Universes Require Export
   Level.Instances
   LevelSet.Instances
   LevelSetOrdProp.Instances

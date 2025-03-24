@@ -31,7 +31,7 @@ echo "Uploading to release assets"
 
 gh release upload $tag $archive
 
-release=https://github.com/MetaCoq/metacoq/releases/download/$tag/$archive
+release=https://github.com/MetaRocq/metarocq/releases/download/$tag/$archive
 
 skipline=""
 

@@ -1,5 +1,5 @@
 From Stdlib Require Import Arith List.
-From MetaCoq.Utils Require Import All_Forall MCSquash.
+From MetaRocq.Utils Require Import All_Forall MCSquash.
 From Equations Require Import Equations.
 Coercion is_true : bool >-> Sortclass.
 

@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool.
 From Stdlib Require CMorphisms CRelationClasses.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config BasicAst Universes Environment Primitive.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config BasicAst Universes Environment Primitive.
 From Equations Require Import Equations.
 
 Module Lookup (T : Term) (E : EnvironmentSig T).

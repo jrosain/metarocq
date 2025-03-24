@@ -7,12 +7,12 @@
 
 
 From Stdlib Require Import List PeanoNat Bool Lia.
-From MetaCoq.Utils Require Import utils monad_utils.
-From MetaCoq.Common Require Export
+From MetaRocq.Utils Require Import utils monad_utils.
+From MetaRocq.Common Require Export
      uGraph        (* The graph of universes *)
      BasicAst      (* The basic AST structures *)
      config.        (* Typing configuration *)
-From MetaCoq.Template Require Export
+From MetaRocq.Template Require Export
      Ast           (* The term AST *)
      AstUtils      (* Utilities on the AST *)
      Induction     (* Induction *)
@@ -224,9 +224,9 @@ Definition eta_expand_program (p : template_program_env) : Ast.Env.program :=
 Inductive tree := T : list tree -> tree.
 Fixpoint tmap (f : tree -> tree) (t : tree) := match t with T l => T (map (tmap f) l) end.
 
-From MetaCoq.Template Require Import Loader Pretty.
-MetaCoq Quote Recursively Definition p := ltac:(let x := eval unfold tmap in tmap in exact (x)).
-MetaCoq Unquote Definition q := (eta_expand p.1.(declarations) [] p.2).
+From MetaRocq.Template Require Import Loader Pretty.
+MetaRocq Quote Recursively Definition p := ltac:(let x := eval unfold tmap in tmap in exact (x)).
+MetaRocq Unquote Definition q := (eta_expand p.1.(declarations) [] p.2).
 Print q.
 
 Eval lazy in let x := print_term (p.1, Monomorphic_ctx) [] true (eta_expand p.1.(declarations) [] p.2) in

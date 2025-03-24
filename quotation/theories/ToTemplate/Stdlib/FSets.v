@@ -1,10 +1,10 @@
 From Stdlib Require Import Structures.Equalities Structures.OrdersAlt FMapInterface FMapList FMapAVL FMapFullAVL FMapFacts.
-From MetaCoq.Utils Require Import MCUtils MCFSets.
-From MetaCoq.Quotation.ToTemplate Require Import Init.
-From MetaCoq.Quotation.ToTemplate Require Import (hints) Stdlib.Numbers Stdlib.Init Stdlib.Lists.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Stdlib.Structures Require Import OrdersAlt.Sig.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Stdlib.FSets Require Import FMapInterface.Sig FMapFacts.Sig FMapAVL.Sig FMapList.Sig.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Utils Require Import MCFSets.Sig.
+From MetaRocq.Utils Require Import MCUtils MCFSets.
+From MetaRocq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate Require Import (hints) Stdlib.Numbers Stdlib.Init Stdlib.Lists.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Stdlib.Structures Require Import OrdersAlt.Sig.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Stdlib.FSets Require Import FMapInterface.Sig FMapFacts.Sig FMapAVL.Sig FMapList.Sig.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Utils Require Import MCFSets.Sig.
 
 #[export] Hint Unfold Int.Z_as_Int.t : quotation.
 

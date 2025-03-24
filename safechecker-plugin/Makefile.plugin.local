@@ -1,5 +1,5 @@
 CAMLFLAGS :=-thread -bin-annot -strict-sequence -w -a+1..3-4+5..8-9+10..26-27+28..39-40-41-42+43-44-45+46..47-48+49..57-58+59..66-67-68+69-70
-CAMLFLAGS+=-open Metacoq_template_plugin
+CAMLFLAGS+=-open MetaRocq_template_plugin
 CAMLFLAGS+=-w -8 # Non-exhaustive matches due to translation of comparison to int
 CAMLFLAGS+=-w -20 # Unused arguments
 CAMLFLAGS+=-w -33 # Unused opens
@@ -7,11 +7,11 @@ CAMLFLAGS+=-w -32 # Unused values
 CAMLFLAGS+=-w -34 # Unused types
 CAMLFLAGS+=-w -39 # Unused rec flags
 CAMLFLAGS+=-w -60 # Unused module in functor
-CAMLPKGS+=-package coq-metacoq-template-ocaml.plugin
+CAMLPKGS+=-package coq-metarocq-template-ocaml.plugin
 
 -include ../Makefile.conf
 
-ifeq '$(METACOQ_CONFIG)' 'local'
+ifeq '$(METAROCQ_CONFIG)' 'local'
   ifeq ($(shell which cygpath 2>/dev/null),)
   OCAMLPATH := $(shell pwd)/../template-coq/:$(OCAMLPATH)
   else

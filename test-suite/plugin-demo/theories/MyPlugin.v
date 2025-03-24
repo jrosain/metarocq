@@ -1,9 +1,9 @@
 From Stdlib Require Import Lists.List.
-From MetaCoq.Utils Require Import bytestring.
-From MetaCoq.Common Require Import BasicAst.
-From MetaCoq.Template Require Import Ast Loader TemplateMonad.Extractable.
+From MetaRocq.Utils Require Import bytestring.
+From MetaRocq.Common Require Import BasicAst.
+From MetaRocq.Template Require Import Ast Loader TemplateMonad.Extractable.
 Import TemplateMonad.Extractable.
-From MetaCoq.Template Require Import AstUtils Ast.
+From MetaRocq.Template Require Import AstUtils Ast.
 
 Open Scope bs_scope.
 
@@ -58,7 +58,7 @@ Definition tmResolve (nm : String.t) : TM (option kername) :=
 
 (* ^^ Everything above here is generic *)
 
-From MetaCoq Require Import ExtractedPluginDemo.Lens.
+From MetaRocq Require Import ExtractedPluginDemo.Lens.
 
 Set Primitive Projections.
 Set Universe Polymorphism.

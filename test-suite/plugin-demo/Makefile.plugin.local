@@ -6,12 +6,12 @@ CAMLFLAGS+=-w -26 # Unused variable
 CAMLFLAGS+=-w -34 # Unused type
 CAMLFLAGS+=-w -60 # Unused module
 CAMLFLAGS+=-bin-annot # For merlin
-CAMLFLAGS+=-open Metacoq_template_plugin
-CAMLPKGS+=-package coq-metacoq-template-ocaml.plugin
+CAMLFLAGS+=-open MetaRocq_template_plugin
+CAMLPKGS+=-package coq-metarocq-template-ocaml.plugin
 
 -include ../../Makefile.conf
 
-ifeq '$(METACOQ_CONFIG)' 'local'
+ifeq '$(METAROCQ_CONFIG)' 'local'
   ifeq ($(shell which cygpath 2>/dev/null),)
   OCAMLPATH := $(shell pwd)/../../template-coq/:$(OCAMLPATH)
   else

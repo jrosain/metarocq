@@ -1,4 +1,4 @@
--R theories MetaCoq.PCUIC
+-R theories MetaRocq.PCUIC
 
 theories/PCUICAst.v
 

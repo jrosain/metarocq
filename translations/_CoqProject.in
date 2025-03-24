@@ -1,4 +1,4 @@
--R . MetaCoq.Translations
+-R . MetaRocq.Translations
 
 sigma.v
 MiniHoTT.v

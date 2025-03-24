@@ -1,6 +1,6 @@
 From Stdlib Require Import ZArith Zcompare Lia ssrbool.
 From Stdlib Require Import MSetAVL MSetFacts MSetProperties.
-From MetaCoq.Utils Require Import MCUtils.
+From MetaRocq.Utils Require Import MCUtils.
 From Stdlib Require Import ssreflect.
 From Equations Require Import Equations.
 

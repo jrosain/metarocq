@@ -1,9 +1,9 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Common Require BasicAst.
+From MetaRocq.Common Require BasicAst.
 
-From MetaCoq.Template Require TemplateMonad.Core TemplateMonad.Extractable Ast Constants.
+From MetaRocq.Template Require TemplateMonad.Core TemplateMonad.Extractable Ast Constants.
 
-Declare ML Module "coq-metacoq-template-coq.plugin".
+Declare ML Module "coq-metarocq-template-coq.plugin".
 
 Notation "<% x %>" := (ltac:(let p y := exact y in quote_term x p))
   (only parsing).

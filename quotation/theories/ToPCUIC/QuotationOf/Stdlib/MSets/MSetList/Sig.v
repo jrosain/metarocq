@@ -1,11 +1,11 @@
 From Stdlib.Structures Require Import Equalities Orders.
 From Stdlib.MSets Require Import MSetList.
-From MetaCoq.Utils Require Import MCMSets.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.Stdlib.MSets Require Import MSetInterface.Sig.
+From MetaRocq.Utils Require Import MCMSets.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.Stdlib.MSets Require Import MSetInterface.Sig.
 
 Module Type QuotationOfOrderedTypeWithLeibniz (O : OrderedTypeWithLeibniz).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "O").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "O").
 End QuotationOfOrderedTypeWithLeibniz.
 
 Module Type QuotationOfSWithLeibniz (S : SWithLeibniz).
@@ -15,7 +15,7 @@ End QuotationOfSWithLeibniz.
 
 Module MSetList.
   Module Type QuotationOfMake (T : OrderedType) (M : MSetList.MakeSig T).
-    MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "M").
+    MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "M").
   End QuotationOfMake.
 
   Module Type QuotationOfMakeWithLeibniz (T : OrderedTypeWithLeibniz) (M : MSetList.MakeWithLeibnizSig T).

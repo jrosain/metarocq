@@ -1,6 +1,6 @@
 From Stdlib Require Import List.
-From MetaCoq.Common Require Import config Transform.
-From MetaCoq.Template Require Import TemplateProgram Pretty EtaExpand All Loader.
+From MetaRocq.Common Require Import config Transform.
+From MetaRocq.Template Require Import TemplateProgram Pretty EtaExpand All Loader.
 Import ListNotations.
 Import MCMonadNotation.
 Import bytestring.
@@ -73,4 +73,4 @@ Definition check_wf_eta (p : Ast.Env.program) : TemplateMonad unit :=
 
 (* To test that a program's eta-expansion is indeed well-typed according to Coq's kernel use:
 
-  MetaCoq Run (tmQuoteRec wf_program >>= check_wf_eta). *)
+  MetaRocq Run (tmQuoteRec wf_program >>= check_wf_eta). *)

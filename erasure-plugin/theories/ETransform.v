@@ -1,17 +1,17 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Program ssreflect ssrbool.
 From Equations Require Import Equations.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import Environment Transform config BasicAst uGraph.
-From MetaCoq.Template Require Pretty Typing WcbvEval EtaExpand.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import Environment Transform config BasicAst uGraph.
+From MetaRocq.Template Require Pretty Typing WcbvEval EtaExpand.
 Set Warnings "-notation-overridden".
-From MetaCoq.PCUIC Require PCUICAst PCUICAstUtils PCUICProgram PCUICWeakeningEnvSN.
+From MetaRocq.PCUIC Require PCUICAst PCUICAstUtils PCUICProgram PCUICWeakeningEnvSN.
 Set Warnings "+notation-overridden".
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICWfEnvImpl.
-From MetaCoq.Erasure Require EAstUtils ErasureCorrectness Extract EOptimizePropDiscr
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICWfEnvImpl.
+From MetaRocq.Erasure Require EAstUtils ErasureCorrectness Extract EOptimizePropDiscr
   ERemoveParams EProgram.
-From MetaCoq.Erasure Require Import ErasureFunction ErasureFunctionProperties.
-From MetaCoq.TemplatePCUIC Require Import PCUICTransform.
+From MetaRocq.Erasure Require Import ErasureFunction ErasureFunctionProperties.
+From MetaRocq.TemplatePCUIC Require Import PCUICTransform.
 
 Import PCUICAst (term) PCUICProgram PCUICTransform (eval_pcuic_program) Extract EProgram
     EAst Transform ERemoveParams.
@@ -267,10 +267,10 @@ Definition typed_erasure_pre (p : pcuic_program) :=
   /\ NormalizationIn_erase_pcuic_program_1 p.1
   /\ NormalizationIn_erase_pcuic_program_2 p.1.
 
-From MetaCoq.Erasure.Typed Require Import Erasure ExAst Optimize ExtractionCorrectness OptimizeCorrectness.
-From MetaCoq.Erasure Require Import EWellformed.
-From MetaCoq.PCUIC Require Import PCUICTyping.
-From MetaCoq.SafeChecker Require Import PCUICWfEnvImpl.
+From MetaRocq.Erasure.Typed Require Import Erasure ExAst Optimize ExtractionCorrectness OptimizeCorrectness.
+From MetaRocq.Erasure Require Import EWellformed.
+From MetaRocq.PCUIC Require Import PCUICTyping.
+From MetaRocq.SafeChecker Require Import PCUICWfEnvImpl.
 Set Equations Transparent.
 Equations? erase_program_typed guard (p : pcuic_program) (pre : typed_erasure_pre p) : ExAst.global_env * EAst.term :=
  erase_program_typed guard p pre :=
@@ -875,7 +875,7 @@ Proof.
   eapply wellformed_remove_match_on_box_extends; eauto. apply pr. apply pr'.
 Qed.
 
-From MetaCoq.Erasure Require Import EInlineProjections.
+From MetaRocq.Erasure Require Import EInlineProjections.
 
 Program Definition inline_projections_optimization {fl : WcbvFlags} {wcon : EWcbvEval.with_constructor_as_block = false} (efl := switch_no_params all_env_flags)
   {hastrel : has_tRel} {hastbox : has_tBox} :
@@ -919,7 +919,7 @@ Proof.
   eapply wellformed_optimize_extends; eauto. apply pr. apply pr'.
 Qed.
 
-From MetaCoq.Erasure Require Import EConstructorsAsBlocks.
+From MetaRocq.Erasure Require Import EConstructorsAsBlocks.
 
 Program Definition constructors_as_blocks_transformation {efl : EEnvFlags}
   {has_app : has_tApp} {has_rel : has_tRel} {has_box : has_tBox} {has_pars : has_cstr_params = false} {has_cstrblocks : cstr_as_blocks = false} :
@@ -969,7 +969,7 @@ Proof.
   eapply transform_blocks_extends; eauto. apply pr. apply pr'.
 Qed.
 
-From MetaCoq.Erasure Require ECoInductiveToInductive.
+From MetaRocq.Erasure Require ECoInductiveToInductive.
 
 Program Definition coinductive_to_inductive_transformation (efl : EEnvFlags)
   {has_app : has_tApp} {has_box : has_tBox} {has_rel : has_tRel} {has_pars : has_cstr_params = false}
@@ -1018,7 +1018,7 @@ Proof.
   eapply ECoInductiveToInductive.trust_cofix.
 Qed.
 
-From MetaCoq.Erasure Require Import EReorderCstrs.
+From MetaRocq.Erasure Require Import EReorderCstrs.
 
 Definition eval_eprogram_mapping (wfl : WcbvFlags) (p : inductives_mapping * eprogram) t :=
   eval_eprogram wfl p.2 t.
@@ -1074,7 +1074,7 @@ Proof.
   move: pr'; cbn. now intros []. apply pr. apply pr'.
 Qed.
 
-From MetaCoq.Erasure Require Import EUnboxing.
+From MetaRocq.Erasure Require Import EUnboxing.
 
 Axiom trust_unboxing_wf :
   forall efl : EEnvFlags,

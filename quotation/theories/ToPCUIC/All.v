@@ -1,6 +1,6 @@
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICTyping PCUICCumulativitySpec PCUICReduction.
-From MetaCoq.Quotation.ToPCUIC.PCUIC Require PCUICAst PCUICTyping PCUICCumulativitySpec PCUICReduction.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICTyping PCUICCumulativitySpec PCUICReduction.
+From MetaRocq.Quotation.ToPCUIC.PCUIC Require PCUICAst PCUICTyping PCUICCumulativitySpec PCUICReduction.
 
 (* without typing derivations *)
 Module Raw.

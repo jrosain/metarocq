@@ -1,14 +1,14 @@
 From Stdlib Require Import Arith List.
 From Equations Require Import Equations.
-From MetaCoq.PCUIC Require Import
+From MetaRocq.PCUIC Require Import
      PCUICPrimitive PCUICAst PCUICAstUtils PCUICTyping PCUICInversion PCUICWeakeningEnv PCUICWeakeningEnvTyp.
 Set Warnings "-notation-overridden".
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils ECSubst EInduction
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils ECSubst EInduction
   ELiftSubst EGlobalEnv EWcbvEval Extract ESubstitution.
-From MetaCoq.Erasure Require EExtends.
+From MetaRocq.Erasure Require EExtends.
 Set Warnings "+notation-overridden".
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
 
 Derive NoConfusion for term.
 Derive Signature for erases_deps.

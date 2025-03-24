@@ -5,11 +5,11 @@ From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
 
 From Stdlib Require Import Bool String List Program.
-From MetaCoq.Utils Require Import utils monad_utils.
-From MetaCoq.Common Require Import config uGraph.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICTyping PCUICValidity PCUICSN
+From MetaRocq.Utils Require Import utils monad_utils.
+From MetaRocq.Common Require Import config uGraph.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICTyping PCUICValidity PCUICSN
     PCUICWellScopedCumulativity PCUICSafeLemmata PCUICInversion.
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICSafeReduce PCUICWfEnv PCUICSafeRetyping.
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICSafeReduce PCUICWfEnv PCUICSafeRetyping.
 
 (** We might need to weaken calls to the retyping function w.r.t. the global environment: i.e.
     if we infer some type for a term in an environment Σ, then any other environment having at least

@@ -1,6 +1,6 @@
-From MetaCoq.Common Require Import uGraph.
-From MetaCoq.Template Require Import Ast TemplateMonad Loader Checker.
-From MetaCoq.Utils Require Import utils.
+From MetaRocq.Common Require Import uGraph.
+From MetaRocq.Template Require Import Ast TemplateMonad Loader Checker.
+From MetaRocq.Utils Require Import utils.
 
 #[local] Set Universe Polymorphism.
 
@@ -133,7 +133,7 @@ End TemplateMonadNotations.
 
 (** * Packed inductives and constructors. *)
 
-(** In MetaCoq.Template the information related to an inductive type is spread accross
+(** In MetaRocq.Template the information related to an inductive type is spread accross
     three different datatypes : [inductive], [one_inductive_body] and [mutual_inductive_body].
     One often needs access to all three : [packed_inductive] packages them in a single datatype. *)
 Record packed_inductive :=

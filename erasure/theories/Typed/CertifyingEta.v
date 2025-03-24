@@ -8,14 +8,14 @@ From Stdlib Require Import List.
 From Stdlib Require Import PeanoNat.
 From Stdlib Require Import Bool.
 From Stdlib Require Import String.
-From MetaCoq.Common Require Import Kernames.
-From MetaCoq.Template Require Import All.
-From MetaCoq.Erasure.Typed Require Import Erasure.
-From MetaCoq.Erasure.Typed Require Import Optimize.
-From MetaCoq.Erasure.Typed Require Import Utils.
-From MetaCoq.Erasure.Typed Require Import ResultMonad.
-From MetaCoq.Erasure.Typed Require Import Extraction.
-From MetaCoq.Erasure.Typed Require Import Certifying.
+From MetaRocq.Common Require Import Kernames.
+From MetaRocq.Template Require Import All.
+From MetaRocq.Erasure.Typed Require Import Erasure.
+From MetaRocq.Erasure.Typed Require Import Optimize.
+From MetaRocq.Erasure.Typed Require Import Utils.
+From MetaRocq.Erasure.Typed Require Import ResultMonad.
+From MetaRocq.Erasure.Typed Require Import Extraction.
+From MetaRocq.Erasure.Typed Require Import Certifying.
 
 Open Scope nat.
 Import MCMonadNotation.
@@ -261,10 +261,10 @@ Definition template_eta
     let p : forall B : Type, unit -> B -> unit × B := @pair unit in
     p bool tt true.
   End Ex1.
-  MetaCoq Quote Recursively Definition p_app_pair_syn := Ex1.partial_app_pair.
+  MetaRocq Quote Recursively Definition p_app_pair_syn := Ex1.partial_app_pair.
 
   Module Test1.
-    MetaCoq Run (cur_mod <- tmCurrentModPath tt;;
+    MetaRocq Run (cur_mod <- tmCurrentModPath tt;;
                  eta_global_env_template
                   (fun _ => None)
                    false false cur_mod
@@ -284,17 +284,17 @@ Definition template_eta
 
   Set Printing Implicit.
   (** Expands the dependencies and adds the corresponding definitions *)
-  MetaCoq Run (eta_expand_def
+  MetaRocq Run (eta_expand_def
                  (fun _ => None)
                  true true
                  Ex2.partial_app2).
 
   (** [partial_app2_expanded] is defined in terms of [partial_app1_expanded] *)
   (* FIXME: it's a bit fragile to refer to unquoted definitions, because their names depend on a module/path they are in *)
-  (* Print MetaCoq.Erasure.Typed_CertifyingEta_Examples_Ex2_partial_app2_expanded. *)
-  (* MetaCoq.Erasure.Typed_CertifyingEta_Examples_Ex2_partial_app2_expanded =
+  (* Print MetaRocq.Erasure.Typed_CertifyingEta_Examples_Ex2_partial_app2_expanded. *)
+  (* MetaRocq.Erasure.Typed_CertifyingEta_Examples_Ex2_partial_app2_expanded =
   let f :=
-    fun A B : Type => MetaCoq.Erasure.Typed_CertifyingEta_Examples_Ex2_partial_app1_expanded A B in
+    fun A B : Type => MetaRocq.Erasure.Typed_CertifyingEta_Examples_Ex2_partial_app1_expanded A B in
   f bool true
        : bool -> true -> MyInd bool true bool
    *)
@@ -306,7 +306,7 @@ Definition template_eta
   Definition partial_app3 A B n m :=
     let f := miCtor1 A in f B bool n m I.
 
-  MetaCoq Run (eta_expand_def (fun _ => None) true true partial_app3).
+  MetaRocq Run (eta_expand_def (fun _ => None) true true partial_app3).
 
   Module Ex3.
   Definition inc_balance (st : nat × nat) (new_balance : nat)
@@ -315,7 +315,7 @@ Definition template_eta
 
   Definition partial_inc_balance st i := inc_balance st i.
   End Ex3.
-  MetaCoq Run (cur_mod <- tmCurrentModPath tt;;
+  MetaRocq Run (cur_mod <- tmCurrentModPath tt;;
                p <- tmQuoteRecTransp Ex3.partial_inc_balance false ;;
                eta_global_env_template
                  (fun _ => None)
@@ -331,7 +331,7 @@ Definition template_eta
     Definition papp_cons A (x : A) (xs : list A) := let my_cons := @cons in
                                                       my_cons A x xs.
 
-    MetaCoq Run (eta_expand_def (fun _ => None) false false papp_cons).
+    MetaRocq Run (eta_expand_def (fun _ => None) false false papp_cons).
   End Ex4.
 
   Module Ex5.
@@ -347,7 +347,7 @@ Definition template_eta
       let f := odd_S 0 in
       f even_O.
 
-    MetaCoq Run (eta_expand_def (fun _ => None) false false papp_odd).
+    MetaRocq Run (eta_expand_def (fun _ => None) false false papp_odd).
 
     Inductive Expr (Annot : Type) :=
     | eNat : nat -> Expr Annot
@@ -362,7 +362,7 @@ Definition template_eta
       let part_app := eApp _ (eFn unit "f" (eNat unit 0)) in
       part_app (eCons _ (eNat unit 0) (eNil _)).
 
-    MetaCoq Run (eta_expand_def (fun _ => None) false false papp_expr).
+    MetaRocq Run (eta_expand_def (fun _ => None) false false papp_expr).
   End Ex5.
 
 End Examples.

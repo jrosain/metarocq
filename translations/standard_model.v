@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All.
-From MetaCoq.Translations Require Import translation_utils sigma.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All.
+From MetaRocq.Translations Require Import translation_utils sigma.
 Import MCMonadNotation.
 
 Infix "<=" := Nat.leb.
@@ -17,8 +17,8 @@ Print Typing Flags.
 Unset Guard Checking.
 
 
-MetaCoq Quote Definition tUnit := unit.
-MetaCoq Quote Definition ttt := tt.
+MetaRocq Quote Definition tUnit := unit.
+MetaRocq Quote Definition ttt := tt.
 
 Fixpoint kproj (k : nat) (t : term) :=
   match k with
@@ -99,12 +99,12 @@ Instance param : Translation :=
 
 (* Definition toto := ((fun A (x : A) => x) (Type : Type)). *)
 Definition toto := fun (f : forall A, A -> A) => f Type.
-MetaCoq Run (Translate emptyTC "toto").
+MetaRocq Run (Translate emptyTC "toto").
 Check (totoᵗ : unit -> (forall A, A -> A) -> Type -> Type).
 
 
 Definition FALSE := forall X, X.
-MetaCoq Run (TC <- Translate emptyTC "FALSE" ;; tmPrint "toto" ;;
+MetaRocq Run (TC <- Translate emptyTC "FALSE" ;; tmPrint "toto" ;;
    Implement TC "a" (forall (A : Set) (A0 : A -> Set) (x : A), FALSE -> A0 x)).
 Next Obligation.
   compute in X. apply X.
@@ -112,8 +112,8 @@ Defined.
 
 
 Definition T := forall A, A -> A.
-MetaCoq Run (Translate emptyTC "T").
+MetaRocq Run (Translate emptyTC "T").
 
 
 Definition tm := ((fun A (x:A) => x) (Type -> Type) (fun x => x)).
-MetaCoq Run (Translate emptyTC "tm").
+MetaRocq Run (Translate emptyTC "tm").

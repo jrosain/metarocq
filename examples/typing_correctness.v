@@ -1,6 +1,6 @@
-(*From MetaCoq.Template Require Import config All.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTyping PCUICLiftSubst TemplateToPCUIC.
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICWfEnvImpl PCUICTypeChecker PCUICSafeChecker.
+(*From MetaRocq.Template Require Import config All.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTyping PCUICLiftSubst TemplateToPCUIC.
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICWfEnvImpl PCUICTypeChecker PCUICSafeChecker.
 From Equations Require Import Equations.
 
 
@@ -20,19 +20,19 @@ Polymorphic Inductive empty@{u} : Type@{u} :=.
 
 Polymorphic Inductive unit@{u} : Type@{u} := tt.
 
-MetaCoq Quote Recursively Definition empty_sig_full_template := (fun (A : Type@{u}) (x : A) => x).
+MetaRocq Quote Recursively Definition empty_sig_full_template := (fun (A : Type@{u}) (x : A) => x).
 Definition empty_sig_full := trans_template_program empty_sig_full_template.
 
-MetaCoq Quote Recursively Definition empty_full_template := empty@{u}.
+MetaRocq Quote Recursively Definition empty_full_template := empty@{u}.
 Definition empty_full := trans_template_program empty_full_template.
 
-MetaCoq Quote Recursively Definition unit_full_template := tt@{u}.
+MetaRocq Quote Recursively Definition unit_full_template := tt@{u}.
 Definition unit_full := trans_template_program unit_full_template.
 
-MetaCoq Quote Recursively Definition list_full_template := list@{u}.
+MetaRocq Quote Recursively Definition list_full_template := list@{u}.
 Definition list_full := trans_template_program list_full_template.
 
-MetaCoq Quote Recursively Definition rtree_full_template := rtree@{u}.
+MetaRocq Quote Recursively Definition rtree_full_template := rtree@{u}.
 Definition rtree_full := trans_template_program rtree_full_template.
 
 Definition extract_gctx : PCUICProgram.pcuic_program -> global_env_ext :=
@@ -64,11 +64,11 @@ Proof.
 Defined.
 *)
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Universes.
-From MetaCoq.Template Require Import Loader.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTyping PCUICLiftSubst.
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICWfEnvImpl PCUICTypeChecker PCUICSafeChecker.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Universes.
+From MetaRocq.Template Require Import Loader.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTyping PCUICLiftSubst.
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICWfEnvImpl PCUICTypeChecker PCUICSafeChecker.
 From Equations Require Import Equations.
 
 Local Existing Instance default_checker_flags.

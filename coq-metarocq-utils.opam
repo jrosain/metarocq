@@ -1,9 +1,9 @@
 opam-version: "2.0"
 version: "dev"
 maintainer: "matthieu.sozeau@inria.fr"
-homepage: "https://metacoq.github.io/metacoq"
-dev-repo: "git+https://github.com/MetaCoq/metacoq.git#main"
-bug-reports: "https://github.com/MetaCoq/metacoq/issues"
+homepage: "https://metarocq.github.io/metarocq"
+dev-repo: "git+https://github.com/MetaRocq/metarocq.git#main"
+bug-reports: "https://github.com/MetaRocq/metarocq/issues"
 authors: ["Abhishek Anand <aa755@cs.cornell.edu>"
           "Danil Annenkov <danil.v.annenkov@gmail.com>"
           "Simon Boulier <simon.boulier@inria.fr>"
@@ -22,24 +22,17 @@ authors: ["Abhishek Anand <aa755@cs.cornell.edu>"
 license: "MIT"
 build: [
   ["bash" "./configure.sh"]
-  [make "-j" "%{jobs}%" "-C" "erasure-plugin"]
+  [make "-j" "%{jobs}%" "utils"]
 ]
 install: [
-  [make "-C" "erasure-plugin" "install"]
+  [make "-C" "utils" "install"]
 ]
 depends: [
-  "coq-metacoq-template-pcuic" {= version}
-  "coq-metacoq-erasure" {= version}
+  "stdlib-shims"
+  "rocq-prover" { >= "9.0~" & != "9.0.dev" & < "10" }
+  "coq-equations" { = "1.3.1+9.0" }
 ]
-synopsis: "Implementation and verification of an erasure procedure for Coq"
+synopsis: "The utility library of Template Coq and PCUIC"
 description: """
-MetaCoq is a meta-programming framework for Coq.
-
-The Erasure module provides a complete specification of Coq's so-called
-\"extraction\" procedure, starting from the PCUIC calculus and targeting
-untyped call-by-value lambda-calculus.
-
-The `erasure` function translates types and proofs in well-typed terms
-into a dummy `tBox` constructor, following closely P. Letouzey's PhD
-thesis.
+MetaRocq is a meta-programming framework for Coq.
 """

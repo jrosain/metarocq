@@ -1,12 +1,12 @@
 From Stdlib Require Import List.
 From Stdlib Require Import ssrbool.
-From MetaCoq.Erasure.Typed Require Import Utils.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Erasure Require Import EPrimitive EAst.
-From MetaCoq.Erasure Require Import EAstUtils.
-From MetaCoq.Erasure Require Import ECSubst.
-From MetaCoq.Erasure Require Import EInduction.
-From MetaCoq.Erasure Require Import ELiftSubst.
+From MetaRocq.Erasure.Typed Require Import Utils.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Erasure Require Import EPrimitive EAst.
+From MetaRocq.Erasure Require Import EAstUtils.
+From MetaRocq.Erasure Require Import ECSubst.
+From MetaRocq.Erasure Require Import EInduction.
+From MetaRocq.Erasure Require Import ELiftSubst.
 
 Lemma closedn_mkApps k hd args :
   closedn k hd ->

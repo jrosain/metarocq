@@ -2,13 +2,13 @@
 
 From Stdlib Require Import Bool List Arith Lia.
 From Stdlib Require String.
-From MetaCoq.Utils Require Import utils monad_utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils monad_utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
   PCUICLiftSubst PCUICUnivSubst PCUICEquality PCUICUtils
   PCUICPosition PCUICTyping PCUICCumulativity PCUICReduction.
 
-From MetaCoq.Utils Require Export LibHypsNaming.
+From MetaRocq.Utils Require Export LibHypsNaming.
 From Stdlib Require Import ssreflect.
 Set Asymmetric Patterns.
 From Equations.Type Require Import Relation.

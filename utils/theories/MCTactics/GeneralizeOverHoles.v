@@ -1,4 +1,4 @@
-From MetaCoq Require Import Utils.MCTactics.Zeta1.
+From MetaRocq Require Import Utils.MCTactics.Zeta1.
 From Stdlib Require Import ssr.ssreflect.
 
 Ltac generalize_over_holes tac :=

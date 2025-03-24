@@ -1,9 +1,9 @@
 From Stdlib.FSets Require Import FMapAVL.
 From Stdlib.Structures Require Import Equalities OrdersAlt.
-From MetaCoq.Utils Require Import MCFSets.
-From MetaCoq.Quotation.ToTemplate Require Import Init.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Stdlib.Structures Require Import OrdersAlt.Sig.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Stdlib.FSets Require Import FMapList.Sig.
+From MetaRocq.Utils Require Import MCFSets.
+From MetaRocq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Stdlib.Structures Require Import OrdersAlt.Sig.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Stdlib.FSets Require Import FMapList.Sig.
 Import List.ListNotations.
 Local Open Scope list_scope.
 
@@ -15,12 +15,12 @@ Module FMapAVL.
         Module qPX := Nop <+ QuotationOfKeyOrderedTypeOrig T M.Raw.Proofs.PX.
         Module qL := Nop <+ FMapList.QuotationOfRaw T M.Raw.Proofs.L.
         Export (hints) qMX qPX qL.
-        MetaCoq Run (tmDeclareQuotationOfModule (all_submodules_except [["MX"]; ["PX"]; ["L"]]%bs) (Some export) "M.Raw.Proofs").
+        MetaRocq Run (tmDeclareQuotationOfModule (all_submodules_except [["MX"]; ["PX"]; ["L"]]%bs) (Some export) "M.Raw.Proofs").
       End qProofs.
       Export (hints) qProofs.
-      MetaCoq Run (tmDeclareQuotationOfModule (all_submodules_except [["Proofs"]]%bs) (Some export) "M.Raw").
+      MetaRocq Run (tmDeclareQuotationOfModule (all_submodules_except [["Proofs"]]%bs) (Some export) "M.Raw").
     End qRaw.
     Export (hints) qRaw.
-    MetaCoq Run (tmDeclareQuotationOfModule (all_submodules_except [["Raw"]]%bs) (Some export) "M").
+    MetaRocq Run (tmDeclareQuotationOfModule (all_submodules_except [["Raw"]]%bs) (Some export) "M").
   End QuotationOfMake.
 End FMapAVL.

@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import RelationClasses.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
      PCUICGeneration PCUICLiftSubst
      PCUICUnivSubst PCUICTyping PCUICPosition PCUICNormal
      PCUICInversion PCUICSR PCUICSN
@@ -11,7 +11,7 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
      PCUICOnFreeVars PCUICWellScopedCumulativity
      PCUICClassification.
 
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICWfReduction PCUICWfEnv.
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICWfReduction PCUICWfEnv.
 
 From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
@@ -29,7 +29,7 @@ Set Equations With UIP.
  *)
 
 (* From Program *)
-Notation " `  t " := (proj1_sig t) (at level 10, t at next level) : metacoq_scope.
+Notation " `  t " := (proj1_sig t) (at level 10, t at next level) : metarocq_scope.
 
 Set Default Goal Selector "!".
 

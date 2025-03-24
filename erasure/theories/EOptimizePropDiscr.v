@@ -1,13 +1,13 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8 Program.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
      PCUICReflect PCUICWeakeningEnvConv PCUICWeakeningEnvTyp
      PCUICTyping PCUICInversion
      PCUICSafeLemmata. (* for welltyped *)
-From MetaCoq.SafeChecker Require Import PCUICWfEnvImpl.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils EDeps EExtends
+From MetaRocq.SafeChecker Require Import PCUICWfEnvImpl.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils EDeps EExtends
     ELiftSubst ECSubst EGlobalEnv EWellformed EWcbvEval Extract Prelim
     EEnvMap EArities EProgram.
 
@@ -740,7 +740,7 @@ Proof.
     rewrite -lookup_constructor_remove_match_on_box //. destruct args => //.
 Qed.
 
-From MetaCoq.Erasure Require Import EEtaExpanded.
+From MetaRocq.Erasure Require Import EEtaExpanded.
 
 Lemma isLambda_remove_match_on_box Σ t : isLambda t -> isLambda (remove_match_on_box Σ t).
 Proof. destruct t => //. Qed.
@@ -864,7 +864,7 @@ Proof.
     all:intros; rtoProp; intuition auto; solve_all.
 Qed.
 
-From MetaCoq.Erasure Require Import EGenericGlobalMap.
+From MetaRocq.Erasure Require Import EGenericGlobalMap.
 
 #[local]
 Instance GT : GenTransform := { gen_transform := remove_match_on_box; gen_transform_inductive_decl := id }.

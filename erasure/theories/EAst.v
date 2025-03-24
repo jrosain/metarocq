@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import BasicAst Universes.
-From MetaCoq.Erasure Require Import EPrimitive.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import BasicAst Universes.
+From MetaRocq.Erasure Require Import EPrimitive.
 (** * Extracted terms
 
   These are the terms produced by extraction: compared to kernel terms,

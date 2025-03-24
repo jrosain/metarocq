@@ -1,4 +1,4 @@
 From Stdlib Require Import String.
-From MetaCoq.Template Require ExtractableLoader.
+From MetaRocq.Template Require ExtractableLoader.
 
-Declare ML Module "coq-metacoq-erasure.plugin".
+Declare ML Module "coq-metarocq-erasure.plugin".

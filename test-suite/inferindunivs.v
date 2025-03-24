@@ -1,5 +1,5 @@
 From Stdlib Require Import List.
-From MetaCoq.Template Require Import All Loader.
+From MetaRocq.Template Require Import All Loader.
 Import Ast.Env.
 Import ListNotations.
 Import MCMonadNotation.
@@ -8,15 +8,15 @@ Local Open Scope bs_scope.
 
 Definition bnamed n := {| binder_name := nNamed n; binder_relevance := Relevant |}.
 
-MetaCoq Quote Definition rid := @id.
+MetaRocq Quote Definition rid := @id.
 
 Universe u.
-MetaCoq Quote Definition qu := Type@{u}.
+MetaRocq Quote Definition qu := Type@{u}.
 Universe v.
-MetaCoq Quote Definition qv := Type@{v}.
+MetaRocq Quote Definition qv := Type@{v}.
 
 Universe w.
-MetaCoq Quote Definition qw := Type@{w}.
+MetaRocq Quote Definition qw := Type@{w}.
 
 Definition update_mutual_inductive_entry_inds (mie : mutual_inductive_entry) inds' :=
  {| mind_entry_record := mie.(mind_entry_record);
@@ -51,9 +51,9 @@ Definition add_cstr_univs (mie : mutual_inductive_entry) :=
 Inductive foo : Set :=
  | bar : foo.
 
-Definition fooref := (MPfile ["inferindunivs"; "TestSuite"; "MetaCoq"], "foo").
+Definition fooref := (MPfile ["inferindunivs"; "TestSuite"; "MetaRocq"], "foo").
 
-MetaCoq Run (tmQuoteInductive fooref >>= fun mib =>
+MetaRocq Run (tmQuoteInductive fooref >>= fun mib =>
     let mie := mind_body_to_entry mib in
     let mie := add_cstr_univs mie in
     tmMkInductive true mie).

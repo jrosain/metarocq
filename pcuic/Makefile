@@ -1,7 +1,7 @@
 all: coq
 
-_CoqProject: _CoqProject.in metacoq-config
-	cat metacoq-config > _CoqProject
+_CoqProject: _CoqProject.in metarocq-config
+	cat metarocq-config > _CoqProject
 	cat _CoqProject.in >> _CoqProject
 
 Makefile.coq: _CoqProject

@@ -1,6 +1,6 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Template Require Import utils All.
-From MetaCoq.Translations Require Import translation_utils.
+From MetaRocq.Template Require Import utils All.
+From MetaRocq.Translations Require Import translation_utils.
 From Stdlib Require Import ssreflect.
 (* Import BasicAst. *)
 
@@ -106,15 +106,15 @@ with tsl_rec1 (E : tsl_table) (t : term) {struct t} : term :=
 
 
 
-MetaCoq Run (tm <- tmQuote (forall A, A -> A) ;;
+MetaRocq Run (tm <- tmQuote (forall A, A -> A) ;;
                      let tm' := tsl_rec1 [] tm in
                      tmUnquote tm' >>= tmPrint).
 
-MetaCoq Run (tm <- tmQuote (fun A (x : A) => x) ;;
+MetaRocq Run (tm <- tmQuote (fun A (x : A) => x) ;;
                      let tm' := tsl_rec0 [] tm in
                      tmUnquote tm' >>= tmPrint).
 
-MetaCoq Run (tm <- tmQuote (fun A (x : A) => x) ;;
+MetaRocq Run (tm <- tmQuote (fun A (x : A) => x) ;;
                      let tm' := tsl_rec1 [] tm in
                      tmUnquote tm' >>= tmPrint).
 
@@ -124,11 +124,11 @@ Goal ((fun f : forall (A : Type) (Aᵗ : A -> Type) (H : A), Aᵗ H -> A =>
 reflexivity.
 Defined.
 
-MetaCoq Quote Definition tm := ((fun A (x:A) => x) (Type -> Type) (fun x => x)).
+MetaRocq Quote Definition tm := ((fun A (x:A) => x) (Type -> Type) (fun x => x)).
 
-Unset MetaCoq Strict Unquote Universe Mode.
+Unset MetaRocq Strict Unquote Universe Mode.
 
-MetaCoq Run (let tm' := tsl_rec1 [] tm in
+MetaRocq Run (let tm' := tsl_rec1 [] tm in
                      print_nf tm' ;;
                      tmUnquote tm' >>= tmPrint).
 
@@ -252,17 +252,17 @@ Definition tTranslate (ΣE : tsl_context) (id : ident)
 
 Definition Ty := Type.
 Definition TyTy := Ty -> Type.
-MetaCoq Run (ΣE <- tTranslate ([],[]) "Ty" ;;
+MetaRocq Run (ΣE <- tTranslate ([],[]) "Ty" ;;
                      let ΣE := option_get todo ΣE in
                         (* print_nf ΣE). *)
                      tTranslate ΣE "TyTy" >>= tmPrint).
 
-(* MetaCoq Run (ΣE <- tTranslate ([],[]) "nat" ;; *)
+(* MetaRocq Run (ΣE <- tTranslate ([],[]) "nat" ;; *)
 (*                      let ΣE := option_get todo ΣE in *)
 (*                         (* print_nf ΣE). *) *)
 (*                      tTranslate ΣE "t" >>= tmPrint). *)
 
-Fail MetaCoq Run (tTranslate ([],[]) "nat").
+Fail MetaRocq Run (tTranslate ([],[]) "nat").
 
 
 
@@ -595,4 +595,4 @@ elim/typing_ind: H => {Γ t T} Γ.
 
 
 From Stdlib Require Import Vector.
-(* MetaCoq Run (ΣE <- tTranslate ([],[]) "nat" ;; *)
+(* MetaRocq Run (ΣE <- tTranslate ([],[]) "nat" ;; *)

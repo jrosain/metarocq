@@ -1,14 +1,14 @@
 (** * Definition of programs in template-coq, well-typed terms and provided transformations **)
 From Stdlib Require Import ssreflect.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Transform.
-From MetaCoq.Template Require TemplateProgram.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Transform.
+From MetaRocq.Template Require TemplateProgram.
 Import TemplateProgram (template_program, wt_template_program, eval_template_program).
 
-From MetaCoq.PCUIC Require Import PCUICAstUtils PCUICAst
+From MetaRocq.PCUIC Require Import PCUICAstUtils PCUICAst
     PCUICGlobalEnv PCUICTyping PCUICEtaExpand
     PCUICProgram.
-From MetaCoq.TemplatePCUIC Require TemplateToPCUIC TemplateToPCUICWcbvEval
+From MetaRocq.TemplatePCUIC Require TemplateToPCUIC TemplateToPCUICWcbvEval
   TemplateToPCUICCorrectness TemplateToPCUICExpanded.
 
 Import Transform TemplateToPCUIC.
@@ -58,7 +58,7 @@ Next Obligation.
   apply X. destruct X as [wfΣ [T HT]]. apply TypingWf.typing_wf in HT. apply HT. auto.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICExpandLets PCUICExpandLetsCorrectness.
+From MetaRocq.PCUIC Require Import PCUICExpandLets PCUICExpandLetsCorrectness.
 
 (** Expansion of let bindings in constructor types / case branches.
     Direcly preserves evaluation as well: the new value is simply the

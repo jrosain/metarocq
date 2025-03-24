@@ -1,15 +1,15 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Primitive.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Primitive.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive
   PCUICLiftSubst PCUICUnivSubst PCUICEquality PCUICUtils PCUICPosition.
-From MetaCoq.PCUIC Require Export PCUICCumulativitySpec.
-From MetaCoq.PCUIC Require Export PCUICCases.
+From MetaRocq.PCUIC Require Export PCUICCumulativitySpec.
+From MetaRocq.PCUIC Require Export PCUICCases.
 
 Import MCMonadNotation.
 
 (* TODO: remove this export *)
-From MetaCoq.Utils Require Export LibHypsNaming.
+From MetaRocq.Utils Require Export LibHypsNaming.
 
 From Stdlib Require Import ssreflect ssrbool.
 From Equations.Type Require Import Relation.

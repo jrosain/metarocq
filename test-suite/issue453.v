@@ -1,4 +1,4 @@
-From MetaCoq.Template Require Import Loader All.
+From MetaRocq.Template Require Import Loader All.
 Require  Import ssreflect.
 (* above two lines can be run in either order *)
 

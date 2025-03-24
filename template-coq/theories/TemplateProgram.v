@@ -1,10 +1,10 @@
 (** * Definition of programs in template-coq, well-typed terms and provided transformations **)
 
-From MetaCoq.Utils Require Import utils.
+From MetaRocq.Utils Require Import utils.
 
-From MetaCoq.Common Require Export config Transform.
+From MetaRocq.Common Require Export config Transform.
 
-From MetaCoq.Template Require Import
+From MetaRocq.Template Require Import
         Ast           (* The term AST *)
         Typing        (* Typing judgment *)
         WcbvEval

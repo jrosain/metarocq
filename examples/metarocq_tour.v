@@ -1,13 +1,13 @@
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.Template Require Import All.
-From MetaCoq.Template Require Import TemplateMonad.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICReduction PCUICCumulativity PCUICTyping PCUICSafeLemmata.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.Template Require Import All.
+From MetaRocq.Template Require Import TemplateMonad.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICReduction PCUICCumulativity PCUICTyping PCUICSafeLemmata.
 
 Import MCMonadNotation.
 Local Open Scope bs_scope.
 
-(** MetaCoq is:
+(** MetaRocq is:
 
   - The "template-coq" monad, dealing with reification of terms
     and environments.
@@ -23,16 +23,16 @@ Local Open Scope bs_scope.
 Print Ast.term.
 
 
-MetaCoq Quote Definition reifx := (fun x : nat => x).
+MetaRocq Quote Definition reifx := (fun x : nat => x).
 Definition foo := (fun x : nat => fun x : nat => x).
-MetaCoq Quote Definition reifx' := Eval compute in (fun x : nat => let y := x in fun x : nat => y).
+MetaRocq Quote Definition reifx' := Eval compute in (fun x : nat => let y := x in fun x : nat => y).
 Print reifx'.
-MetaCoq Unquote Definition x :=
+MetaRocq Unquote Definition x :=
   (Ast.tConstruct (mkInd (MPfile ["Datatypes"; "Init"; "Corelib"], "nat") 0) 0 []).
 
-MetaCoq Run (tmBind (tmQuote (3 + 3)) tmPrint).
+MetaRocq Run (tmBind (tmQuote (3 + 3)) tmPrint).
 
-MetaCoq Run (t <- tmLemma "foo44" nat ;;
+MetaRocq Run (t <- tmLemma "foo44" nat ;;
              qt <- tmQuote t ;;
              t <- tmEval all t ;;
              tmPrint qt ;; tmPrint t).
@@ -54,14 +54,14 @@ Check type_Sort.
 Check type_LetIn.
 Check type_Const.
 
-From MetaCoq.PCUIC Require PCUICSR.
+From MetaRocq.PCUIC Require PCUICSR.
 
 Check PCUICSR.subject_reduction.
 
 (** Verified conversion and type-checking *)
 
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICWfEnvImpl PCUICTypeChecker PCUICSafeChecker PCUICSafeRetyping.
-From MetaCoq.SafeCheckerPlugin Require Import Loader.
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICWfEnvImpl PCUICTypeChecker PCUICSafeChecker PCUICSafeRetyping.
+From MetaRocq.SafeCheckerPlugin Require Import Loader.
 Check PCUICSafeConversion.isconv_term_sound.
 Check PCUICSafeConversion.isconv_term_complete.
 
@@ -75,7 +75,7 @@ Check type_of.
 Check type_of_subtype.
 
 (* Running the safe checker inside Coq *)
-From MetaCoq.Examples Require Import metacoq_tour_prelude.
+From MetaRocq.Examples Require Import metarocq_tour_prelude.
 
 Check check_inh.
 
@@ -92,16 +92,16 @@ Qed. *)
 
 (** The extracted typechecker also runs in OCaml *)
 (* FIXME: checker unusable in OCaml due to representation of universes *)
-(* MetaCoq SafeCheck (fun x : nat => x + 1). *)
+(* MetaRocq SafeCheck (fun x : nat => x + 1). *)
 
 (** Erasure *)
-From MetaCoq.ErasurePlugin Require Import Erasure Loader.
+From MetaRocq.ErasurePlugin Require Import Erasure Loader.
 
 (** Running erasure live in Coq *)
 Definition test (p : Ast.Env.program) : string :=
   erase_and_print_template_program default_erasure_config [] p.
 
-MetaCoq Quote Recursively Definition zero := 0.
+MetaRocq Quote Recursively Definition zero := 0.
 
 Definition zerocst := Eval lazy in test zero.
 
@@ -111,12 +111,12 @@ Definition singleton_elim :=
                   | eq_refl => true
                   end)).
 
-MetaCoq Run (tmEval lazy singleton_elim >>= tmQuoteRec >>=
+MetaRocq Run (tmEval lazy singleton_elim >>= tmQuoteRec >>=
   fun p => tmEval lazy (test p) >>= tmPrint). (* Optimized to remove match on Props *)
 
-MetaCoq Erase singleton_elim.
+MetaRocq Erase singleton_elim.
 
-(** Conclusion: Status of MetaCoq
+(** Conclusion: Status of MetaRocq
 
   - Correctness and complete typechecker for (a large fragment of) Coq.
 

@@ -1,6 +1,6 @@
 From Stdlib Require Import Nat ZArith Bool.
 
-From MetaCoq.Utils Require Export MCPrelude
+From MetaRocq.Utils Require Export MCPrelude
         MCReflect
         All_Forall
         MCArith

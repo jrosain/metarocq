@@ -1,9 +1,9 @@
-From MetaCoq.Quotation.ToTemplate Require Import Init.
-From MetaCoq.Quotation.ToTemplate.Stdlib Require Import (hints) Init MSets Numbers.
-From MetaCoq.Quotation.ToTemplate.Utils Require Import (hints) MCOption bytestring.
-From MetaCoq.Quotation.ToTemplate.Common Require Import (hints) BasicAst config.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Common Require Import Universes.Instances.
-From MetaCoq.Common Require Import Kernames Universes UniversesDec.
+From MetaRocq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate.Stdlib Require Import (hints) Init MSets Numbers.
+From MetaRocq.Quotation.ToTemplate.Utils Require Import (hints) MCOption bytestring.
+From MetaRocq.Quotation.ToTemplate.Common Require Import (hints) BasicAst config.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Common Require Import Universes.Instances.
+From MetaRocq.Common Require Import Kernames Universes UniversesDec.
 
 (* Grrr, [valuation]s cause so much trouble, because they're not quotable *)
 (*

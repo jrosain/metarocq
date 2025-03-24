@@ -1,14 +1,14 @@
 From Stdlib Require Import Bool List Arith Lia.
 From Stdlib Require String.
 From Equations Require Import Equations.
-From MetaCoq.Utils Require Import utils monad_utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICGlobalEnv
+From MetaRocq.Utils Require Import utils monad_utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICGlobalEnv
   PCUICTactics PCUICCumulativity
   PCUICInduction PCUICLiftSubst PCUICUnivSubst PCUICEquality PCUICUtils
   PCUICPosition PCUICTyping PCUICSigmaCalculus PCUICOnFreeVars PCUICClosed PCUICConfluence PCUICSpine PCUICInductiveInversion PCUICParallelReductionConfluence PCUICWellScopedCumulativity PCUICClosed PCUICRenameDef PCUICInstConv PCUICClosedTyp PCUICWeakeningEnvTyp PCUICRenameTyp PCUICRenameConv PCUICGuardCondition PCUICWeakeningConv.
 
-From MetaCoq.PCUIC Require Import BDTyping BDToPCUIC BDFromPCUIC.
+From MetaRocq.PCUIC Require Import BDTyping BDToPCUIC BDFromPCUIC.
 
 From Stdlib Require Import ssreflect ssrbool.
 From Stdlib.Program Require Import Equality.

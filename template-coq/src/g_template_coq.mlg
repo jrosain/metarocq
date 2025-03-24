@@ -1,5 +1,5 @@
 
-DECLARE PLUGIN "coq-metacoq-template-coq.plugin"
+DECLARE PLUGIN "coq-metarocq-template-coq.plugin"
 
 {
 
@@ -31,7 +31,7 @@ let _ =
   declare_bool_option
     { optdepr  = None;
       optstage = Interp;
-      optkey   = ["MetaCoq"; "Strict"; "Unquote"; "Universe"; "Mode"];
+      optkey   = ["MetaRocq"; "Strict"; "Unquote"; "Universe"; "Mode"];
       optread  = (fun () -> !Denoter.strict_unquote_universe_mode);
       optwrite = (fun b -> Denoter.strict_unquote_universe_mode := b) }
 
@@ -63,7 +63,7 @@ let to_constr_evars sigma c = EConstr.to_constr ~abort_on_undefined_evars:false 
 (** ********* Commands ********* *)
 
 VERNAC COMMAND EXTEND TemplateCoq_Test_Quote CLASSIFIED AS QUERY STATE program
-    | #[ poly = polymorphic ] [ "MetaCoq" "Test" "Quote" constr(def) ] ->
+    | #[ poly = polymorphic ] [ "MetaRocq" "Test" "Quote" constr(def) ] ->
       { fun ~pm -> let (env, evm) = fresh_env () in
         let (evm, def) = Constrintern.interp_open_constr env evm def in
         let (evm, pgm) = EConstr.fresh_global env evm (Lazy.force Template_monad.ptmTestQuote) in
@@ -73,7 +73,7 @@ VERNAC COMMAND EXTEND TemplateCoq_Test_Quote CLASSIFIED AS QUERY STATE program
 END
 
 VERNAC COMMAND EXTEND TemplateCoq_Quote_Definition CLASSIFIED AS SIDEFF STATE program
-    | #[ poly = polymorphic ] [ "MetaCoq" "Quote" "Definition" ident(name) ":=" constr(def) ] ->
+    | #[ poly = polymorphic ] [ "MetaRocq" "Quote" "Definition" ident(name) ":=" constr(def) ] ->
       { fun ~pm -> let (env, evm) = fresh_env () in
         let (evm, def) = Constrintern.interp_open_constr env evm def in
         let (evm, pgm) = EConstr.fresh_global env evm (Lazy.force Template_monad.ptmQuoteDefinition) in
@@ -83,7 +83,7 @@ VERNAC COMMAND EXTEND TemplateCoq_Quote_Definition CLASSIFIED AS SIDEFF STATE pr
 END
 
 VERNAC COMMAND EXTEND TemplateCoq_Quote_Definition_Eval CLASSIFIED AS SIDEFF STATE program
-  | #[ poly = polymorphic ] [ "MetaCoq" "Quote" "Definition" ident(name) ":=" "Eval" red_expr(rd) "in" constr(def) ] ->
+  | #[ poly = polymorphic ] [ "MetaRocq" "Quote" "Definition" ident(name) ":=" "Eval" red_expr(rd) "in" constr(def) ] ->
       { fun ~pm -> let (env, evm) = fresh_env () in
         let (evm, def) = Constrintern.interp_open_constr env evm def in
         (* TODO : implem quoting of tactic reductions so that we can use ptmQuoteDefinitionRed *)
@@ -95,7 +95,7 @@ VERNAC COMMAND EXTEND TemplateCoq_Quote_Definition_Eval CLASSIFIED AS SIDEFF STA
 END
 
 VERNAC COMMAND EXTEND TemplateCoq_Quote_Recursively_Definition CLASSIFIED AS SIDEFF STATE program
-  | #[ poly = polymorphic ] [ "MetaCoq" "Quote" "Recursively" "Definition" ident(name) ":=" constr(def) ] ->
+  | #[ poly = polymorphic ] [ "MetaRocq" "Quote" "Recursively" "Definition" ident(name) ":=" constr(def) ] ->
       { fun ~pm -> let (env, evm) = fresh_env () in
         let (evm, def) = Constrintern.interp_open_constr env evm def in
         let (evm, pgm) = EConstr.fresh_global env evm (Lazy.force Template_monad.ptmQuoteRecDefinition) in
@@ -105,7 +105,7 @@ VERNAC COMMAND EXTEND TemplateCoq_Quote_Recursively_Definition CLASSIFIED AS SID
 END
 
 VERNAC COMMAND EXTEND TemplateCoq_Test_Unquote CLASSIFIED AS QUERY STATE program
-    | #[ poly = polymorphic ] [ "MetaCoq" "Test" "Unquote" constr(def) ] ->
+    | #[ poly = polymorphic ] [ "MetaRocq" "Test" "Unquote" constr(def) ] ->
       { fun ~pm -> let (env, evm) = fresh_env () in
         let (evm, def) = Constrintern.interp_open_constr env evm def in
         let (evm, pgm) = EConstr.fresh_global env evm (Lazy.force Template_monad.ptmTestUnquote) in
@@ -115,7 +115,7 @@ VERNAC COMMAND EXTEND TemplateCoq_Test_Unquote CLASSIFIED AS QUERY STATE program
 END
 
 VERNAC COMMAND EXTEND TemplateCoq_Make_Definition CLASSIFIED AS SIDEFF STATE program
-  | #[ poly = polymorphic ] [ "MetaCoq" "Unquote" "Definition" ident(name) ":=" constr(def) ] ->
+  | #[ poly = polymorphic ] [ "MetaRocq" "Unquote" "Definition" ident(name) ":=" constr(def) ] ->
       { fun ~pm -> let (env, evm) = fresh_env () in
         let (evm, def) = Constrintern.interp_open_constr env evm def in
         let (evm, pgm) = EConstr.fresh_global env evm (Lazy.force Template_monad.ptmMkDefinition) in
@@ -126,7 +126,7 @@ VERNAC COMMAND EXTEND TemplateCoq_Make_Definition CLASSIFIED AS SIDEFF STATE pro
 END
 
 VERNAC COMMAND EXTEND TemplateCoq_Make_Inductive CLASSIFIED AS SIDEFF STATE program
-  | #[ poly = polymorphic ] [ "MetaCoq" "Unquote" "Inductive" constr(def) ] ->
+  | #[ poly = polymorphic ] [ "MetaRocq" "Unquote" "Inductive" constr(def) ] ->
       { fun ~pm -> let (env, evm) = fresh_env () in
         let (evm, def) = Constrintern.interp_open_constr env evm def in
         let (evm, pgm) = EConstr.fresh_global env evm (Lazy.force Template_monad.ptmMkInductive) in
@@ -136,7 +136,7 @@ VERNAC COMMAND EXTEND TemplateCoq_Make_Inductive CLASSIFIED AS SIDEFF STATE prog
 END
 
 VERNAC COMMAND EXTEND TemplateCoq_Run_Template_Program CLASSIFIED AS SIDEFF STATE program
-  | #[ poly = polymorphic ] [ "MetaCoq" "Run" constr(def) ] ->
+  | #[ poly = polymorphic ] [ "MetaRocq" "Run" constr(def) ] ->
       { fun ~pm -> let (env, evm) = fresh_env () in
         let (pgm, ctx) = Constrintern.interp_constr env evm def in
         let evm = Evd.from_ctx ctx in

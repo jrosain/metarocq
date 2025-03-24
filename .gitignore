@@ -1,4 +1,4 @@
-metacoq-config
+metarocq-config
 .history
 docs/_site
 *.annot
@@ -234,18 +234,18 @@ checker/src/wf.mli
 /pcuic/src/init.ml
 /pcuic/src/classes0.mli
 /pcuic/src/classes0.ml
-/checker/metacoq-config
-/template-coq/metacoq-config
-/common/metacoq-config
-/translations/metacoq-config
+/checker/metarocq-config
+/template-coq/metarocq-config
+/common/metarocq-config
+/translations/metarocq-config
 /erasure/_CoqProject
 /erasure/_PluginProject
-/erasure/metacoq-config
+/erasure/metarocq-config
 /pcuic/_CoqProject
 /pcuic/_PluginProject
-/pcuic/metacoq-config
+/pcuic/metarocq-config
 /checker/_CoqProject
-/safechecker/metacoq-config
+/safechecker/metarocq-config
 /safechecker/_PluginProject
 /safechecker/_CoqProject
 /template-coq/_CoqProject
@@ -362,16 +362,16 @@ erasure/src/eEnvMap.mli
 erasure/src/eGlobalEnv.mli
 erasure/src/eGlobalEnv.ml
 Makefile.conf
-test-suite/plugin-demo/src/META.coq-metacoq-demo-plugin
-pcuic/src/META.coq-metacoq-pcuic
+test-suite/plugin-demo/src/META.coq-metarocq-demo-plugin
+pcuic/src/META.coq-metarocq-pcuic
 examples/_CoqProject
 test-suite/_CoqProject
-quotation/metacoq-config
-examples/metacoq-config
-test-suite/metacoq-config
+quotation/metarocq-config
+examples/metarocq-config
+test-suite/metarocq-config
 test-suite/plugin-demo/_CoqProject
 test-suite/plugin-demo/_PluginProject
-test-suite/plugin-demo/metacoq-config
+test-suite/plugin-demo/metarocq-config
 erasure/META
 safechecker/META
 template-coq/META
@@ -388,7 +388,7 @@ quotation/_CoqProject
 quotation/Makefile.quotation
 quotation/Makefile.quotation.conf
 
-safechecker-plugin/metacoq-config
+safechecker-plugin/metarocq-config
 safechecker-plugin/demo.v
 safechecker-plugin/Makefile.local
 safechecker-plugin/_CoqProject
@@ -398,7 +398,7 @@ safechecker-plugin/Makefile.safecheckerplugin.conf
 safechecker-plugin/Makefile.plugin
 safechecker-plugin/Makefile.plugin.conf
 
-erasure-plugin/metacoq-config
+erasure-plugin/metarocq-config
 erasure-plugin/demo.v
 erasure-plugin/Makefile.local
 erasure-plugin/_CoqProject

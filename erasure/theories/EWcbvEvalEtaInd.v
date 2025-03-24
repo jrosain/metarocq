@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8 Program ssreflect ssrbool btauto.Algebra.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames BasicAst EnvMap.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils EInduction EWcbvEval EGlobalEnv
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames BasicAst EnvMap.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils EInduction EWcbvEval EGlobalEnv
   EWellformed ECSubst EInduction EWcbvEvalInd EEtaExpanded.
 
 Set Asymmetric Patterns.
@@ -735,7 +735,7 @@ Proof.
   - intros ise. split => //. eapply Qatom; tea.
 Qed.
 
-From MetaCoq.Erasure Require Import ELiftSubst.
+From MetaRocq.Erasure Require Import ELiftSubst.
 Lemma Qpreserves_wellformed (efl : EEnvFlags) Σ :
   cstr_as_blocks = false ->
   wf_glob Σ -> Qpreserves (fun n x => wellformed Σ n x) Σ.

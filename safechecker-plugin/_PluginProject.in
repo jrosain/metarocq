@@ -1,7 +1,7 @@
-src/META.coq-metacoq-safechecker
+src/META.coq-metarocq-safechecker
 -I src
--Q src MetaCoq.SafeCheckerPlugin
--R theories MetaCoq.SafeCheckerPlugin
+-Q src MetaRocq.SafeCheckerPlugin
+-R theories MetaRocq.SafeCheckerPlugin
 
 # src/classes0.mli
 # src/classes0.ml
@@ -62,7 +62,7 @@ src/safeTemplateChecker.ml
 src/extraction.mli
 src/extraction.ml
 
-src/g_metacoq_safechecker.mlg
-src/metacoq_safechecker_plugin.mlpack
+src/g_metarocq_safechecker.mlg
+src/metarocq_safechecker_plugin.mlpack
 
 theories/Loader.v

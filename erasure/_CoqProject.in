@@ -1,4 +1,4 @@
--R theories MetaCoq.Erasure
+-R theories MetaRocq.Erasure
 
 theories/EPrimitive.v
 theories/EAst.v

@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Universes.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICCasesContexts
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Universes.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICCasesContexts
      PCUICTyping PCUICGlobalEnv
      PCUICLiftSubst PCUICInductives PCUICGeneration PCUICSpine
      PCUICWeakeningEnv PCUICWeakeningEnvTyp
@@ -11,7 +11,7 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICCases
      PCUICSR PCUICInversion PCUICValidity PCUICSafeLemmata
      PCUICContextConversion PCUICContextConversionTyp
      PCUICCumulProp PCUICWellScopedCumulativity PCUICArities.
-From MetaCoq.PCUIC Require Import PCUICInductiveInversion PCUICOnFreeVars PCUICEquality.
+From MetaRocq.PCUIC Require Import PCUICInductiveInversion PCUICOnFreeVars PCUICEquality.
 
 Require Equations.Prop.DepElim.
 From Equations Require Import Equations.

@@ -1,10 +1,10 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Program ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.Erasure Require Import EPrimitive ELiftSubst EGlobalEnv EWcbvEval Extract Prelim
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.Erasure Require Import EPrimitive ELiftSubst EGlobalEnv EWcbvEval Extract Prelim
      ESubstitution EArities EDeps.
-From MetaCoq.PCUIC Require Import PCUICTyping PCUICGlobalEnv PCUICAst
+From MetaRocq.PCUIC Require Import PCUICTyping PCUICGlobalEnv PCUICAst
   PCUICAstUtils PCUICConversion PCUICSigmaCalculus
   PCUICClosed PCUICClosedTyp
   PCUICWeakeningEnv PCUICWeakeningEnvTyp
@@ -20,7 +20,7 @@ From MetaCoq.PCUIC Require Import PCUICTyping PCUICGlobalEnv PCUICAst
   PCUICOnFreeVars PCUICWellScopedCumulativity PCUICValidity
   PCUICContexts PCUICEquality PCUICSpine
   PCUICInductives.
-From MetaCoq.PCUIC Require Import PCUICTactics.
+From MetaRocq.PCUIC Require Import PCUICTactics.
 
 From Equations.Prop Require Import DepElim.
 

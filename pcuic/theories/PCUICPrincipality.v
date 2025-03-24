@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-  From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
+  From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
      PCUICLiftSubst PCUICTyping PCUICGlobalEnv
      PCUICWeakeningEnvTyp PCUICSubstitution PCUICEquality
      PCUICReduction PCUICCumulativity PCUICConfluence PCUICClosed PCUICClosedTyp
@@ -436,7 +436,7 @@ Proof.
   intros. now eapply eq_term_empty_eq_term.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICClassification.
+From MetaRocq.PCUIC Require Import PCUICClassification.
 
 Lemma typing_leq_term {cf:checker_flags} (Σ : global_env_ext) Γ t t' T T' :
   wf Σ.1 ->

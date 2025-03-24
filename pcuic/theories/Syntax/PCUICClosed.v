@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Morphisms.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICInduction PCUICUnivSubst PCUICLiftSubst PCUICSigmaCalculus.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICInduction PCUICUnivSubst PCUICLiftSubst PCUICSigmaCalculus.
 
 From Stdlib Require Import ssreflect ssrbool.
 From Equations Require Import Equations.

@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8 Program ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames BasicAst EnvMap.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils EInduction ELiftSubst EWcbvEval EGlobalEnv
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames BasicAst EnvMap.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils EInduction ELiftSubst EWcbvEval EGlobalEnv
   EWellformed ECSubst EInduction EWcbvEvalInd EEtaExpanded.
 
 Set Asymmetric Patterns.

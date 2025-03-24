@@ -1,17 +1,17 @@
-From MetaCoq.Erasure.Typed Require Import Utils.
-From MetaCoq.Erasure.Typed Require Import Erasure.
-From MetaCoq.Erasure.Typed Require Import ExAst.
+From MetaRocq.Erasure.Typed Require Import Utils.
+From MetaRocq.Erasure.Typed Require Import Erasure.
+From MetaRocq.Erasure.Typed Require Import ExAst.
 From Equations Require Import Equations.
-From MetaCoq.Erasure Require Import EDeps.
-From MetaCoq.Erasure Require Import ESubstitution.
-From MetaCoq.Erasure Require Import Extract.
-From MetaCoq.Erasure Require Import ErasureFunction ErasureFunctionProperties.
-From MetaCoq.PCUIC Require Import PCUICAstUtils.
-From MetaCoq.PCUIC Require Import PCUICSR.
-From MetaCoq.PCUIC Require Import PCUICTyping.
-From MetaCoq.PCUIC Require Import PCUICAst.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import Kernames.
+From MetaRocq.Erasure Require Import EDeps.
+From MetaRocq.Erasure Require Import ESubstitution.
+From MetaRocq.Erasure Require Import Extract.
+From MetaRocq.Erasure Require Import ErasureFunction ErasureFunctionProperties.
+From MetaRocq.PCUIC Require Import PCUICAstUtils.
+From MetaRocq.PCUIC Require Import PCUICSR.
+From MetaRocq.PCUIC Require Import PCUICTyping.
+From MetaRocq.PCUIC Require Import PCUICAst.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import Kernames.
 From Stdlib Require Import List.
 
 Import ListNotations.

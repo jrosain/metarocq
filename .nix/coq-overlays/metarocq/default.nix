@@ -3,8 +3,8 @@
   coqPackages, coq, equations, version ? null }@args:
 with builtins // lib;
 let
-  repo  = "metacoq";
-  owner = "MetaCoq";
+  repo  = "metarocq";
+  owner = "MetaRocq";
   defaultVersion = with versions; switch coq.coq-version [
       { case = "8.11"; out = "1.0-beta2-8.11"; }
       { case = "8.12"; out = "1.0-beta2-8.12"; }
@@ -25,16 +25,16 @@ let
   };
   releaseRev = v: "v${v}";
 
-  # list of core metacoq packages sorted by dependency order
+  # list of core metarocq packages sorted by dependency order
   packages = [ "utils" "common" "template-coq" "pcuic" "safechecker" "template-pcuic" "erasure" "quotation" "safechecker-plugin" "erasure-plugin" "all" ];
 
-  template-coq = metacoq_ "template-coq";
+  template-coq = metarocq_ "template-coq";
 
-  metacoq_ = package: let
-      metacoq-deps = if package == "single" then []
-        else map metacoq_ (head (splitList (pred.equal package) packages));
+  metarocq_ = package: let
+      metarocq-deps = if package == "single" then []
+        else map metarocq_ (head (splitList (pred.equal package) packages));
       pkgpath = if package == "single" then "./" else "./${package}";
-      pname = if package == "all" then "metacoq" else "metacoq-${package}";
+      pname = if package == "all" then "metarocq" else "metarocq-${package}";
       pkgallMake = ''
           mkdir all
           echo "all:" > all/Makefile
@@ -44,7 +44,7 @@ let
         inherit version pname defaultVersion release releaseRev repo owner;
 
         mlPlugin = true;
-        propagatedBuildInputs = [ equations coq.ocamlPackages.zarith ] ++ metacoq-deps;
+        propagatedBuildInputs = [ equations coq.ocamlPackages.zarith ] ++ metarocq-deps;
 
         patchPhase =  ''
           patchShebangs ./configure.sh
@@ -57,9 +57,9 @@ let
         '' ;
 
         configurePhase = optionalString (package == "all") pkgallMake + ''
-          touch ${pkgpath}/metacoq-config
+          touch ${pkgpath}/metarocq-config
         '' + optionalString (elem package ["safechecker" "erasure" "template-pcuic" "quotation" "safechecker-plugin" "erasure-plugin"]) ''
-          echo  "-I ${template-coq}/lib/coq/${coq.coq-version}/user-contrib/MetaCoq/Template/" > ${pkgpath}/metacoq-config
+          echo  "-I ${template-coq}/lib/coq/${coq.coq-version}/user-contrib/MetaRocq/Template/" > ${pkgpath}/metarocq-config
         '' + optionalString (package == "single") ''
           ./configure.sh local
         '';
@@ -69,12 +69,12 @@ let
         '' ;
 
         meta = {
-          homepage    = "https://metacoq.github.io/";
+          homepage    = "https://metarocq.github.io/";
           license     = licenses.mit;
           maintainers = with maintainers; [ cohencyril ];
         };
       } // optionalAttrs (package != "single")
-        { passthru = genAttrs packages metacoq_; })
+        { passthru = genAttrs packages metarocq_; })
      ).overrideAttrs (o:
        let requiresOcamlStdlibShims = versionAtLeast o.version "1.0-8.16" ||
                                       (o.version == "dev" && (versionAtLeast coq.coq-version "8.16" || coq.coq-version == "dev")) ;
@@ -84,4 +84,4 @@ let
        });
     in derivation;
 in
-metacoq_ (if single then "single" else "all")
+metarocq_ (if single then "single" else "all")

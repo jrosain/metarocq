@@ -1,8 +1,8 @@
--generate-meta-for-package coq-metacoq-demo-plugin
+-generate-meta-for-package coq-metarocq-demo-plugin
 
 -I src
 -I gen-src
--R theories MetaCoq.ExtractedPluginDemo
+-R theories MetaRocq.ExtractedPluginDemo
 
 src/g_demo_plugin.mlg
 src/demo_plugin.mlpack

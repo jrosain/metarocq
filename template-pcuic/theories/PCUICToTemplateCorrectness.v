@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool Utf8 CRelationClasses.
 From Equations.Type Require Import Relation Relation_Properties.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
      PCUICLiftSubst PCUICEquality PCUICReduction PCUICCasesContexts PCUICTactics
      PCUICWeakeningConv PCUICWeakeningTyp PCUICUnivSubst PCUICTyping PCUICGlobalEnv
      PCUICClosedTyp PCUICGeneration PCUICConversion (* Needs transitivity of cumulativity *)
@@ -10,14 +10,14 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
      PCUICSafeLemmata PCUICInductives PCUICInductiveInversion.
 Set Warnings "-notation-overridden".
 
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.Template Require Import Ast TypingWf UnivSubst
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.Template Require Import Ast TypingWf UnivSubst
      TermEquality LiftSubst Reduction.
 Set Warnings "notation-overridden".
 
-From MetaCoq.PCUIC Require Import PCUICEquality.
-From MetaCoq.TemplatePCUIC Require Import PCUICToTemplate.
+From MetaRocq.PCUIC Require Import PCUICEquality.
+From MetaRocq.TemplatePCUIC Require Import PCUICToTemplate.
 
 Import MCMonadNotation.
 
@@ -1478,7 +1478,7 @@ Proof.
   eapply trans_eq_term_upto_univ ; eauto.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICCumulativity.
+From MetaRocq.PCUIC Require Import PCUICCumulativity.
 
 Section wtcumul.
   Set Warnings "-notation-overridden".
@@ -2175,7 +2175,7 @@ Proof.
     now rewrite trans_to_extended_list.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICClosed PCUICWeakeningEnvConv PCUICWeakeningEnvTyp.
+From MetaRocq.PCUIC Require Import PCUICClosed PCUICWeakeningEnvConv PCUICWeakeningEnvTyp.
 
 Lemma trans_subst_instance_decl u x : map_decl (subst_instance u) (trans_decl x) = trans_decl (map_decl (subst_instance u) x).
 Proof.

@@ -5,9 +5,9 @@ From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
 
 Set Warnings "-notation-overridden".
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICOnOne PCUICCases PCUICInduction
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICOnOne PCUICCases PCUICInduction
      PCUICLiftSubst PCUICEquality PCUICReduction PCUICCasesContexts PCUICTactics
      PCUICSigmaCalculus PCUICClosed PCUICClosedTyp PCUICContexts PCUICSubstitution
      PCUICWeakeningEnv PCUICWeakeningEnvTyp PCUICEquality
@@ -17,7 +17,7 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICOnOne PCUICCases P
      PCUICValidity PCUICArities PCUICInversion
      PCUICCases PCUICWellScopedCumulativity PCUICSpine PCUICSR
      PCUICSafeLemmata PCUICInductives PCUICInductiveInversion.
-From MetaCoq.PCUIC Require Import PCUICExpandLets.
+From MetaRocq.PCUIC Require Import PCUICExpandLets.
 Set Warnings "+notation-overridden".
 
 Import MCMonadNotation.
@@ -1089,7 +1089,7 @@ Proof.
   rewrite (trans_cstr_branch_context p i) //.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICContexts.
+From MetaRocq.PCUIC Require Import PCUICContexts.
 
 Lemma eq_names_smash_context Γ :
   All2 (fun x y => decl_name x = decl_name y) (smash_context [] (trans_local Γ)) (smash_context [] Γ).
@@ -1201,7 +1201,7 @@ Proof.
   now rewrite (declared_minductive_ind_npars declc).
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICSpine.
+From MetaRocq.PCUIC Require Import PCUICSpine.
 
 Lemma trans_reln l p Γ : map trans (SE.reln l p Γ) =
   reln (map trans l) p (trans_local Γ).
@@ -1549,7 +1549,7 @@ Proof.
   eapply is_closed_context_smash_end; fvs.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICConfluence PCUICNormal.
+From MetaRocq.PCUIC Require Import PCUICConfluence PCUICNormal.
 
 Lemma red_context_rel_assumptions {cf} {Σ : global_env_ext} {Γ Δ Δ'} :
   red_context_rel Σ Γ Δ Δ' -> context_assumptions Δ = context_assumptions Δ'.
@@ -1689,7 +1689,7 @@ Proof.
       len. rewrite (All2_fold_length cum). now len in clb'. reflexivity.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICSubstitution.
+From MetaRocq.PCUIC Require Import PCUICSubstitution.
 
 Lemma is_closed_context_subst Γ Γ' s Δ :
   is_closed_context (Γ ,,, Γ' ,,, Δ) ->
@@ -1739,7 +1739,7 @@ Proof.
   eapply is_open_term_lift. 2-3:now len. apply ont.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICSubstitution.
+From MetaRocq.PCUIC Require Import PCUICSubstitution.
 
 Lemma untyped_subslet_lift (Γ Δ : context) s Δ' :
   untyped_subslet Γ s Δ' ->
@@ -1768,7 +1768,7 @@ Proof.
     eapply IHa; tea.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICUnivSubstitutionConv.
+From MetaRocq.PCUIC Require Import PCUICUnivSubstitutionConv.
 
 Lemma OnOne2_All_OnOne2 {A} {P : A -> A -> Type} {Q R} l l' :
   OnOne2 P l l' ->
@@ -2328,7 +2328,7 @@ Proof.
   eapply trans_eq_term_upto_univ; eauto; tc.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICContextConversion.
+From MetaRocq.PCUIC Require Import PCUICContextConversion.
 
 Lemma wt_red1_wt {cf} {Σ} {wfΣ : wf Σ} {Γ t u} :
   wt Σ Γ t -> red1 Σ Γ t u -> wt Σ Γ u.
@@ -4310,7 +4310,7 @@ Proof.
       eapply All2_fold_app. reflexivity. apply X. }
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICRedTypeIrrelevance.
+From MetaRocq.PCUIC Require Import PCUICRedTypeIrrelevance.
 
 Lemma pres_let_bodies_assumption_context {cf} {Σ : global_env_ext} {wfΣ : wf Σ} {Γ Γ'} :
   #|Γ| = #|Γ'| ->
@@ -5100,7 +5100,7 @@ Qed.
 
 (* Print Assumptions expand_lets_sound. *)
 
-From MetaCoq.PCUIC Require Import PCUICWcbvEval PCUICClassification PCUICCSubst.
+From MetaRocq.PCUIC Require Import PCUICWcbvEval PCUICClassification PCUICCSubst.
 
 Lemma trans_csubst a k b :
   closed a ->
@@ -5374,7 +5374,7 @@ Proof.
     destruct t => //.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICEtaExpand.
+From MetaRocq.PCUIC Require Import PCUICEtaExpand.
 
 Lemma trans_isConstruct t : isConstruct t = isConstruct (trans t).
 Proof. destruct t => //. Qed.
@@ -5494,7 +5494,7 @@ Proof.
                   all: inversion o0; eauto.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICProgram PCUICFirstorder.
+From MetaRocq.PCUIC Require Import PCUICProgram PCUICFirstorder.
 
 Lemma expanded_expand_lets_program {cf : checker_flags} p (wtp : wt_pcuic_program p) :
   expanded_pcuic_program p ->
@@ -5569,7 +5569,7 @@ Proof.
     destruct (decl_body c); lia.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICLiftSubst PCUICContexts PCUICOnFreeVars.
+From MetaRocq.PCUIC Require Import PCUICLiftSubst PCUICContexts PCUICOnFreeVars.
 
 Lemma expand_lets_tFix Γ mfix idx k :
   expand_lets_k Γ k (tFix mfix idx) = tFix (List.map (map_def (expand_lets_k Γ k) (expand_lets_k Γ (#|mfix| + k))) mfix) idx.

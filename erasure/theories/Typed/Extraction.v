@@ -1,19 +1,19 @@
 (** This file provides the main function for invoking our extraction. *)
 From Stdlib Require Import String.
-From MetaCoq.Erasure.Typed Require Import Erasure.
-From MetaCoq.Erasure.Typed Require Import Optimize.
-From MetaCoq.Erasure.Typed Require OptimizePropDiscr.
-From MetaCoq.Erasure.Typed Require Import ResultMonad.
-From MetaCoq.Erasure.Typed Require Import Transform.
-From MetaCoq.Erasure.Typed Require Import Utils.
-From MetaCoq.Erasure.Typed Require Import Certifying.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import Kernames.
-From MetaCoq.Common Require Import config.
-From MetaCoq.Template Require Import TemplateMonad.
-From MetaCoq.PCUIC Require Import PCUICAst.
-From MetaCoq.PCUIC Require Import PCUICTyping.
-From MetaCoq.TemplatePCUIC Require Import TemplateToPCUIC.
+From MetaRocq.Erasure.Typed Require Import Erasure.
+From MetaRocq.Erasure.Typed Require Import Optimize.
+From MetaRocq.Erasure.Typed Require OptimizePropDiscr.
+From MetaRocq.Erasure.Typed Require Import ResultMonad.
+From MetaRocq.Erasure.Typed Require Import Transform.
+From MetaRocq.Erasure.Typed Require Import Utils.
+From MetaRocq.Erasure.Typed Require Import Certifying.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import Kernames.
+From MetaRocq.Common Require Import config.
+From MetaRocq.Template Require Import TemplateMonad.
+From MetaRocq.PCUIC Require Import PCUICAst.
+From MetaRocq.PCUIC Require Import PCUICTyping.
+From MetaRocq.TemplatePCUIC Require Import TemplateToPCUIC.
 
 #[export]
 Existing Instance extraction_checker_flags.
@@ -161,7 +161,7 @@ Definition extract_template_env_certifying_passes
     | Err e => tmFail e
   end.
 
-(** MetaCoq's safe checker does not run from within Coq, only when extracting.
+(** MetaRocq's safe checker does not run from within Coq, only when extracting.
     To work around this we assume environments are well formed when extracting
     from within Coq. This is justified since our environments are produced by quoting
     and thus come directly from Coq, where they have already been type checked. *)

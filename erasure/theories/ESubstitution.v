@@ -1,12 +1,12 @@
 
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Program ssreflect.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICLiftSubst PCUICTyping
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICLiftSubst PCUICTyping
      PCUICGlobalEnv PCUICWeakeningConv PCUICWeakeningTyp PCUICSubstitution
      PCUICWeakeningEnv PCUICWeakeningEnvTyp PCUICOnFreeVars PCUICElimination PCUICFirstorder.
-From MetaCoq.Erasure Require Import EGlobalEnv Extract Prelim.
+From MetaRocq.Erasure Require Import EGlobalEnv Extract Prelim.
 
 Local Set Keyed Unification.
 
@@ -154,7 +154,7 @@ Proof.
     now apply All_local_env_app_inv in X1.
 Qed.
 
-From MetaCoq Require Import PCUIC.PCUICInversion.
+From MetaRocq Require Import PCUIC.PCUICInversion.
 Derive Signature for erases.
 
 Lemma erases_ctx_ext (Σ : global_env_ext) Γ Γ' t t' :

@@ -5,8 +5,8 @@ open Pp
 let resolve (tm : string) : GlobRef.t Lazy.t =
   lazy (Rocqlib.lib_ref tm)
 
-let r_template_monad_prop_p s = resolve ("metacoq.templatemonad.prop." ^ s)
-let r_template_monad_type_p s = resolve ("metacoq.templatemonad.type." ^ s)
+let r_template_monad_prop_p s = resolve ("metarocq.templatemonad.prop." ^ s)
+let r_template_monad_type_p s = resolve ("metarocq.templatemonad.type." ^ s)
 
 (* for "Core" *)
 let (ptmReturn,
@@ -214,10 +214,10 @@ let rec app_full trm acc =
 let monad_failure s k =
   CErrors.user_err  Pp.(str s ++ str " must take " ++ int k ++
                           str " argument" ++ str (if k > 0 then "s" else "") ++ str "." ++ fnl () ++
-                          str "Please file a bug with MetaCoq.")
+                          str "Please file a bug with MetaRocq.")
 
 let next_action env evd (pgm : constr) : template_monad * _ =
-  let () = ppdebug 2 (fun () -> Pp.(str "MetaCoq: TemplateProgram: Going to reduce " ++ fnl () ++ Printer.pr_constr_env env evd pgm)) in
+  let () = ppdebug 2 (fun () -> Pp.(str "MetaRocq: TemplateProgram: Going to reduce " ++ fnl () ++ Printer.pr_constr_env env evd pgm)) in
   let pgm = Reduction.whd_all env pgm in
   let (coConstr, args) = app_full pgm [] in
   let (glob_ref, universes) =
@@ -234,13 +234,13 @@ let next_action env evd (pgm : constr) : template_monad * _ =
   in
   let eq_gr t = Environ.QGlobRef.equal env glob_ref (Lazy.force t) in
   if eq_gr ptmBind || eq_gr ttmBind then
-    let () = ppdebug 1 (fun () -> Pp.(str "MetaCoq: TemplateProgram: processing tmBind")) in
+    let () = ppdebug 1 (fun () -> Pp.(str "MetaRocq: TemplateProgram: processing tmBind")) in
     match args with
     | _::_::a::f::[] ->
        (TmBind (a, f), universes)
     | _ -> monad_failure "tmBind" 4
   else
-    let () = ppdebug 0 (fun () -> Pp.(str "MetaCoq: TemplateProgram: Going to run:" ++ fnl () ++ Printer.pr_constr_env env evd pgm)) in
+    let () = ppdebug 0 (fun () -> Pp.(str "MetaRocq: TemplateProgram: Going to run:" ++ fnl () ++ Printer.pr_constr_env env evd pgm)) in
     if eq_gr ptmReturn || eq_gr ttmReturn then
       match args with
       | _::h::[] ->

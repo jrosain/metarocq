@@ -1,15 +1,15 @@
 all: coq template-coq plugin
 
-_PluginProject: _PluginProject.in metacoq-config
-	cat metacoq-config > _PluginProject
+_PluginProject: _PluginProject.in metarocq-config
+	cat metarocq-config > _PluginProject
 	cat _PluginProject.in >> _PluginProject
 
-_CoqProject: _CoqProject.in metacoq-config
-	cat metacoq-config > _CoqProject
+_CoqProject: _CoqProject.in metarocq-config
+	cat metarocq-config > _CoqProject
 	cat _CoqProject.in >> _CoqProject
 
-_TemplateCoqProject: _TemplateCoqProject.in metacoq-config
-	cat metacoq-config > _TemplateCoqProject
+_TemplateCoqProject: _TemplateCoqProject.in metarocq-config
+	cat metarocq-config > _TemplateCoqProject
 	cat _TemplateCoqProject.in >> _TemplateCoqProject
 
 

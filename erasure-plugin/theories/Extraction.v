@@ -1,6 +1,6 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Ascii FSets ExtrOcamlBasic ExtrOCamlFloats ExtrOCamlInt63.
-From MetaCoq.Utils Require Import utils.
+From MetaRocq.Utils Require Import utils.
 
 (** * Extraction setup for the erasure phase of template-coq.
 
@@ -14,8 +14,8 @@ Extraction Blacklist Classes config uGraph Universes Ast String List Nat Int
 Set Warnings "-extraction-opaque-accessed".
 Set Warnings "-extraction-reserved-identifier".
 
-From MetaCoq.Erasure Require Import EAst EAstUtils EInduction ELiftSubst EGlobalEnv Extract ErasureFunction.
-From MetaCoq.ErasurePlugin Require Import Erasure.
+From MetaRocq.Erasure Require Import EAst EAstUtils EInduction ELiftSubst EGlobalEnv Extract ErasureFunction.
+From MetaRocq.ErasurePlugin Require Import Erasure.
 
 Extraction Inline Equations.Prop.Classes.noConfusion.
 Extraction Inline Equations.Prop.Logic.eq_elim.

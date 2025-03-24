@@ -1,9 +1,9 @@
 opam-version: "2.0"
 version: "dev"
 maintainer: "matthieu.sozeau@inria.fr"
-homepage: "https://metacoq.github.io/metacoq"
-dev-repo: "git+https://github.com/MetaCoq/metacoq.git#main"
-bug-reports: "https://github.com/MetaCoq/metacoq/issues"
+homepage: "https://metarocq.github.io/metarocq"
+dev-repo: "git+https://github.com/MetaRocq/metarocq.git#main"
+bug-reports: "https://github.com/MetaRocq/metarocq/issues"
 authors: ["Abhishek Anand <aa755@cs.cornell.edu>"
           "Danil Annenkov <danil.v.annenkov@gmail.com>"
           "Simon Boulier <simon.boulier@inria.fr>"
@@ -20,17 +20,24 @@ authors: ["Abhishek Anand <aa755@cs.cornell.edu>"
           "Théo Winterhalter <theo.winterhalter@inria.fr>"
 ]
 license: "MIT"
-build: [
-  ["bash" "./configure.sh"]
-  [make "-j" "%{jobs}%" "-C" "common"]
-]
-install: [
-  [make "-C" "common" "install"]
-]
 depends: [
-  "coq-metacoq-utils" {= version}
+  "coq-metarocq-safechecker-plugin" {= version}
+  "coq-metarocq-erasure-plugin" {= version}
+  "coq-metarocq-translations" {= version}
+  "coq-metarocq-quotation" {= version}
 ]
-synopsis: "The common library of Template Coq and PCUIC"
+build: [
+  ["bash" "./configure.sh" ] {with-test}
+  [make "-C" "examples" ] {with-test}
+  [make "-C" "test-suite" ] {with-test}
+]
+synopsis: "A meta-programming framework for Coq"
 description: """
-MetaCoq is a meta-programming framework for Coq.
+MetaRocq is a meta-programming framework for Coq.
+
+The meta-package includes the template-coq library,
+the PCUIC development including a verified equivalence between Coq and PCUIC,
+a safe type checker and verified erasure for PCUIC and example translations.
+
+See individual packages for more detailed descriptions.
 """

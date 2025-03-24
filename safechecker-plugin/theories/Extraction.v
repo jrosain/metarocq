@@ -1,10 +1,10 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import OrdersTac Ascii ExtrOcamlBasic ExtrOCamlInt63 ExtrOCamlFloats.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.SafeChecker Require Import PCUICWfEnvImpl PCUICSafeChecker PCUICSafeConversion.
-From MetaCoq.SafeCheckerPlugin Require Import SafeTemplateChecker.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.SafeChecker Require Import PCUICWfEnvImpl PCUICSafeChecker PCUICSafeConversion.
+From MetaRocq.SafeCheckerPlugin Require Import SafeTemplateChecker.
 
-(** * Extraction setup for the safechecker phase of MetaCoq.
+(** * Extraction setup for the safechecker phase of MetaRocq.
 
     Any extracted code planning to link with the plugin's OCaml reifier
     should use these same directives for consistency.

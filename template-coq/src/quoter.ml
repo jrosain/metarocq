@@ -16,16 +16,16 @@ let cast_prop = ref (false)
 (* whether Set Template Cast Propositions is on, as needed for erasure in Certicoq *)
 let is_cast_prop () = !cast_prop
 
-let metacoq_cat = match CWarnings.get_category "metacoq" with
+let metarocq_cat = match CWarnings.get_category "metarocq" with
   | There c -> c
   | OtherType -> assert false
-  | NotThere -> CWarnings.create_category ~name:"metacoq" ()
+  | NotThere -> CWarnings.create_category ~name:"metarocq" ()
 
 let make_warning_if_not_exist w =
   match CWarnings.get_warning w with
   | There w -> w
   | OtherType -> assert false (* used as category *)
-  | NotThere -> CWarnings.create_warning ~name:w ~from:[metacoq_cat] ()
+  | NotThere -> CWarnings.create_warning ~name:w ~from:[metarocq_cat] ()
 
 let warn_primitive_turned_into_axiom =
   CWarnings.create_in (make_warning_if_not_exist "primitive-turned-into-axiom")

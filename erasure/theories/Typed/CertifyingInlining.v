@@ -5,13 +5,13 @@
 From Stdlib Require Import List.
 From Stdlib Require Import String.
 From Stdlib Require Import Bool.
-From MetaCoq.Erasure.Typed Require Import Transform.
-From MetaCoq.Erasure.Typed Require Import CertifyingBeta.
-From MetaCoq.Erasure.Typed Require Import ResultMonad.
-From MetaCoq.Erasure.Typed Require Import Utils.
-From MetaCoq.Erasure.Typed Require Import Certifying.
-From MetaCoq.Template Require Import All.
-From MetaCoq.Common Require Import Kernames.
+From MetaRocq.Erasure.Typed Require Import Transform.
+From MetaRocq.Erasure.Typed Require Import CertifyingBeta.
+From MetaRocq.Erasure.Typed Require Import ResultMonad.
+From MetaRocq.Erasure.Typed Require Import Utils.
+From MetaRocq.Erasure.Typed Require Import Certifying.
+From MetaRocq.Template Require Import All.
+From MetaRocq.Common Require Import Kernames.
 
 Import MCMonadNotation.
 
@@ -120,7 +120,7 @@ Definition inline_globals (should_inline : kername -> bool)
                       the lookup functions take [global_env]. *)
                   let Σ0 := {| universes := ContextSet.empty;
                               declarations := decls;
-                              retroknowledge := MetaCoq.Common.Environment.Retroknowledge.empty |} in
+                              retroknowledge := MetaRocq.Common.Environment.Retroknowledge.empty |} in
                   (kn, inline_in_decl should_inline Σ0 decl) :: decls) [] Σ in
   filter (fun '(kn, _) => negb (should_inline kn)) newΣ.
 
@@ -165,7 +165,7 @@ Module Tests.
 
     Definition baz : nat -> nat := fun x => foo x + bar x.
 
-    MetaCoq Run (env <- inline_def (fun kn => eq_kername <%% foo %%> kn
+    MetaRocq Run (env <- inline_def (fun kn => eq_kername <%% foo %%> kn
                                           || eq_kername <%% bar %%> kn)
                                   baz ;;
                  t <- tmEval lazy (map fst env);;
@@ -174,7 +174,7 @@ Module Tests.
 
   (** Inlining into the definition from the standard library *)
   Module Ex2.
-    MetaCoq Run (inline_def (fun kn => eq_kername <%% Nat.add %%> kn ) mult).
+    MetaRocq Run (inline_def (fun kn => eq_kername <%% Nat.add %%> kn ) mult).
   End Ex2.
 
   (** Inlining a function of several arguments *)
@@ -184,7 +184,7 @@ Module Tests.
     Definition bar : nat -> nat := fun n => foo (n + 1) 1 n.
 
     Definition baz : nat -> nat := fun z => bar z.
-    MetaCoq Run (inline_def (fun kn => eq_kername <%% foo %%> kn ||
+    MetaRocq Run (inline_def (fun kn => eq_kername <%% foo %%> kn ||
                 eq_kername <%% bar %%> kn) baz).
   End Ex3.
 
@@ -201,14 +201,14 @@ Module Tests.
 
     Definition bar (b : blah ) := set_field1 b 0.
 
-    MetaCoq Run (inline_def (fun kn => eq_kername <%% set_field1 %%> kn) bar).
+    MetaRocq Run (inline_def (fun kn => eq_kername <%% set_field1 %%> kn) bar).
   End Ex4.
 
   (** Casts *)
   Module Ex5.
     Definition foo : nat -> nat -> nat := fun x y => x + y.
     Definition bar : nat -> nat := fun x => ((foo (x * 2)) : nat -> nat) x.
-    MetaCoq Run (inline_def (fun kn => eq_kername <%% foo %%> kn) bar).
+    MetaRocq Run (inline_def (fun kn => eq_kername <%% foo %%> kn) bar).
   End Ex5.
 
   (** Inlining type aliases in inductives *)
@@ -221,7 +221,7 @@ Module Tests.
 
     Definition foo (p : my_prod nat bool) : blah := blah_ctor p.
 
-    MetaCoq Run (inline_def (fun kn => eq_kername <%% my_prod %%> kn) foo).
+    MetaRocq Run (inline_def (fun kn => eq_kername <%% my_prod %%> kn) foo).
   End Ex6.
 
 End Tests.

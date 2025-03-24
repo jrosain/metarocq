@@ -1,14 +1,14 @@
 (* Distributed under the terms of the MIT license. *)
 
-From MetaCoq.Utils Require Export
+From MetaRocq.Utils Require Export
      monad_utils   (* Monadic notations *)
      MCUtils. (* Utility functions *)
 
-From MetaCoq.Common Require Export
+From MetaRocq.Common Require Export
      uGraph        (* The graph of universes *)
      BasicAst      (* The basic AST structures *).
 
-From MetaCoq.Template Require Export
+From MetaRocq.Template Require Export
      Ast           (* The term AST *)
      AstUtils      (* Utilities on the AST *)
      Induction     (* Induction *)

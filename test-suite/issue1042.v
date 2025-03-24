@@ -1,5 +1,5 @@
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All.
 Import MCMonadNotation.
 
 
@@ -14,7 +14,7 @@ Inductive tm : Set := .
 
 Definition d1 : TemplateMonad unit.
 (* Set Debug "backtrace". *)
-Fail MetaCoq Run(
+Fail MetaRocq Run(
     quote  <- quote_inductive tm;;
     constructor <- ident_term quote;;
     tmPrint constructor)

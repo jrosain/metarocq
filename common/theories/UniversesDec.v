@@ -1,7 +1,7 @@
 From Stdlib Require Import PArith NArith ZArith Lia.
-From MetaCoq.Utils Require Import MCList MCOption MCUtils.
-From MetaCoq.Common Require Import uGraph.
-From MetaCoq.Common Require Import Universes.
+From MetaRocq.Utils Require Import MCList MCOption MCUtils.
+From MetaRocq.Common Require Import uGraph.
+From MetaRocq.Common Require Import Universes.
 Import wGraph.
 
 Definition levels_of_cs (cstr : ConstraintSet.t) : LevelSet.t

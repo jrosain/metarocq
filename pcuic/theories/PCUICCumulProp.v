@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Universes.
-From MetaCoq.PCUIC Require Import PCUICTyping PCUICAst PCUICAstUtils PCUICTactics
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Universes.
+From MetaRocq.PCUIC Require Import PCUICTyping PCUICAst PCUICAstUtils PCUICTactics
      PCUICLiftSubst PCUICInductives PCUICGeneration PCUICSpine
      PCUICGlobalEnv PCUICWeakeningEnvConv PCUICWeakeningEnvTyp
      PCUICSubstitution PCUICUnivSubst PCUICUnivSubstitutionConv

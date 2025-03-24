@@ -1,9 +1,9 @@
 (* For primitive integers and floats  *)
 From Stdlib Require Numbers.Cyclic.Int63.Uint63 Floats.PrimFloat.
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils monad_utils.
-From MetaCoq.Common Require Import BasicAst Primitive Environment.
-From MetaCoq.Template Require Import Ast.
+From MetaRocq.Utils Require Import utils monad_utils.
+From MetaRocq.Common Require Import BasicAst Primitive Environment.
+From MetaRocq.Template Require Import Ast.
 From Stdlib Require Import ssreflect ssrbool.
 From Stdlib Require Import ZArith.
 

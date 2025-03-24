@@ -1,7 +1,7 @@
-From MetaCoq.Common Require Import Kernames.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.Utils Require Import MCFSets.Sig.
+From MetaRocq.Common Require Import Kernames.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.Utils Require Import MCFSets.Sig.
 
 Module qKernameMapExtraFact <: QuotationOfWFactsExtra_fun KernameMap.E KernameMap KernameMapFact.F KernameMapExtraFact.
-  MetaCoq Run (tmMakeQuotationOfModule everything None "KernameMapExtraFact").
+  MetaRocq Run (tmMakeQuotationOfModule everything None "KernameMapExtraFact").
 End qKernameMapExtraFact.

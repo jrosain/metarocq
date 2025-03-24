@@ -1,6 +1,6 @@
-From MetaCoq Require Import Utils.MCTactics.SpecializeBy.
-From MetaCoq Require Import Utils.MCTactics.GeneralizeOverHoles.
-From MetaCoq Require Import Utils.MCTactics.UniquePose.
+From MetaRocq Require Import Utils.MCTactics.SpecializeBy.
+From MetaRocq Require Import Utils.MCTactics.GeneralizeOverHoles.
+From MetaRocq Require Import Utils.MCTactics.UniquePose.
 
 Ltac guarded_in_hyp_term_under_binders_do' guard_tac H tac :=
   let is_transparent := match goal with

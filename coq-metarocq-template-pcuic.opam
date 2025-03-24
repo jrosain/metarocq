@@ -1,9 +1,9 @@
 opam-version: "2.0"
 version: "dev"
 maintainer: "matthieu.sozeau@inria.fr"
-homepage: "https://metacoq.github.io/metacoq"
-dev-repo: "git+https://github.com/MetaCoq/metacoq.git#main"
-bug-reports: "https://github.com/MetaCoq/metacoq/issues"
+homepage: "https://metarocq.github.io/metarocq"
+dev-repo: "git+https://github.com/MetaRocq/metarocq.git#main"
+bug-reports: "https://github.com/MetaRocq/metarocq/issues"
 authors: ["Abhishek Anand <aa755@cs.cornell.edu>"
           "Danil Annenkov <danil.v.annenkov@gmail.com>"
           "Simon Boulier <simon.boulier@inria.fr>"
@@ -22,24 +22,15 @@ authors: ["Abhishek Anand <aa755@cs.cornell.edu>"
 license: "MIT"
 build: [
   ["bash" "./configure.sh"]
-  [make "-j" "%{jobs}%" "-C" "safechecker-plugin"]
+  [make "-j" "%{jobs}%" "-C" "template-pcuic"]
 ]
 install: [
-  [make "-C" "safechecker-plugin" "install"]
+  [make "-C" "template-pcuic" "install"]
 ]
 depends: [
-  "coq-metacoq-template-pcuic" {= version}
-  "coq-metacoq-safechecker" {= version}
+  "coq-metarocq-template" {= version}
+  "coq-metarocq-pcuic" {= version}
 ]
-synopsis: "Implementation and verification of an erasure procedure for Coq"
+synopsis: "Translations between Template Coq and PCUIC and proofs of correctness"
 description: """
-MetaCoq is a meta-programming framework for Coq.
-
-The Erasure module provides a complete specification of Coq's so-called
-\"extraction\" procedure, starting from the PCUIC calculus and targeting
-untyped call-by-value lambda-calculus.
-
-The `erasure` function translates types and proofs in well-typed terms
-into a dummy `tBox` constructor, following closely P. Letouzey's PhD
-thesis.
 """

@@ -3,7 +3,7 @@ COQEXTRAFLAGS+=-q
 
 -include ../Makefile.conf
 
-ifeq '$(METACOQ_CONFIG)' 'local'
+ifeq '$(METAROCQ_CONFIG)' 'local'
   ifeq ($(shell which cygpath 2>/dev/null),)
   OCAMLPATH := $(shell pwd)/../template-coq/:$(shell pwd)/../safechecker/src/:$(shell pwd)/../erasure/src/:$(OCAMLPATH)
   else

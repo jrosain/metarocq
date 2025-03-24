@@ -1,4 +1,4 @@
--R theories MetaCoq.SafeChecker
+-R theories MetaRocq.SafeChecker
 
 theories/PCUICEqualityDec.v
 theories/PCUICErrors.v

@@ -1,11 +1,11 @@
 all: theory plugin
 
-_PluginProject: _PluginProject.in metacoq-config
-	cat metacoq-config > _PluginProject
+_PluginProject: _PluginProject.in metarocq-config
+	cat metarocq-config > _PluginProject
 	cat _PluginProject.in >> _PluginProject
 
-_CoqProject: _CoqProject.in metacoq-config
-	cat metacoq-config > _CoqProject
+_CoqProject: _CoqProject.in metarocq-config
+	cat metarocq-config > _CoqProject
 	cat _CoqProject.in >> _CoqProject
 
 Makefile.plugin: _PluginProject
@@ -37,7 +37,7 @@ clean: Makefile.safecheckerplugin Makefile.plugin
 	make -f Makefile.plugin clean
 
 mrproper:
-	rm -f metacoq-config
+	rm -f metarocq-config
 	rm -f Makefile.plugin _PluginProject
 	rm -f Makefile.safecheckerplugin _CoqProject
 

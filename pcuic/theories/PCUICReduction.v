@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Primitive.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICOnOne PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Primitive.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICOnOne PCUICAstUtils
      PCUICLiftSubst PCUICUnivSubst PCUICInduction PCUICPrimitive
      PCUICCases PCUICClosed PCUICTactics.
 
@@ -2159,7 +2159,7 @@ Proof.
 Qed.
 
 (* TODO Find a better place for this. *)
-From MetaCoq.PCUIC Require Import PCUICPosition.
+From MetaRocq.PCUIC Require Import PCUICPosition.
 Section Stacks.
 
   Context (Σ : global_env_ext).

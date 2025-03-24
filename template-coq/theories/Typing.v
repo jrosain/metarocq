@@ -3,9 +3,9 @@
 From Equations.Type Require Import Relation.
 From Equations Require Import Equations.
 From Stdlib Require Import ssreflect Wellfounded Relation_Operators CRelationClasses.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Environment Primitive EnvironmentTyping Reflect.
-From MetaCoq.Template Require Import Ast AstUtils LiftSubst UnivSubst ReflectAst TermEquality WfAst.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Environment Primitive EnvironmentTyping Reflect.
+From MetaRocq.Template Require Import Ast AstUtils LiftSubst UnivSubst ReflectAst TermEquality WfAst.
 
 Import MCMonadNotation.
 

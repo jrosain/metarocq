@@ -1,7 +1,7 @@
 all: theory
 
-_CoqProject: _CoqProject.in metacoq-config
-	cat metacoq-config > _CoqProject
+_CoqProject: _CoqProject.in metarocq-config
+	cat metarocq-config > _CoqProject
 	cat _CoqProject.in >> _CoqProject
 
 Makefile.quotation: _CoqProject
@@ -20,7 +20,7 @@ clean: Makefile.quotation
 	make -f Makefile.quotation clean
 
 mrproper:
-	rm -f metacoq-config
+	rm -f metarocq-config
 	rm -f Makefile.quotation _CoqProject
 
 .merlin: Makefile.quotation

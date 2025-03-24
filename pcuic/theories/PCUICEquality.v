@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import CMorphisms.
-From MetaCoq.Utils Require Import LibHypsNaming utils.
-From MetaCoq.Common Require Import config Reflect.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
+From MetaRocq.Utils Require Import LibHypsNaming utils.
+From MetaRocq.Common Require Import config Reflect.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
      PCUICLiftSubst PCUICReflect.
 
 From Stdlib Require Import ssreflect ssrbool.

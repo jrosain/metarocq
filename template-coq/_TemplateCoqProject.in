@@ -1,10 +1,10 @@
 -I src
--Q src MetaCoq.Template
--R theories MetaCoq.Template
-META.coq-metacoq-template-coq
+-Q src MetaRocq.Template
+-R theories MetaRocq.Template
+META.coq-metarocq-template-coq
 -I .
 
-# the MetaCoq plugin
+# the MetaRocq plugin
 src/tm_util.ml
 
 src/reification.ml
@@ -27,5 +27,5 @@ theories/Loader.v
 theories/Lib.v
 theories/All.v
 
-# A checker of well-formedness in MetaCoq and Coq
+# A checker of well-formedness in MetaRocq and Coq
 theories/TemplateCheckWf.v

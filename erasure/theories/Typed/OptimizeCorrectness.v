@@ -1,25 +1,25 @@
-From MetaCoq.Erasure.Typed Require Import Utils.
-From MetaCoq.Erasure.Typed Require Import ClosedAux.
-From MetaCoq.Erasure.Typed Require Import ExAst.
-From MetaCoq.Erasure.Typed Require Import Optimize.
-From MetaCoq.Erasure.Typed Require Import Transform.
-From MetaCoq.Erasure.Typed Require Import WcbvEvalAux.
+From MetaRocq.Erasure.Typed Require Import Utils.
+From MetaRocq.Erasure.Typed Require Import ClosedAux.
+From MetaRocq.Erasure.Typed Require Import ExAst.
+From MetaRocq.Erasure.Typed Require Import Optimize.
+From MetaRocq.Erasure.Typed Require Import Transform.
+From MetaRocq.Erasure.Typed Require Import WcbvEvalAux.
 From Stdlib Require Import Btauto.
 From Stdlib Require Import btauto.Algebra.
 From Stdlib Require Import List.
 From Stdlib Require Import ssreflect ssrbool.
 From Stdlib Require Import PeanoNat.
 From Equations Require Import Equations.
-From MetaCoq.Erasure Require Import EPrimitive EAstUtils.
-From MetaCoq.Erasure Require Import ECSubst.
-From MetaCoq.Erasure Require Import EInduction.
-From MetaCoq.Erasure Require Import ELiftSubst.
-From MetaCoq.Erasure Require Import EWcbvEval.
-From MetaCoq.Erasure Require Import EGlobalEnv EWellformed.
-From MetaCoq.Utils Require Import MCList.
-From MetaCoq.Utils Require Import MCPrelude.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Utils Require Import All_Forall.
+From MetaRocq.Erasure Require Import EPrimitive EAstUtils.
+From MetaRocq.Erasure Require Import ECSubst.
+From MetaRocq.Erasure Require Import EInduction.
+From MetaRocq.Erasure Require Import ELiftSubst.
+From MetaRocq.Erasure Require Import EWcbvEval.
+From MetaRocq.Erasure Require Import EGlobalEnv EWellformed.
+From MetaRocq.Utils Require Import MCList.
+From MetaRocq.Utils Require Import MCPrelude.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Utils Require Import All_Forall.
 Require ssreflect.
 
 Import ExAst.
@@ -66,7 +66,7 @@ Proof.
 Qed.
 
 (** We use our own "properly ordered" contexts to represent the lambdas/lets
-    that we debox away. Unlike the rest of MetaCoq, these contexts actually
+    that we debox away. Unlike the rest of MetaRocq, these contexts actually
     have the first declaration at the beginning. *)
 Fixpoint subst_context (t : term) (k : nat) (Γ : context) : context :=
   match Γ with
@@ -2258,7 +2258,7 @@ Proof.
   - now propify.
 Qed.
 
-(* NOTE: borrowed from MetaCoq (where it's commented out) and fixed *)
+(* NOTE: borrowed from MetaRocq (where it's commented out) and fixed *)
 Lemma closedn_subst s k k' t :
   forallb (closedn k) s -> closedn (k + k' + #|s|) t ->
   closedn (k + k') (subst s k' t).
@@ -4126,7 +4126,7 @@ Proof.
   now destruct nth_error;cbn in *;try congruence;auto.
 Qed.
 
-(* NOTE: there is a similar lemma in MetaCoq, but it's missing
+(* NOTE: there is a similar lemma in MetaRocq, but it's missing
    the fact about arguments and the arity. *)
 Lemma eval_mkApps_Construct_inv' {fl : WcbvFlags} Σ kn c args e :
   with_constructor_as_block = false ->

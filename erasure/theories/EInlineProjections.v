@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8 Program.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames BasicAst.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils EExtends
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames BasicAst.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils EExtends
     ELiftSubst ECSubst EGlobalEnv EWellformed EWcbvEval Extract
     EEnvMap EArities EProgram.
 
@@ -735,7 +735,7 @@ Proof.
     destruct args; cbn in *; eauto.
 Qed.
 
-From MetaCoq.Erasure Require Import EEtaExpanded.
+From MetaRocq.Erasure Require Import EEtaExpanded.
 
 Lemma optimize_expanded {Σ : GlobalContextMap.t} t : expanded Σ t -> expanded Σ (optimize Σ t).
 Proof.
@@ -841,7 +841,7 @@ Proof.
   now apply optimize_wellformed_term.
 Qed.
 
-From MetaCoq.Erasure Require Import EGenericGlobalMap.
+From MetaRocq.Erasure Require Import EGenericGlobalMap.
 
 #[local]
 Instance GT : GenTransform := { gen_transform := optimize; gen_transform_inductive_decl := id }.

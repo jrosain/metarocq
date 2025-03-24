@@ -13,8 +13,8 @@ From Stdlib Require Import Lia.
 From Equations Require Import Equations.
 Set Primitive Projections.
 Set Default Proof Using "Type".
-From MetaCoq.Utils Require Import MCCompare ReflectEq.
-From MetaCoq.Utils Require ByteCompare ByteCompareSpec.
+From MetaRocq.Utils Require Import MCCompare ReflectEq.
+From MetaRocq.Utils Require ByteCompare ByteCompareSpec.
 (** bytes *)
 
 Definition byte_parse (b : Byte.byte) : Byte.byte := b.

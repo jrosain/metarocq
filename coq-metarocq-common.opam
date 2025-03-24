@@ -1,9 +1,9 @@
 opam-version: "2.0"
 version: "dev"
 maintainer: "matthieu.sozeau@inria.fr"
-homepage: "https://metacoq.github.io/metacoq"
-dev-repo: "git+https://github.com/MetaCoq/metacoq.git#main"
-bug-reports: "https://github.com/MetaCoq/metacoq/issues"
+homepage: "https://metarocq.github.io/metarocq"
+dev-repo: "git+https://github.com/MetaRocq/metarocq.git#main"
+bug-reports: "https://github.com/MetaRocq/metarocq/issues"
 authors: ["Abhishek Anand <aa755@cs.cornell.edu>"
           "Danil Annenkov <danil.v.annenkov@gmail.com>"
           "Simon Boulier <simon.boulier@inria.fr>"
@@ -22,19 +22,15 @@ authors: ["Abhishek Anand <aa755@cs.cornell.edu>"
 license: "MIT"
 build: [
   ["bash" "./configure.sh"]
-  [make "-j" "%{jobs}%" "-C" "translations"]
+  [make "-j" "%{jobs}%" "-C" "common"]
 ]
 install: [
-  [make "-C" "translations" "install"]
+  [make "-C" "common" "install"]
 ]
 depends: [
-  "coq-metacoq-template" {= version}
+  "coq-metarocq-utils" {= version}
 ]
-synopsis: "Translations built on top of MetaCoq"
+synopsis: "The common library of Template Coq and PCUIC"
 description: """
-MetaCoq is a meta-programming framework for Coq.
-
-The Translations modules provides implementation of standard translations
-from type theory to type theory, e.g. parametricity and the `cross-bool`
-translation that invalidates functional extensionality.
+MetaRocq is a meta-programming framework for Coq.
 """

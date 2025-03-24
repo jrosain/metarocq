@@ -1,9 +1,9 @@
 opam-version: "2.0"
 version: "dev"
 maintainer: "matthieu.sozeau@inria.fr"
-homepage: "https://metacoq.github.io/metacoq"
-dev-repo: "git+https://github.com/MetaCoq/metacoq.git#main"
-bug-reports: "https://github.com/MetaCoq/metacoq/issues"
+homepage: "https://metarocq.github.io/metarocq"
+dev-repo: "git+https://github.com/MetaRocq/metarocq.git#main"
+bug-reports: "https://github.com/MetaRocq/metarocq/issues"
 authors: ["Abhishek Anand <aa755@cs.cornell.edu>"
           "Danil Annenkov <danil.v.annenkov@gmail.com>"
           "Simon Boulier <simon.boulier@inria.fr>"
@@ -22,18 +22,19 @@ authors: ["Abhishek Anand <aa755@cs.cornell.edu>"
 license: "MIT"
 build: [
   ["bash" "./configure.sh"]
-  [make "-j" "%{jobs}%" "-C" "safechecker"]
+  [make "-j" "%{jobs}%" "-C" "translations"]
 ]
 install: [
-  [make "-C" "safechecker" "install"]
+  [make "-C" "translations" "install"]
 ]
 depends: [
-  "coq-metacoq-pcuic" {= version}
+  "coq-metarocq-template" {= version}
 ]
-synopsis: "Implementation and verification of safe conversion and typechecking algorithms for Coq"
+synopsis: "Translations built on top of MetaRocq"
 description: """
-MetaCoq is a meta-programming framework for Coq.
+MetaRocq is a meta-programming framework for Coq.
 
-The SafeChecker modules provides a correct implementation of
-weak-head reduction, conversion and typechecking of Coq definitions and global environments.
+The Translations modules provides implementation of standard translations
+from type theory to type theory, e.g. parametricity and the `cross-bool`
+translation that invalidates functional extensionality.
 """

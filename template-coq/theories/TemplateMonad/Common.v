@@ -1,6 +1,6 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import Ast.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import Ast.
 
 Local Set Universe Polymorphism.
 

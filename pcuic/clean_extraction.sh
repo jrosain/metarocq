@@ -21,7 +21,7 @@ do
 done
 cd ..
 
-# Remove extracted modules already linked in metacoq_template_plugin and checker.
+# Remove extracted modules already linked in metarocq_template_plugin and checker.
 echo "Removing:" $files
 
 rm -f $files

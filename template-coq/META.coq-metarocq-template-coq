@@ -1,7 +1,7 @@
 # TODO: Generate automatically with Dune
 
 package "plugin" (
-    description = "The MetaCoq Coq Template Plugin"
+    description = "The MetaRocq Coq Template Plugin"
     version = "8.20"
     directory = "src"
     requires = "coq-core.plugins.ltac"

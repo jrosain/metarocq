@@ -1,6 +1,6 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils monad_utils.
-From MetaCoq.Template Require Import Ast.
+From MetaRocq.Utils Require Import utils monad_utils.
+From MetaRocq.Template Require Import Ast.
 
 Import MCMonadNotation.
 Local Set Universe Polymorphism.

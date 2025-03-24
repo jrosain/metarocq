@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 From Equations Require Import Equations.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Export Environment EnvironmentTyping Universes BasicAst.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Export Environment EnvironmentTyping Universes BasicAst.
 (* For primitive integers and floats  *)
 From Stdlib Require Uint63 Floats.PrimFloat Floats.SpecFloat PArray PrimString.
 From Stdlib Require Import ssreflect Morphisms.

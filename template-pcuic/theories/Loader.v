@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Template Require ExtractableLoader.
-From MetaCoq.Template Require Export Loader.
-From MetaCoq.TemplatePCUIC.PCUICTemplateMonad Require Core.
-From MetaCoq.TemplatePCUIC Require Import TemplateMonadToPCUIC.
+From MetaRocq.Template Require ExtractableLoader.
+From MetaRocq.Template Require Export Loader.
+From MetaRocq.TemplatePCUIC.PCUICTemplateMonad Require Core.
+From MetaRocq.TemplatePCUIC Require Import TemplateMonadToPCUIC.
 
 Notation eval_pcuic_quotation := eval_pcuic_quotation (only parsing).
 #[export] Existing Instance default_eval_pcuic_quotation.

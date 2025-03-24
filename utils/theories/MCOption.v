@@ -1,6 +1,6 @@
 From Stdlib Require Import List ssreflect ssrbool Arith Morphisms Relation_Definitions.
 
-From MetaCoq.Utils Require Import MCPrelude MCList MCProd MCReflect ReflectEq.
+From MetaRocq.Utils Require Import MCPrelude MCList MCProd MCReflect ReflectEq.
 
 Definition option_get {A} (default : A) (x : option A) : A
   := match x with

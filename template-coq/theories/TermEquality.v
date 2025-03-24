@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import CMorphisms.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Reflect Environment EnvironmentTyping.
-From MetaCoq.Template Require Import Ast AstUtils Induction.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Reflect Environment EnvironmentTyping.
+From MetaRocq.Template Require Import Ast AstUtils Induction.
 
 From Stdlib Require Import ssreflect ssrbool.
 From Equations.Prop Require Import DepElim.

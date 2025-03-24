@@ -1,9 +1,9 @@
 (** Pass that removes discrimination (matches and projections) on things in Prop.
-    This uses MetaCoq's optimization but adapted to run on our environments. *)
+    This uses MetaRocq's optimization but adapted to run on our environments. *)
 
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Erasure.Typed Require Import ExAst.
-From MetaCoq.Erasure Require Import EOptimizePropDiscr.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Erasure.Typed Require Import ExAst.
+From MetaRocq.Erasure Require Import EOptimizePropDiscr.
 
 Definition remove_match_on_box_constant_body Σ cst :=
   {| cst_type := cst_type cst;

@@ -1,11 +1,11 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Program ssreflect ssrbool.
 From Equations Require Import Equations.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import Transform config BasicAst.
-From MetaCoq.PCUIC Require PCUICAst PCUICAstUtils PCUICProgram.
-(* From MetaCoq.SafeChecker Require Import PCUICErrors PCUICWfEnvImpl. *)
-From MetaCoq.Erasure Require EAstUtils EWellformed EEnvMap EGlobalEnv EWcbvEval.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import Transform config BasicAst.
+From MetaRocq.PCUIC Require PCUICAst PCUICAstUtils PCUICProgram.
+(* From MetaRocq.SafeChecker Require Import PCUICErrors PCUICWfEnvImpl. *)
+From MetaRocq.Erasure Require EAstUtils EWellformed EEnvMap EGlobalEnv EWcbvEval.
 Import EEnvMap.
 
 Import bytestring.

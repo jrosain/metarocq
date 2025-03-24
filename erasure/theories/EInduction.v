@@ -1,9 +1,9 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import List ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import BasicAst.
-From MetaCoq.PCUIC Require Import PCUICSize.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import BasicAst.
+From MetaRocq.PCUIC Require Import PCUICSize.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils.
 From Equations Require Import Equations.
 Set Equations Transparent.
 

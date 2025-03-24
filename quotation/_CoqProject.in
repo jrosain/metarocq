@@ -1,4 +1,4 @@
--R theories MetaCoq.Quotation
+-R theories MetaRocq.Quotation
 
 theories/CommonUtils.v
 theories/ToPCUIC/All.v

@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool.
-From MetaCoq.Template Require Import utils BasicAst Universes.
-From MetaCoq.PCUIC Require Import PCUICPrimitive.
-From MetaCoq.Erasure Require Import EAst EAstUtils EInduction ECSubst ELiftSubst EGlobalEnv.
+From MetaRocq.Template Require Import utils BasicAst Universes.
+From MetaRocq.PCUIC Require Import PCUICPrimitive.
+From MetaRocq.Erasure Require Import EAst EAstUtils EInduction ECSubst ELiftSubst EGlobalEnv.
 (* EEtaExpanded.*)
 From Equations Require Import Equations.
 Set Equations Transparent.

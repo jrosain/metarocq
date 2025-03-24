@@ -1,4 +1,4 @@
--R theories MetaCoq.Common
+-R theories MetaRocq.Common
 
 theories/Primitive.v
 theories/uGraph.v

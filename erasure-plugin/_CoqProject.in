@@ -1,4 +1,4 @@
--R theories MetaCoq.ErasurePlugin
+-R theories MetaRocq.ErasurePlugin
 
 theories/ETransform.v
 theories/Erasure.v

@@ -1,7 +1,7 @@
 all: theory
 
-_CoqProject: _CoqProject.in metacoq-config
-	cat metacoq-config > _CoqProject
+_CoqProject: _CoqProject.in metarocq-config
+	cat metarocq-config > _CoqProject
 	cat _CoqProject.in >> _CoqProject
 
 Makefile.templatepcuic: _CoqProject
@@ -20,7 +20,7 @@ clean: Makefile.templatepcuic
 	make -f Makefile.templatepcuic clean
 
 mrproper:
-	rm -f metacoq-config
+	rm -f metarocq-config
 	rm -f Makefile.templatepcuic _CoqProject
 
 .merlin: Makefile.templatepcuic

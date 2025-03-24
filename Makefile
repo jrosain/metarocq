@@ -3,7 +3,7 @@ all: printconf template-coq pcuic safechecker erasure erasure-plugin safechecker
 
 -include Makefile.conf
 
-ifeq '$(METACOQ_CONFIG)' 'local'
+ifeq '$(METAROCQ_CONFIG)' 'local'
   ifeq ($(shell which cygpath 2>/dev/null),)
   OCAMLPATH := $(shell pwd)/template-coq/:$(shell pwd)/safechecker-plugin/src:$(shell pwd)/erasure-plugin/src:$(OCAMLPATH)
   else
@@ -15,10 +15,10 @@ endif
 .PHONY: printconf all utils template-coq pcuic erasure install uninstall html clean mrproper safechecker-plugin .merlin test-suite translations quotation
 
 printconf:
-ifeq '$(METACOQ_CONFIG)' 'local'
+ifeq '$(METAROCQ_CONFIG)' 'local'
 	@echo "Local configuration"
 else
-ifeq '$(METACOQ_CONFIG)' 'global'
+ifeq '$(METAROCQ_CONFIG)' 'global'
 	@echo "Global configuration"
 else
 	@echo "Run ./configure.sh first"
@@ -54,17 +54,17 @@ uninstall:
 html: all
 	"coqdoc" --multi-index -toc -utf8 -html \
     --with-header ./html/resources/header.html --with-footer ./html/resources/footer.html \
-		-R utils/theories MetaCoq.Utils \
-		-R common/theories MetaCoq.Common \
-		-R template-coq/theories MetaCoq.Template \
-		-R pcuic/theories MetaCoq.PCUIC \
-		-R safechecker/theories MetaCoq.SafeChecker \
-		-R template-pcuic/theories MetaCoq.TemplatePCUIC \
-		-R quotation/theories MetaCoq.Quotation \
-		-R erasure/theories MetaCoq.Erasure \
-		-R erasure-plugin/theories MetaCoq.ErasurePlugin \
-		-R translations MetaCoq.Translations \
-		-R examples MetaCoq.Examples \
+		-R utils/theories MetaRocq.Utils \
+		-R common/theories MetaRocq.Common \
+		-R template-coq/theories MetaRocq.Template \
+		-R pcuic/theories MetaRocq.PCUIC \
+		-R safechecker/theories MetaRocq.SafeChecker \
+		-R template-pcuic/theories MetaRocq.TemplatePCUIC \
+		-R quotation/theories MetaRocq.Quotation \
+		-R erasure/theories MetaRocq.Erasure \
+		-R erasure-plugin/theories MetaRocq.ErasurePlugin \
+		-R translations MetaRocq.Translations \
+		-R examples MetaRocq.Examples \
 		-d html */theories/*.v */theories/*/*.v translations/*.v examples/*.v
 
 clean:
@@ -203,7 +203,7 @@ ci-quick:
 ci-opam:
 # Use -v so that regular output is produced
 	opam install --with-test -v -y .
-	opam remove -y coq-metacoq coq-metacoq-template
+	opam remove -y coq-metarocq coq-metarocq-template
 
 checktodos:
 	sh checktodos.sh

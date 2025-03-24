@@ -1,13 +1,13 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8 Program.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
      PCUICReflect PCUICWeakeningEnvConv PCUICWeakeningEnvTyp
      PCUICTyping PCUICInversion
      PCUICSafeLemmata. (* for welltyped *)
-From MetaCoq.SafeChecker Require Import PCUICWfEnvImpl.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils EDeps EExtends
+From MetaRocq.SafeChecker Require Import PCUICWfEnvImpl.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils EDeps EExtends
     EEtaExpanded
     ELiftSubst ECSubst ESpineView EGlobalEnv EInduction EWellformed EWcbvEval Extract Prelim
     EEnvMap EArities EProgram.
@@ -604,7 +604,7 @@ Ltac destruct_times :=
   | [ H : MCProd.and10 _ _ _ _ _ _ _ _ _ _ |- _ ] => destruct H
   end.
 
-From MetaCoq.Erasure Require Import EWcbvEvalCstrsAsBlocksInd.
+From MetaRocq.Erasure Require Import EWcbvEvalCstrsAsBlocksInd.
 Lemma trans_correct {efl : EEnvFlags} {fl} {wcon : with_constructor_as_block = true}
   {wcb : cstr_as_blocks = true}
   {wpc : with_prop_case = false} (* Avoid tLazy tBox values *)
@@ -824,7 +824,7 @@ Qed.
     rewrite -lookup_constructor_trans //. destruct l => //.
 Qed.
 *)
-From MetaCoq.Erasure Require Import EEtaExpanded.
+From MetaRocq.Erasure Require Import EEtaExpanded.
 
 Lemma isLambda_trans Σ t : isLambda t -> isLambda (trans Σ t).
 Proof. destruct t => //. Qed.

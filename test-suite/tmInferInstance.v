@@ -1,4 +1,4 @@
-From MetaCoq Require Import Template.All.
+From MetaRocq Require Import Template.All.
 Require Export String List.
 
 Import MCMonadNotation.
@@ -6,8 +6,8 @@ Import MCMonadNotation.
 Existing Class True.
 Global Existing Instance I.
 
-MetaCoq Run (tmInferInstance None True >>= tmPrint).
-MetaCoq Run (tmInferInstance None False >>= tmPrint).
+MetaRocq Run (tmInferInstance None True >>= tmPrint).
+MetaRocq Run (tmInferInstance None False >>= tmPrint).
 
 Section noFixUniverse.
   Set Printing Universes.

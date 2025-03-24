@@ -1,8 +1,8 @@
-From MetaCoq.Common Require Import BasicAst Environment EnvironmentTyping.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Common Require Import BasicAst Environment EnvironmentTyping.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
 
 Module Type QuotationOfLookup (T : Term) (E : EnvironmentSig T) (L : LookupSig T E).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "L").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "L").
 End QuotationOfLookup.
 
 Module Type QuoteLookupSig (Import T : Term) (Import E : EnvironmentSig T) (Import L : LookupSig T E).
@@ -23,7 +23,7 @@ Module Type QuoteLookupSig (Import T : Term) (Import E : EnvironmentSig T) (Impo
 End QuoteLookupSig.
 
 Module Type QuotationOfEnvTyping (T : Term) (E : EnvironmentSig T) (TU : TermUtils T E) (ET : EnvTypingSig T E TU).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "ET").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "ET").
 End QuotationOfEnvTyping.
 
 Module Type QuoteEnvTypingSig (Import T : Term) (Import E : EnvironmentSig T) (Import TU : TermUtils T E) (Import ET : EnvTypingSig T E TU).
@@ -58,7 +58,7 @@ Module Type QuoteEnvTypingSig (Import T : Term) (Import E : EnvironmentSig T) (I
 End QuoteEnvTypingSig.
 
 Module Type QuotationOfConversion (T : Term) (E : EnvironmentSig T) (TU : TermUtils T E) (ET : EnvTypingSig T E TU) (C : ConversionSig T E TU ET).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "C").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "C").
 End QuotationOfConversion.
 
 Module Type QuoteConversionSig (Import T : Term) (Import E : EnvironmentSig T) (Import TU : TermUtils T E) (Import ET : EnvTypingSig T E TU) (Import C : ConversionSig T E TU ET).
@@ -83,7 +83,7 @@ Module Type QuoteConversionSig (Import T : Term) (Import E : EnvironmentSig T) (
 End QuoteConversionSig.
 
 Module Type QuotationOfGlobalMaps (T : Term) (E : EnvironmentSig T) (TU : TermUtils T E) (ET : EnvTypingSig T E TU) (C : ConversionSig T E TU ET) (L : LookupSig T E) (GM : GlobalMapsSig T E TU ET C L).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "GM").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "GM").
 End QuotationOfGlobalMaps.
 
 Module Type QuoteGlobalMapsSig (Import T: Term) (Import E: EnvironmentSig T) (Import TU : TermUtils T E) (Import ET: EnvTypingSig T E TU) (Import C: ConversionSig T E TU ET) (Import L: LookupSig T E) (Import GM : GlobalMapsSig T E TU ET C L).
@@ -136,7 +136,7 @@ Module Type QuoteGlobalMapsSig (Import T: Term) (Import E: EnvironmentSig T) (Im
 End QuoteGlobalMapsSig.
 
 Module Type QuotationOfConversionPar (T : Term) (E : EnvironmentSig T) (TU : TermUtils T E) (ET : EnvTypingSig T E TU) (CS : ConversionParSig T E TU ET).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "CS").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "CS").
 End QuotationOfConversionPar.
 
 Module Type QuoteConversionParSig (T : Term) (E : EnvironmentSig T) (TU : TermUtils T E) (ET : EnvTypingSig T E TU) (Import CS : ConversionParSig T E TU ET).
@@ -145,7 +145,7 @@ End QuoteConversionParSig.
 
 Module Type QuotationOfTyping (T : Term) (E : EnvironmentSig T) (TU : TermUtils T E) (ET : EnvTypingSig T E TU)
   (CT : ConversionSig T E TU ET) (CS : ConversionParSig T E TU ET) (Ty : Typing T E TU ET CT CS).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "Ty").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "Ty").
 End QuotationOfTyping.
 
 Module Type QuoteTyping (T : Term) (E : EnvironmentSig T) (TU : TermUtils T E) (ET : EnvTypingSig T E TU)
@@ -158,7 +158,7 @@ Module Type QuotationOfDeclarationTyping (T : Term) (E : EnvironmentSig T) (TU :
   (ET : EnvTypingSig T E TU) (CT : ConversionSig T E TU ET)
   (CS : ConversionParSig T E TU ET) (Ty : Typing T E TU ET CT CS)
   (L : LookupSig T E) (GM : GlobalMapsSig T E TU ET CT L) (DT : DeclarationTypingSig T E TU ET CT CS Ty L GM).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "DT").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "DT").
 End QuotationOfDeclarationTyping.
 
 Module Type QuoteDeclarationTypingSig (Import T : Term) (Import E : EnvironmentSig T) (Import TU : TermUtils T E)

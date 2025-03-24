@@ -1,4 +1,4 @@
-From MetaCoq Require Import Template.All Utils.bytestring Template.Pretty.
+From MetaRocq Require Import Template.All Utils.bytestring Template.Pretty.
 From Stdlib Require Export List.
 Open Scope bs_scope.
 Import ListNotations.
@@ -14,8 +14,8 @@ Definition tmLocateInd (q : qualid) : TemplateMonad kername :=
   | _ :: _ => tmFail ("[" ++ q ++ "] not an inductive")
   end.
 
-MetaCoq Run (tmLocateInd "Datatypes.unit" >>= tmDefinition "q_unit").
-MetaCoq Run (tmLocateInd "test" >>= tmDefinition "q_test").
+MetaRocq Run (tmLocateInd "Datatypes.unit" >>= tmDefinition "q_unit").
+MetaRocq Run (tmLocateInd "test" >>= tmDefinition "q_test").
 
 Definition nAnon := {| binder_name := nAnon; binder_relevance := Relevant |}.
 Definition nNamed s := {| binder_name := nNamed s; binder_relevance := Relevant |}.
@@ -32,10 +32,10 @@ tFix
            [{| bcontext := [nNamed "x0"]; bbody := (tApp (tRel 2) [tRel 0]) |}]))
      0] 0.
 
-(* MetaCoq Run (tmEval cbv (print_term (empty_ext []) [] true T) >>= tmPrint).   *)
-Fail MetaCoq Run (tmUnquote T >>= tmPrint).
+(* MetaRocq Run (tmEval cbv (print_term (empty_ext []) [] true T) >>= tmPrint).   *)
+Fail MetaRocq Run (tmUnquote T >>= tmPrint).
 
 Fail Definition bla := (existT_typed_term (test unit -> unit) (fix f (x : test f) : unit := match x with
                                                                               | test_T _ x0 => f x0
                                                                               end)).
-Fail MetaCoq Run (tmUnquote T >>= tmDefinition "fails").
+Fail MetaRocq Run (tmUnquote T >>= tmDefinition "fails").

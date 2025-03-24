@@ -1,10 +1,10 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8 Program.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames BasicAst EnvMap.
-From MetaCoq.Erasure Require Import EPrimitive EAst EGlobalEnv EAstUtils EEnvMap EExtends EWellformed.
-From MetaCoq.Erasure Require Import EWcbvEvalInd EProgram EWcbvEval.
-From MetaCoq.Erasure Require Import EInduction ELiftSubst ESpineView ECSubst EProgram.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames BasicAst EnvMap.
+From MetaRocq.Erasure Require Import EPrimitive EAst EGlobalEnv EAstUtils EEnvMap EExtends EWellformed.
+From MetaRocq.Erasure Require Import EWcbvEvalInd EProgram EWcbvEval.
+From MetaRocq.Erasure Require Import EInduction ELiftSubst ESpineView ECSubst EProgram.
 
 Set Default Proof Using "Type*".
 

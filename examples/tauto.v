@@ -1,6 +1,6 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All.
 
 From Equations Require Import Equations.
 
@@ -472,15 +472,15 @@ revert s; induction n; simpl; intros.
 Qed.
 
 
-MetaCoq Quote Definition MProp := Prop.
+MetaRocq Quote Definition MProp := Prop.
 
-MetaCoq Quote Definition MFalse := False.
+MetaRocq Quote Definition MFalse := False.
 
-MetaCoq Quote Definition MTrue := True.
+MetaRocq Quote Definition MTrue := True.
 
-MetaCoq Quote Definition Mand := and.
+MetaRocq Quote Definition Mand := and.
 
-MetaCoq Quote Definition Mor := or.
+MetaRocq Quote Definition Mor := or.
 
 Definition tImpl (A B : term) :=
   tProd banon A (lift0 1 B).
@@ -846,10 +846,10 @@ Definition tmLocateInd (q : qualid) : TemplateMonad kername :=
   end.
 
 
-MetaCoq Run (tmLocateInd "Logic.and" >>= tmDefinition "q_and").
-MetaCoq Run (tmLocateInd "Logic.or" >>= tmDefinition "q_or").
-MetaCoq Run (tmLocateInd "Logic.True" >>= tmDefinition "q_True").
-MetaCoq Run (tmLocateInd "Logic.False" >>= tmDefinition "q_False").
+MetaRocq Run (tmLocateInd "Logic.and" >>= tmDefinition "q_and").
+MetaRocq Run (tmLocateInd "Logic.or" >>= tmDefinition "q_or").
+MetaRocq Run (tmLocateInd "Logic.True" >>= tmDefinition "q_True").
+MetaRocq Run (tmLocateInd "Logic.False" >>= tmDefinition "q_False").
 
 Equations reify (Σ : global_env_ext) (Γ : context) (P : term) : option form
   by wf (tsize P) lt :=
@@ -926,7 +926,7 @@ Next Obligation.
   simpl in h1. lia.
 Qed.
 
-Local Instance Propositional_Logic_MetaCoq : Propositional_Logic term :=
+Local Instance Propositional_Logic_MetaRocq : Propositional_Logic term :=
   {| Pfalse := MFalse; Ptrue := MTrue; Pand := fun P Q => mkApps Mand [P;Q];
      Por := fun P Q => mkApps Mor [P;Q]; Pimpl := fun P Q => tImpl P Q |}.
 

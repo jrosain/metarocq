@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import Environment.
-From MetaCoq.Template Require Import Ast AstUtils Induction WfAst.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import Environment.
+From MetaRocq.Template Require Import Ast AstUtils Induction WfAst.
 From Stdlib Require Import ssreflect.
 From Equations Require Import Equations.
 

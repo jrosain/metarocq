@@ -1,5 +1,5 @@
 From Stdlib Require Import List.
-From MetaCoq.Template Require Import All Loader.
+From MetaRocq.Template Require Import All Loader.
 Import MCMonadNotation.
 Open Scope bs.
 

@@ -1,12 +1,12 @@
 (* Distributed under the terms of the MIT license. *)
 Set Warnings "-notation-overridden".
 
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All Checker.
-From MetaCoq.Translations Require Import translation_utils MiniHoTT.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All Checker.
+From MetaRocq.Translations Require Import translation_utils MiniHoTT.
 Import MCMonadNotation.
 
-Unset MetaCoq Strict Unquote Universe Mode.
+Unset MetaRocq Strict Unquote Universe Mode.
 
 Local Set Primitive Projections.
 Record prod A B := pair { π1 : A ; π2 : B }.
@@ -20,9 +20,9 @@ Notation "( x ; y )" := (pair x y) : prod_scope.
 Notation " A × B " := (prod A B) : type_scope.
 Open Scope prod_scope.
 
-MetaCoq Quote Definition tprod := prod.
-MetaCoq Quote Definition tpair := @pair.
-MetaCoq Run (t <- tmQuote prod ;;
+MetaRocq Quote Definition tprod := prod.
+MetaRocq Quote Definition tpair := @pair.
+MetaRocq Run (t <- tmQuote prod ;;
             match t with
             | tInd i _ => tmDefinition "prod_ind" i
             | _ => tmFail "bug"
@@ -32,8 +32,8 @@ Definition proj1 (t : term) : term
 Definition proj2 (t : term) : term
   := tProj (mkProjection prod_ind 2 (S 0)) t.
 
-MetaCoq Quote Definition tbool := bool.
-MetaCoq Quote Definition ttrue := true.
+MetaRocq Quote Definition tbool := bool.
+MetaRocq Quote Definition ttrue := true.
 Definition timesBool (A : term) := tApp tprod [A; tbool].
 Definition pairTrue typ tm := tApp tpair [typ; tbool; tm; ttrue].
 
@@ -243,7 +243,7 @@ Definition NotFunext :=
 
 Unset Universe Checking.
 
-MetaCoq Run (TC <- TranslateRec emptyTC NotFunext ;;
+MetaRocq Run (TC <- TranslateRec emptyTC NotFunext ;;
                      tmDefinition "TC" TC ;;
                      Implement TC "notFunext" NotFunext).
 Next Obligation.
@@ -255,7 +255,7 @@ Next Obligation.
   inversion H.
 Defined.
 
-MetaCoq Run (Implement TC "notη" ((forall (A B : Set) (f : A -> B), f = fun x => f x) -> False)).
+MetaRocq Run (Implement TC "notη" ((forall (A B : Set) (f : A -> B), f = fun x => f x) -> False)).
 
 Next Obligation.
   tIntro H.
@@ -266,20 +266,20 @@ Defined.
 
 (* Require Import Vector Even. *)
 (* Definition SS := S. *)
-(* MetaCoq Run (TC <- Translate emptyTC "nat" ;; *)
+(* MetaRocq Run (TC <- Translate emptyTC "nat" ;; *)
 (*                      TC <- Translate TC "even" ;; *)
 (*                      tmDefinition "TC2" TC). *)
 
 (* Inductive foo := *)
 (* | bar : (nat -> foo) -> foo. *)
 (* Definition bar' := bar. *)
-(* MetaCoq Run (TranslateRec TC2 bar'). *)
+(* MetaRocq Run (TranslateRec TC2 bar'). *)
 
 
 Definition UIP := forall A (x y : A) (p q : x = y), p = q.
 
 
-MetaCoq Run (TC <- TranslateRec TC UIP ;;
+MetaRocq Run (TC <- TranslateRec TC UIP ;;
                      tmDefinition "eqTC" TC).
 
 Definition eqᵗ_eq {A} x y
@@ -317,7 +317,7 @@ Definition wFunext
   := forall A (B : A -> Type) (f g : forall x, B x), (forall x, f x = g x) -> f = g.
 
 
-MetaCoq Run (TC <- TranslateRec eqTC (wFunext -> False) ;;
+MetaRocq Run (TC <- TranslateRec eqTC (wFunext -> False) ;;
                      tmDefinition "eqTC'" TC ;;
                      Implement TC "notwFunext" (wFunext -> False)).
 Next Obligation.
@@ -331,7 +331,7 @@ Defined.
 Definition wUnivalence
   := forall A B, Equiv A B -> A = B.
 
-MetaCoq Run (TC <- Translate eqTC' "idpath" ;;
+MetaRocq Run (TC <- Translate eqTC' "idpath" ;;
                      TC <- ImplementExisting TC "paths_ind" ;;
                      tmDefinition "eqTC''" TC).
 Next Obligation.
@@ -339,7 +339,7 @@ Next Obligation.
   tIntro y. tIntro p. destruct p. exact t.
 Defined.
 
-MetaCoq Run (TC <- TranslateRec eqTC'' wUnivalence ;;
+MetaRocq Run (TC <- TranslateRec eqTC'' wUnivalence ;;
                      tmDefinition "eqTC3" TC).
 
 Theorem preserves_wUnivalence : wUnivalence -> wUnivalenceᵗ.
@@ -365,7 +365,7 @@ Defined.
 
 Definition UA := forall A B, IsEquiv (paths_ind A (fun B _ => Equiv A B) (equiv_idmap A) B).
 
-MetaCoq Run (TC <- Translate eqTC3 "isequiv_idmap" ;;
+MetaRocq Run (TC <- Translate eqTC3 "isequiv_idmap" ;;
                      TC <- Translate TC "equiv_idmap" ;;
                      TC <- Translate TC "UA" ;;
                      tmDefinition "eqTC4" TC).
@@ -383,7 +383,7 @@ Lemma eqᵗ_unit_unit (e e' : eqᵗ Type unit unit) : e = e'.
 Defined.
 
 
-MetaCoq Run (Implement eqTC4 "notUA" (UA -> False)).
+MetaRocq Run (Implement eqTC4 "notUA" (UA -> False)).
 Next Obligation.
   unfold UAᵗ; tIntro ua.
   tSpecialize ua unit.

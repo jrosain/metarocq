@@ -1,10 +1,10 @@
 Set Warnings "-notation-overridden".
-From MetaCoq.Utils Require Export bytestring.
-From MetaCoq.Utils Require Import utils MCList.
-From MetaCoq.Common Require Import MonadBasicAst.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICMonadAst.
-From MetaCoq.TemplatePCUIC Require Import PCUICTemplateMonad Loader.
-From MetaCoq.Quotation Require Export CommonUtils.
+From MetaRocq.Utils Require Export bytestring.
+From MetaRocq.Utils Require Import utils MCList.
+From MetaRocq.Common Require Import MonadBasicAst.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICMonadAst.
+From MetaRocq.TemplatePCUIC Require Import PCUICTemplateMonad Loader.
+From MetaRocq.Quotation Require Export CommonUtils.
 From Equations.Prop Require Import Classes.
 From Stdlib Require Import Lists.List.
 Export TemplateMonad.Common (export, local, global).
@@ -417,7 +417,7 @@ Ltac unfold_quotation_of _ :=
   end.
 
 (* for universe adjustment with [tmDeclareQuotationOfModule], [tmMakeQuotationOfModule] *)
-#[export] Unset MetaCoq Strict Unquote Universe Mode.
+#[export] Unset MetaRocq Strict Unquote Universe Mode.
 (* N.B. We need to kludge around COQBUG(https://github.com/coq/coq/issues/17303) in Kernames :-( *)
 Polymorphic Definition tmMakeQuotationOfConstants_gen@{d t u _T _above_u'} {debug:debug_opt} (work_around_coq_bug_17303 : bool) (include_submodule : list ident -> bool) (include_supermodule : list ident -> list ident -> bool) (existing_instance : option hint_locality) (base : modpath) (cs : list global_reference) (tmDoWithDefinition : ident -> forall A : Type@{d}, A -> TemplateMonad@{t u} A) : TemplateMonad@{t u} unit
   := let warn_bad_ctx c ctx :=
@@ -459,7 +459,7 @@ Polymorphic Definition tmMakeQuotationOfConstants_gen@{d t u _T _above_u'} {debu
        _ <- tmDebugPrint (split_common_prefix base mp);;
        ret tt in
      let make_definition '(name, tyv)
-       := ((let tmTyv := tmRetypeAroundMetaCoqBug853 name tyv in
+       := ((let tmTyv := tmRetypeAroundMetaRocqBug853 name tyv in
             _ <- tmDebugPrint tmTyv;;
             '{| my_projT1 := ty ; my_projT2 := v |} <- tmTyv;;
             tmDef_name <- tmEval cbv (@tmDoWithDefinition (name:string));;
@@ -599,5 +599,5 @@ Global Arguments tmDeclareQuotationOfModule {_%_bool} _ _ _%_bs.
 (*
 From Stdlib Require Import MSetPositive.
 Instance: debug_opt := true.
-MetaCoq Run (tmMakeQuotationOfModule None "Stdlib.MSets.MSetPositive.PositiveSet"%bs).
+MetaRocq Run (tmMakeQuotationOfModule None "Stdlib.MSets.MSetPositive.PositiveSet"%bs).
 *)

@@ -189,7 +189,7 @@ struct
       match args with
       | s :: [] -> debug (fun () -> str "Unquoting level " ++ Printer.pr_constr_env (Global.env ()) evm trm);
         let s = (unquote_string s) in
-        s = "__metacoq_fresh_level__"
+        s = "__metarocq_fresh_level__"
       | _ -> bad_term_verb trm "unquote_level"
     else false
 

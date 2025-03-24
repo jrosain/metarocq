@@ -3,8 +3,8 @@ From Stdlib Require Import Lists.List.
 From Stdlib Require Import Lia.
 From Stdlib Require Import Arith.
 From Stdlib Require Import NArith.
-From MetaCoq.Utils Require Import monad_utils.
-From MetaCoq.Template Require Import Loader TemplateMonad.Core.
+From MetaRocq.Utils Require Import monad_utils.
+From MetaRocq.Template Require Import Loader TemplateMonad.Core.
 
 Local Set Default Proof Mode "Classic".
 
@@ -63,8 +63,8 @@ Module TC.
 End TC.
 Module Unquote.
   Import MCMonadNotation.
-  Import MetaCoq.Common.Universes.
-  Import MetaCoq.Template.Ast.
+  Import MetaRocq.Common.Universes.
+  Import MetaRocq.Template.Ast.
   Import bytestring.
   Import ListNotations.
   Local Set Universe Polymorphism.
@@ -127,7 +127,7 @@ Module Unquote.
             bind@{t u} tmQuoteLevel@{b t u} (fun qb =>
             bind@{t u} tmQuoteLevel@{t t u} (fun qt =>
             bind@{t u} tmQuoteLevel@{u t u} (fun qu =>
-            let self := tConst (MPfile ["Core"; "TemplateMonad"; "Template"; "MetaCoq"], "tmFix'")%bs [qa;qb;qt;qu] in
+            let self := tConst (MPfile ["Core"; "TemplateMonad"; "Template"; "MetaRocq"], "tmFix'")%bs [qa;qb;qt;qu] in
             @tmFix'@{a b t u} A B (mkApps self [qA; qB]) f a))))))).
   Definition six := tmFix (fun f a => if (6 <? a) then ret 6 else f (S a))%nat 0%nat.
   Goal True.
@@ -137,15 +137,15 @@ End Unquote.
 Module NoGuard.
   (* N.B. This version is inconsistent *)
   Import MCMonadNotation.
-  Import MetaCoq.Common.Universes.
-  Import MetaCoq.Template.Ast.
+  Import MetaRocq.Common.Universes.
+  Import MetaRocq.Template.Ast.
   Import bytestring.
   Import ListNotations.
   Local Set Universe Polymorphism.
   Local Unset Universe Minimization ToSet.
   (* idk why this is needed... *)
   #[local] Hint Extern 1 (Monad _) => refine TemplateMonad_Monad : typeclass_instances.
-  Local Unset Guard Checking. (* Inconsistent!  See https://coq.zulipchat.com/#narrow/stream/237658-MetaCoq/topic/.60tmFix.60point.20combinator/near/311488798 *)
+  Local Unset Guard Checking. (* Inconsistent!  See https://coq.zulipchat.com/#narrow/stream/237658-MetaRocq/topic/.60tmFix.60point.20combinator/near/311488798 *)
   Definition tmFix {A B} (f : (A -> TemplateMonad B) -> (A -> TemplateMonad B)) : A -> TemplateMonad B
     := (fix tmFix (dummy : unit) {struct dummy} : A -> @TemplateMonad B
         := f (fun a => tmFix tt a)) tt.

@@ -1,6 +1,6 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import Ast AstUtils Common.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import Ast AstUtils Common.
 
 Local Set Universe Polymorphism.
 Local Unset Universe Minimization ToSet.
@@ -45,9 +45,9 @@ Cumulative Inductive TemplateMonad@{t u} : Type@{t} -> Prop :=
 | tmCurrentModPath : unit -> TemplateMonad modpath
 
 (* Quoting and unquoting commands *)
-(* Similar to MetaCoq Quote Definition ... := ... *)
+(* Similar to MetaRocq Quote Definition ... := ... *)
 | tmQuote : forall {A:Type@{t}}, A  -> TemplateMonad Ast.term
-(* Similar to MetaCoq Quote Recursively Definition but takes a boolean "bypass opacity" flag.
+(* Similar to MetaRocq Quote Recursively Definition but takes a boolean "bypass opacity" flag.
   ([true] - quote bodies of all dependencies (transparent and opaque);
    [false] -quote bodies of transparent definitions only) *)
 | tmQuoteRecTransp : forall {A:Type@{t}}, A -> bool(* bypass opacity? *) -> TemplateMonad program
@@ -149,7 +149,7 @@ Definition tmLocateModType1 (q : qualid) : TemplateMonad modpath :=
 Definition tmTestQuote {A} (t : A) := tmQuote t >>= tmPrint.
 
 Definition Common_kn (s : ident) :=
-  (MPfile ["Common"; "TemplateMonad"; "Template"; "MetaCoq"], s).
+  (MPfile ["Common"; "TemplateMonad"; "Template"; "MetaRocq"], s).
 Definition tmTestUnquote (t : term) :=
      t' <- tmUnquote t ;;
      t'' <- tmEval (unfold (Common_kn "my_projT2")) (my_projT2 t') ;;
@@ -235,5 +235,5 @@ Definition tmFix@{a b t u} {A : Type@{a}} {B : Type@{b}} (f : (A -> TemplateMona
             qb <- tmQuoteLevel@{b _ _};;
             qt <- tmQuoteLevel@{t _ _};;
             qu <- tmQuoteLevel@{u _ _};;
-            let self := tConst (MPfile ["Core"; "TemplateMonad"; "Template"; "MetaCoq"], "tmFix'")%bs [qa;qb;qt;qu] in
+            let self := tConst (MPfile ["Core"; "TemplateMonad"; "Template"; "MetaRocq"], "tmFix'")%bs [qa;qb;qt;qu] in
             @tmFix'@{a b t u} A B (mkApps self [qA; qB]) f a)).

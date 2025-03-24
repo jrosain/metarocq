@@ -1,12 +1,12 @@
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All.
 Import MCMonadNotation.
 
-MetaCoq Run (tmLocate1 "I" >>= tmDefinition "qI").
+MetaRocq Run (tmLocate1 "I" >>= tmDefinition "qI").
 
-Fail MetaCoq Run (tmExistingInstance global qI).
+Fail MetaRocq Run (tmExistingInstance global qI).
 
 Existing Class True.
 
-MetaCoq Run (tmExistingInstance global qI).
+MetaRocq Run (tmExistingInstance global qI).
 Print Instances True.
