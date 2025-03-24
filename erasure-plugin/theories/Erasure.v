@@ -1084,7 +1084,7 @@ Global Existing Instance fake_normalization.
 (** This uses the retyping-based erasure and assumes that the global environment and term
   are welltyped (for speed). As such this should only be used for testing, or when we know that
   the environment is wellformed and the term well-typed (e.g. when it comes directly from a
-  Coq definition). *)
+  Rocq definition). *)
 
 Axiom assume_that_we_only_erase_on_wellformed_inductive_mappings : forall {cf : checker_flags},
   forall (p : Ast.Env.program) (m : inductives_mapping), wf_template_inductives_mapping p.1 m.

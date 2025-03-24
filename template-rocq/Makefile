@@ -4,25 +4,25 @@ _PluginProject: _PluginProject.in metarocq-config
 	cat metarocq-config > _PluginProject
 	cat _PluginProject.in >> _PluginProject
 
-_CoqProject: _CoqProject.in metarocq-config
-	cat metarocq-config > _CoqProject
-	cat _CoqProject.in >> _CoqProject
+_RocqProject: _RocqProject.in metarocq-config
+	cat metarocq-config > _RocqProject
+	cat _RocqProject.in >> _RocqProject
 
-_TemplateCoqProject: _TemplateCoqProject.in metarocq-config
-	cat metarocq-config > _TemplateCoqProject
-	cat _TemplateCoqProject.in >> _TemplateCoqProject
+_TemplateRocqProject: _TemplateRocqProject.in metarocq-config
+	cat metarocq-config > _TemplateRocqProject
+	cat _TemplateRocqProject.in >> _TemplateRocqProject
 
 
-Makefile.coq: _CoqProject
-	rocq makefile -f _CoqProject -o Makefile.coq
+Makefile.coq: _RocqProject
+	rocq makefile -f _RocqProject -o Makefile.coq
 
 Makefile.plugin: _PluginProject
 	rocq makefile -f _PluginProject -o Makefile.plugin
 # Avoid conflicting dependency file creation for the template plugin
 	sed -e s/coqdeps/coqdeps.plugin/g Makefile.plugin > Makefile.plugin.tmp && mv -f Makefile.plugin.tmp Makefile.plugin
 
-Makefile.template: _TemplateCoqProject
-	rocq makefile -f _TemplateCoqProject -o Makefile.template
+Makefile.template: _TemplateRocqProject
+	rocq makefile -f _TemplateRocqProject -o Makefile.template
 # Avoid conflicting dependency file creation for the template plugin
 	sed -e s/coqdeps/coqdeps.template/g Makefile.template > Makefile.template.tmp && mv -f Makefile.template.tmp Makefile.template
 
@@ -32,7 +32,7 @@ Makefile.template: _TemplateCoqProject
 coq: Makefile.coq
 	$(MAKE) -f Makefile.coq
 
-# The template-coq plugin to run template programs live in Coq
+# The template-coq plugin to run template programs live in Rocq
 template-coq: coq Makefile.template
 # Force building the ML code before the .v's requiring them.
 	$(MAKE) -f Makefile.template optfiles

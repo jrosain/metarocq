@@ -1,5 +1,5 @@
 
-(** The reifier to Coq values *)
+(** The reifier to Rocq values *)
 module ConstrReification =
 struct
   type t = Constr.t

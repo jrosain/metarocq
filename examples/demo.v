@@ -72,7 +72,7 @@ MetaRocq Quote Definition eo_syntax := Eval compute in even.
 MetaRocq Quote Definition add'_syntax := Eval compute in add'.
 
 (** Reflecting definitions **)
-Check Coq.Init.Datatypes.nat.
+Check Rocq.Init.Datatypes.nat.
 MetaRocq Unquote Definition zero_from_syntax :=
   (Ast.tConstruct (mkInd (MPfile ["Datatypes"; "Init"; "Corelib"], "nat") 0) 0 []).
 Set Printing All.

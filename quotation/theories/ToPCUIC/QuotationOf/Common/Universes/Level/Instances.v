@@ -5,5 +5,5 @@ Import List.ListNotations.
 Local Open Scope list_scope.
 
 Module qLevel <: QuotationOfOrderedType Level.
-  MetaRocq Run (tmMakeQuotationOfModuleWorkAroundCoqBug17303 everything (*None*) "Level").
+  MetaRocq Run (tmMakeQuotationOfModuleWorkAroundRocqBug17303 everything (*None*) "Level").
 End qLevel.

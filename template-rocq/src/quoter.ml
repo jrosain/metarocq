@@ -363,7 +363,7 @@ struct
       | Constr.Int i -> (Q.mkInt (Q.quote_int63 i), acc)
       | Constr.Float f -> (Q.mkFloat (Q.quote_float64 f), acc)
       | Constr.String s -> (Q.mkString (Q.quote_pstring s), acc)
-      | Constr.Meta _ -> failwith "Meta not supported by TemplateCoq"
+      | Constr.Meta _ -> failwith "Meta not supported by TemplateRocq"
       | Constr.Array (u, ar, def, ty) ->
         let u = match UVars.Instance.to_array u with (_, [| u |]) -> u | _ -> assert false in
         let def', acc = quote_term acc env sigma def in
@@ -673,8 +673,8 @@ since  [absrt_info] is a private type *)
         if bypass
         then Some (quote_term env evm (fst (Global.force_proof Library.indirect_accessor cs)))
         else None
-      | Primitive _ -> failwith "Primitive types not supported by TemplateCoq"
-      | Symbol _ -> failwith "Symbols are not supported by TemplateCoq"
+      | Primitive _ -> failwith "Primitive types not supported by TemplateRocq"
+      | Symbol _ -> failwith "Symbols are not supported by TemplateRocq"
     in
     (ty, body)
 

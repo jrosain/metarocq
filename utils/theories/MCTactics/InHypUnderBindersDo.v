@@ -19,7 +19,7 @@ Ltac guarded_in_hyp_term_under_binders_do' guard_tac H tac :=
                              pose (H' v) as H;
                              subst H'
                    | false
-                     => (* kludge for old Coq *)
+                     => (* kludge for old Rocq *)
                        (*let v := open_constr:(_) in*)
                        let t := open_constr:(_) in
                        let v := fresh in

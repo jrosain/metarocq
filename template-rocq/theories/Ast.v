@@ -6,7 +6,7 @@ From MetaRocq.Common Require Export Environment EnvironmentTyping Universes Basi
 From Stdlib Require Uint63 Floats.PrimFloat Floats.SpecFloat PArray PrimString.
 From Stdlib Require Import ssreflect Morphisms.
 
-(** * AST of Coq kernel terms and kernel data structures
+(** * AST of Rocq kernel terms and kernel data structures
 
     ** Basic data-types:
 
@@ -421,7 +421,7 @@ Inductive term : Type :=
 
 (** This can be used to represent holes, that, when unquoted, turn into fresh existential variables.
     The fresh evar will depend on the whole context at this point in the term, despite the empty instance.
-    Denotation will call Coq's Typing.solve_evars to try and fill these holes using typing information.
+    Denotation will call Rocq's Typing.solve_evars to try and fill these holes using typing information.
 *)
 Definition hole := tEvar fresh_evar_id [].
 
@@ -760,7 +760,7 @@ Record mutual_inductive_entry := {
   mind_entry_variance  : option (list (option Universes.Variance.t));
   mind_entry_private   : option bool
   (* Private flag for sealing an inductive definition in an enclosing
-     module. Not handled by Template Coq yet. *) }.
+     module. Not handled by Template Rocq yet. *) }.
 
 Lemma inds_length ind u l : #|inds ind u l| = #|l|.
 Proof.

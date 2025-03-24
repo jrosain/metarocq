@@ -188,7 +188,7 @@ let _denote_variances evm trm : _ * Variance.t array option =
   | Some t -> let evm, v = denote_variance evm t in
       evm, Some v
 
-(* todo : stick to Coq implem *)
+(* todo : stick to Rocq implem *)
 type universe_context_type =
   | Monomorphic_uctx of ContextSet.t
   | Polymorphic_uctx of AbstractContext.t

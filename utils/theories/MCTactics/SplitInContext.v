@@ -1,4 +1,4 @@
-(* Coq's build in tactics don't work so well with things like [iff]
+(* Rocq's build in tactics don't work so well with things like [iff]
    so split them up into multiple hypotheses *)
 Ltac split_in_context_by ident funl funr tac :=
   repeat match goal with

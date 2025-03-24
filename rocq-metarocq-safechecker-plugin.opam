@@ -31,11 +31,11 @@ depends: [
   "coq-metarocq-template-pcuic" {= version}
   "coq-metarocq-safechecker" {= version}
 ]
-synopsis: "Implementation and verification of an erasure procedure for Coq"
+synopsis: "Implementation and verification of an erasure procedure for Rocq"
 description: """
-MetaRocq is a meta-programming framework for Coq.
+MetaRocq is a meta-programming framework for Rocq.
 
-The Erasure module provides a complete specification of Coq's so-called
+The Erasure module provides a complete specification of Rocq's so-called
 \"extraction\" procedure, starting from the PCUIC calculus and targeting
 untyped call-by-value lambda-calculus.
 

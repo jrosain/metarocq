@@ -37,7 +37,7 @@ Definition dummy_branch : branch term := mk_branch [] tDummy.
 
 (** *** One step strong beta-zeta-iota-fix-delta reduction
 
-  Inspired by the reduction relation from Coq in Coq [Barras'99].
+  Inspired by the reduction relation from Rocq in Rocq [Barras'99].
 *)
 
 Arguments OnOne2 {A} P%_type l l'.

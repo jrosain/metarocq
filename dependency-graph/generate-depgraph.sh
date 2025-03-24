@@ -33,7 +33,7 @@ do
     cd ../$folder
     echo `pwd`
     # WARNING: coqdep <= 8.11 only supports -dumpgraph
-    coqdep -f _CoqProject -dumpgraph ../dependency-graph/$folder.dot > /dev/null
+    coqdep -f _RocqProject -dumpgraph ../dependency-graph/$folder.dot > /dev/null
     cd ../dependency-graph
     # remove the first and last lines
     sed '1d' $folder.dot > $folder.dottmp && mv -f $folder.dottmp $folder.dot

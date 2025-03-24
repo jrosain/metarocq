@@ -1,11 +1,11 @@
 all: theory
 
-_CoqProject: _CoqProject.in metarocq-config
-	cat metarocq-config > _CoqProject
-	cat _CoqProject.in >> _CoqProject
+_RocqProject: _RocqProject.in metarocq-config
+	cat metarocq-config > _RocqProject
+	cat _RocqProject.in >> _RocqProject
 
-Makefile.erasure: _CoqProject
-	rocq makefile -f _CoqProject -o Makefile.erasure $(DEPS)
+Makefile.erasure: _RocqProject
+	rocq makefile -f _RocqProject -o Makefile.erasure $(DEPS)
 
 theory: Makefile.erasure
 	$(MAKE) -f Makefile.erasure

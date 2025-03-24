@@ -26,7 +26,7 @@ let rs_unfold (env : Environ.env) (gr : global_reference) =
   | _ -> CErrors.user_err
            Pp.(str "Constant not found or not a constant: " ++ Printer.pr_global gr)
 
-(* Coq state related to vernaculars, needed to declare constants,
+(* Rocq state related to vernaculars, needed to declare constants,
    could be a good idea to add the evar_map / env here as a record *)
 type coq_state = Declare.OblState.t
 
@@ -195,7 +195,7 @@ let quote_module ~(include_functor : bool) ~(include_submodule : bool) ~(include
           match field with
           | SFBconst _ -> [GlobRef.ConstRef (Constant.make2 mp label)]
           | SFBmind _ -> [GlobRef.IndRef (MutInd.make2 mp label, 0)]
-          | SFBrules _ -> failwith "Rewrite rules are not supported by TemplateCoq"
+          | SFBrules _ -> failwith "Rewrite rules are not supported by TemplateRocq"
           | SFBmodule mb -> if include_submodule then aux mb.mod_type mb.mod_mp else []
           | SFBmodtype mtb -> if include_submodtype then aux mtb.mod_type mtb.mod_mp else []
         in
@@ -262,7 +262,7 @@ let _constant_entry_of_cb (cb : Declarations.constant_body) =
     let proof = Opaqueproof.force_proof opaquetab pr in
     let ctx = Opaqueproof.force_constraints opaquetab pr in
     DefinitionEntry (with_body_opaque proof ~withctx:ctx true)
-  | Primitive _ -> failwith "Primitives not supported by TemplateCoq"
+  | Primitive _ -> failwith "Primitives not supported by TemplateRocq"
 
 *)
 

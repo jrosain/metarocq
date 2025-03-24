@@ -734,14 +734,14 @@ Qed.
 (** There are some assumptions of which almost all are in MetaRocq.
     From this project is only assume_env_wellformed assumption which is
     used to assume that the environments we extract are
-    wellformed. MetaRocq's safe checker does not run from within Coq, so
+    wellformed. MetaRocq's safe checker does not run from within Rocq, so
     we cannot type check the environments. However, our environments
-    are unquoted directly from Coq's kernel where they are already
+    are unquoted directly from Rocq's kernel where they are already
     welltyped, so this is justified (and the same assumption is used in
     MetaRocq when they run their erasure).
 
     The rest of the assumptions are normal MetaRocq assumptions
-    (which are justified in Coq Coq Correct!).
+    (which are justified in Rocq Rocq Correct!).
 
     [JMeq.JMeq_eq] leaks from the use of some tactics and probably can be avoided.
  *)

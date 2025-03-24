@@ -6,7 +6,7 @@ Local Set Universe Polymorphism.
 
 (** * The Extractable Template Monad
 
-  A monad for programming with Template Coq structures. Use [Run
+  A monad for programming with Template Rocq structures. Use [Run
   TemplateProgram] on a monad action to produce its side-effects.
 
  *)

@@ -181,7 +181,7 @@ Module PTree.
    end.
 
    (** This use of [Node] causes some run-time overhead, which we eliminate
-       by asking Coq to unfold the definition of [Node] in [rem'],
+       by asking Rocq to unfold the definition of [Node] in [rem'],
        then simplify the definition.  This is a form of partial evaluation. *)
 
    Definition remove' := Eval cbv [rem' Node] in @rem'.
@@ -461,7 +461,7 @@ Module PTree.
      end.
 
    (** [tree_ind] defined above has almost the same type as the
-       induction principle automatically derived by Coq for the
+       induction principle automatically derived by Rocq for the
        [Original.tree] type of the original trie implementation.
        The only difference is that the [node] case receives an additional
        hypothesis [not_trivially_empty l o r], which is useful to apply

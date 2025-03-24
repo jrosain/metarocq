@@ -4,7 +4,7 @@ From MetaRocq.Common Require Import config Environment uGraph.
 From MetaRocq.Template Require Import Ast AstUtils LiftSubst UnivSubst Typing.
 Import MCMonadNotation.
 
-(** * Coq type-checker for kernel terms
+(** * Rocq type-checker for kernel terms
 
   Implemets [typecheck_program] which returns an error and
   on success should guarantee that the term has the given type.

@@ -22,9 +22,9 @@ Set Default Proof Using "Type*".
   which conversion is defined. Hence two terms that reduce to the same
   wcbv head normal form are convertible.
 
-  This reduction strategy is supposed to mimick at the Coq level the
+  This reduction strategy is supposed to mimick at the Rocq level the
   reduction strategy of ML programming languages. It is used to state
-  the extraction conjecture that can be applied to Coq terms to produce
+  the extraction conjecture that can be applied to Rocq terms to produce
   (untyped) terms where all proofs are erased to a dummy value. *)
 
 

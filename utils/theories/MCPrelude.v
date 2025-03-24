@@ -21,7 +21,7 @@ Notation "g ∘ f" := (eta_compose g f) (at level 40, left associativity).
 
 Notation " ! " := (@False_rect _ _) : metarocq_scope.
 
-(* Use \sum to input ∑ in Company Coq (it is not a sigma Σ). *)
+(* Use \sum to input ∑ in Company Rocq (it is not a sigma Σ). *)
 Notation "'∑' x .. y , p" := (sigT (fun x => .. (sigT (fun y => p%type)) ..))
   (at level 200, x binder, right associativity,
    format "'[' '∑'  '/  ' x  ..  y ,  '/  ' p ']'")

@@ -238,20 +238,20 @@ checker/src/wf.mli
 /template-coq/metarocq-config
 /common/metarocq-config
 /translations/metarocq-config
-/erasure/_CoqProject
+/erasure/_RocqProject
 /erasure/_PluginProject
 /erasure/metarocq-config
-/pcuic/_CoqProject
+/pcuic/_RocqProject
 /pcuic/_PluginProject
 /pcuic/metarocq-config
-/checker/_CoqProject
+/checker/_RocqProject
 /safechecker/metarocq-config
 /safechecker/_PluginProject
-/safechecker/_CoqProject
-/template-coq/_CoqProject
+/safechecker/_RocqProject
+/template-coq/_RocqProject
 /template-coq/_PluginProject
-/template-coq/_TemplateCoqProject
-/common/_CoqProject
+/template-coq/_TemplateRocqProject
+/common/_RocqProject
 /safechecker/Makefile.safechecker.conf
 /safechecker/Makefile.safechecker
 /safechecker/Makefile.plugin.conf
@@ -290,7 +290,7 @@ pcuic/src/pCUICUtils.mli
 template-coq/gen-src/cRelationClasses.mli.rej
 .DS_Store
 
-/translations/_CoqProject
+/translations/_RocqProject
 test-suite/vs.mli
 test-suite/vs.ml
 test-suite/myMain.mli
@@ -318,9 +318,9 @@ test-suite/plugin-demo/Makefile.plugin
 template-coq/gen-src/cRelationClasses.mli.bak
 template-coq/gen-src/specFloat.ml.rej
 
-bidirectional/CoqMakefile
+bidirectional/RocqMakefile
 
-bidirectional/CoqMakefile.conf
+bidirectional/RocqMakefile.conf
 
 bidirectional/.vscode/
 erasure/src/decidableType.ml
@@ -364,12 +364,12 @@ erasure/src/eGlobalEnv.ml
 Makefile.conf
 test-suite/plugin-demo/src/META.coq-metarocq-demo-plugin
 pcuic/src/META.coq-metarocq-pcuic
-examples/_CoqProject
-test-suite/_CoqProject
+examples/_RocqProject
+test-suite/_RocqProject
 quotation/metarocq-config
 examples/metarocq-config
 test-suite/metarocq-config
-test-suite/plugin-demo/_CoqProject
+test-suite/plugin-demo/_RocqProject
 test-suite/plugin-demo/_PluginProject
 test-suite/plugin-demo/metarocq-config
 erasure/META
@@ -379,19 +379,19 @@ template-coq/META
 
 template-pcuic/demo.v
 template-pcuic/Makefile.local
-template-pcuic/_CoqProject
+template-pcuic/_RocqProject
 template-pcuic/Makefile.templatepcuic
 template-pcuic/Makefile.templatepcuic.conf
 
 quotation/Makefile.local
-quotation/_CoqProject
+quotation/_RocqProject
 quotation/Makefile.quotation
 quotation/Makefile.quotation.conf
 
 safechecker-plugin/metarocq-config
 safechecker-plugin/demo.v
 safechecker-plugin/Makefile.local
-safechecker-plugin/_CoqProject
+safechecker-plugin/_RocqProject
 safechecker-plugin/_PluginProject
 safechecker-plugin/Makefile.safecheckerplugin
 safechecker-plugin/Makefile.safecheckerplugin.conf
@@ -401,7 +401,7 @@ safechecker-plugin/Makefile.plugin.conf
 erasure-plugin/metarocq-config
 erasure-plugin/demo.v
 erasure-plugin/Makefile.local
-erasure-plugin/_CoqProject
+erasure-plugin/_RocqProject
 erasure-plugin/_PluginProject
 erasure-plugin/Makefile.erasureplugin
 erasure-plugin/Makefile.erasureplugin.conf
@@ -409,7 +409,7 @@ erasure-plugin/Makefile.plugin
 erasure-plugin/Makefile.plugin.conf
 erasure-plugin/META
 safechecker-plugin/META
-template-rocq/_TemplateCoqProject
+template-rocq/_TemplateRocqProject
 .gitignore
 template-rocq/_PluginProject
-template-rocq/_CoqProject
+template-rocq/_RocqProject

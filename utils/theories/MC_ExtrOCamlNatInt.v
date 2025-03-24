@@ -1,5 +1,5 @@
 (************************************************************************)
-(*         *   The Coq Proof Assistant / The Coq Development Team       *)
+(*         *   The Rocq Proof Assistant / The Rocq Development Team       *)
 (*  v      *         Copyright INRIA, CNRS and contributors             *)
 (* <O___,, * (see version control and CREDITS file for authors & dates) *)
 (*   \VV/  **************************************************************)
@@ -10,7 +10,7 @@
 
 (** Extraction of [nat] into Ocaml's [int] *)
 
-Require Coq.extraction.Extraction.
+Require Rocq.extraction.Extraction.
 
 From Stdlib Require Import Arith Even Div2 EqNat Euclid.
 From Stdlib Require Import ExtrOcamlBasic.

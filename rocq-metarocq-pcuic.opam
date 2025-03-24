@@ -30,11 +30,11 @@ install: [
 depends: [
   "coq-metarocq-common" {= version}
 ]
-synopsis: "A type system equivalent to Coq's and its metatheory"
+synopsis: "A type system equivalent to Rocq's and its metatheory"
 description: """
-MetaRocq is a meta-programming framework for Coq.
+MetaRocq is a meta-programming framework for Rocq.
 
-The PCUIC module provides a cleaned-up specification of Coq's typing algorithm along
+The PCUIC module provides a cleaned-up specification of Rocq's typing algorithm along
 with a certified typechecker for it. This module includes the standard metatheory of
 PCUIC: Weakening, Substitution, Confluence and Subject Reduction are proven here.
 """

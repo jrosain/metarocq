@@ -4,15 +4,15 @@ coq: Makefile.coq
 	$(MAKE) -f Makefile.coq
 	cd gen-src && ./to-lower.sh
 
-Makefile.coq: _CoqProject
-	rocq makefile -f _CoqProject -o Makefile.coq
+Makefile.coq: _RocqProject
+	rocq makefile -f _RocqProject -o Makefile.coq
 
 Makefile.plugin: _PluginProject
 	rocq makefile -f _PluginProject -o Makefile.plugin
 
-_CoqProject: _CoqProject.in metarocq-config
-	cat metarocq-config > _CoqProject
-	cat _CoqProject.in >> _CoqProject
+_RocqProject: _RocqProject.in metarocq-config
+	cat metarocq-config > _RocqProject
+	cat _RocqProject.in >> _RocqProject
 
 _PluginProject: _PluginProject.in metarocq-config
 	cat metarocq-config > _PluginProject

@@ -11,7 +11,7 @@ Local Open Scope bs_scope.
 
   - The "template-coq" monad, dealing with reification of terms
     and environments.
-  - The PCUIC development of the syntactic metatheory of Coq.
+  - The PCUIC development of the syntactic metatheory of Rocq.
   - The SafeChecker package implementing reduction, conversion
     and typechecking in a sound and complete way.
   - The Erasure package implementing verified extraction to
@@ -74,12 +74,12 @@ Check PCUICSafeChecker.infer_wf_env.
 Check type_of.
 Check type_of_subtype.
 
-(* Running the safe checker inside Coq *)
+(* Running the safe checker inside Rocq *)
 From MetaRocq.Examples Require Import metarocq_tour_prelude.
 
 Check check_inh.
 
-(** We construct a proof of typing entirely within Coq, calling the typechecker to produce the derivation *)
+(** We construct a proof of typing entirely within Rocq, calling the typechecker to produce the derivation *)
 (* Lemma identity_typing (u := Universe.make univ):
   inh gctx_wf_env [] (tProd (bNamed "s") (tSort u) (tImpl (tRel 0) (tRel 0))).
 Proof.
@@ -97,7 +97,7 @@ Qed. *)
 (** Erasure *)
 From MetaRocq.ErasurePlugin Require Import Erasure Loader.
 
-(** Running erasure live in Coq *)
+(** Running erasure live in Rocq *)
 Definition test (p : Ast.Env.program) : string :=
   erase_and_print_template_program default_erasure_config [] p.
 
@@ -118,9 +118,9 @@ MetaRocq Erase singleton_elim.
 
 (** Conclusion: Status of MetaRocq
 
-  - Correctness and complete typechecker for (a large fragment of) Coq.
+  - Correctness and complete typechecker for (a large fragment of) Rocq.
 
-  - All metatheory proofs are finished. Compared to Coq's implementation:
+  - All metatheory proofs are finished. Compared to Rocq's implementation:
 
     - full (max (i + k, j + l)) universe support (including a naïve acyclicity checking
       algorithm)
@@ -130,7 +130,7 @@ MetaRocq Erase singleton_elim.
     - approximate cumulative inductive types checking (not yet up to reduction)
 
     - missing eta-conversion: the plan is to use contravariant subtyping and eta-reduction,
-      as in Coq CEP #47
+      as in Rocq CEP #47
 
     - missing template-polymorphism: we're studying a sort polymorphism extension
       (with G. Gilbert, K. Maillard and N. Tabareau) to subsume it completely.
@@ -139,13 +139,13 @@ MetaRocq Erase singleton_elim.
 
   - Much work to come on the template-coq side to ease meta-programming.
 
-  - Relation to CertiCoq: fast and verified correct erasure, not depending on type-checking
+  - Relation to CertiRocq: fast and verified correct erasure, not depending on type-checking
     (only retyping).
 
-    + CertiCoq needs to have all constructors eta-expanded, a proof of the
+    + CertiRocq needs to have all constructors eta-expanded, a proof of the
       syntactic translation expanding constructors is in progress.
 
-    + Otherwise the front-end part of CertiCoq is complete with proofs.
+    + Otherwise the front-end part of CertiRocq is complete with proofs.
 
     + Future work: handling of primitive types (ints, floats, arrays, ...)
 

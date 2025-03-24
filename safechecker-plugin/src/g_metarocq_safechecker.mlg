@@ -36,8 +36,8 @@ let check env evm poly (c, ustate) =
       uctx
   in
   match check with
-  | Coq_inl s -> Feedback.msg_info (pr_string s)
-  | Coq_inr s -> CErrors.user_err (pr_string s)
+  | Rocq_inl s -> Feedback.msg_info (pr_string s)
+  | Rocq_inr s -> CErrors.user_err (pr_string s)
 }
 
 VERNAC COMMAND EXTEND MetaRocqSafeCheck CLASSIFIED AS QUERY
@@ -91,13 +91,13 @@ let retypecheck_term_dependencies ~opaque_access env gr =
 
 let kern_check ~opaque_access env evm gr =
   try
-    let () = time (str"Coq kernel checking") (retypecheck_term_dependencies ~opaque_access env) gr in
+    let () = time (str"Rocq kernel checking") (retypecheck_term_dependencies ~opaque_access env) gr in
     Feedback.msg_info (Printer.pr_global gr ++ str " and all its dependencies are well-typed.")
   with e -> raise e
 }
 
-VERNAC COMMAND EXTEND MetaRocqCoqCheck CLASSIFIED AS QUERY STATE opaque_access
-| [ "MetaRocq" "CoqCheck" global(c) ] -> {
+VERNAC COMMAND EXTEND MetaRocqRocqCheck CLASSIFIED AS QUERY STATE opaque_access
+| [ "MetaRocq" "RocqCheck" global(c) ] -> {
     let env = Global.env () in
     let evm = Evd.from_env env in
     kern_check env evm (Nametab.global c)

@@ -76,7 +76,7 @@ Polymorphic Definition add_ctor (mind : mutual_inductive_body) (ind0 : inductive
             mind.(ind_bodies) |}.
 
 
-(* [add_constructor] is a new command (in Template Coq style) *)
+(* [add_constructor] is a new command (in Template Rocq style) *)
 (* which do what we want *)
 
 Polymorphic Definition add_constructor (tm : Ast.term)

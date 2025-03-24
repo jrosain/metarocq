@@ -3,12 +3,12 @@ all: examples
 examples: Makefile.coq
 	$(MAKE) -f Makefile.coq TIMED=$(TIMED)
 
-Makefile.coq: Makefile _CoqProject
-	rocq makefile -f _CoqProject -o Makefile.coq
+Makefile.coq: Makefile _RocqProject
+	rocq makefile -f _RocqProject -o Makefile.coq
 
-_CoqProject: _CoqProject.in metarocq-config
-	cat metarocq-config > _CoqProject
-	cat _CoqProject.in >> _CoqProject
+_RocqProject: _RocqProject.in metarocq-config
+	cat metarocq-config > _RocqProject
+	cat _RocqProject.in >> _RocqProject
 
 clean: Makefile.coq
 	$(MAKE) -f Makefile.coq clean

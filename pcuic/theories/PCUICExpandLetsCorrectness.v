@@ -36,7 +36,7 @@ Set Default Proof Using "Type*".
   preserve positivity and the cumulativity relation for cumulative inductive types, which is not entirely
   trivial. *)
 
-(** Source = PCUIC, Target = Coq *)
+(** Source = PCUIC, Target = Rocq *)
 Module S := PCUICAst.
 Module SE := PCUICEnvironment.
 Module ST := PCUICTyping.

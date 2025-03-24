@@ -30,10 +30,10 @@ install: [
 depends: [
   "coq-metarocq-pcuic" {= version}
 ]
-synopsis: "Implementation and verification of safe conversion and typechecking algorithms for Coq"
+synopsis: "Implementation and verification of safe conversion and typechecking algorithms for Rocq"
 description: """
-MetaRocq is a meta-programming framework for Coq.
+MetaRocq is a meta-programming framework for Rocq.
 
 The SafeChecker modules provides a correct implementation of
-weak-head reduction, conversion and typechecking of Coq definitions and global environments.
+weak-head reduction, conversion and typechecking of Rocq definitions and global environments.
 """

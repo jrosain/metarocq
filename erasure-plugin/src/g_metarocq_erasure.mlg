@@ -103,7 +103,7 @@ Valid options:\n\
 -time        :  Time each compilation phase\n\
 -bypass-qeds :  Bypass the use of Qed and quote opaque proofs. Beware, this can result in large memory\n\
                 consumption due to reification of large proof terms.\n\
-                By default, we use the (trusted) Template-Coq quoting optimization that quotes every opaque term as an axiom.\n\
+                By default, we use the (trusted) Template-Rocq quoting optimization that quotes every opaque term as an axiom.\n\
                 All these axioms should live in Prop so that erasure is not affected by the absence of their bodies.\n\
 -fast        : Enables an alternative implementation of the parameter stripping phase that uses accumulators\n\
                instead of a view (see Erasure.ERemoveParams).\n\

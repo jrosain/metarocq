@@ -14,7 +14,7 @@ MetaRocq SafeCheck (3 + 1).
 Definition bool_list := List.map negb (cons true (cons false nil)).
 (* was working a bit by accident *)
 (* MetaRocq SafeCheck bool_list. *)
-MetaRocq CoqCheck bool_list.
+MetaRocq RocqCheck bool_list.
 
 (* Time MetaRocq SafeCheck @infer_and_print_template_program. *)
 (* Uses template polymorphism:
@@ -28,7 +28,7 @@ Type error: Terms are not <= for cumulativity: Sort([Stdlib.Init.Datatypes.23,St
 From Stdlib Require Import Decimal.
 Definition bignat : nat := Nat.of_num_uint 10000%uint.
 MetaRocq SafeCheck bignat.
-MetaRocq CoqCheck bignat.
+MetaRocq RocqCheck bignat.
 
 Set Warnings "-notation-overriden".
 From MetaRocq.TestSuite Require Import hott_example.
@@ -36,7 +36,7 @@ From MetaRocq.TestSuite Require Import hott_example.
 MetaRocq SafeCheck @issect'.
 
 MetaRocq SafeCheck @ap_pp.
-MetaRocq CoqCheck ap_pp.
+MetaRocq RocqCheck ap_pp.
 
 Set MetaRocq Timing.
 
@@ -44,7 +44,7 @@ From MetaRocq.TestSuite Require Import hott_example.
 
 (* FIXME TODO Private polymorphic universes *)
 MetaRocq SafeCheck @isequiv_adjointify.
-MetaRocq CoqCheck isequiv_adjointify.
+MetaRocq RocqCheck isequiv_adjointify.
 
 MetaRocq SafeCheck @IsEquiv.
-MetaRocq CoqCheck IsEquiv.
+MetaRocq RocqCheck IsEquiv.

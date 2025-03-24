@@ -10,7 +10,7 @@ Definition compare_ident := string_compare.
 
 (** ** Reification of names ** *)
 
-(** [Comment taken from Coq's code]
+(** [Comment taken from Rocq's code]
     - Id.t is the type of identifiers, that is morally a subset of strings which
       only contains Unicode characters of the Letter kind (and a few more).
       => [ident]
@@ -23,7 +23,7 @@ Definition compare_ident := string_compare.
       => [ident]
     - ModPath.t are module paths.
       => [modpath]
-    - KerName.t are absolute names of objects in Coq.
+    - KerName.t are absolute names of objects in Rocq.
       => [kername]
 
     And also :

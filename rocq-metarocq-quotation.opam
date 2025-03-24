@@ -32,9 +32,9 @@ depends: [
   "coq-metarocq-pcuic" {= version}
   "coq-metarocq-template-pcuic" {= version}
 ]
-synopsis: "Gallina quotation functions for Template Coq"
+synopsis: "Gallina quotation functions for Template Rocq"
 description: """
-MetaRocq is a meta-programming framework for Coq.
+MetaRocq is a meta-programming framework for Rocq.
 
 The Quotation module is geared at providing functions `□T → □□T` for
 `□T := Ast.term` (currently implemented) and for `□T := { t : Ast.term

@@ -8,7 +8,7 @@
 
 	// A list of arguments to send to coqtop. Use seperate elements instead of spaces to seperate each argument, especially when a flag expects another trailing argument, e.g. `["-I","./bin"]` instead of `["-I ./bin"]`
 	"coqtop.args": [
-		// "-bt", // get backtraces from Coq on errors
+		// "-bt", // get backtraces from Rocq on errors
 		"-R", "utils/theories", "MetaRocq.Utils",
 		"-R", "common/theories", "MetaRocq.Common",
 		"-R", "template-coq/theories", "MetaRocq.Template",
@@ -35,7 +35,7 @@
 		"-R", "examples", "MetaRocq.Examples",
 	    ],
 		"vscoq.args": [
-		// "-bt", // get backtraces from Coq on errors
+		// "-bt", // get backtraces from Rocq on errors
 		"-R", "utils/theories", "MetaRocq.Utils",
 		"-R", "common/theories", "MetaRocq.Common",
 		"-R", "template-coq/theories", "MetaRocq.Template",
@@ -62,7 +62,7 @@
 		"-R", "examples", "MetaRocq.Examples",
 	    ],
 	    "coq-lsp.args": [
-		// "-bt", // get backtraces from Coq on errors
+		// "-bt", // get backtraces from Rocq on errors
 		"-R", "utils/theories,MetaRocq.Utils",
 		"-R", "common/theories,MetaRocq.Common",
 		"-R", "template-coq/theories,MetaRocq.Template",

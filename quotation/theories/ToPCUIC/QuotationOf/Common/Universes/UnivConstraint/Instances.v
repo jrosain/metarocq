@@ -5,5 +5,5 @@ Import List.ListNotations.
 Local Open Scope list_scope.
 
 Module qUnivConstraint <: QuotationOfOrderedType UnivConstraint.
-  MetaRocq Run (tmMakeQuotationOfModuleWorkAroundCoqBug17303 everything (*None*) "UnivConstraint").
+  MetaRocq Run (tmMakeQuotationOfModuleWorkAroundRocqBug17303 everything (*None*) "UnivConstraint").
 End qUnivConstraint.

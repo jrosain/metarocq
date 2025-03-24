@@ -37,7 +37,7 @@ Section Tags.
     | tag' :: tags => if tag == tag' then Some idx
       else find_tag tags (S idx) tag
     end.
-  (* e.g. for bool: [ 1 0 ], i.e true (0 in Coq) is mapped to 1 and false (1 in Coq) is mapped to 0 *)
+  (* e.g. for bool: [ 1 0 ], i.e true (0 in Rocq) is mapped to 1 and false (1 in Rocq) is mapped to 0 *)
   Definition new_tag tags tag := find_tag tags 0 tag.
   Definition old_tag (tags : list nat) tag := nth_error tags tag.
 

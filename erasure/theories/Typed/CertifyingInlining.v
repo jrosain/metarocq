@@ -1,7 +1,7 @@
-(** * Inlining pass on the Template Coq representation *)
+(** * Inlining pass on the Template Rocq representation *)
 
 (** Essentially, just an adaptaion of the inlining pass on the erased representation.
- After the pass is applied we generate proofs that the original and the transformed terms are equal in the theory of Coq. The proofs are just by [eq_refl], since the terms are convertible *)
+ After the pass is applied we generate proofs that the original and the transformed terms are equal in the theory of Rocq. The proofs are just by [eq_refl], since the terms are convertible *)
 From Stdlib Require Import List.
 From Stdlib Require Import String.
 From Stdlib Require Import Bool.

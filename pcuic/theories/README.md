@@ -279,15 +279,15 @@
 [PCUICExpandLetsCorrectness]: ./PCUICExpandLetsCorrectness.v
 
 
-## Relation with Template-Coq
+## Relation with Template-Rocq
 
 | File              | Description                                              |
 |-------------------|----------------------------------------------------------|
-| [TemplateToPCUIC] | Translation from Template-Coq syntax to PUIC syntax      |
+| [TemplateToPCUIC] | Translation from Template-Rocq syntax to PUIC syntax      |
 | [TemplateToPCUICCorrectness] | Type preservation of the aformentioned translation |
-| [PCUICToTemplate] | Translation from PCUIC syntax to Template-Coq syntax |
+| [PCUICToTemplate] | Translation from PCUIC syntax to Template-Rocq syntax |
 | [PCUICToTemplateCorrectness] | Type preservation of the aformentioned translation |
-| [TemplateToPCUICWcbvEval] | The weak-head call-by-value evaluation strategy is preserved by the translation between Template-Coq and PCUIC
+| [TemplateToPCUICWcbvEval] | The weak-head call-by-value evaluation strategy is preserved by the translation between Template-Rocq and PCUIC
 
 [TemplateToPCUIC]: ./TemplateToPCUIC.v
 [TemplateToPCUICCorrectness]: ./TemplateToPCUICCorrectness.v

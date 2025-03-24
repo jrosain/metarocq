@@ -30,7 +30,7 @@ install: [
 depends: [
   "coq-metarocq-utils" {= version}
 ]
-synopsis: "The common library of Template Coq and PCUIC"
+synopsis: "The common library of Template Rocq and PCUIC"
 description: """
-MetaRocq is a meta-programming framework for Coq.
+MetaRocq is a meta-programming framework for Rocq.
 """

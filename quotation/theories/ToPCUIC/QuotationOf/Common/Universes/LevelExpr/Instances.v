@@ -5,5 +5,5 @@ Import List.ListNotations.
 Local Open Scope list_scope.
 
 Module qLevelExpr <: QuotationOfOrderedType LevelExpr.
-  MetaRocq Run (tmMakeQuotationOfModuleWorkAroundCoqBug17303 everything (*None*) "LevelExpr").
+  MetaRocq Run (tmMakeQuotationOfModuleWorkAroundRocqBug17303 everything (*None*) "LevelExpr").
 End qLevelExpr.

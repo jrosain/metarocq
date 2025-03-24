@@ -546,7 +546,7 @@ Polymorphic Definition tmMakeQuotationOfConstants_gen@{d t u _T _above_u'} {debu
 Definition tmMakeQuotationOfConstants {debug:debug_opt} (include_submodule : list ident -> bool) (include_supermodule : list ident -> list ident -> bool) (existing_instance : option hint_locality) (base : modpath) (cs : list global_reference) : TemplateMonad unit
   := tmMakeQuotationOfConstants_gen false include_submodule include_supermodule existing_instance base cs (fun name ty body => @tmDefinition name ty body).
 
-Definition tmMakeQuotationOfConstantsWorkAroundCoqBug17303 {debug:debug_opt} (include_submodule : list ident -> bool) (include_supermodule : list ident -> list ident -> bool) (base : modpath) (cs : list global_reference) : TemplateMonad unit
+Definition tmMakeQuotationOfConstantsWorkAroundRocqBug17303 {debug:debug_opt} (include_submodule : list ident -> bool) (include_supermodule : list ident -> list ident -> bool) (base : modpath) (cs : list global_reference) : TemplateMonad unit
   := tmMakeQuotationOfConstants_gen true include_submodule include_supermodule None base cs (fun name ty body => @tmDefinition name ty body).
 
 Definition tmDeclareQuotationOfConstants {debug:debug_opt} (include_submodule : list ident -> bool) (include_supermodule : list ident -> list ident -> bool) (existing_instance : option hint_locality) (base : modpath) (cs : list global_reference) : TemplateMonad unit
@@ -580,13 +580,13 @@ Definition tmMakeQuotationOfModule {debug:debug_opt} (include_submodule : submod
      tmMakeQuotationOfConstants include_submodule include_supermodule existing_instance base cs.
 Global Arguments tmMakeQuotationOfModule {_%_bool} _ _ _%_bs.
 
-Definition tmMakeQuotationOfModuleWorkAroundCoqBug17303 {debug:debug_opt} (include_submodule : submodule_inclusion) (m : qualid) : TemplateMonad _
+Definition tmMakeQuotationOfModuleWorkAroundRocqBug17303 {debug:debug_opt} (include_submodule : submodule_inclusion) (m : qualid) : TemplateMonad _
   := cs <- tmQuoteModule m;;
      base <- tmLocateModule1 m;;
      let include_supermodule := include_supermodule_of_submodule_inclusion include_submodule in
      let include_submodule := include_submodule_of_submodule_inclusion include_submodule in
-     tmMakeQuotationOfConstantsWorkAroundCoqBug17303 include_submodule include_supermodule base cs.
-Global Arguments tmMakeQuotationOfModuleWorkAroundCoqBug17303 {_%_bool} _ _%_bs.
+     tmMakeQuotationOfConstantsWorkAroundRocqBug17303 include_submodule include_supermodule base cs.
+Global Arguments tmMakeQuotationOfModuleWorkAroundRocqBug17303 {_%_bool} _ _%_bs.
 
 Definition tmDeclareQuotationOfModule {debug:debug_opt} (include_submodule : submodule_inclusion) (existing_instance : option hint_locality) (m : qualid) : TemplateMonad _
   := cs <- tmQuoteModule m;;

@@ -59,7 +59,7 @@ MetaRocq Run (tmEval hnf singlelim >>= erase).
 MetaRocq Run (erase (plus 0 1)).
 
 (** vector addition **)
-Require Coq.Vectors.Vector.
+Require Rocq.Vectors.Vector.
 
 Definition vplus {n:nat} :
   Vector.t nat n -> Vector.t nat n -> Vector.t nat n := (Vector.map2 plus).
@@ -340,7 +340,7 @@ Print Assumptions provedCopy.
 
 Definition x := 3.
 Definition provedCopyx := provedCopy x.
-(* Compute provedCopyx.  * evals correctly in Coq * *)
+(* Compute provedCopyx.  * evals correctly in Rocq * *)
 MetaRocq Quote Recursively Definition cbv_provedCopyx :=
   ltac:(let t:=(eval cbv delta [provedCopyx provedCopy] in provedCopyx) in exact t).
 Definition ans_provedCopyx :=

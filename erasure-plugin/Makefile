@@ -4,17 +4,17 @@ _PluginProject: _PluginProject.in metarocq-config
 	cat metarocq-config > _PluginProject
 	cat _PluginProject.in >> _PluginProject
 
-_CoqProject: _CoqProject.in metarocq-config
-	cat metarocq-config > _CoqProject
-	cat _CoqProject.in >> _CoqProject
+_RocqProject: _RocqProject.in metarocq-config
+	cat metarocq-config > _RocqProject
+	cat _RocqProject.in >> _RocqProject
 
 Makefile.plugin: _PluginProject
 	rocq makefile -f _PluginProject -o Makefile.plugin $(DEPS)
 # Avoid conflicting dependency file creation for the template plugin
 	sed -e s/coqdeps/coqdeps.plugin/g Makefile.plugin > Makefile.plugin.tmp && mv -f Makefile.plugin.tmp Makefile.plugin
 
-Makefile.erasureplugin: _CoqProject
-	rocq makefile -f _CoqProject -o Makefile.erasureplugin $(DEPS)
+Makefile.erasureplugin: _RocqProject
+	rocq makefile -f _RocqProject -o Makefile.erasureplugin $(DEPS)
 
 theory: Makefile.erasureplugin
 	$(MAKE) -f Makefile.erasureplugin
@@ -39,7 +39,7 @@ clean: Makefile.erasureplugin Makefile.plugin
 mrproper:
 	rm -f metarocq-config
 	rm -f Makefile.plugin _PluginProject
-	rm -f Makefile.erasureplugin _CoqProject
+	rm -f Makefile.erasureplugin _RocqProject
 
 .merlin: Makefile.plugin
 	make -f $< $@

@@ -153,7 +153,7 @@ Proof.
   rewrite (decompose_app_rec_size t []); cbn. lia.
 Qed.
 
-(* We redefine these lemmas locally so they can be used to compute a spine view in Coq itself *)
+(* We redefine these lemmas locally so they can be used to compute a spine view in Rocq itself *)
 Local Lemma decompose_app_rec_inv {t l' f l} :
   decompose_app_rec t l' = (f, l) ->
   mkApps t l' = mkApps f l.

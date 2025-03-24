@@ -30,16 +30,16 @@ install: [
 depends: [
   "coq-metarocq-common" {= version}
 ]
-synopsis: "A quoting and unquoting library for Coq in Coq"
+synopsis: "A quoting and unquoting library for Rocq in Rocq"
 description: """
-MetaRocq is a meta-programming framework for Coq.
+MetaRocq is a meta-programming framework for Rocq.
 
-Template Coq is a quoting library for Coq. It takes Coq terms and
-constructs a representation of their syntax tree as a Coq inductive data
+Template Rocq is a quoting library for Rocq. It takes Rocq terms and
+constructs a representation of their syntax tree as a Rocq inductive data
 type. The representation is based on the kernel's term representation.
 
 In addition to a complete reification and denotation of CIC terms,
-Template Coq includes:
+Template Rocq includes:
 
 - Reification of the environment structures, for constant and inductive declarations.
 - Denotation of terms and global declarations

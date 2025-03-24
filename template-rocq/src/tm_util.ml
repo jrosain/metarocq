@@ -7,7 +7,7 @@ let gen_constant_in_modules s =
     let tm_ref = Rocqlib.lib_ref s in
     UnivGen.constr_of_monomorphic_global (Global.env ()) tm_ref
   )
-  (* lazy (Universes.constr_of_global (Coqlib.gen_reference_in_modules locstr dirs s)) *)
+  (* lazy (Universes.constr_of_global (Rocqlib.gen_reference_in_modules locstr dirs s)) *)
 
 module Debug : sig
   val ppdebug : int -> (unit -> Pp.t) -> unit

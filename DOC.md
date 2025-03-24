@@ -4,8 +4,8 @@
 
 **tl;dr** You should do your PRs against [coq-8.20](https://github.com/MetaRocq/metarocq/tree/coq-8.20).
 
-Coq's kernel API is not stable yet, and changes there are reflected in MetaRocq's reified structures,
-so we do not ensure any compatibility from version to version. There is one branch for each Coq version.
+Rocq's kernel API is not stable yet, and changes there are reflected in MetaRocq's reified structures,
+so we do not ensure any compatibility from version to version. There is one branch for each Rocq version.
 
 The *main branch* or *current branch* is the one which appers when you go on
 [https://github.com/MetaRocq/metarocq](https://github.com/MetaRocq/metarocq).
@@ -13,9 +13,9 @@ Currently (unless you are reading the README of an outdated branch),
 it is the [coq-8.20](https://github.com/MetaRocq/metarocq/tree/coq-8.20).
 You should use it both for usage of MetaRocq and development of MetaRocq.
 
-The [main](https://github.com/MetaRocq/metarocq/tree/main) branch is following Coq's master
+The [main](https://github.com/MetaRocq/metarocq/tree/main) branch is following Rocq's master
 branch and gets regular updates from the the main development branch which follows the latest
-stable release of Coq.
+stable release of Rocq.
 
 <!-- The branch ... -->
 <!-- gets backports from `coq-8.11` when possible. Both `coq-8.11` and `coq-8.10` have associated -->
@@ -45,7 +45,7 @@ MetaRocq uses three types convertible to `string` which have a different intende
   E.g. `Stdlib.Init.Datatypes.nat`
 
 Quoting always produce fully qualified names. On the converse, unquoting allow to
-have only partially qualified names and rely on Coq to resolve them. The commands
+have only partially qualified names and rely on Rocq to resolve them. The commands
 of the TemplateMonad also allow partially qualified names.
 
 ## Hint databases
@@ -54,9 +54,9 @@ The development uses three main hint databases:
 
 - The "len" databases which gathers all relevant length lemmas (mainly list length lemmas
   relevant to the operations). This database is large (> 100 lemmas) for a given theory
-  (PCUIC or Template-Coq) and it is advisable to not mix together both databases,
+  (PCUIC or Template-Rocq) and it is advisable to not mix together both databases,
   as autorewrite would become very slow.
-  BEWARE: If working in the PCUIC theory, do not require anything besides the BasicAst and utils modules from the Template-Coq module.
+  BEWARE: If working in the PCUIC theory, do not require anything besides the BasicAst and utils modules from the Template-Rocq module.
 - The "pcuic" rewrite and auto database gathers lemmas helping solving side-conditions
   of typing judgements.
 

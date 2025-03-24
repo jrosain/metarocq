@@ -1233,7 +1233,7 @@ Module GlobalMaps (T: Term) (E: EnvironmentSig T) (TU : TermUtils T E) (ET: EnvT
       (* We decompose the constructor's arguments' type and verify the inductive references
         only appear in the conclusion, if any. *)
       let (ctx, concl) := decompose_prod_assum [] arg in
-      (* Again, we smash the context, as Coq does *)
+      (* Again, we smash the context, as Rocq does *)
       let ctx := smash_context [] ctx in
       alli (fun i d => noccur_between (npars + narg + i) ninds d.(decl_type)) 0 (List.rev ctx) &&
       let (hd, args) := decompose_app concl in
@@ -1243,7 +1243,7 @@ Module GlobalMaps (T: Term) (E: EnvironmentSig T) (TU : TermUtils T E) (ET: EnvT
           (* Call to an unrelated variable *)
           true
         else (* Recursive call to the inductive *)
-          (* Coq disallows the inductive to be applied to another inductive in the block *)
+          (* Rocq disallows the inductive to be applied to another inductive in the block *)
           forallb (noccur_between (npars + narg + #|ctx|) ninds) args
       | tInd ind u =>
         if forallb (noccur_between (npars + narg + #|ctx|) ninds) args then
@@ -1255,7 +1255,7 @@ Module GlobalMaps (T: Term) (E: EnvironmentSig T) (TU : TermUtils T E) (ET: EnvT
 
     Definition positive_cstr_args ninds npars (args : context) : bool :=
       alli (fun i decl => positive_cstr_arg nind npars i decl.(decl_type))
-      (* We smash the context, just as Coq's kernel computes positivity on
+      (* We smash the context, just as Rocq's kernel computes positivity on
         weak-head normalized types *)
       (List.rev (smash_context [] args))
     *)

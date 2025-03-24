@@ -69,7 +69,7 @@ Tactic Notation "len" "in" hyp(id) :=
     rewrite !pclengths /= // in id);
   try lia.
 
-(* Source =Template, Target (unqualified) = Coq *)
+(* Source =Template, Target (unqualified) = Rocq *)
 
 Module S :=Template.Ast.
 Module SEq :=Template.TermEquality.
@@ -2226,7 +2226,7 @@ Local Hint Transparent Ast.Env.global_env_ext : trans.
 Local Hint Transparent sort : trans.
 Local Hint Variables Transparent : trans.
 Ltac trans := try typeclasses eauto with trans.
-(* bug in Coq, typeclasses eauto tries exact with a quantified hypothesis starting with a let-in *)
+(* bug in Rocq, typeclasses eauto tries exact with a quantified hypothesis starting with a let-in *)
 Ltac simpl_let :=
   match goal with
   | [ H : let _ := _ in _ |- _ ] => progress (cbv zeta in H)

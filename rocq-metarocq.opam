@@ -31,12 +31,12 @@ build: [
   [make "-C" "examples" ] {with-test}
   [make "-C" "test-suite" ] {with-test}
 ]
-synopsis: "A meta-programming framework for Coq"
+synopsis: "A meta-programming framework for Rocq"
 description: """
-MetaRocq is a meta-programming framework for Coq.
+MetaRocq is a meta-programming framework for Rocq.
 
 The meta-package includes the template-coq library,
-the PCUIC development including a verified equivalence between Coq and PCUIC,
+the PCUIC development including a verified equivalence between Rocq and PCUIC,
 a safe type checker and verified erasure for PCUIC and example translations.
 
 See individual packages for more detailed descriptions.

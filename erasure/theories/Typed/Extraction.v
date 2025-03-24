@@ -161,16 +161,16 @@ Definition extract_template_env_certifying_passes
     | Err e => tmFail e
   end.
 
-(** MetaRocq's safe checker does not run from within Coq, only when extracting.
+(** MetaRocq's safe checker does not run from within Rocq, only when extracting.
     To work around this we assume environments are well formed when extracting
-    from within Coq. This is justified since our environments are produced by quoting
-    and thus come directly from Coq, where they have already been type checked. *)
+    from within Rocq. This is justified since our environments are produced by quoting
+    and thus come directly from Rocq, where they have already been type checked. *)
 Axiom assume_env_wellformed : forall Σ, ∥wf Σ∥.
 
 (** Extract an environment with some minimal checks. This assumes the environment
-    is well-formed (to make it computable from within Coq) but furthermore checks that the
+    is well-formed (to make it computable from within Rocq) but furthermore checks that the
     erased context is closed, expanded and that the masks are valid before dearging.
-    Suitable for extraction of programs **from within Coq**. *)
+    Suitable for extraction of programs **from within Rocq**. *)
 Definition extract_within_coq : extract_template_env_params :=
   {| template_transforms := [];
      check_wf_env_func Σ := Ok (assume_env_wellformed Σ);

@@ -22,7 +22,7 @@ From MetaRocq.PCUIC Require Import BDTyping BDToPCUIC BDFromPCUIC BDUnique.
 
 From MetaRocq.SafeChecker Require Import PCUICErrors PCUICSafeReduce PCUICWfEnv.
 
-(** Allow reduction to run inside Coq *)
+(** Allow reduction to run inside Rocq *)
 Transparent Acc_intro_generator.
 
 Local Open Scope string_scope.

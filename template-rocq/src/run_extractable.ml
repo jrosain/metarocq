@@ -124,8 +124,8 @@ let get_constant_body b =
     let proof, _ = Global.force_proof Library.indirect_accessor pr in
     (* FIXME delayed univs skipped *)
     Some proof
-  | Primitive _ -> failwith "Primitives not supported by TemplateCoq"
-  | Symbol _ -> failwith "Symbols are not supported by TemplateCoq"
+  | Primitive _ -> failwith "Primitives not supported by TemplateRocq"
+  | Symbol _ -> failwith "Symbols are not supported by TemplateRocq"
 
 (* note(gmm): code taken from quoter.ml (quote_entry_aux) *)
 let of_constant_body (env : Environ.env) (cd : Plugin_core.constant_body) : Ast0.Env.constant_body =
@@ -137,7 +137,7 @@ let of_constant_body (env : Environ.env) (cd : Plugin_core.constant_body) : Ast0
          cst_relevance = quote_relevance rel})
 
 (* what about the overflow?
-  efficiency? extract to bigint using Coq directives and convert to int here? *)
+  efficiency? extract to bigint using Rocq directives and convert to int here? *)
 let of_nat (t : int) : int = t
 
 let of_cast_kind (ck: BasicAst.cast_kind) : Constr.cast_kind =

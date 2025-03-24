@@ -1,8 +1,8 @@
 all: coq
 
-_CoqProject: _CoqProject.in metarocq-config
-	cat metarocq-config > _CoqProject
-	cat _CoqProject.in >> _CoqProject
+_RocqProject: _RocqProject.in metarocq-config
+	cat metarocq-config > _RocqProject
+	cat _RocqProject.in >> _RocqProject
 
 coq: Makefile.coq
 	$(MAKE) -f Makefile.coq
@@ -24,8 +24,8 @@ clean: Makefile.coq
 mrproper:
 	rm -f Makefile.coq
 
-Makefile.coq: _CoqProject
-	rocq makefile -f _CoqProject -o Makefile.coq
+Makefile.coq: _RocqProject
+	rocq makefile -f _RocqProject -o Makefile.coq
 
 .merlin: Makefile.coq
 	$(MAKE) -f $< $@

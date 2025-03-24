@@ -8,5 +8,5 @@ Module qKername <: QuotationOfOrderedType Kername.
   Module qOT <: QuotationOfOrderedTypeOrig Kername.OT.
     MetaRocq Run (tmMakeQuotationOfModule everything None "Kername.OT").
   End qOT.
-  MetaRocq Run (tmMakeQuotationOfModuleWorkAroundCoqBug17303 (all_submodules_except [["OT"]]%bs) (*None*) "Kername").
+  MetaRocq Run (tmMakeQuotationOfModuleWorkAroundRocqBug17303 (all_submodules_except [["OT"]]%bs) (*None*) "Kername").
 End qKername.

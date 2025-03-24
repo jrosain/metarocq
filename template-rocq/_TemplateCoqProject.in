@@ -27,5 +27,5 @@ theories/Loader.v
 theories/Lib.v
 theories/All.v
 
-# A checker of well-formedness in MetaRocq and Coq
+# A checker of well-formedness in MetaRocq and Rocq
 theories/TemplateCheckWf.v

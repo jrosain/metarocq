@@ -32,7 +32,7 @@ depends: [
 ]
 synopsis: "Translations built on top of MetaRocq"
 description: """
-MetaRocq is a meta-programming framework for Coq.
+MetaRocq is a meta-programming framework for Rocq.
 
 The Translations modules provides implementation of standard translations
 from type theory to type theory, e.g. parametricity and the `cross-bool`

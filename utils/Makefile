@@ -20,8 +20,8 @@ clean: Makefile.coq
 mrproper:
 	rm -f Makefile.coq
 
-Makefile.coq: _CoqProject
-	rocq makefile -f _CoqProject -o Makefile.coq
+Makefile.coq: _RocqProject
+	rocq makefile -f _RocqProject -o Makefile.coq
 
 .merlin: Makefile.coq
 	$(MAKE) -f $< $@

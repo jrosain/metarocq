@@ -42,17 +42,17 @@ From Equations Require Import Equations.
     For example one couldn't do recursive calls on such "rebuilt" contexts using simple structural
     recursion, the new contexts having no structural relation to the terms at hand.
 
-    This means that.Common-Coq's `red1` reduction of cases requires well-formedness conditions
+    This means that.Common-Rocq's `red1` reduction of cases requires well-formedness conditions
     not readily available in PCUIC's. We solve this conundrum using subject reduction: indeed
     cumulativity is always called starting with two well-sorted types, and we can hence show
     that every one-step reduction in a PCUIC cumulativity derivation goes from a well-typed term
-    to a well-typed term. We can hence prove that.Common-Coq's `red1` reductions follow from the
+    to a well-typed term. We can hence prove that.Common-Rocq's `red1` reductions follow from the
     untyped PCUIC reduction when restricted to well-typed terms (which have many more invariants).
     We actually just need the term to be reduced to be well-typed to show that the interpretation
     preserves one-step reduction in [trans_red1}].
 *)
 
-(** Source = PCUIC, Target = Coq *)
+(** Source = PCUIC, Target = Rocq *)
 Module S := PCUICAst.
 Module SE := PCUICEnvironment.
 Module ST := PCUICTyping.
@@ -1950,7 +1950,7 @@ Proof.
     * simpl. cbn in *. lia.
 Qed.
 
-(** Likewise, in.Common-Coq, we can append without re-typing the result *)
+(** Likewise, in.Common-Rocq, we can append without re-typing the result *)
 Lemma TT_typing_spine_app {cf:checker_flags} Σ Γ ty T' args na A B arg s :
   TT.typing Σ Γ (T.tProd na A B) (T.tSort s) ->
   TT.typing_spine Σ Γ ty args T' ->
