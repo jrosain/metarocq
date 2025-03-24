@@ -3,7 +3,7 @@ From MetaRocq.Quotation.ToTemplate Require Import (hints) Stdlib.Init Stdlib.Flo
 From MetaRocq.Quotation.ToTemplate.Utils Require Import (hints) utils.
 From MetaRocq.Quotation.ToTemplate.Common Require Import (hints) Kernames.
 From MetaRocq.Common Require Import BasicAst.
-From MetaRocq.Utils Require Import MCUtils.
+From MetaRocq.Utils Require Import MRUtils.
 From MetaRocq.Template Require Import AstUtils (* for tFixType *).
 
 #[export] Instance quote_name : ground_quotable name := ltac:(destruct 1; exact _).

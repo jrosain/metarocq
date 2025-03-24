@@ -1,5 +1,5 @@
 From Stdlib Require Import List Bool Arith ssreflect ssrbool Morphisms Lia.
-From MetaRocq.Utils Require Import MCPrelude MCReflect MCList MCRelations MCProd MCOption.
+From MetaRocq.Utils Require Import MRPrelude MRReflect MRList MRRelations MRProd MROption.
 From Equations Require Import Equations.
 
 Definition predA {A} (p q : pred A) : pred A := (fun i => p i ==> q i).

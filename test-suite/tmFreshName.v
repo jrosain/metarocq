@@ -1,6 +1,6 @@
 From Stdlib Require Import List Arith.
 From MetaRocq Require Import Template.All.
-Import ListNotations MCMonadNotation.
+Import ListNotations MRMonadNotation.
 
 
 MetaRocq Run (x <- tmFreshName ("x" ++ "y")%bs ;;

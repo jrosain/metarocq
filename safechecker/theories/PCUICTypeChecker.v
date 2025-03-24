@@ -30,7 +30,7 @@ From Stdlib Require Import Program.
 Local Set Keyed Unification.
 Set Equations Transparent.
 
-(* Import MCMonadNotation. *)
+(* Import MRMonadNotation. *)
 
 Lemma Forall_nth_def {A : Type} {P : A -> Prop} l d i :
   Forall P l ->

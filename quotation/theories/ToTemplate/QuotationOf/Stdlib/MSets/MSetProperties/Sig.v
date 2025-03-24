@@ -1,5 +1,5 @@
 From Stdlib.MSets Require Import MSetProperties.
-From MetaRocq.Utils Require Import MCMSets.
+From MetaRocq.Utils Require Import MRMSets.
 From MetaRocq.Quotation.ToTemplate Require Import Init.
 From MetaRocq.Quotation.ToTemplate.QuotationOf.Stdlib.Structures Require Import OrdersFacts.Sig.
 From MetaRocq.Quotation.ToTemplate.QuotationOf.Stdlib.MSets Require Import MSetFacts.Sig MSetDecide.Sig.

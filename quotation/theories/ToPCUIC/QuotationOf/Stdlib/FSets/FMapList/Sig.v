@@ -1,6 +1,6 @@
 From Stdlib.FSets Require Import FMapList.
 From Stdlib.Structures Require Import Equalities OrdersAlt.
-From MetaRocq.Utils Require Import MCFSets.
+From MetaRocq.Utils Require Import MRFSets.
 From MetaRocq.Quotation.ToPCUIC Require Import Init.
 From MetaRocq.Quotation.ToPCUIC.QuotationOf.Stdlib.Structures Require Import OrdersAlt.Sig.
 Import List.ListNotations.

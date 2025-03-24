@@ -9,7 +9,7 @@ From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils EInduction EGloba
 
 Local Open Scope string_scope.
 Set Asymmetric Patterns.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 From Equations Require Import Equations.
 Set Equations Transparent.
@@ -24,7 +24,7 @@ Ltac introdep := let H := fresh in intros H; depelim H.
 #[global]
 Hint Constructors eval : core.
 
-Import MCList (map_InP, map_InP_elim, map_InP_spec).
+Import MRList (map_InP, map_InP_elim, map_InP_spec).
 
 Equations discr_construct (t : term) : Prop :=
 discr_construct (tConstruct ind n block_args) := False ;

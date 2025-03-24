@@ -1,5 +1,5 @@
 From Stdlib.MSets Require Import MSetInterface.
-From MetaRocq.Utils Require Import MCMSets.
+From MetaRocq.Utils Require Import MRMSets.
 From MetaRocq.Quotation.ToPCUIC Require Import Init.
 Import List.ListNotations.
 Local Open Scope list_scope.

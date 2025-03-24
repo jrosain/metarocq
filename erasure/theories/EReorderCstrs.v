@@ -4,12 +4,12 @@ From Equations Require Import Equations.
 Set Equations Transparent.
 
 From MetaRocq.PCUIC Require Import PCUICAstUtils.
-From MetaRocq.Utils Require Import MCList bytestring utils monad_utils.
+From MetaRocq.Utils Require Import MRList bytestring utils monad_utils.
 From MetaRocq.Erasure Require Import EProgram EPrimitive EAst ESpineView EEtaExpanded EInduction ERemoveParams Erasure EGlobalEnv
   EAstUtils ELiftSubst EWellformed ECSubst EWcbvEval.
 
 Import Kernames.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Lemma lookup_declared_constructor {Σ id mdecl idecl cdecl} :
   lookup_constructor Σ id.1 id.2 = Some (mdecl, idecl, cdecl) ->

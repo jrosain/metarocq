@@ -1,7 +1,7 @@
 From MetaRocq.Common Require Import BasicAst Environment EnvironmentTyping Universes.
 From MetaRocq.Quotation.ToPCUIC Require Import Init.
 From MetaRocq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.ssr.
-From MetaRocq.Quotation.ToPCUIC.Utils Require Import (hints) All_Forall MCOption.
+From MetaRocq.Quotation.ToPCUIC.Utils Require Import (hints) All_Forall MROption.
 From MetaRocq.Quotation.ToPCUIC.Common Require Import (hints) config BasicAst Kernames Universes Environment.
 From MetaRocq.Quotation.ToPCUIC.QuotationOf.Common Require Import Environment.Sig EnvironmentTyping.Sig.
 From Equations.Prop Require Import EqDecInstances.
@@ -55,7 +55,7 @@ Module QuoteEnvTyping (Import T : Term) (Import E : EnvironmentSig T) (Import TU
    {checking sorting cproperty sproperty Γ H}
    {qchecking : quotation_of checking} {qsorting : quotation_of sorting} {qcproperty : quotation_of cproperty} {qsproperty : quotation_of sproperty}
    {quote_checking : forall Γ t T, ground_quotable (checking Γ t T)} {quote_sorting : forall Γ T u, ground_quotable (sorting Γ T u)} {quote_sproperty : forall Γ all t u tu, ground_quotable (sproperty Γ all t u tu)} {quote_cproperty : forall Γ all b t tb, ground_quotable (cproperty Γ all b t tb)}
-    : ground_quotable (@All_local_env_over_sorting checking sorting cproperty sproperty Γ H) := ltac:(induction 1; cbv [lift_sorting j_term MCOption.option_default] in *; exact _).
+    : ground_quotable (@All_local_env_over_sorting checking sorting cproperty sproperty Γ H) := ltac:(induction 1; cbv [lift_sorting j_term MROption.option_default] in *; exact _).
   #[export] Instance quote_All_local_env_over {typing property Γ H}
    {qtyping : quotation_of typing} {qproperty : quotation_of property}
    {quote_typing : forall Γ t T, ground_quotable (typing Γ t T)} {quote_property : forall Γ all b t tb, ground_quotable (property Γ all b t tb)}

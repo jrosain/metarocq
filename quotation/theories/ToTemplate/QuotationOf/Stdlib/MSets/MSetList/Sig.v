@@ -1,6 +1,6 @@
 From Stdlib.Structures Require Import Equalities Orders.
 From Stdlib.MSets Require Import MSetList.
-From MetaRocq.Utils Require Import MCMSets.
+From MetaRocq.Utils Require Import MRMSets.
 From MetaRocq.Quotation.ToTemplate Require Import Init.
 From MetaRocq.Quotation.ToTemplate.QuotationOf.Stdlib.MSets Require Import MSetInterface.Sig.
 

@@ -1,6 +1,6 @@
 From Stdlib Require Import OrdersAlt MSetList MSetAVL MSetFacts MSetProperties MSetDecide FMapAVL.
 From Equations Require Import Equations.
-From MetaRocq.Utils Require Import utils MCMSets MCFSets.
+From MetaRocq.Utils Require Import utils MRMSets MRFSets.
 From MetaRocq.Common Require Import BasicAst config.
 From Stdlib Require Import ssreflect.
 

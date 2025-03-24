@@ -736,7 +736,7 @@ Section classification.
     axiom_free_value Σ' (map (axiom_free_value Σ' []) args' ++ args) hd.
   Proof.
     revert hd args.
-    induction args' using MCList.rev_ind; intros hd args; cbn; auto.
+    induction args' using MRList.rev_ind; intros hd args; cbn; auto.
     rewrite mkApps_app /=.
     rewrite IHargs'.
     now rewrite map_app /= -app_assoc.

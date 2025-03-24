@@ -6,7 +6,7 @@
 
 From Stdlib Require Export Bool ZArith Arith Lia List.
 
-From MetaRocq.Utils Require Export MCUtils monad_utils.
+From MetaRocq.Utils Require Export MRUtils monad_utils.
 
 Global Set Asymmetric Patterns.
 

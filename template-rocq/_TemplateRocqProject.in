@@ -14,8 +14,8 @@ src/constr_reification.ml
 src/constr_quoter.ml
 src/constr_denoter.ml
 
-src/g_template_coq.mlg
-src/template_coq.mlpack
+src/g_template_rocq.mlg
+src/template_rocq.mlpack
 src/template_monad.mli
 src/template_monad.ml
 src/run_template_monad.mli

@@ -2038,7 +2038,7 @@ Section ReduceFns.
   Proof using Type.
     unfold arity_ass_context.
     rewrite rev_map_spec.
-    induction l using MCList.rev_ind; cbn.
+    induction l using MRList.rev_ind; cbn.
     - constructor.
     - rewrite map_app, rev_app_distr.
       cbn.

@@ -1,6 +1,6 @@
 From Stdlib.Structures Require Import Orders.
 From Stdlib.MSets Require Import MSetAVL.
-From MetaRocq.Utils Require Import MCMSets.
+From MetaRocq.Utils Require Import MRMSets.
 From MetaRocq.Quotation.ToPCUIC Require Import Init.
 
 Module MSetAVL.

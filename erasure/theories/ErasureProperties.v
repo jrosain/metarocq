@@ -469,7 +469,7 @@ Section wellscoped.
     | Some (ConstantDecl d) => Some d
     | _ => None
     end.
-  Import MCMonadNotation.
+  Import MRMonadNotation.
 
   Section Def.
   Context (Σ : global_env).

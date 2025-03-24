@@ -1,6 +1,6 @@
 From Stdlib.FSets Require Import FMapFacts.
 From Stdlib.Structures Require Import Orders.
-From MetaRocq.Utils Require Import MCFSets.
+From MetaRocq.Utils Require Import MRFSets.
 From MetaRocq.Quotation.ToPCUIC Require Import Init.
 
 Module Export FSets.

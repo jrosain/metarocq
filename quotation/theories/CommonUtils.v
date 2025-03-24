@@ -1,4 +1,4 @@
-From MetaRocq.Utils Require Import utils monad_utils MCList.
+From MetaRocq.Utils Require Import utils monad_utils MRList.
 From MetaRocq.Common Require Import Kernames MonadBasicAst.
 From MetaRocq.Template Require MonadAst TemplateMonad Ast Loader.
 From Equations.Prop Require Import Classes.
@@ -8,7 +8,7 @@ Import ListNotations.
 Local Unset Universe Minimization ToSet.
 Local Set Primitive Projections.
 Local Open Scope bs.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Class debug_opt : Set := debug : bool.
 Class cls_is_true (b : bool) : Set := is_truev : is_true b.

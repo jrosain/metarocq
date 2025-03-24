@@ -358,7 +358,7 @@ Definition destInd (t : term) :=
 Definition forget_types {term} (c : list (BasicAst.context_decl term)) : list aname :=
   map decl_name c.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Definition mkCase_old (Σ : global_env) (ci : case_info) (p : term) (c : term) (brs : list (nat × term)) : option term :=
   '(mib, oib) <- lookup_inductive Σ ci.(ci_ind) ;;
@@ -560,7 +560,7 @@ Definition fold_term_with_binders (f : A -> Acc -> term -> Acc) (acc : Acc) (t :
 End TraverseWithBinders.
 
 Section TraverseWithBindersM.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Context {M : Type -> Type} `{Monad M} {Acc : Type} {A : Type} {a : A} {liftM : aname -> A -> M A}.
 

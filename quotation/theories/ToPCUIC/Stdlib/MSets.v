@@ -1,10 +1,10 @@
 From Stdlib Require Import MSetInterface MSetList MSetAVL MSetFacts MSetProperties MSetDecide.
-From MetaRocq.Utils Require Import MCMSets.
+From MetaRocq.Utils Require Import MRMSets.
 From MetaRocq.Quotation.ToPCUIC Require Import Init.
 From MetaRocq.Quotation.ToPCUIC Require Import (hints) Stdlib.Numbers Stdlib.Init Stdlib.Lists.
 From MetaRocq.Quotation.ToPCUIC.QuotationOf.Stdlib.Structures Require Import Orders.Sig.
 From MetaRocq.Quotation.ToPCUIC.QuotationOf.Stdlib.MSets Require Import MSetInterface.Sig MSetProperties.Sig MSetAVL.Sig MSetList.Sig.
-From MetaRocq.Quotation.ToPCUIC.QuotationOf.Utils Require Import MCMSets.Sig.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.Utils Require Import MRMSets.Sig.
 
 #[export] Hint Unfold Int.Z_as_Int.t : quotation.
 

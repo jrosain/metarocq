@@ -1,5 +1,5 @@
 From MetaRocq.Utils Require Export bytestring.
-From MetaRocq.Utils Require Import utils MCList.
+From MetaRocq.Utils Require Import utils MRList.
 From MetaRocq.Common Require Import MonadBasicAst.
 From MetaRocq.Template Require Import MonadAst TemplateMonad Ast Loader.
 From MetaRocq.Quotation Require Export CommonUtils.
@@ -11,7 +11,7 @@ Import ListNotations.
 Local Set Primitive Projections.
 Local Unset Universe Minimization ToSet.
 Local Open Scope bs.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Class quotation_of {T} (t : T) := quoted_term_of : Ast.term.
 #[global] Arguments quoted_term_of {T} t {_}.

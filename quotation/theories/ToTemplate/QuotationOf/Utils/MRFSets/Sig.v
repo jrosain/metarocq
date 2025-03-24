@@ -1,6 +1,6 @@
 From Stdlib.Structures Require Import Orders OrdersAlt.
 From Stdlib.FSets Require Import FMapInterface.
-From MetaRocq.Utils Require Import MCFSets.
+From MetaRocq.Utils Require Import MRFSets.
 From MetaRocq.Quotation.ToTemplate Require Import Init.
 
 Module Type QuotationOfWFactsExtra_fun (E : DecidableTypeOrig) (W : WSfun E) (WFacts : WFacts_funSig E W) (WFactsExtra : WFactsExtra_funSig E W WFacts).

@@ -74,7 +74,7 @@ cleanplugin: Makefile.plugin
 	make -f Makefile.plugin clean
 
 PLUGIN_PROJECT_BLACKLIST := \
-	mCUint63 \
+	mRUint63 \
 	#
 
 space := $(subst ,, )

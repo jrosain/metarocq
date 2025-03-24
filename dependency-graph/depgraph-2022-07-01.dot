@@ -114,7 +114,7 @@ node[style=filled]
 "pcuic/PCUICTyping" -> "pcuic/Syntax/PCUICNamelessDef"
 "pcuic/PCUICEquality" -> "pcuic/Syntax/PCUICOnFreeVars"
 "pcuic/Syntax/PCUICClosed" -> "pcuic/Syntax/PCUICOnFreeVars"
-"template-rocq/utils/MCPred" -> "pcuic/Syntax/PCUICOnFreeVars"
+"template-rocq/utils/MRPred" -> "pcuic/Syntax/PCUICOnFreeVars"
 "pcuic/PCUICEquality" -> "pcuic/Syntax/PCUICPosition"
 "pcuic/Syntax/PCUICInduction" -> "pcuic/Syntax/PCUICReflect"
 "pcuic/PCUICTyping" -> "pcuic/Syntax/PCUICRenameDef"
@@ -181,29 +181,29 @@ node[style=filled]
 "template-rocq/utils/wGraph" -> "template-rocq/common/uGraph"
 "template-rocq/utils/All_Forall" -> "template-rocq/monad_utils"
 "template-rocq/monad_utils" -> "template-rocq/utils"
-"template-rocq/utils/MCUtils" -> "template-rocq/utils"
-"template-rocq/utils/MCOption" -> "template-rocq/utils/All_Forall"
-"template-rocq/utils/MCSquash" -> "template-rocq/utils/All_Forall"
+"template-rocq/utils/MRUtils" -> "template-rocq/utils"
+"template-rocq/utils/MROption" -> "template-rocq/utils/All_Forall"
+"template-rocq/utils/MRSquash" -> "template-rocq/utils/All_Forall"
 "template-rocq/utils/ByteCompare" -> "template-rocq/utils/ByteCompareSpec"
-"template-rocq/utils/MCCompare" -> "template-rocq/utils/ByteCompareSpec"
+"template-rocq/utils/MRCompare" -> "template-rocq/utils/ByteCompareSpec"
 "template-rocq/utils/ReflectEq" -> "template-rocq/utils/ByteCompareSpec"
-"template-rocq/utils/MCPrelude" -> "template-rocq/utils/MCList"
-"template-rocq/utils/MCRelations" -> "template-rocq/utils/MCList"
-"template-rocq/utils/ReflectEq" -> "template-rocq/utils/MCList"
-"template-rocq/utils/MCList" -> "template-rocq/utils/MCOption"
-"template-rocq/utils/MCProd" -> "template-rocq/utils/MCOption"
-"template-rocq/utils/MCReflect" -> "template-rocq/utils/MCOption"
-"template-rocq/utils/MCOption" -> "template-rocq/utils/MCPred"
-"template-rocq/utils/MCPrelude" -> "template-rocq/utils/MCReflect"
-"template-rocq/utils/bytestring" -> "template-rocq/utils/MCString"
-"template-rocq/utils/All_Forall" -> "template-rocq/utils/MCUtils"
-"template-rocq/utils/MCArith" -> "template-rocq/utils/MCUtils"
-"template-rocq/utils/MCEquality" -> "template-rocq/utils/MCUtils"
-"template-rocq/utils/MCString" -> "template-rocq/utils/MCUtils"
+"template-rocq/utils/MRPrelude" -> "template-rocq/utils/MRList"
+"template-rocq/utils/MRRelations" -> "template-rocq/utils/MRList"
+"template-rocq/utils/ReflectEq" -> "template-rocq/utils/MRList"
+"template-rocq/utils/MRList" -> "template-rocq/utils/MROption"
+"template-rocq/utils/MRProd" -> "template-rocq/utils/MROption"
+"template-rocq/utils/MRReflect" -> "template-rocq/utils/MROption"
+"template-rocq/utils/MROption" -> "template-rocq/utils/MRPred"
+"template-rocq/utils/MRPrelude" -> "template-rocq/utils/MRReflect"
+"template-rocq/utils/bytestring" -> "template-rocq/utils/MRString"
+"template-rocq/utils/All_Forall" -> "template-rocq/utils/MRUtils"
+"template-rocq/utils/MRArith" -> "template-rocq/utils/MRUtils"
+"template-rocq/utils/MREquality" -> "template-rocq/utils/MRUtils"
+"template-rocq/utils/MRString" -> "template-rocq/utils/MRUtils"
 "template-rocq/utils/ByteCompareSpec" -> "template-rocq/utils/bytestring"
 "template-rocq/utils/canonicaltries/String2pos" -> "template-rocq/utils/canonicaltries/CanonicalTries"
-"template-rocq/utils/MCUtils" -> "template-rocq/utils/wGraph"
-"template-rocq/utils/MC_ExtrOCamlZPosInt" -> "safechecker/Extraction"
+"template-rocq/utils/MRUtils" -> "template-rocq/utils/wGraph"
+"template-rocq/utils/MR_ExtrOCamlZPosInt" -> "safechecker/Extraction"
 "safechecker/SafeTemplateChecker" -> "safechecker/Extraction"
 "safechecker/PCUICSafeReduce" -> "safechecker/PCUICConsistency"
 "safechecker/PCUICWfEnvImpl" -> "safechecker/PCUICConsistency"
@@ -269,23 +269,23 @@ node[style=filled]
 "template-rocq/Transform"[label="Transform", color=aquamarine]
 "template-rocq/common/uGraph"[label="uGraph", color=aquamarine]
 "template-rocq/utils/ReflectEq"[label="ReflectEq", color=aquamarine]
-"template-rocq/utils/MC_ExtrOCamlZPosInt"[label="MC_ExtrOCamlZPosInt", color=aquamarine]
-"template-rocq/utils/MCUtils"[label="MCUtils", color=aquamarine]
+"template-rocq/utils/MR_ExtrOCamlZPosInt"[label="MR_ExtrOCamlZPosInt", color=aquamarine]
+"template-rocq/utils/MRUtils"[label="MRUtils", color=aquamarine]
 "template-rocq/utils/wGraph"[label="wGraph", color=aquamarine]
-"template-rocq/utils/MCString"[label="MCString", color=aquamarine]
-"template-rocq/utils/MCSquash"[label="MCSquash", color=aquamarine]
-"template-rocq/utils/MCRelations"[label="MCRelations", color=aquamarine]
-"template-rocq/utils/MCPred"[label="MCPred", color=aquamarine]
-"template-rocq/utils/MCProd"[label="MCProd", color=aquamarine]
-"template-rocq/utils/MCOption"[label="MCOption", color=aquamarine]
-"template-rocq/utils/MCList"[label="MCList", color=aquamarine]
+"template-rocq/utils/MRString"[label="MRString", color=aquamarine]
+"template-rocq/utils/MRSquash"[label="MRSquash", color=aquamarine]
+"template-rocq/utils/MRRelations"[label="MRRelations", color=aquamarine]
+"template-rocq/utils/MRPred"[label="MRPred", color=aquamarine]
+"template-rocq/utils/MRProd"[label="MRProd", color=aquamarine]
+"template-rocq/utils/MROption"[label="MROption", color=aquamarine]
+"template-rocq/utils/MRList"[label="MRList", color=aquamarine]
 "template-rocq/utils/LibHypsNaming"[label="LibHypsNaming", color=aquamarine]
-"template-rocq/utils/MCEquality"[label="MCEquality", color=aquamarine]
-"template-rocq/utils/MCCompare"[label="MCCompare", color=aquamarine]
-"template-rocq/utils/MCArith"[label="MCArith", color=aquamarine]
+"template-rocq/utils/MREquality"[label="MREquality", color=aquamarine]
+"template-rocq/utils/MRCompare"[label="MRCompare", color=aquamarine]
+"template-rocq/utils/MRArith"[label="MRArith", color=aquamarine]
 "template-rocq/utils/All_Forall"[label="All_Forall", color=aquamarine]
-"template-rocq/utils/MCReflect"[label="MCReflect", color=aquamarine]
-"template-rocq/utils/MCPrelude"[label="MCPrelude", color=aquamarine]
+"template-rocq/utils/MRReflect"[label="MRReflect", color=aquamarine]
+"template-rocq/utils/MRPrelude"[label="MRPrelude", color=aquamarine]
 "template-rocq/utils/bytestring"[label="bytestring", color=aquamarine]
 "template-rocq/utils/ByteCompareSpec"[label="ByteCompareSpec", color=aquamarine]
 "template-rocq/utils/ByteCompare"[label="ByteCompare", color=aquamarine]
@@ -299,7 +299,7 @@ node[style=filled]
 "template-rocq/Pretty" -> "template-rocq/Extraction"
 "template-rocq/TemplateMonad/Extractable" -> "template-rocq/Extraction"
 "template-rocq/TemplateProgram" -> "template-rocq/Extraction"
-"template-rocq/utils/MC_ExtrOCamlZPosInt" -> "template-rocq/Extraction"
+"template-rocq/utils/MR_ExtrOCamlZPosInt" -> "template-rocq/Extraction"
 "template-rocq/Typing" -> "template-rocq/Normal"
 "template-rocq/LiftSubst" -> "template-rocq/Pretty"
 "template-rocq/Typing" -> "template-rocq/Reduction"

@@ -1,6 +1,6 @@
 Set Warnings "-notation-overridden".
 From MetaRocq.Utils Require Export bytestring.
-From MetaRocq.Utils Require Import utils MCList.
+From MetaRocq.Utils Require Import utils MRList.
 From MetaRocq.Common Require Import MonadBasicAst.
 From MetaRocq.PCUIC Require Import PCUICAst PCUICMonadAst.
 From MetaRocq.TemplatePCUIC Require Import PCUICTemplateMonad Loader.
@@ -15,7 +15,7 @@ Set Warnings "+notation-overridden".
 Local Set Primitive Projections.
 Local Unset Universe Minimization ToSet.
 Local Open Scope bs.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Class quotation_of {T} (t : T) := quoted_term_of : PCUICAst.term.
 #[global] Arguments quoted_term_of {T} t {_}.

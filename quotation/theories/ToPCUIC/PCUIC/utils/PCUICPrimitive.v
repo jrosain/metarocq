@@ -1,4 +1,4 @@
-From MetaRocq.Utils.MCTactics Require Import DestructHead UniquePose.
+From MetaRocq.Utils.MRTactics Require Import DestructHead UniquePose.
 From MetaRocq.PCUIC Require Import utils.PCUICPrimitive.
 From MetaRocq.Quotation.ToPCUIC Require Import Init.
 From MetaRocq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Numbers Stdlib.Floats.

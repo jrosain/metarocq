@@ -1,6 +1,6 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import CRelationClasses.
-From MetaRocq.Utils Require Import utils MCList.
+From MetaRocq.Utils Require Import utils MRList.
 From MetaRocq.Common Require Import config Environment Reflect.
 From MetaRocq.Template Require Import Ast AstUtils LiftSubst UnivSubst WfAst TypingWf Typing.
 

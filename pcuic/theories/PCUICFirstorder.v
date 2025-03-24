@@ -1,5 +1,5 @@
 From Stdlib Require Import Program ssreflect ssrbool List.
-From MetaRocq.Utils Require Import utils MCRelations.
+From MetaRocq.Utils Require Import utils MRRelations.
 From MetaRocq.Common Require Import config Kernames.
 
 

@@ -1,5 +1,5 @@
 From Stdlib.MSets Require Import MSetInterface MSetDecide.
-From MetaRocq.Utils Require Import MCMSets.
+From MetaRocq.Utils Require Import MRMSets.
 From MetaRocq.Quotation.ToTemplate Require Import Init.
 
 Module Export MSets.

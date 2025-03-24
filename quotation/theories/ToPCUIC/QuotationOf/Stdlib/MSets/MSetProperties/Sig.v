@@ -1,5 +1,5 @@
 From Stdlib.MSets Require Import MSetProperties.
-From MetaRocq.Utils Require Import MCMSets.
+From MetaRocq.Utils Require Import MRMSets.
 From MetaRocq.Quotation.ToPCUIC Require Import Init.
 From MetaRocq.Quotation.ToPCUIC.QuotationOf.Stdlib.Structures Require Import OrdersFacts.Sig.
 From MetaRocq.Quotation.ToPCUIC.QuotationOf.Stdlib.MSets Require Import MSetFacts.Sig MSetDecide.Sig.

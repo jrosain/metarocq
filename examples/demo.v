@@ -3,7 +3,7 @@ From MetaRocq.Utils Require Import utils.
 From MetaRocq.Template Require Import All.
 From Stdlib Require Init.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 (** This is just printing **)
 MetaRocq Test Quote (fun x : nat => x).

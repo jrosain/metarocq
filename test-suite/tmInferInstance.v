@@ -1,7 +1,7 @@
 From MetaRocq Require Import Template.All.
 Require Export String List.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Existing Class True.
 Global Existing Instance I.

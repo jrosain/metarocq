@@ -18,7 +18,7 @@ From MetaRocq.Erasure.Typed Require Import Extraction.
 From MetaRocq.Erasure.Typed Require Import Certifying.
 
 Open Scope nat.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Section Eta.
   Definition ctors_info := list (inductive

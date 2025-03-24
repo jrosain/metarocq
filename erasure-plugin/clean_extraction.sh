@@ -31,7 +31,7 @@ then
     done
     cd ..
 
-    # Remove extracted modules already linked in the template_coq plugin.
+    # Remove extracted modules already linked in the template_rocq plugin.
     echo "Removing:" $files
     rm -f $files
 else

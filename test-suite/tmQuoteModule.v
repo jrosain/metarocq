@@ -1,6 +1,6 @@
 From MetaRocq.Utils Require Import bytestring.
 From MetaRocq.Template Require Import Loader All.
-Import MCMonadNotation.
+Import MRMonadNotation.
 Module Foo.
     Inductive bar : Set := .
   Definition t := nat.

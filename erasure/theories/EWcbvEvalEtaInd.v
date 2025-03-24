@@ -478,7 +478,7 @@ Proof.
         assert (efix : isEtaExp Σ (mkApps (tFix mfix idx) argsv)) by iheta q.
         rewrite isEtaExp_mkApps_napp /= // in efix.
         move/andP: efix => [efix hargs].
-        apply MCProd.and_assum.
+        apply MRProd.and_assum.
         eapply isEtaExp_cunfold_fix. now simp_eta in efix. exact e.
         intros hfn.
         eapply isEtaExp_mkApps_intro => //.

@@ -13,7 +13,7 @@ From Stdlib Require Import Lia.
 From Equations Require Import Equations.
 Set Primitive Projections.
 Set Default Proof Using "Type".
-From MetaRocq.Utils Require Import MCCompare ReflectEq.
+From MetaRocq.Utils Require Import MRCompare ReflectEq.
 From MetaRocq.Utils Require ByteCompare ByteCompareSpec.
 (** bytes *)
 

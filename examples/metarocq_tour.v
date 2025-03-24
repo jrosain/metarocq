@@ -4,7 +4,7 @@ From MetaRocq.Template Require Import All.
 From MetaRocq.Template Require Import TemplateMonad.
 From MetaRocq.PCUIC Require Import PCUICAst PCUICReduction PCUICCumulativity PCUICTyping PCUICSafeLemmata.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 Local Open Scope bs_scope.
 
 (** MetaRocq is:

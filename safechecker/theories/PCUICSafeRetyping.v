@@ -27,7 +27,7 @@ Transparent Acc_intro_generator.
 
 Local Open Scope string_scope.
 Set Asymmetric Patterns.
-Import monad_utils.MCMonadNotation.
+Import monad_utils.MRMonadNotation.
 
 #[global]
 Hint Constructors assumption_context : pcuic.

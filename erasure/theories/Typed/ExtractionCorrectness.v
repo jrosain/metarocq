@@ -316,7 +316,7 @@ Proof.
       inversion Hdecl;subst;clear Hdecl.
       unfold trans_global_decl,trans_cst.
       cbn [EWellformed.wf_global_decl].
-      unfold MCOption.option_default.
+      unfold MROption.option_default.
       destruct EAst.cst_body eqn:heq => //.
       set (deps := KernameSet.union _ _).
       unshelve eapply (erase_constant_body_correct'' (X_type := X_type) (decls := decls) seeds) in heq as [[t0 [T [[] ?]]]].
@@ -403,7 +403,7 @@ Proof.
       inversion Hdecl;subst;clear Hdecl.
       unfold trans_global_decl,trans_cst.
       cbn [EWellformed.wf_global_decl].
-      unfold MCOption.option_default.
+      unfold MROption.option_default.
       destruct EAst.cst_body eqn:heq => //.
       set (deps := KernameSet.union _ _).
       destruct c as [ty [b|] cunivs rel]. 2:cbn in heq => //.
@@ -450,7 +450,7 @@ Proof.
   simpl.
   destruct a;simpl.
   destruct (KernameSet.mem _ _);cbn.
-  - unfold MCProd.test_snd;cbn.
+  - unfold MRProd.test_snd;cbn.
     constructor.
     * unfold trans_env in *;cbn in *.
       apply IHdecls.
@@ -489,7 +489,7 @@ Proof.
   simpl.
   destruct a;simpl.
   destruct (KernameSet.mem _ _);cbn.
-  - unfold MCProd.test_snd;cbn.
+  - unfold MRProd.test_snd;cbn.
     constructor.
     * unfold trans_env in *;cbn in *.
       depelim H0.
@@ -582,7 +582,7 @@ Qed.
 From Stdlib Require Import String.
 Local Open Scope string_scope.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Definition compute_masks overridden_masks do_trim_const_masks do_trim_ctor_masks Σ : result dearg_set bytestring.string :=
   let (const_masks, ind_masks) := Utils.timed "Dearg analysis" (fun _ => analyze_env overridden_masks Σ) in

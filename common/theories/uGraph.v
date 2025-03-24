@@ -6,7 +6,7 @@ From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
 Import ConstraintType.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 
 Arguments Z.add : simpl nomatch.
@@ -3247,7 +3247,7 @@ Proof.
   unfold is_consistent. by move=> /on_SomeP [? [-> <-]].
 Qed.
 
-From MetaRocq.Utils Require Import MCUtils.
+From MetaRocq.Utils Require Import MRUtils.
 
 Lemma global_uctx_invariants_union_or lvls1 lvls2 cs
   : global_uctx_invariants (lvls1, cs) \/ global_uctx_invariants (lvls2, cs)

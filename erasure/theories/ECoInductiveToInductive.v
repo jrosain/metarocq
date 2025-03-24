@@ -12,11 +12,11 @@ From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils EDeps EExtends
     ELiftSubst ECSubst ESpineView EGlobalEnv EInduction EWellformed EWcbvEval Extract Prelim
     EEnvMap EArities EProgram.
 
-Import MCList (map_InP, map_InP_elim, map_InP_spec).
+Import MRList (map_InP, map_InP_elim, map_InP_spec).
 
 Local Open Scope string_scope.
 Set Asymmetric Patterns.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 From Equations Require Import Equations.
 Set Equations Transparent.
@@ -594,14 +594,14 @@ Qed.
 Ltac destruct_times :=
   match goal with
   | [ H : pair _ _ |- _ ] => destruct H
-  | [ H : MCProd.and3 _ _ _ |- _ ] => destruct H
-  | [ H : MCProd.and4 _ _ _ _ |- _ ] => destruct H
-  | [ H : MCProd.and5 _ _ _ _ _ |- _ ] => destruct H
-  | [ H : MCProd.and6 _ _ _ _ _ _ |- _ ] => destruct H
-  | [ H : MCProd.and7 _ _ _ _ _ _ _ |- _ ] => destruct H
-  | [ H : MCProd.and8 _ _ _ _ _ _ _ _ |- _ ] => destruct H
-  | [ H : MCProd.and9 _ _ _ _ _ _ _ _ _ |- _ ] => destruct H
-  | [ H : MCProd.and10 _ _ _ _ _ _ _ _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and3 _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and4 _ _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and5 _ _ _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and6 _ _ _ _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and7 _ _ _ _ _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and8 _ _ _ _ _ _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and9 _ _ _ _ _ _ _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and10 _ _ _ _ _ _ _ _ _ _ |- _ ] => destruct H
   end.
 
 From MetaRocq.Erasure Require Import EWcbvEvalCstrsAsBlocksInd.

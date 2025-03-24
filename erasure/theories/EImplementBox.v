@@ -8,7 +8,7 @@ From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils EInduction EAriti
 
 Local Open Scope string_scope.
 Set Asymmetric Patterns.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 From Equations Require Import Equations.
 Set Equations Transparent.
@@ -22,7 +22,7 @@ Ltac introdep := let H := fresh in intros H; depelim H.
 #[global]
 Hint Constructors eval : core.
 
-Import MCList (map_InP, map_InP_elim, map_InP_spec).
+Import MRList (map_InP, map_InP_elim, map_InP_spec).
 
 Section implement_box.
   Context (Σ : global_declarations).
@@ -586,7 +586,7 @@ Proof.
     (wellformed Σ) (Qpres := Qpreserves_wellformed efl _ wfΣ)) => //.
   { intros. eapply EWcbvEval.eval_wellformed => //; tea. }
   all:intros *.
-  - intros; repeat match goal with [H : MCProd.and3 _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and3 _ _ _ |- _] => destruct H end.
     simp implement_box in *.
     eapply eval_fix' => //.
     + eauto.
@@ -596,15 +596,15 @@ Proof.
       eapply value_final. eapply eval_to_value; eauto.
       unfold iBox. cbn -[implement_box]. unfold map_def. cbn -[implement_box].
       econstructor. cbn. eauto.
-  - intros; repeat match goal with [H : MCProd.and3 _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and3 _ _ _ |- _] => destruct H end.
     simp implement_box in *.
     econstructor; eauto.
     now rewrite -implement_box_csubst.
-  - intros; repeat match goal with [H : MCProd.and3 _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and3 _ _ _ |- _] => destruct H end.
     simp implement_box in *.
     econstructor; eauto.
     now rewrite -implement_box_csubst.
-  - intros; repeat match goal with [H : MCProd.and3 _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and3 _ _ _ |- _] => destruct H end.
     simp implement_box in *.
     assert (pars = 0) as -> by now (eapply constructor_isprop_pars_decl_params; eauto).
     pose proof (Hcon := H1).
@@ -639,26 +639,26 @@ Proof.
       eapply wellformed_closed in i2.
       cbn in i2.
       solve_all.
-  - intros; repeat match goal with [H : MCProd.and3 _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and3 _ _ _ |- _] => destruct H end.
     simp implement_box in *.
     eapply eval_fix' => //; eauto.
     eapply implement_box_cunfold_fix.
     eapply forallb_All. eapply closed_fix_subst.
     eapply wellformed_closed in i4.
     now cbn in i4. eauto.
-  - intros; repeat match goal with [H : MCProd.and3 _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and3 _ _ _ |- _] => destruct H end.
     rewrite wellformed_mkApps in i2. eauto.
     cbn in i2. rtoProp. congruence.
-  - intros; repeat match goal with [H : MCProd.and3 _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and3 _ _ _ |- _] => destruct H end.
     rewrite wellformed_mkApps in i2. eauto.
     cbn in i2. rtoProp. congruence.
-  - intros; repeat match goal with [H : MCProd.and3 _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and3 _ _ _ |- _] => destruct H end.
     simp implement_box in *.
     econstructor.
     eapply implement_box_declared_constant; eauto.
     destruct decl. cbn in *. now rewrite H0.
     eauto.
-  - intros; repeat match goal with [H : MCProd.and3 _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and3 _ _ _ |- _] => destruct H end.
     simp implement_box in *.
     unfold constructor_isprop_pars_decl in *.
     destruct lookup_constructor as [[[mdecl idecl] cdecl']|] eqn:hc => //.
@@ -672,7 +672,7 @@ Proof.
       rewrite hc //= H1 H7. reflexivity.
     + len.
     + rewrite nth_error_map /=. rewrite H7 in H2; rewrite -H2 in H4; rewrite H4; eauto.
-  - intros; repeat match goal with [H : MCProd.and3 _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and3 _ _ _ |- _] => destruct H end.
     simp implement_box in *.
     eapply eval_app_cong; eauto.
     revert H1.
@@ -681,7 +681,7 @@ Proof.
     rewrite implement_box_isConstructApp; eauto.
     rewrite implement_box_isPrimApp; eauto.
     rewrite implement_box_isLazyApp; eauto.
-  - intros; repeat match goal with [H : MCProd.and3 _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and3 _ _ _ |- _] => destruct H end.
     simp implement_box in *.
     eapply eval_construct_block; tea. eauto.
     2: len; eassumption.

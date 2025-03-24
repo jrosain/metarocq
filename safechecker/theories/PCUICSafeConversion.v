@@ -5543,7 +5543,7 @@ Qed.
     exfalso.
     revert teq.
     induction X0 in args |- *; intros; solve_discr.
-    destruct args as [|? ? _] using MCList.rev_ind; [easy|].
+    destruct args as [|? ? _] using MRList.rev_ind; [easy|].
     rewrite mkApps_app in teq.
     cbn in teq. noconf teq.
     eauto.

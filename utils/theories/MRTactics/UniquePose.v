@@ -1,4 +1,4 @@
-From MetaRocq.Utils Require Import MCTactics.FindHyp.
+From MetaRocq.Utils Require Import MRTactics.FindHyp.
 
 (** [pose proof defn], but only if no hypothesis of the same type exists.
     most useful for proofs of a proposition *)

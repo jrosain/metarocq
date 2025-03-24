@@ -2,7 +2,7 @@ From Stdlib Require Import List.
 From MetaRocq.Template Require Import All Loader.
 Import Ast.Env.
 Import ListNotations.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Local Open Scope bs_scope.
 

@@ -1,4 +1,4 @@
-Require Export MetaRocq.Utils.MCTactics.UniquePose.
+Require Export MetaRocq.Utils.MRTactics.UniquePose.
 
 Ltac specialize_all_ways :=
   repeat match goal with

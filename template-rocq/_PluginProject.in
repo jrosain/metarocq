@@ -121,30 +121,30 @@ gen-src/logic1.ml
 gen-src/logic1.mli
 gen-src/logic2.ml
 gen-src/logic2.mli
-gen-src/mCCompare.ml
-gen-src/mCCompare.mli
-gen-src/mCFSets.ml
-gen-src/mCFSets.mli
-gen-src/mCList.ml
-gen-src/mCList.mli
-gen-src/mCMSets.ml
-gen-src/mCMSets.mli
-gen-src/mCOption.ml
-gen-src/mCOption.mli
-gen-src/mCPrelude.ml
-gen-src/mCPrelude.mli
-gen-src/mCProd.ml
-gen-src/mCProd.mli
-gen-src/mCReflect.ml
-gen-src/mCReflect.mli
-gen-src/mCRelations.ml
-gen-src/mCRelations.mli
-gen-src/mCString.ml
-gen-src/mCString.mli
-# gen-src/mCUint63.ml
-# gen-src/mCUint63.mli
-gen-src/mCUtils.ml
-gen-src/mCUtils.mli
+gen-src/mRCompare.ml
+gen-src/mRCompare.mli
+gen-src/mRFSets.ml
+gen-src/mRFSets.mli
+gen-src/mRList.ml
+gen-src/mRList.mli
+gen-src/mRMSets.ml
+gen-src/mRMSets.mli
+gen-src/mROption.ml
+gen-src/mROption.mli
+gen-src/mRPrelude.ml
+gen-src/mRPrelude.mli
+gen-src/mRProd.ml
+gen-src/mRProd.mli
+gen-src/mRReflect.ml
+gen-src/mRReflect.mli
+gen-src/mRRelations.ml
+gen-src/mRRelations.mli
+gen-src/mRString.ml
+gen-src/mRString.mli
+# gen-src/mRUint63.ml
+# gen-src/mRUint63.mli
+gen-src/mRUtils.ml
+gen-src/mRUtils.mli
 gen-src/mSetAVL.ml
 gen-src/mSetAVL.mli
 gen-src/mSetDecide.ml

@@ -11,7 +11,7 @@ From MetaRocq.TypedExtraction.Tests Require Import ErasureTests.
 From MetaRocq.Template Require Import Kernames.
 From MetaRocq.Template Require Import Loader.
 From MetaRocq.Template Require Import config.
-From MetaRocq.Template Require Import MCUtils.
+From MetaRocq.Template Require Import MRUtils.
 
 
 Module P := PCUICAst.PCUICEnvironment.
@@ -75,7 +75,7 @@ Section printing.
     | tCase (mkInd mind i as ind, nparam) t brs =>
       fun '(bt, (ta, trs)) =>
       "Case(" ++ string_of_inductive ind ++ "," ++ string_of_nat i ++ "," ++ MetaRocq.Erasure.EAstUtils.string_of_term t ++ ","
-                    ++ MCString.string_of_list (fun b => MetaRocq.Erasure.EAstUtils.string_of_term (snd b)) brs ++ ")"
+                    ++ MRString.string_of_list (fun b => MetaRocq.Erasure.EAstUtils.string_of_term (snd b)) brs ++ ")"
     | _ => fun _ => "error: cannot print"
     end.
 

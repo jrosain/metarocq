@@ -1,7 +1,7 @@
 From Stdlib Require Import List Nat.
 From MetaRocq.Template Require Import All.
 
-Import MCMonadNotation ListNotations.
+Import MRMonadNotation ListNotations.
 
 Definition foo : nat. exact 0. Qed.
 

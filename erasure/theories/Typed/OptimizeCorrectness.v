@@ -16,8 +16,8 @@ From MetaRocq.Erasure Require Import EInduction.
 From MetaRocq.Erasure Require Import ELiftSubst.
 From MetaRocq.Erasure Require Import EWcbvEval.
 From MetaRocq.Erasure Require Import EGlobalEnv EWellformed.
-From MetaRocq.Utils Require Import MCList.
-From MetaRocq.Utils Require Import MCPrelude.
+From MetaRocq.Utils Require Import MRList.
+From MetaRocq.Utils Require Import MRPrelude.
 From MetaRocq.Utils Require Import utils.
 From MetaRocq.Utils Require Import All_Forall.
 Require ssreflect.
@@ -3072,7 +3072,7 @@ Lemma eval_mkApps_tConstruct {wfl : WcbvFlags} Σ ind c args argsv mdecl idecl c
   Σ e⊢ mkApps (tConstruct ind c []) args ⇓ mkApps (tConstruct ind c []) argsv.
 Proof.
   revert argsv a.
-  induction args using MCList.rev_ind; intros argsv all block ctor_look argsv_lt.
+  induction args using MRList.rev_ind; intros argsv all block ctor_look argsv_lt.
   - depelim all.
     cbn.
     constructor.
@@ -3082,7 +3082,7 @@ Proof.
     destruct g;cbn in *;try congruence.
     rewrite block.
     repeat destruct nth_error;cbn;try congruence.
-  - destruct argsv as [|? ? _] using MCList.rev_ind.
+  - destruct argsv as [|? ? _] using MRList.rev_ind.
     { apply All2_length in all as len.
       rewrite length_app in len; cbn in *; lia. }
     destruct (All2_eval_snoc_elim all).
@@ -3531,7 +3531,7 @@ Section dearg.
       trans_env (dearg_env Σ) e⊢ mkApps (dearg hd) (map dearg args) ⇓ dearg v.
   Proof.
     intros ? clos_hd valid_hd exp_hd clos_args valid_args exp_args no_args ev ev_len.
-    destruct args as [|? ? _] using MCList.rev_ind; cbn in *; [easy|].
+    destruct args as [|? ? _] using MRList.rev_ind; cbn in *; [easy|].
     revert ev ev_len.
     rewrite map_app, !mkApps_app.
     cbn.
@@ -5124,7 +5124,7 @@ Proof.
     + depelim ev.
 Qed.
 
-Import MCMonadNotation ResultMonad.
+Import MRMonadNotation ResultMonad.
 From Stdlib Require Import String.
 Definition compute_masks overridden_masks (do_trim_const_masks do_trim_ctor_masks : bool) Σ : result dearg_set bytestring.string :=
   let (const_masks, ind_masks) := Utils.timed "Dearg analysis" (fun _ => analyze_env overridden_masks Σ) in

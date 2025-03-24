@@ -40,7 +40,7 @@ Proof.
   - constructor. now rewrite <- eq.
 Qed.
 
-From MetaRocq Require Import MCCompare.
+From MetaRocq Require Import MRCompare.
 
 Definition lt x y := compare x y = Lt.
 

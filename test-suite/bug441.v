@@ -1,5 +1,5 @@
 From MetaRocq.Template Require Import All.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 #[local] Existing Instance TemplateMonad_OptimizedMonad.
 

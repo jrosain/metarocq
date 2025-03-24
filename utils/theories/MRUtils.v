@@ -1,26 +1,26 @@
 From Stdlib Require Import Nat ZArith Bool.
 
-From MetaRocq.Utils Require Export MCPrelude
-        MCReflect
+From MetaRocq.Utils Require Export MRPrelude
+        MRReflect
         All_Forall
-        MCArith
-        MCCompare
-        MCEquality
-        MCList
-        MCOption
-        MCProd
-        MCSquash
-        MCRelations
-        MCString
-        MCTactics.InHypUnderBindersDo
-        MCTactics.SpecializeUnderBindersBy
-        MCTactics.Zeta1
-        MCTactics.DestructHead
-        MCTactics.SpecializeAllWays
-        MCTactics.SplitInContext
-        MCTactics.Head
-        MCTactics.SpecializeBy
-        MCTactics.UniquePose
+        MRArith
+        MRCompare
+        MREquality
+        MRList
+        MROption
+        MRProd
+        MRSquash
+        MRRelations
+        MRString
+        MRTactics.InHypUnderBindersDo
+        MRTactics.SpecializeUnderBindersBy
+        MRTactics.Zeta1
+        MRTactics.DestructHead
+        MRTactics.SpecializeAllWays
+        MRTactics.SplitInContext
+        MRTactics.Head
+        MRTactics.SpecializeBy
+        MRTactics.UniquePose
         ReflectEq
         bytestring
         Show

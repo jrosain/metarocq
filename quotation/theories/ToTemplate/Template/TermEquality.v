@@ -5,7 +5,7 @@ From MetaRocq.Quotation.ToTemplate.Utils Require Import (hints) utils All_Forall
 From MetaRocq.Quotation.ToTemplate.Common Require Import (hints) config Reflect Environment Universes BasicAst Kernames.
 From MetaRocq.Quotation.ToTemplate.Template Require Import (hints) Ast AstUtils Induction.
 
-#[export] Instance quote_on_rel {T T'} {R} {f: T -> T'} {x y : T} {qR : quotation_of R} {quoteR : forall x y, ground_quotable (R x y:Prop)}: ground_quotable (MCRelations.on_rel R f x y) := ltac:(cbv [MCRelations.on_rel]; exact _).
+#[export] Instance quote_on_rel {T T'} {R} {f: T -> T'} {x y : T} {qR : quotation_of R} {quoteR : forall x y, ground_quotable (R x y:Prop)}: ground_quotable (MRRelations.on_rel R f x y) := ltac:(cbv [MRRelations.on_rel]; exact _).
 
 #[export] Instance quote_cmp_universe_instance {R u u'} {qR : quotation_of R} {quoteR : forall x y, ground_quotable (R x y:Prop)} : ground_quotable (@cmp_universe_instance R u u') := ltac:(cbv [cmp_universe_instance]; exact _).
 Section with_R.

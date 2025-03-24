@@ -2,7 +2,7 @@
 
 From MetaRocq.Utils Require Export
      monad_utils   (* Monadic notations *)
-     MCUtils. (* Utility functions *)
+     MRUtils. (* Utility functions *)
 
 From MetaRocq.Common Require Export
      uGraph        (* The graph of universes *)

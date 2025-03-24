@@ -5,11 +5,11 @@ From MetaRocq.Common Require Import config.
 From MetaRocq.PCUIC Require Import PCUICAst PCUICInduction
      PCUICReflect PCUICEquality PCUICLiftSubst PCUICCases.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.

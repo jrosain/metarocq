@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Morphisms.
 From Stdlib Require Import ssreflect ssrfun ssrbool.
-From MetaRocq.Utils Require Import utils MCPred.
+From MetaRocq.Utils Require Import utils MRPred.
 From MetaRocq.Common Require Import config.
 From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICInduction
   PCUICLiftSubst PCUICUnivSubst

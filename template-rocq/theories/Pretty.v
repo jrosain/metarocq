@@ -109,7 +109,7 @@ Section print_term.
                                        (Some (decl_type decl)) :: Γids)
                            Γ
         end in
-    aux Γ (MCList.rev Γ').
+    aux Γ (MRList.rev Γ').
 
 End print_term.
 
@@ -138,7 +138,7 @@ Module PrintTermTree.
     | sType l =>
       if with_universes then
         ("Type(" ++
-           MCString.string_of_list string_of_level_expr (LevelExprSet.elements l) ++
+           MRString.string_of_list string_of_level_expr (LevelExprSet.elements l) ++
           ")")%bs
        else "Type"
     end.
@@ -206,7 +206,7 @@ Module PrintTermTree.
       | Some Γret =>
         let Γret := fresh_names Σ Γ Γret in
         let ret_binders := firstn #|pcontext p| Γret in
-        let (as_name, indices) := (hd "_" ret_binders, MCList.rev (tail ret_binders)) in
+        let (as_name, indices) := (hd "_" ret_binders, MRList.rev (tail ret_binders)) in
         let in_args := (repeat "_" #|pparams p| ++ indices)%list in
         let in_str := oib.(ind_name) ^ concat "" (map (fun a : bytestring.string => " " ^ a) in_args) in
 

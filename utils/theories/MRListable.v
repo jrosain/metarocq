@@ -1,5 +1,5 @@
 From Stdlib Require Import Lia Arith Bool List Program.
-From MetaRocq.Utils Require Import MCPrelude ReflectEq.
+From MetaRocq.Utils Require Import MRPrelude ReflectEq.
 From Stdlib.ssr Require Import ssreflect.
 From Equations Require Import Equations.
 Import ListNotations.

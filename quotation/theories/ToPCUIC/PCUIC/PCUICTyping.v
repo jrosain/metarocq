@@ -1,7 +1,7 @@
 From MetaRocq.PCUIC Require Import PCUICAst PCUICTyping.
 From MetaRocq.Quotation.ToPCUIC Require Import Init.
 From MetaRocq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.Numbers Stdlib.Floats.
-From MetaRocq.Quotation.ToPCUIC.Utils Require Import (hints) utils All_Forall (* MCProd*).
+From MetaRocq.Quotation.ToPCUIC.Utils Require Import (hints) utils All_Forall (* MRProd*).
 From MetaRocq.Quotation.ToPCUIC.Common Require Import (hints) config BasicAst Universes Kernames Environment EnvironmentTyping Primitive Reflect.
 From MetaRocq.Quotation.ToPCUIC.Common Require Import (hints) Environment EnvironmentTyping.
 From MetaRocq.Quotation.ToPCUIC.PCUIC Require Import (hints) (*PCUICAstUtils

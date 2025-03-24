@@ -7,7 +7,7 @@ From MetaRocq.Erasure.Typed Require Import Certifying.
 From MetaRocq.Template Require Import All.
 From MetaRocq.Common Require Import Kernames.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Section betared.
   Context (Σ : global_env).

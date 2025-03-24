@@ -1,7 +1,7 @@
 From Stdlib.Structures Require Import Equalities Orders OrdersAlt.
 From Stdlib.FSets Require Import FMapInterface FMapList FMapAVL FMapFullAVL FMapFacts.
-From MetaRocq.Utils Require Import MCReflect MCUtils.
-From MetaRocq.Utils.MCTactics Require Import SpecializeUnderBindersBy DestructHead SplitInContext.
+From MetaRocq.Utils Require Import MRReflect MRUtils.
+From MetaRocq.Utils.MRTactics Require Import SpecializeUnderBindersBy DestructHead SplitInContext.
 From Equations.Prop Require Import Classes.
 
 Module Export FSets.

@@ -2,7 +2,7 @@
 From MetaRocq.Utils Require Import utils monad_utils.
 From MetaRocq.Template Require Import Ast.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 Local Set Universe Polymorphism.
 Local Unset Universe Minimization ToSet.
 

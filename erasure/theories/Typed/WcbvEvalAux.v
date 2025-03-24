@@ -1,6 +1,6 @@
 From Equations Require Import Equations.
 From MetaRocq.Erasure.Typed Require Import ClosedAux.
-From MetaRocq.Utils Require Import MCPrelude.
+From MetaRocq.Utils Require Import MRPrelude.
 From MetaRocq.Common Require Import Kernames.
 From MetaRocq.Erasure Require Import EAst.
 From MetaRocq.Erasure Require Import EAstUtils.
@@ -386,9 +386,9 @@ Lemma All2_rev_rect X Y (T : X -> Y -> Type) (P : forall xs ys, All2 T xs ys -> 
   forall xs ys (a : All2 T xs ys), P xs ys a.
 Proof.
   intros nil_case snoc_case.
-  induction xs using MCList.rev_ind; intros ys a.
+  induction xs using MRList.rev_ind; intros ys a.
   - now depelim a.
-  - destruct ys as [|y ys _] using MCList.rev_ind.
+  - destruct ys as [|y ys _] using MRList.rev_ind.
     + apply All2_length in a as ?.
       rewrite length_app in *.
       now cbn in *.
@@ -469,7 +469,7 @@ Lemma eval_mkApps_heads_deriv {Σ hd hd' hdv args v}
   (deriv_length ev_apps + deriv_length ev_hd' = deriv_length ev_apps' + deriv_length ev_hd)%nat.
 Proof.
   revert hd hd' hdv v ev_hd ev_hd' ev_apps.
-  induction args using MCList.rev_ind; intros; cbn in *.
+  induction args using MRList.rev_ind; intros; cbn in *.
   - pose proof (eval_unique_sig ev_hd ev_apps) as H; noconf H.
     exists ev_hd'; lia.
   - revert ev_apps; rewrite !mkApps_app; intros.

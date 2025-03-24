@@ -1,7 +1,7 @@
 From MetaRocq.Template Require Import Ast Typing.
 From MetaRocq.Quotation.ToTemplate Require Import Init.
 From MetaRocq.Quotation.ToTemplate Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.Numbers Stdlib.Floats.
-From MetaRocq.Quotation.ToTemplate.Utils Require Import (hints) utils All_Forall (* MCProd*).
+From MetaRocq.Quotation.ToTemplate.Utils Require Import (hints) utils All_Forall (* MRProd*).
 From MetaRocq.Quotation.ToTemplate.Common Require Import (hints) config BasicAst Universes Kernames Environment EnvironmentTyping Primitive Reflect.
 From MetaRocq.Quotation.ToTemplate.Template Require Import (hints) AstUtils
   LiftSubst UnivSubst ReflectAst TermEquality WfAst.

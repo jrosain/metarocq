@@ -2,7 +2,7 @@ From Stdlib Require Import List.
 From MetaRocq.Common Require Import config Transform.
 From MetaRocq.Template Require Import TemplateProgram Pretty EtaExpand All Loader.
 Import ListNotations.
-Import MCMonadNotation.
+Import MRMonadNotation.
 Import bytestring.
 Open Scope bs_scope.
 

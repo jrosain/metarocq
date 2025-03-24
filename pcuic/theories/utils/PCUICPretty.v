@@ -108,7 +108,7 @@ Section fresh.
                                         (Some (decl_type decl)) :: Γids)
                             Γ
         end in
-    aux Γ (MCList.rev Γ').
+    aux Γ (MRList.rev Γ').
 End fresh.
 
 Module PrintTermTree.
@@ -228,7 +228,7 @@ Module PrintTermTree.
         let Γret := p.(pcontext) in
         let Γret := fresh_names Σ Γ Γret in
         let ret_binders := firstn #|pcontext p| Γret in
-        let (as_name, indices) := (hd "_" ret_binders, MCList.rev (tail ret_binders)) in
+        let (as_name, indices) := (hd "_" ret_binders, MRList.rev (tail ret_binders)) in
         let in_args := (repeat "_" #|pparams p| ++ indices)%list in
         let in_str := oib.(ind_name) ^ concat "" (map (fun a : String.t => " " ^ a) in_args) in
 

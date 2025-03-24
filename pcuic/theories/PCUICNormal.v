@@ -235,11 +235,11 @@ Proof.
         rewrite nth_error_app1 in e0; auto.
         rewrite length_firstn.
         lia.
-  - destruct l using MCList.rev_ind; [|now rewrite mkApps_app in eq].
+  - destruct l using MRList.rev_ind; [|now rewrite mkApps_app in eq].
     cbn in *; subst; auto.
-  - destruct l using MCList.rev_ind; [|now rewrite mkApps_app in eq].
+  - destruct l using MRList.rev_ind; [|now rewrite mkApps_app in eq].
     cbn in *; subst; auto.
-  - destruct l using MCList.rev_ind; [|now rewrite mkApps_app in eq].
+  - destruct l using MRList.rev_ind; [|now rewrite mkApps_app in eq].
     cbn in *; subst; auto.
   - destruct (mkApps_elim t l).
     apply mkApps_eq_inj in eq as (<-&<-); auto.
@@ -256,7 +256,7 @@ Proof.
     lia.
   - destruct (mkApps_elim t l).
     apply mkApps_eq_inj in eq as (<-&<-); auto.
-  - destruct l using MCList.rev_ind; [|now rewrite mkApps_app in eq].
+  - destruct l using MRList.rev_ind; [|now rewrite mkApps_app in eq].
     cbn in *; subst; auto.
 Qed.
 
@@ -280,19 +280,19 @@ Proof.
   - now inv whn; solve_discr.
   - inv whn.
     + easy.
-    + destruct v0 as [|? ? _] using MCList.rev_ind; [discriminate|].
+    + destruct v0 as [|? ? _] using MRList.rev_ind; [discriminate|].
       rewrite mkApps_app in H0 *.
       cbn in *; inv H0.
       constructor.
       eapply IHwhe.
       apply whnf_cstrapp.
-    + destruct v0 as [|? ? _] using MCList.rev_ind; [discriminate|].
+    + destruct v0 as [|? ? _] using MRList.rev_ind; [discriminate|].
       rewrite mkApps_app in H0 *.
       cbn in *; inv H0.
       constructor.
       eapply IHwhe.
       apply whnf_indapp.
-    + destruct args as [|? ? _] using MCList.rev_ind; [discriminate|].
+    + destruct args as [|? ? _] using MRList.rev_ind; [discriminate|].
       rewrite mkApps_app in H H0 *.
       cbn in *; inv H.
       constructor.
@@ -303,7 +303,7 @@ Proof.
       apply nth_error_None in H0.
       rewrite length_app in H0; cbn in *.
       lia.
-    + destruct v0 as [|? ? _] using MCList.rev_ind; [discriminate|].
+    + destruct v0 as [|? ? _] using MRList.rev_ind; [discriminate|].
       rewrite mkApps_app in H0 *.
       cbn in *; inv H0.
       constructor.
@@ -589,7 +589,7 @@ Proof.
   exfalso.
   revert teq.
   induction X in args |- *; intros; solve_discr.
-  destruct args as [|? ? _] using MCList.rev_ind; [easy|].
+  destruct args as [|? ? _] using MRList.rev_ind; [easy|].
   rewrite mkApps_app in teq.
   cbn in teq.
   inv teq.
@@ -786,7 +786,7 @@ Proof using Type.
     + depelim wh; solve_discr.
       now apply Hbeta_nobeta.
     + unfold unfold_fix in *.
-      destruct args as [|? ? _] using MCList.rev_ind; [now solve_discr|].
+      destruct args as [|? ? _] using MRList.rev_ind; [now solve_discr|].
       rewrite mkApps_app in x.
       cbn in *.
       inv x.
@@ -813,7 +813,7 @@ Proof using Type.
          now eapply whne_isConstruct_app in ctor. }
     destruct r as [[(?&->&?)|(?&->&?)]|(?&->&?)]; eauto.
   - depelim r; eauto.
-    destruct args using MCList.rev_ind; [|rewrite mkApps_app in x; cbn in x; discriminate].
+    destruct args using MRList.rev_ind; [|rewrite mkApps_app in x; cbn in x; discriminate].
     cbn in *.
     unfold is_constructor in e1.
     rewrite nth_error_nil in e1; discriminate.
@@ -1077,7 +1077,7 @@ Lemma whnf_red_mkApps_l_inv Σ Γ hd args t :
 Proof.
   intros r.
   revert hd t r.
-  induction args using MCList.rev_ind; intros hd t r.
+  induction args using MRList.rev_ind; intros hd t r.
   - cbn in *.
     eexists _, []; split; [reflexivity|].
     eauto with pcuic.
@@ -1097,7 +1097,7 @@ Lemma whnf_red_mkApps_r_inv Σ Γ t hd' args' :
 Proof.
   intros r.
   revert hd' t r.
-  induction args' using MCList.rev_ind; intros hd' t r.
+  induction args' using MRList.rev_ind; intros hd' t r.
   - cbn in *.
     eexists _, []; split; [reflexivity|].
     eauto with pcuic.
@@ -1554,7 +1554,7 @@ Proof.
   intros wh eq.
   induction wh in pb, napp, t, t', eq, wh |- *; depelim eq;
     try solve [eauto using whne; depelim wh; solve_discr; eauto using whne].
-  - destruct args as [|? ? _] using MCList.rev_ind; [discriminate x|].
+  - destruct args as [|? ? _] using MRList.rev_ind; [discriminate x|].
     rewrite mkApps_app in x; cbn in x; inv x.
     apply eq_term_upto_univ_napp_mkApps_l_inv in eq1 as (?&?&(eq_hds&?)&->).
     depelim eq_hds.
@@ -1575,7 +1575,7 @@ Proof.
     + rewrite <- e.
       destruct p as (?& eqrarg &?). rewrite eqrarg. reflexivity.
     + eapply IHwh; eauto.
-  - destruct args using MCList.rev_ind; [|rewrite mkApps_app in x; discriminate x].
+  - destruct args using MRList.rev_ind; [|rewrite mkApps_app in x; discriminate x].
     now rewrite nth_error_nil in e0.
 Qed.
 

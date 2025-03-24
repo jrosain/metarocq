@@ -1,5 +1,5 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaRocq.Utils Require Import MCUtils utils.
+From MetaRocq.Utils Require Import MRUtils utils.
 From MetaRocq.Common Require Import config.
 From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
   PCUICWeakeningConfig PCUICEquality PCUICReduction PCUICCumulativity PCUICCumulativitySpec

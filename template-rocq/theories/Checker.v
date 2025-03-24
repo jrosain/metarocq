@@ -2,7 +2,7 @@
 From MetaRocq.Utils Require Import utils.
 From MetaRocq.Common Require Import config Environment uGraph.
 From MetaRocq.Template Require Import Ast AstUtils LiftSubst UnivSubst Typing.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 (** * Rocq type-checker for kernel terms
 

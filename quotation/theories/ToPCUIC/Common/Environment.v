@@ -1,9 +1,9 @@
 From Stdlib Require Import Structures.Equalities Lists.List Lists.ListDec.
-From MetaRocq.Utils Require Import MCProd All_Forall ReflectEq MCRelations MCReflect.
+From MetaRocq.Utils Require Import MRProd All_Forall ReflectEq MRRelations MRReflect.
 From MetaRocq.Common Require Import Environment Universes.
 From MetaRocq.Quotation.ToPCUIC Require Import Init.
 From MetaRocq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.ssr utils BasicAst Primitive Universes Kernames.
-From MetaRocq.Quotation.ToPCUIC.Utils Require Import (hints) MCOption MCProd All_Forall.
+From MetaRocq.Quotation.ToPCUIC.Utils Require Import (hints) MROption MRProd All_Forall.
 From MetaRocq.Quotation.ToPCUIC.QuotationOf.Common Require Import Environment.Sig.
 
 Module Retroknowledge.

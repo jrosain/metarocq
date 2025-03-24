@@ -213,7 +213,7 @@ Debug: calling eauto recursively at depth 3 on 1 subgoals
 Debug: 1.1-1.1-1: looking for (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) without backtracking
 Debug: 1.1-1.1-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Σ b (j_typ (TermTyp b t)))
 Debug: 1.1-1.1-1.1: (*external*) (is_var t; destruct t) on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: pattern-matching failed
@@ -340,7 +340,7 @@ Debug:
 1.1-1.2-1.1-1.1-1: looking for (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) with backtracking
 Debug: 1.1-1.2-1.1-1.1-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Σ b (j_typ (TermTyp b t)))
 Debug: 1.1-1.2-1.1-1.1-1.1: (*external*) (is_var t; destruct t) on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: pattern-matching failed
@@ -442,7 +442,7 @@ Debug: calling eauto recursively at depth 2 on 1 subgoals
 Debug: 1.2-1: looking for (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) without backtracking
 Debug: 1.2-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Σ b (j_typ (TermTyp b t)))
 Debug: 1.2-1.1: (*external*) (is_var t; destruct t) on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: pattern-matching failed
@@ -461,7 +461,7 @@ Debug: calling eauto recursively at depth 3 on 1 subgoals
 Debug: 1.2-1.1-1: looking for (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) without backtracking
 Debug: 1.2-1.1-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Σ b (j_typ (TermTyp b t)))
 Debug: 1.2-1.1-1.1: (*external*) (is_var t; destruct t) on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: pattern-matching failed
@@ -603,7 +603,7 @@ Debug:
 1.3-1.1-1.1-1.1-1: looking for (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) with backtracking
 Debug: 1.3-1.1-1.1-1.1-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Σ b (j_typ (TermTyp b t)))
 Debug: 1.3-1.1-1.1-1.1-1.1: (*external*) (is_var t; destruct t) on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: pattern-matching failed
@@ -701,7 +701,7 @@ Debug: calling eauto recursively at depth 4 on 1 subgoals
 Debug: 1.3-1.1-1.2-1: looking for (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) with backtracking
 Debug: 1.3-1.1-1.2-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Σ b (j_typ (TermTyp b t)))
 Debug: 1.3-1.1-1.2-1.1: (*external*) (is_var t; destruct t) on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: pattern-matching failed
@@ -721,7 +721,7 @@ Debug:
 1.3-1.1-1.2-1.1-1: looking for (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) with backtracking
 Debug: 1.3-1.1-1.2-1.1-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Σ b (j_typ (TermTyp b t)))
 Debug: 1.3-1.1-1.2-1.1-1.1: (*external*) (is_var t; destruct t) on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: pattern-matching failed
@@ -788,11 +788,11 @@ The important lines are
 Debug: 1.1-1.1-1: looking for (ground_quotable (cproperty Γ all b (j_typ (TermTyp b t)) (fst tu))) without backtracking
 Debug: 1.1-1.1-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Γ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Γ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Γ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Γ b (j_typ (TermTyp b t)))
 ```
-The problem is that, for performance, we have told typeclass resolution to not unfold any constants, and so we fail to reduce `MCOption.option_default` and `j_term`.
-Adding something like `cbn [MCOption.option_default j_term] in *` to manually unfold these constants can resolve the issue.
+The problem is that, for performance, we have told typeclass resolution to not unfold any constants, and so we fail to reduce `MROption.option_default` and `j_term`.
+Adding something like `cbn [MROption.option_default j_term] in *` to manually unfold these constants can resolve the issue.
 
 Note that if it is not clear what's going wrong, you can also
 ```coq
@@ -801,7 +801,7 @@ Set Debug "tactic-unification".
 This setting will add, between the above lines, a unification trace ending in
 ```
 Debug:
-[tactic-unification] Starting unification: MCOption.option_default (fun tm : term => checking Γ tm (j_typ (TermTyp b t)))
+[tactic-unification] Starting unification: MROption.option_default (fun tm : term => checking Γ tm (j_typ (TermTyp b t)))
                                              (j_term (TermTyp b t)) unit ~= checking Γ b (j_typ (TermTyp b t))
 Debug: [tactic-unification] Leaving unification with failure
 ```

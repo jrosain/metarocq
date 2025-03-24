@@ -63,7 +63,7 @@ Defined.
 Definition Sn_plus_one_transparent {n} : S n = n + 1.
 now induction n. Defined.
 
-(* NOTE: borrowed from metarocq's MCList. There it's defined for some other [rev] *)
+(* NOTE: borrowed from metarocq's MRList. There it's defined for some other [rev] *)
 Definition length_rev_transparent {A} (l : list A) :
   #|List.rev l| = #|l|.
 induction l.

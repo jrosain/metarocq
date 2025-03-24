@@ -1,6 +1,6 @@
 From MetaRocq.Template Require Import All.
 From Stdlib Require Import List Arith.
-Import ListNotations MCMonadNotation.
+Import ListNotations MRMonadNotation.
 Open Scope bs_scope.
 
 Notation "'unfolded' d" :=
@@ -148,7 +148,7 @@ Polymorphic Inductive foo3@{i j k l} (A : Type@{i}) (B : Type@{j}) : Type@{k} :=
 MetaRocq Quote Recursively Definition qfoo3 := foo3.
 (* Compute qfoo3. *)
 
-From MetaRocq Require Import Utils.monad_utils. Import MCMonadNotation.
+From MetaRocq Require Import Utils.monad_utils. Import MRMonadNotation.
 From MetaRocq Require Import Template.TemplateMonad.Core.
 
 (* MetaRocq Run (tmQuoteInductive (cp "foo") >>= tmPrint).

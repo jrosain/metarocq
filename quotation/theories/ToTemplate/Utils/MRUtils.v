@@ -1,16 +1,16 @@
 From MetaRocq.Quotation.ToTemplate.Utils Require Import
-     MCPrelude
-     MCReflect
+     MRPrelude
+     MRReflect
      All_Forall
-     MCArith
-     MCCompare
-     MCEquality
-     MCList
-     MCOption
-     MCProd
-     MCSquash
-     MCRelations
-     MCString
+     MRArith
+     MRCompare
+     MREquality
+     MRList
+     MROption
+     MRProd
+     MRSquash
+     MRRelations
+     MRString
      ReflectEq
      bytestring
 .

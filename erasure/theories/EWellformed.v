@@ -7,7 +7,7 @@ From MetaRocq.PCUIC Require Import PCUICTactics.
 
 Local Open Scope string_scope.
 Set Asymmetric Patterns.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 From Equations Require Import Equations.
 Set Equations Transparent.

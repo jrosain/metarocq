@@ -38,10 +38,10 @@ Set Warnings "-extraction-logical-axiom".
 Separate Extraction FloatOps.Prim2SF.
 
 Recursive Extraction Library Extractable.
-Extraction Library MCPrelude.
-Extraction Library MCOption.
-Extraction Library MCUtils.
-Extraction Library MCList.
+Extraction Library MRPrelude.
+Extraction Library MROption.
+Extraction Library MRUtils.
+Extraction Library MRList.
 Extraction Library EqDecInstances.
 Extraction Library Induction.
 Extraction Library LiftSubst.

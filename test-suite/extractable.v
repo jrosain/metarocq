@@ -10,7 +10,7 @@ From MetaRocq.Template.TemplateMonad Require Import
      Common Extractable.
 
 Local Open Scope bs_scope.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Notation "<% x %>" := (ltac:(let p y := exact y in quote_term x p))
    (only parsing).

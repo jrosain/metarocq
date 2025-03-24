@@ -116,7 +116,7 @@ Record extract_template_env_params :=
     check_wf_env_func : forall Σ, result (∥wf Σ∥) string;
     pcuic_args : extract_pcuic_params }.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Definition check_wf_and_extract (params : extract_template_env_params)
            (Σ : global_env) (seeds : KernameSet.t) (ignore : kername -> bool) :=

@@ -1,6 +1,6 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Bool.
-From MetaRocq.Utils Require Import MCPrelude.
+From MetaRocq.Utils Require Import MRPrelude.
 From Stdlib Require Import ssreflect.
 From Equations Require Import Equations.
 

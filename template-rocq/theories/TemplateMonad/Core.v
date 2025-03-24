@@ -5,7 +5,7 @@ From MetaRocq.Template Require Import Ast AstUtils Common.
 Local Set Universe Polymorphism.
 Local Unset Universe Minimization ToSet.
 Local Unset Asymmetric Patterns.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 (** * The Template Monad
 

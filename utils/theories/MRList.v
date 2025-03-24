@@ -1,6 +1,6 @@
 From Equations Require Import Equations.
 From Stdlib Require Import Bool Arith Lia SetoidList Utf8.
-From MetaRocq.Utils Require Import MCPrelude MCRelations.
+From MetaRocq.Utils Require Import MRPrelude MRRelations.
 
 Set Equations Transparent.
 
