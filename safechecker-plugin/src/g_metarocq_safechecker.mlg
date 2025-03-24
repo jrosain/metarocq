@@ -1,5 +1,5 @@
 
-DECLARE PLUGIN "coq-metarocq-safechecker.plugin"
+DECLARE PLUGIN "rocq-metarocq-safechecker.plugin"
 
 {
 open Attributes

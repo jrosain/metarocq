@@ -21,10 +21,10 @@ authors: ["Abhishek Anand <aa755@cs.cornell.edu>"
 ]
 license: "MIT"
 depends: [
-  "coq-metarocq-safechecker-plugin" {= version}
-  "coq-metarocq-erasure-plugin" {= version}
-  "coq-metarocq-translations" {= version}
-  "coq-metarocq-quotation" {= version}
+  "rocq-metarocq-safechecker-plugin" {= version}
+  "rocq-metarocq-erasure-plugin" {= version}
+  "rocq-metarocq-translations" {= version}
+  "rocq-metarocq-quotation" {= version}
 ]
 build: [
   ["bash" "./configure.sh" ] {with-test}
@@ -35,7 +35,7 @@ synopsis: "A meta-programming framework for Rocq"
 description: """
 MetaRocq is a meta-programming framework for Rocq.
 
-The meta-package includes the template-coq library,
+The meta-package includes the template-rocq library,
 the PCUIC development including a verified equivalence between Rocq and PCUIC,
 a safe type checker and verified erasure for PCUIC and example translations.
 

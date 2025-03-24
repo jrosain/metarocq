@@ -2,7 +2,7 @@
 From Stdlib Require Import Ascii FSets ExtrOcamlBasic ExtrOCamlFloats ExtrOCamlInt63.
 From MetaRocq.Utils Require Import utils.
 
-(** * Extraction setup for the erasure phase of template-coq.
+(** * Extraction setup for the erasure phase of template-rocq.
 
     Any extracted code planning to link with the plugin
     should use these same directives for consistency.

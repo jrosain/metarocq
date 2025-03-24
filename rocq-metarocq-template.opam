@@ -22,13 +22,13 @@ authors: ["Abhishek Anand <aa755@cs.cornell.edu>"
 license: "MIT"
 build: [
   ["bash" "./configure.sh"]
-  [make "-j" "%{jobs}%" "-C" "template-coq"]
+  [make "-j" "%{jobs}%" "-C" "template-rocq"]
 ]
 install: [
-  [make "-C" "template-coq" "install"]
+  [make "-C" "template-rocq" "install"]
 ]
 depends: [
-  "coq-metarocq-common" {= version}
+  "rocq-metarocq-common" {= version}
 ]
 synopsis: "A quoting and unquoting library for Rocq in Rocq"
 description: """

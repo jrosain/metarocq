@@ -1,5 +1,5 @@
 (* Distributed under the terms of the MIT license. *)
-(** * Extraction setup for template-coq.
+(** * Extraction setup for template-rocq.
 
     Any extracted code planning to link with the plugin's OCaml reifier
     should use these same directives for consistency.

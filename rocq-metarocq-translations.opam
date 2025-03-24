@@ -28,7 +28,7 @@ install: [
   [make "-C" "translations" "install"]
 ]
 depends: [
-  "coq-metarocq-template" {= version}
+  "rocq-metarocq-template" {= version}
 ]
 synopsis: "Translations built on top of MetaRocq"
 description: """

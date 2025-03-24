@@ -1,6 +1,6 @@
 (** * Eta-expansion and proof generation **)
 
-(** We perform eta-expansion of template-coq terms and generate proofs that
+(** We perform eta-expansion of template-rocq terms and generate proofs that
     we terms are equal to the originals. Since eta-conversion is part of the
     Rocq's conversion, the proof is essentially [eq_refl].
     All dependencies are also expanded.*)

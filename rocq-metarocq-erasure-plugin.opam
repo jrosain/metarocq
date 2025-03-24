@@ -28,8 +28,8 @@ install: [
   [make "-C" "erasure-plugin" "install"]
 ]
 depends: [
-  "coq-metarocq-template-pcuic" {= version}
-  "coq-metarocq-erasure" {= version}
+  "rocq-metarocq-template-pcuic" {= version}
+  "rocq-metarocq-erasure" {= version}
 ]
 synopsis: "Implementation and verification of an erasure procedure for Rocq"
 description: """

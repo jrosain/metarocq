@@ -1,4 +1,4 @@
-(** * Definition of programs in template-coq, well-typed terms and provided transformations **)
+(** * Definition of programs in template-rocq, well-typed terms and provided transformations **)
 
 From MetaRocq.Utils Require Import utils.
 

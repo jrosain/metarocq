@@ -1,4 +1,4 @@
-src/META.coq-metarocq-safechecker
+src/META.rocq-metarocq-safechecker
 -I src
 -Q src MetaRocq.SafeCheckerPlugin
 -R theories MetaRocq.SafeCheckerPlugin

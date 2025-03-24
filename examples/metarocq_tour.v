@@ -9,7 +9,7 @@ Local Open Scope bs_scope.
 
 (** MetaRocq is:
 
-  - The "template-coq" monad, dealing with reification of terms
+  - The "template-rocq" monad, dealing with reification of terms
     and environments.
   - The PCUIC development of the syntactic metatheory of Rocq.
   - The SafeChecker package implementing reduction, conversion
@@ -137,7 +137,7 @@ MetaRocq Erase singleton_elim.
 
     - missing modules and fast conversion machines.
 
-  - Much work to come on the template-coq side to ease meta-programming.
+  - Much work to come on the template-rocq side to ease meta-programming.
 
   - Relation to CertiRocq: fast and verified correct erasure, not depending on type-checking
     (only retyping).

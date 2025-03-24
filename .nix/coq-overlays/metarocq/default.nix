@@ -26,9 +26,9 @@ let
   releaseRev = v: "v${v}";
 
   # list of core metarocq packages sorted by dependency order
-  packages = [ "utils" "common" "template-coq" "pcuic" "safechecker" "template-pcuic" "erasure" "quotation" "safechecker-plugin" "erasure-plugin" "all" ];
+  packages = [ "utils" "common" "template-rocq" "pcuic" "safechecker" "template-pcuic" "erasure" "quotation" "safechecker-plugin" "erasure-plugin" "all" ];
 
-  template-coq = metarocq_ "template-coq";
+  template-rocq = metarocq_ "template-rocq";
 
   metarocq_ = package: let
       metarocq-deps = if package == "single" then []
@@ -48,18 +48,18 @@ let
 
         patchPhase =  ''
           patchShebangs ./configure.sh
-          patchShebangs ./template-coq/update_plugin.sh
-          patchShebangs ./template-coq/gen-src/to-lower.sh
+          patchShebangs ./template-rocq/update_plugin.sh
+          patchShebangs ./template-rocq/gen-src/to-lower.sh
           patchShebangs ./safechecker-plugin/clean_extraction.sh
           patchShebangs ./erasure-plugin/clean_extraction.sh
           echo "CAMLFLAGS+=-w -60 # Unused module" >> ./safechecker/Makefile.plugin.local
-          sed -i -e 's/mv $i $newi;/mv $i tmp; mv tmp $newi;/' ./template-coq/gen-src/to-lower.sh ./safechecker-plugin/clean_extraction.sh ./erasure-plugin/clean_extraction.sh
+          sed -i -e 's/mv $i $newi;/mv $i tmp; mv tmp $newi;/' ./template-rocq/gen-src/to-lower.sh ./safechecker-plugin/clean_extraction.sh ./erasure-plugin/clean_extraction.sh
         '' ;
 
         configurePhase = optionalString (package == "all") pkgallMake + ''
           touch ${pkgpath}/metarocq-config
         '' + optionalString (elem package ["safechecker" "erasure" "template-pcuic" "quotation" "safechecker-plugin" "erasure-plugin"]) ''
-          echo  "-I ${template-coq}/lib/coq/${coq.coq-version}/user-contrib/MetaRocq/Template/" > ${pkgpath}/metarocq-config
+          echo  "-I ${template-rocq}/lib/coq/${coq.coq-version}/user-contrib/MetaRocq/Template/" > ${pkgpath}/metarocq-config
         '' + optionalString (package == "single") ''
           ./configure.sh local
         '';

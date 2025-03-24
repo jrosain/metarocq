@@ -1,10 +1,10 @@
 -I gen-src
 -Q gen-src MetaRocq.Template
 -R theories MetaRocq.Template
-META.coq-metarocq-template-ocaml
+META.rocq-metarocq-template-ocaml
 -I .
 
-# Generated Code by `ls -1 gen-src/*.ml gen-src/*.mli` in `template-coq/` after having compiled `Extraction.v`
+# Generated Code by `ls -1 gen-src/*.ml gen-src/*.mli` in `template-rocq/` after having compiled `Extraction.v`
 gen-src/all_Forall.ml
 gen-src/all_Forall.mli
 gen-src/ascii.ml

@@ -55,7 +55,7 @@ The [dependency graph](https://raw.githubusercontent.com/MetaRocq/metarocq.githu
 might be useful to navigate the project.
 Statistics: ~300kLoC of Rocq, ~30kLoC of OCaml.
 
-### [Template-Rocq](https://github.com/MetaRocq/metarocq/tree/main/template-coq/theories)
+### [Template-Rocq](https://github.com/MetaRocq/metarocq/tree/main/template-rocq/theories)
 
 Template-Rocq is a quoting library for [Rocq](http://coq.inria.fr). It
 takes `Rocq` terms and constructs a representation of their syntax tree as
@@ -247,7 +247,7 @@ See the Quotation [README](https://github.com/MetaRocq/metarocq/tree/main/quotat
   Abhishek Anand, Simon Boulier, Cyril Cohen, Matthieu Sozeau and Nicolas Tabareau.
   ITP 2018.
 
-- The system was presented at [Rocq'PL 2018](https://popl18.sigplan.org/event/coqpl-2018-typed-template-coq)
+- The system was presented at [Rocq'PL 2018](https://popl18.sigplan.org/event/coqpl-2018-typed-template-rocq)
 
 ## Related Projects
 

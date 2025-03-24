@@ -28,7 +28,7 @@ install: [
   [make "-C" "common" "install"]
 ]
 depends: [
-  "coq-metarocq-utils" {= version}
+  "rocq-metarocq-utils" {= version}
 ]
 synopsis: "The common library of Template Rocq and PCUIC"
 description: """

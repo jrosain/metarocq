@@ -28,7 +28,7 @@ install: [
   [make "-C" "pcuic" "install"]
 ]
 depends: [
-  "coq-metarocq-common" {= version}
+  "rocq-metarocq-common" {= version}
 ]
 synopsis: "A type system equivalent to Rocq's and its metatheory"
 description: """

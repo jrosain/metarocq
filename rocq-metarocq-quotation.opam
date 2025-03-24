@@ -28,9 +28,9 @@ install: [
   [make "-C" "quotation" "install"]
 ]
 depends: [
-  "coq-metarocq-template" {= version}
-  "coq-metarocq-pcuic" {= version}
-  "coq-metarocq-template-pcuic" {= version}
+  "rocq-metarocq-template" {= version}
+  "rocq-metarocq-pcuic" {= version}
+  "rocq-metarocq-template-pcuic" {= version}
 ]
 synopsis: "Gallina quotation functions for Template Rocq"
 description: """

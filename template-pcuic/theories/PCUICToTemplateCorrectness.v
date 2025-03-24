@@ -27,13 +27,13 @@ Set Default Proof Using "Type*".
 From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
 
-(** Translation from PCUIC back to template-coq terms.
+(** Translation from PCUIC back to template-rocq terms.
 
-  This translation is not direct due to two peculiarities of template-coq's syntax:
+  This translation is not direct due to two peculiarities of template-rocq's syntax:
   - applications are n-ary and not all terms are well-formed, so we have to
     use an induction on the size of derivations to transform the binary applications
     into n-ary ones.
-  - The representation of cases in template-coq is "compact" in the sense that
+  - The representation of cases in template-rocq is "compact" in the sense that
     the predicate and branches contexts do not appear in the syntax of terms but can
     be canonically rebuilt on-demand, as long as the environment has a declaration for the
     inductive type. In contrast, PCUIC has these contexts explicitely present in terms,
@@ -2027,7 +2027,7 @@ Qed.
 
 (** Finally, for each typing spine built above, assuming we can apply the induction hypothesis
   of the translation to any of the typing derivations in the spine, then we can produce a typing
-  spine in the n-ary application template-coq spec.
+  spine in the n-ary application template-rocq spec.
 
   We have two cases to consider at the "end" of the spine: either we have the same translation of the
   PCUIC conclusion type, or there is exactly one cumulativity step to get to this type. *)

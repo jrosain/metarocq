@@ -222,6 +222,6 @@ Notation global_context := global_declarations.
 (** *** Programs
 
   A set of declarations and a term, as produced by extraction from
-  template-coq programs. *)
+  template-rocq programs. *)
 
 Definition program : Type := global_declarations * term.

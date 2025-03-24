@@ -28,7 +28,7 @@ install: [
   [make "-C" "safechecker" "install"]
 ]
 depends: [
-  "coq-metarocq-pcuic" {= version}
+  "rocq-metarocq-pcuic" {= version}
 ]
 synopsis: "Implementation and verification of safe conversion and typechecking algorithms for Rocq"
 description: """

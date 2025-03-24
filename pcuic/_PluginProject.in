@@ -1,4 +1,4 @@
--generate-meta-for-package coq-metarocq-pcuic
+-generate-meta-for-package rocq-metarocq-pcuic
 -I src
 -Q src MetaRocq.PCUIC
 -R theories MetaRocq.PCUIC

@@ -1,4 +1,4 @@
-all: coq template-coq plugin
+all: coq template-rocq plugin
 
 _PluginProject: _PluginProject.in metarocq-config
 	cat metarocq-config > _PluginProject
@@ -13,8 +13,8 @@ _TemplateRocqProject: _TemplateRocqProject.in metarocq-config
 	cat _TemplateRocqProject.in >> _TemplateRocqProject
 
 
-Makefile.coq: _RocqProject
-	rocq makefile -f _RocqProject -o Makefile.coq
+Makefile.rocq: _RocqProject
+	rocq makefile -f _RocqProject -o Makefile.rocq
 
 Makefile.plugin: _PluginProject
 	rocq makefile -f _PluginProject -o Makefile.plugin
@@ -29,11 +29,11 @@ Makefile.template: _TemplateRocqProject
 .merlin: Makefile.plugin
 	[ -e "gen-src/signature.mli" ] && $(MAKE) -f $< $@
 
-coq: Makefile.coq
-	$(MAKE) -f Makefile.coq
+coq: Makefile.rocq
+	$(MAKE) -f Makefile.rocq
 
-# The template-coq plugin to run template programs live in Rocq
-template-coq: coq Makefile.template
+# The template-rocq plugin to run template programs live in Rocq
+template-rocq: coq Makefile.template
 # Force building the ML code before the .v's requiring them.
 	$(MAKE) -f Makefile.template optfiles
 	$(MAKE) -f Makefile.template
@@ -42,31 +42,31 @@ template-coq: coq Makefile.template
 # The sources of the plugin are built by the coq target, which calls the
 # ./update_plugin.sh after successfull extraction.
 
-plugin: coq template-coq Makefile.plugin
+plugin: coq template-rocq Makefile.plugin
 	$(MAKE) -f Makefile.plugin
 
 .PHONY: install html clean mrproper all plugin
 
-install: Makefile.coq Makefile.template Makefile.plugin
-	$(MAKE) -f Makefile.coq install
+install: Makefile.rocq Makefile.template Makefile.plugin
+	$(MAKE) -f Makefile.rocq install
 	$(MAKE) -f Makefile.template install
 	$(MAKE) -f Makefile.plugin install
 
-uninstall: Makefile.coq Makefile.template Makefile.plugin
-	$(MAKE) -f Makefile.coq uninstall
+uninstall: Makefile.rocq Makefile.template Makefile.plugin
+	$(MAKE) -f Makefile.rocq uninstall
 	$(MAKE) -f Makefile.template uninstall
 	$(MAKE) -f Makefile.plugin uninstall
 
 html: all
-	$(MAKE) -f Makefile.coq html
+	$(MAKE) -f Makefile.rocq html
 
-clean: Makefile.coq
-	$(MAKE) -f Makefile.coq clean
+clean: Makefile.rocq
+	$(MAKE) -f Makefile.rocq clean
 	$(MAKE) -f Makefile.template clean
 	$(MAKE) -f Makefile.plugin clean
 
 mrproper:
-	rm -f Makefile.coq
+	rm -f Makefile.rocq
 	rm -f Makefile.plugin
 	rm -f Makefile.template
 

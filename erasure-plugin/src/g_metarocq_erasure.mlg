@@ -1,5 +1,5 @@
 
-DECLARE PLUGIN "coq-metarocq-erasure.plugin"
+DECLARE PLUGIN "rocq-metarocq-erasure.plugin"
 
 {
 

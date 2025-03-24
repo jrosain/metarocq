@@ -238,7 +238,7 @@ MetaRocq Quote Recursively Definition qT' := F.
 
 MetaRocq Quote Definition qFuntp := Eval compute in Funtp.
 (* Print qFuntp. *)
-(** the same thing is quoted in demo.v using the template-coq monad
+(** the same thing is quoted in demo.v using the template-rocq monad
 there the poly vars actually show up *)
 
 

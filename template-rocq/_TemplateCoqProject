@@ -3,7 +3,7 @@
 -I src
 -Q src MetaRocq.Template
 -R theories MetaRocq.Template
-META.coq-metarocq-template-coq
+META.rocq-metarocq-template-rocq
 -I .
 
 # the MetaRocq plugin

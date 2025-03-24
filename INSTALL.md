@@ -19,24 +19,24 @@ To update the list of available packages at any point use:
 
 Then, simply issue:
 
-    # opam install coq-metarocq
+    # opam install rocq-metarocq
 
 MetaRocq is split into multiple packages that get all installed using the
-`coq-metarocq` meta-package:
+`rocq-metarocq` meta-package:
 
- - `coq-metarocq-utils` for a general library used by all MetaRocq packages
- - `coq-metarocq-common` for definitions used both by Template-Rocq and PCUIC packages
- - `coq-metarocq-template` for the Template Monad and quoting plugin
- - `coq-metarocq-pcuic` for the PCUIC metatheory development
- - `coq-metarocq-template-pcuic` for the verified Template-Rocq <-> PCUIC translations
- - `coq-metarocq-safechecker` for the verified checker on PCUIC terms
- - `coq-metarocq-safechecker-plugin` for the extracted verified checker plugin
- - `coq-metarocq-erasure` for the verifed erasure from PCUIC to
+ - `rocq-metarocq-utils` for a general library used by all MetaRocq packages
+ - `rocq-metarocq-common` for definitions used both by Template-Rocq and PCUIC packages
+ - `rocq-metarocq-template` for the Template Monad and quoting plugin
+ - `rocq-metarocq-pcuic` for the PCUIC metatheory development
+ - `rocq-metarocq-template-pcuic` for the verified Template-Rocq <-> PCUIC translations
+ - `rocq-metarocq-safechecker` for the verified checker on PCUIC terms
+ - `rocq-metarocq-safechecker-plugin` for the extracted verified checker plugin
+ - `rocq-metarocq-erasure` for the verifed erasure from PCUIC to
    untyped lambda-calculus.
- - `coq-metarocq-erasure-plugin` for the extracted verifed erasure plugin
- - `coq-metarocq-translations` for example translations from type theory
+ - `rocq-metarocq-erasure-plugin` for the extracted verifed erasure plugin
+ - `rocq-metarocq-translations` for example translations from type theory
    to type theory: e.g. variants of parametricity.
- - `coq-metarocq-quotation` for a quotation library, allowing to
+ - `rocq-metarocq-quotation` for a quotation library, allowing to
    quote MetaRocq terms and typing derivations as MetaRocq terms,
    with a work-in-progress proof of Löb's theorem.
 
@@ -107,7 +107,7 @@ the sources directory.
 
 Then use:
 
-- `make` to compile the `template-coq` plugin, the `pcuic`
+- `make` to compile the `template-rocq` plugin, the `pcuic`
   development and the `safechecker` and `erasure` plugins,
   along with the `test-suite`, `translations`, `examples`
   and `quotation` libraries.
@@ -122,8 +122,8 @@ Then use:
 For faster development one can use:
 
 - `make vos` to compile `vos` files (bypassing proofs)
-  for `pcuic`, `safechecker` and `erasure`. The template-coq library is still using the regular `vo` target to be able
-  to construct the template-coq plugin. The `safechecker` and
+  for `pcuic`, `safechecker` and `erasure`. The template-rocq library is still using the regular `vo` target to be able
+  to construct the template-rocq plugin. The `safechecker` and
   `erasure` ML plugins *cannot* be built using this mode.
 
 - `make quick` is a synonymous for `make vos` with the addition of a global `Unset Universe Checking` option, i.e.

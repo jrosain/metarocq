@@ -1,4 +1,4 @@
-META.coq-metarocq-demo-plugin
+META.rocq-metarocq-demo-plugin
 -R theories MetaRocq.ExtractedPluginDemo
 
 theories/Lens.v

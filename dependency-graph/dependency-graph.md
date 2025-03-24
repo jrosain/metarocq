@@ -11,7 +11,7 @@ cd dependency-graph
 
 # Generate the dependency graph between files by hand (obsolete)
 
-1. In each folder (template-coq + pcuic + safechecker + erasure), generate the dot file with:
+1. In each folder (template-rocq + pcuic + safechecker + erasure), generate the dot file with:
 ```
 coqdep -f _RocqProject -dumpgraph plop.dot > /dev/null
 ```

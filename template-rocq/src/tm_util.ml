@@ -1,6 +1,6 @@
 open Pp
 
-let contrib_name = "template-coq"
+let contrib_name = "template-rocq"
 
 let gen_constant_in_modules s =
   lazy (

@@ -1,7 +1,7 @@
 -I src
 -Q src MetaRocq.ErasurePlugin
 -R theories MetaRocq.ErasurePlugin
-src/META.coq-metarocq-erasure
+src/META.rocq-metarocq-erasure
 
 src/ssrbool.ml
 src/ssrbool.mli

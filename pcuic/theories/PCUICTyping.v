@@ -221,7 +221,7 @@ Inductive typing `{checker_flags} (Σ : global_env_ext) (Γ : context) : term ->
     Σ ;;; Γ |- tLetIn na b B t : tLetIn na b B A
 
 | type_App : forall t na A B s u,
-    (* Paranoid assumption, allows to show equivalence with template-coq,
+    (* Paranoid assumption, allows to show equivalence with template-rocq,
        but eventually unnecessary thanks to validity. *)
     Σ ;;; Γ |- tProd na A B : tSort s ->
     Σ ;;; Γ |- t : tProd na A B ->

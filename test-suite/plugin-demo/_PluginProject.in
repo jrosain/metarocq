@@ -1,4 +1,4 @@
--generate-meta-for-package coq-metarocq-demo-plugin
+-generate-meta-for-package rocq-metarocq-demo-plugin
 
 -I src
 -I gen-src

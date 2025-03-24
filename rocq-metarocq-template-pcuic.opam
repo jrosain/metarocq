@@ -28,8 +28,8 @@ install: [
   [make "-C" "template-pcuic" "install"]
 ]
 depends: [
-  "coq-metarocq-template" {= version}
-  "coq-metarocq-pcuic" {= version}
+  "rocq-metarocq-template" {= version}
+  "rocq-metarocq-pcuic" {= version}
 ]
 synopsis: "Translations between Template Rocq and PCUIC and proofs of correctness"
 description: """

@@ -45,7 +45,7 @@ my-cachedMake (){
 
 my-cachedMake 'utils' 'utils/theories' 'MetaRocq.Utils'
 my-cachedMake 'common' 'common/theories' 'MetaRocq.Common'
-my-cachedMake 'template-coq' 'template-coq/theories' 'MetaRocq.Template'
+my-cachedMake 'template-rocq' 'template-rocq/theories' 'MetaRocq.Template'
 my-cachedMake 'pcuic' 'pcuic/theories' 'MetaRocq.PCUIC'
 my-cachedMake 'safechecker' 'safechecker/theories' 'MetaRocq.SafeChecker'
 my-cachedMake 'template-pcuic' 'template-pcuic/theories' 'MetaRocq.TemplatePCUIC'

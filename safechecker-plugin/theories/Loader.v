@@ -1,2 +1,2 @@
 (* Distributed under the terms of the MIT license. *)
-Declare ML Module "coq-metarocq-safechecker.plugin".
+Declare ML Module "rocq-metarocq-safechecker.plugin".

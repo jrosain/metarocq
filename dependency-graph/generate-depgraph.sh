@@ -20,7 +20,7 @@ dot_file=$filename.dot
 
 # Associative arrays of the folders together with a color
 declare -A folders
-folders[template-coq]=aquamarine
+folders[template-rocq]=aquamarine
 folders[pcuic]=lemonchiffon1
 folders[safechecker]=paleturquoise1
 folders[erasure]=tan

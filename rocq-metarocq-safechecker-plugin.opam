@@ -28,8 +28,8 @@ install: [
   [make "-C" "safechecker-plugin" "install"]
 ]
 depends: [
-  "coq-metarocq-template-pcuic" {= version}
-  "coq-metarocq-safechecker" {= version}
+  "rocq-metarocq-template-pcuic" {= version}
+  "rocq-metarocq-safechecker" {= version}
 ]
 synopsis: "Implementation and verification of an erasure procedure for Rocq"
 description: """
