@@ -6,7 +6,7 @@ CAMLFLAGS+=-w -26 # Unused variable
 CAMLFLAGS+=-w -34 # Unused type
 CAMLFLAGS+=-w -60 # Unused module
 CAMLFLAGS+=-bin-annot # For merlin
-CAMLFLAGS+=-open MetaRocq_template_plugin
+CAMLFLAGS+=-open Metarocq_template_plugin
 CAMLPKGS+=-package coq-metarocq-template-ocaml.plugin
 
 -include ../../Makefile.conf
