@@ -59,6 +59,10 @@ jobs:
               opam exec -- ./configure.sh --enable-${{matrix.target}}
               opam exec -- make -j 2 ci-${{matrix.target}}
             endGroup
+          # Already done by the ci-opam target 
+          uninstall: |
+            startGroup "Clean project"
+            endGroup
       - name: Revert permissions
         # to avoid a warning at cleanup time
         if: ${{ always() }}
