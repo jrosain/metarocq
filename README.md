@@ -13,14 +13,22 @@ manipulating Rocq terms and developing certified plugins
 
 
 **Quick jump**
-- [Getting started](#getting-started)
-- [Installation instructions](#installation-instructions)
-- [Documentation](#documentation)
-- [Overview of the project](#overview-of-the-project)
-- [Papers](#papers)
-- [Related Projects](#related-projects)
-- [Team & Credits](#team--credits)
-- [Bugs](#bugs)
+- [MetaRocq](#metarocq)
+  - [Getting started](#getting-started)
+  - [Installation instructions](#installation-instructions)
+  - [Documentation](#documentation)
+  - [Overview of the project](#overview-of-the-project)
+    - [Template-Rocq](#template-rocq)
+    - [PCUIC](#pcuic)
+    - [Safe Checker](#safe-checker)
+    - [Erasure](#erasure)
+    - [Translations](#translations)
+    - [Quotation](#quotation)
+    - [Examples](#examples)
+  - [Papers](#papers)
+  - [Related Projects](#related-projects)
+  - [Team \& Credits](#team--credits)
+  - [Bugs](#bugs)
 
 
 
@@ -202,17 +210,17 @@ See the Quotation [README](https://github.com/MetaRocq/metarocq/tree/main/quotat
 
 ## Papers
 
-- ["Correct and Complete Type Checking and Certified Erasure for Rocq, in Rocq"](https://inria.hal.science/hal-04077552) Matthieu Sozeau, Yannick Forster, Meven Lennon-Bertrand, Nicolas Tabareau and Théo Winterhalter. Submitted. April 2023.
+- ["Correct and Complete Type Checking and Certified Erasure for Coq, in Coq"](https://inria.hal.science/hal-04077552) Matthieu Sozeau, Yannick Forster, Meven Lennon-Bertrand, Nicolas Tabareau and Théo Winterhalter. Submitted. April 2023.
 
   This paper presents the whole metatheoretical development of PCUIC and verified typechecking and erasure, as of version 1.2 of MetaRocq.
 
 - ["The Curious Case of Case"](https://sozeau.gitlabpages.inria.fr/www/research/publications/The_Curious_Case_of_Case-WITS22-220122.pdf) Matthieu Sozeau, Meven Lennon-Bertrand and Yannick Forster. WITS 2022 presentation, Philadelphia.
-  This presents the challenges around the representation of cases in Rocq and PCUIC.
+  This presents the challenges around the representation of cases in Coq and PCUIC.
 
 - ["Bidirectional Typing for the Calculus of Inductive Constructions"](https://www.meven.ac/category/phd-thesis.html) Meven Lennon-Bertrand, PhD thesis, June 2022.
   Part 2 describes in detail the bidirectional variant of typing and its use to verify correctness and completeness of the type checker.
 
-- ["Rocq Rocq Correct! Verification of Type Checking and Erasure for Rocq, in Rocq"](https://metarocq.github.io/coqcoqcorrect)
+- ["Coq Coq Correct! Verification of Type Checking and Erasure for Coq, in Coq"](https://metarocq.github.io/coqcoqcorrect)
   Matthieu Sozeau, Simon Boulier, Yannick Forster, Nicolas Tabareau
   and Théo Winterhalter. POPL 2020, New Orleans.
 
@@ -222,36 +230,35 @@ See the Quotation [README](https://github.com/MetaRocq/metarocq/tree/main/quotat
 - ["Formalization and meta-theory of type theory"](https://theowinterhalter.github.io/#phd) Théo Winterhalter, PhD thesis, September 2020.
   Part 3 describes in detail the verified reduction, conversion and type checker.
 
-- ["Rocq Rocq Codet! Towards a Verified Toolchain for Rocq in
-  MetaRocq"](https://sozeau.gitlabpages.inria.fr/www/research/publications/Rocq_Rocq_Codet-RocqWS19.pdf)
+- ["Coq Coq Codet! Towards a Verified Toolchain for Coq in MetaCoq"](https://sozeau.gitlabpages.inria.fr/www/research/publications/Coq_Coq_Codet-CoqWS19.pdf)
   Matthieu Sozeau, Simon Boulier, Yannick Forster, Nicolas Tabareau and
   Théo Winterhalter. Abstract and
   [presentation](http://www.ps.uni-saarland.de/~forster/downloads/slides-coqws19.pdf)
-  given at the [Rocq Workshop
+  given at the [Coq Workshop
   2019](https://staff.aist.go.jp/reynald.affeldt/coq2019/), September
   2019.
 
-- ["The MetaRocq Project"](https://sozeau.gitlabpages.inria.fr/www/research/publications/drafts/The_MetaRocq_Project.pdf)
+- ["The MetaCoq Project"](https://sozeau.gitlabpages.inria.fr/www/research/publications/drafts/The_MetaCoq_Project.pdf)
   Matthieu Sozeau, Abhishek Anand, Simon Boulier, Cyril Cohen, Yannick Forster, Fabian Kunze,
   Gregory Malecha, Nicolas Tabareau and Théo Winterhalter. JAR, February 2020.
   Extended version of the ITP 2018 paper.
 
   This includes a full documentation of the Template Monad and the typing rules of PCUIC.
 
-- [A certifying extraction with time bounds from Rocq to call-by-value λ-calculus](https://www.ps.uni-saarland.de/Publications/documents/ForsterKunze_2019_Certifying-extraction.pdf).
+- [A certifying extraction with time bounds from Coq to call-by-value λ-calculus](https://www.ps.uni-saarland.de/Publications/documents/ForsterKunze_2019_Certifying-extraction.pdf).
   Yannick Forster and Fabian Kunze.
   ITP 2019.
   [Example](https://github.com/uds-psl/certifying-extraction-with-time-bounds/blob/master/Tactics/Extract.v)
 
-- ["Towards Certified Meta-Programming with Typed Template-Rocq"](https://hal.archives-ouvertes.fr/hal-01809681/document)
+- ["Towards Certified Meta-Programming with Typed Template-Coq"](https://hal.archives-ouvertes.fr/hal-01809681/document)
   Abhishek Anand, Simon Boulier, Cyril Cohen, Matthieu Sozeau and Nicolas Tabareau.
   ITP 2018.
 
-- The system was presented at [Rocq'PL 2018](https://popl18.sigplan.org/event/coqpl-2018-typed-template-rocq)
+- The system was presented at [Coq'PL 2018](https://popl18.sigplan.org/event/coqpl-2018-typed-template-coq)
 
 ## Related Projects
 
-- The [CertiRocq](https://github.com/CertiRocq/certicoq) project develops a certified compiler from the output of verified erasure down
+- The [CertiCoq](https://github.com/CertiCoq/certicoq) project develops a certified compiler from the output of verified erasure down
   to CompCert C-light. It provides in particular OCaml and fully foundationally verified plugins
   for the whole compilation pipeline from Gallina to Clight and the verified type-checker of MetaRocq.
 
@@ -324,18 +331,17 @@ MetaRocq is developed by (left to right)
 
 ```
 Copyright (c) 2014-2023 Gregory Malecha
-Copyright (c) 2015-2023 Abhishek Anand, Matthieu Sozeau
-Copyright (c) 2017-2023 Simon Boulier, Nicolas Tabareau, Cyril Cohen
-Copyright (c) 2018-2023 Danil Annenkov, Yannick Forster, Théo Winterhalter
+Copyright (c) 2015-2025 Abhishek Anand, Matthieu Sozeau
+Copyright (c) 2017-2023 Simon Boulier, Cyril Cohen
+Copyright (c) 2017-2025 Nicolas Tabareau, Yannick Forster, Théo Winterhalter
+Copyright (c) 2018-2023 Danil Annenkov
 Copyright (c) 2020-2023 Jakob Botsch Nielsen, Meven Lennon-Bertrand
-Copyright (c) 2022-2023 Kenji Maillard
+Copyright (c) 2022-2025 Kenji Maillard
 Copyright (c) 2023      Jason Gross
 ```
 
 This software is distributed under the terms of the MIT license.
 See [LICENSE](https://github.com/MetaRocq/metarocq/tree/main/LICENSE) for details.
-
-
 
 ## Bugs
 
