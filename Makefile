@@ -57,12 +57,13 @@ html: all
 		-R utils/theories MetaRocq.Utils \
 		-R common/theories MetaRocq.Common \
 		-R template-rocq/theories MetaRocq.Template \
+		-R template-pcuic/theories MetaRocq.TemplatePCUIC \
 		-R pcuic/theories MetaRocq.PCUIC \
 		-R safechecker/theories MetaRocq.SafeChecker \
-		-R template-pcuic/theories MetaRocq.TemplatePCUIC \
-		-R quotation/theories MetaRocq.Quotation \
+		-R safechecker-plugin/theories MetaRocq.SafeCheckerPlugin \
 		-R erasure/theories MetaRocq.Erasure \
 		-R erasure-plugin/theories MetaRocq.ErasurePlugin \
+		-R quotation/theories MetaRocq.Quotation \
 		-R translations MetaRocq.Translations \
 		-R examples MetaRocq.Examples \
 		-d html */theories/*.v */theories/*/*.v translations/*.v examples/*.v
