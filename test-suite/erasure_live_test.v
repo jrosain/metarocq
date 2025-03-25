@@ -59,7 +59,7 @@ MetaRocq Run (tmEval hnf singlelim >>= erase).
 MetaRocq Run (erase (plus 0 1)).
 
 (** vector addition **)
-Require Rocq.Vectors.Vector.
+Require Stdlib.Vectors.Vector.
 
 Definition vplus {n:nat} :
   Vector.t nat n -> Vector.t nat n -> Vector.t nat n := (Vector.map2 plus).

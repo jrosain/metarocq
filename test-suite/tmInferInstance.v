@@ -1,5 +1,5 @@
 From MetaRocq Require Import Template.All.
-Require Export String List.
+From Stdlib Require Export String List.
 
 Import MRMonadNotation.
 
