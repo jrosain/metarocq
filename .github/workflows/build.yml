@@ -45,7 +45,7 @@ jobs:
       - name: Docker-Coq-Action
         uses: coq-community/docker-coq-action@v1
         with:
-          coq_version: ${{ 'dev' }}
+          coq_version: ${{ matrix.coq_version }}
           ocaml_version: ${{ matrix.ocaml_version }}
           script: |
             startGroup "Build project"
