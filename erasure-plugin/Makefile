@@ -10,8 +10,6 @@ _RocqProject: _RocqProject.in metarocq-config
 
 Makefile.plugin: _PluginProject
 	rocq makefile -f _PluginProject -o Makefile.plugin $(DEPS)
-# Avoid conflicting dependency file creation for the template plugin
-	sed -e s/coqdeps/coqdeps.plugin/g Makefile.plugin > Makefile.plugin.tmp && mv -f Makefile.plugin.tmp Makefile.plugin
 
 Makefile.erasureplugin: _RocqProject
 	rocq makefile -f _RocqProject -o Makefile.erasureplugin $(DEPS)
