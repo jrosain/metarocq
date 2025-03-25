@@ -1,5 +1,5 @@
-From MetaCoq.Quotation.ToTemplate Require Import Init.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Template.Ast Require Export
+From MetaRocq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Template.Ast Require Export
   TemplateTerm.Instances
   EnvHelper.Instances
   Env.Instances

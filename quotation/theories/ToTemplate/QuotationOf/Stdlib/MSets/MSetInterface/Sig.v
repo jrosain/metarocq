@@ -1,8 +1,8 @@
 From Stdlib.MSets Require Import MSetInterface.
-From MetaCoq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate Require Import Init.
 
 Module Type QuotationOfWSetsOn (E : DecidableType) (Import W : WSetsOn E).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "W").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "W").
 End QuotationOfWSetsOn.
 Module Type QuotationOfWSets (W : WSets) := QuotationOfWSetsOn W.E W.
 Module Type QuotationOfSetsOn (E : OrderedType) (Import M : SetsOn E).

@@ -1,10 +1,10 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Program.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.Erasure Require Import ELiftSubst EGlobalEnv EWcbvEval Extract Prelim
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.Erasure Require Import ELiftSubst EGlobalEnv EWcbvEval Extract Prelim
      ESubstitution EArities EDeps ErasureProperties.
-From MetaCoq.PCUIC Require Import PCUICTyping PCUICGlobalEnv PCUICAst
+From MetaRocq.PCUIC Require Import PCUICTyping PCUICGlobalEnv PCUICAst
   PCUICAstUtils PCUICConversion PCUICSigmaCalculus
   PCUICClosed PCUICClosedTyp
   PCUICWeakeningEnv PCUICWeakeningEnvConv PCUICWeakeningEnvTyp
@@ -20,7 +20,7 @@ From MetaCoq.PCUIC Require Import PCUICTyping PCUICGlobalEnv PCUICAst
   PCUICOnFreeVars PCUICWellScopedCumulativity PCUICValidity
   PCUICContexts PCUICEquality PCUICSpine
   PCUICInductives.
-From MetaCoq.PCUIC Require Import PCUICTactics.
+From MetaRocq.PCUIC Require Import PCUICTactics.
 
 From Equations.Prop Require Import DepElim.
 From Stdlib Require Import ssreflect.
@@ -1333,8 +1333,8 @@ Proof.
   now eapply cstr_args_length in o.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICEtaExpand.
-From MetaCoq.Erasure Require Import EDeps EEtaExpandedFix.
+From MetaRocq.PCUIC Require Import PCUICEtaExpand.
+From MetaRocq.Erasure Require Import EDeps EEtaExpandedFix.
 Local Hint Constructors expanded : core.
 
 Lemma expanded_erases (cf := config.extraction_checker_flags) {Σ : global_env_ext} Σ' Γ Γ' t v :

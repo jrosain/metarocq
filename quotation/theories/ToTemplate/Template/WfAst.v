@@ -1,9 +1,9 @@
-From MetaCoq.Template Require Import Ast WfAst.
-From MetaCoq.Quotation.ToTemplate Require Import Init.
-From MetaCoq.Quotation.ToTemplate Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.Numbers Stdlib.Floats.
-From MetaCoq.Quotation.ToTemplate.Utils Require Import (hints) utils All_Forall MCProd MCOption.
-From MetaCoq.Quotation.ToTemplate.Common Require Import (hints) config BasicAst Universes Kernames.
-From MetaCoq.Quotation.ToTemplate.Template Require Import (hints) Ast AstUtils Induction UnivSubst.
+From MetaRocq.Template Require Import Ast WfAst.
+From MetaRocq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.Numbers Stdlib.Floats.
+From MetaRocq.Quotation.ToTemplate.Utils Require Import (hints) utils All_Forall MRProd MROption.
+From MetaRocq.Quotation.ToTemplate.Common Require Import (hints) config BasicAst Universes Kernames.
+From MetaRocq.Quotation.ToTemplate.Template Require Import (hints) Ast AstUtils Induction UnivSubst.
 
 #[export] Instance quote_wf {Σ t} : ground_quotable (@wf Σ t).
 Proof.

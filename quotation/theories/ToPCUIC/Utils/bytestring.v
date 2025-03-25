@@ -1,5 +1,5 @@
-From MetaCoq.Quotation.ToPCUIC Require Import Stdlib.Init.
-From MetaCoq.Utils Require Import bytestring.
+From MetaRocq.Quotation.ToPCUIC Require Import Stdlib.Init.
+From MetaRocq.Utils Require Import bytestring.
 
 Module String.
   #[export] Instance quote_t : ground_quotable String.t := ltac:(induction 1; exact _).

@@ -5,7 +5,7 @@ From Stdlib.Numbers Require Import BinNums DecimalFacts HexadecimalFacts
      Cyclic.Int63.CarryType
 .
 From Stdlib Require Import ZArith.
-From MetaCoq.Quotation.ToTemplate Require Import Stdlib.Init.
+From MetaRocq.Quotation.ToTemplate Require Import Stdlib.Init.
 
 #[export] Instance quote_positive : ground_quotable positive := ltac:(induction 1; exact _).
 #[export] Instance quote_N : ground_quotable N := ltac:(induction 1; exact _).

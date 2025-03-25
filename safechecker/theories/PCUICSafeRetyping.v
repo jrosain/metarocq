@@ -4,9 +4,9 @@ From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
 
 From Stdlib Require Import Bool String List Program.
-From MetaCoq.Utils Require Import utils monad_utils.
-From MetaCoq.Common Require Import config uGraph.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICArities PCUICInduction
+From MetaRocq.Utils Require Import utils monad_utils.
+From MetaRocq.Common Require Import config uGraph.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICArities PCUICInduction
      PCUICLiftSubst PCUICUnivSubst PCUICTyping PCUICGlobalEnv
      PCUICWeakeningEnv PCUICWeakeningEnvTyp
      PCUICReduction
@@ -18,16 +18,16 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICAriti
      PCUICContexts PCUICContextConversion PCUICContextConversionTyp PCUICOnFreeVars
      PCUICWellScopedCumulativity PCUICSafeLemmata PCUICSN PCUICConvCumInversion.
 
-From MetaCoq.PCUIC Require Import BDTyping BDToPCUIC BDFromPCUIC BDUnique.
+From MetaRocq.PCUIC Require Import BDTyping BDToPCUIC BDFromPCUIC BDUnique.
 
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICSafeReduce PCUICWfEnv.
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICSafeReduce PCUICWfEnv.
 
-(** Allow reduction to run inside Coq *)
+(** Allow reduction to run inside Rocq *)
 Transparent Acc_intro_generator.
 
 Local Open Scope string_scope.
 Set Asymmetric Patterns.
-Import monad_utils.MCMonadNotation.
+Import monad_utils.MRMonadNotation.
 
 #[global]
 Hint Constructors assumption_context : pcuic.

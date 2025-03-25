@@ -1,16 +1,16 @@
 From Stdlib.Structures Require Import Equalities OrdersAlt.
 From Stdlib.Structures Require OrderedType.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.Stdlib Require Export Structures.Orders.Sig.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.Stdlib Require Export Structures.Orders.Sig.
 Import List.ListNotations.
 Local Open Scope list_scope.
 
 Module Type QuotationOfOrderedTypeOrig (Import O : OrderedTypeOrig).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "O").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "O").
 End QuotationOfOrderedTypeOrig.
 
 Module Type QuotationOfOrderedTypeAlt (Import O : OrderedTypeAlt).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "O").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "O").
 End QuotationOfOrderedTypeAlt.
 
 Module Type Update_OTSig (O : OrderedTypeOrig) <: Orders.OrderedType := Nop <+ Update_OT O.
@@ -67,7 +67,7 @@ End QuotationOfOT_to_Alt.
 
 (** * OrderedType *)
 Module Type QuotationOfMiniOrderedType (O : OrderedType.MiniOrderedType).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "O").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "O").
 End QuotationOfMiniOrderedType.
 
 Module Type MOT_to_OTOrigSig (O : OrderedType.MiniOrderedType) <: OrderedTypeOrig := Nop <+ OrderedType.MOT_to_OT O.
@@ -81,7 +81,7 @@ End QuotationOfMOT_to_OTOrig.
 Module Type OrderedTypeOrigFactsSig (O : OrderedTypeOrig) := Nop <+ OrderedType.OrderedTypeFacts O.
 
 Module Type QuotationOfOrderedTypeOrigFacts (O : OrderedTypeOrig) (F : OrderedTypeOrigFactsSig O).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "F").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "F").
   (*Module qTO.
    #[export] Instance qt : quotation_of F.TO.t := ltac:(unfold_quotation_of (); exact _).
    #[export] Instance qeq : quotation_of F.TO.eq := ltac:(unfold_quotation_of (); exact _).
@@ -106,5 +106,5 @@ Module Type KeyOrderedTypeOrigSig (O : OrderedTypeOrig) := Nop <+ OrderedType.Ke
 Module Type QuotationOfKeyOrderedTypeOrig (O : OrderedTypeOrig) (K : KeyOrderedTypeOrigSig O).
   Module qMO := Nop <+ QuotationOfOrderedTypeOrigFacts O K.MO.
   Export (hints) qMO.
-  MetaCoq Run (tmDeclareQuotationOfModule (all_submodules_except [["MO"]]%bs) (Some export) "K").
+  MetaRocq Run (tmDeclareQuotationOfModule (all_submodules_except [["MO"]]%bs) (Some export) "K").
 End QuotationOfKeyOrderedTypeOrig.

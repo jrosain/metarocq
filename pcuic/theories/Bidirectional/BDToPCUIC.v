@@ -1,14 +1,14 @@
 From Stdlib Require Import Bool List Arith Lia.
-From MetaCoq.Utils Require Import utils monad_utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction PCUICLiftSubst PCUICTyping PCUICInversion PCUICInductives PCUICInductiveInversion PCUICEquality PCUICUnivSubst PCUICClosed PCUICSubstitution PCUICValidity PCUICCumulativity PCUICInductives PCUICWfUniverses PCUICContexts PCUICSpine PCUICSR PCUICWellScopedCumulativity PCUICConversion PCUICOnFreeVars PCUICWeakeningTyp PCUICUnivSubstitutionTyp PCUICClosedTyp PCUICUnivSubstitutionConv.
-From MetaCoq.PCUIC Require Import BDTyping.
+From MetaRocq.Utils Require Import utils monad_utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction PCUICLiftSubst PCUICTyping PCUICInversion PCUICInductives PCUICInductiveInversion PCUICEquality PCUICUnivSubst PCUICClosed PCUICSubstitution PCUICValidity PCUICCumulativity PCUICInductives PCUICWfUniverses PCUICContexts PCUICSpine PCUICSR PCUICWellScopedCumulativity PCUICConversion PCUICOnFreeVars PCUICWeakeningTyp PCUICUnivSubstitutionTyp PCUICClosedTyp PCUICUnivSubstitutionConv.
+From MetaRocq.PCUIC Require Import BDTyping.
 
 From Stdlib Require Import ssreflect ssrbool.
 From Equations Require Import Equations.
 From Equations.Prop Require Import DepElim.
 
-(** Various generic lemmas missing from the MetaCoq library *)
+(** Various generic lemmas missing from the MetaRocq library *)
 
 Lemma All2i_prod (A B : Type) (P Q : nat -> A -> B -> Type) (n : nat) (l : list A) (l' : list B) :
   All2i P n l l' -> All2i Q n l l' -> All2i (fun i x y => (P i x y) × (Q i x y)) n l l'.

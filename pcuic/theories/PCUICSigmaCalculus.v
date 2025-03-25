@@ -1,7 +1,7 @@
 From Stdlib Require Import Morphisms.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICInduction
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICInduction
   PCUICLiftSubst.
 
 From Stdlib Require Import ssreflect ssrbool.
@@ -1074,7 +1074,7 @@ Proof. reflexivity. Qed.
 Lemma Upn_proper : Proper (Logic.eq ==> `=1` ==> `=1`) Upn.
 Proof. intros ? ? -> f g Hfg. unfold Upn. now rewrite Hfg. Qed.
 
-(** The σ-calculus equations for Coq *)
+(** The σ-calculus equations for Rocq *)
 
 Lemma inst_app {s t σ} : (tApp s t).[σ] = tApp s.[σ] t.[σ].
 Proof. reflexivity. Qed.

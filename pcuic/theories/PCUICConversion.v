@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICCases PCUICLiftSubst PCUICTyping PCUICOnOne
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICCases PCUICLiftSubst PCUICTyping PCUICOnOne
      PCUICSubstitution PCUICPosition PCUICCumulativity PCUICReduction PCUICOnFreeVars
      PCUICConfluence PCUICClosed PCUICClosedConv PCUICClosedTyp PCUICParallelReductionConfluence PCUICEquality
      PCUICSigmaCalculus PCUICContextReduction PCUICContextConversion
@@ -4093,7 +4093,7 @@ Qed.
 #[global] Hint Immediate cumulSpec_typed_cumulAlgo : pcuic.
 
 
-From MetaCoq.PCUIC Require Import PCUICContextSubst.
+From MetaRocq.PCUIC Require Import PCUICContextSubst.
 
 Lemma expand_lets_k_app (Γ Γ' : context) t k : expand_lets_k (Γ ++ Γ') k t =
   expand_lets_k Γ' (k + context_assumptions Γ) (expand_lets_k Γ k t).

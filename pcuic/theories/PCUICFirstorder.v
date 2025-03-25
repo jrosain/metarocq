@@ -1,9 +1,9 @@
 From Stdlib Require Import Program ssreflect ssrbool List.
-From MetaCoq.Utils Require Import utils MCRelations.
-From MetaCoq.Common Require Import config Kernames.
+From MetaRocq.Utils Require Import utils MRRelations.
+From MetaRocq.Common Require Import config Kernames.
 
 
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive
   PCUICReduction
   PCUICReflect PCUICWeakeningEnv PCUICWeakeningEnvConv PCUICWeakeningEnvTyp PCUICCasesContexts
   PCUICWeakeningConv PCUICWeakeningTyp
@@ -15,9 +15,9 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive
   PCUICValidity PCUICPrincipality PCUICElimination
   PCUICOnFreeVars PCUICWellScopedCumulativity PCUICSN PCUICClassification.
 
-From MetaCoq.PCUIC Require Import PCUICArities PCUICSpine.
-From MetaCoq.PCUIC Require PCUICWcbvEval.
-From MetaCoq.PCUIC Require Import PCUICEquality PCUICAlpha.
+From MetaRocq.PCUIC Require Import PCUICArities PCUICSpine.
+From MetaRocq.PCUIC Require PCUICWcbvEval.
+From MetaRocq.PCUIC Require Import PCUICEquality PCUICAlpha.
 
 Section firstorder.
 

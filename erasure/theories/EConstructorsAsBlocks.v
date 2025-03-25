@@ -1,14 +1,14 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8 Program.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames BasicAst EnvMap.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils EInduction EArities
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames BasicAst EnvMap.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils EInduction EArities
     ELiftSubst ESpineView EGlobalEnv EWellformed EEnvMap
     EWcbvEval EEtaExpanded ECSubst EWcbvEvalEtaInd EProgram.
 
 Local Open Scope string_scope.
 Set Asymmetric Patterns.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 From Equations Require Import Equations.
 Set Equations Transparent.
@@ -22,7 +22,7 @@ Ltac introdep := let H := fresh in intros H; depelim H.
 #[global]
 Hint Constructors eval : core.
 
-Import MCList (map_InP, map_InP_elim, map_InP_spec).
+Import MRList (map_InP, map_InP_elim, map_InP_spec).
 
 Section transform_blocks.
   Context (Σ : GlobalContextMap.t).
@@ -40,7 +40,7 @@ Section transform_blocks.
       { | view_construct ind i block_args with GlobalContextMap.lookup_constructor_pars_args Σ ind i := {
           | Some (npars, nargs) =>
             let args := map_InP v (fun x H => transform_blocks x) in
-            let '(args, rest) := MCList.chop nargs args in
+            let '(args, rest) := MRList.chop nargs args in
             EAst.mkApps (EAst.tConstruct ind i args) rest
           | None =>
             let args := map_InP v (fun x H => transform_blocks x) in
@@ -147,7 +147,7 @@ Section transform_blocks.
         match lookup_constructor_pars_args Σ ind i with
           | Some (npars, nargs) =>
             let args := map transform_blocks v in
-            let '(args, rest) := MCList.chop nargs args in
+            let '(args, rest) := MRList.chop nargs args in
             EAst.mkApps (EAst.tConstruct ind i args) rest
           | None =>
             let args := map transform_blocks v in
@@ -186,7 +186,7 @@ Section transform_blocks.
         match lookup_constructor_pars_args Σ kn c with
         | Some (npars, nargs) =>
           let args := map (transform_blocks) args in
-          let '(args, rest) := MCList.chop nargs args in
+          let '(args, rest) := MRList.chop nargs args in
           mkApps (tConstruct kn c args) rest
         | None =>
           let args := map transform_blocks args in
@@ -211,7 +211,7 @@ Section transform_blocks.
       forall pars nargs,
       lookup_constructor_pars_args Σ kn c = Some (pars, nargs) ->
       let cargs := map transform_blocks args in
-      let '(cargs, rest) := MCList.chop nargs cargs in
+      let '(cargs, rest) := MRList.chop nargs cargs in
       P (mkApps (tConstruct kn c cargs) rest)
     | view_other fn nconstr =>
         P (mkApps (transform_blocks fn) (map transform_blocks args))
@@ -549,7 +549,7 @@ Lemma transform_blocks_tApp (efl : EEnvFlags) {Σ : GlobalContextMap.t} t a (P :
     match GlobalContextMap.lookup_constructor_pars_args Σ kn c with
     | Some (0, nargs) =>
       let cargs := map (transform_blocks Σ) args in
-      let '(cargs, rest) := MCList.chop nargs cargs in
+      let '(cargs, rest) := MRList.chop nargs cargs in
       (args <> [] /\ t = mkApps (tConstruct kn c block_args) (remove_last args) /\ a = last args a) ->
       P (mkApps (tConstruct kn c cargs) rest)
     | _ => True
@@ -806,7 +806,7 @@ Proof.
   eapply transform_wellformed; tea.
 Qed.
 
-From MetaCoq.Erasure Require Import EGenericMapEnv.
+From MetaRocq.Erasure Require Import EGenericMapEnv.
 
 Lemma transform_blocks_extends {efl : EEnvFlags} :
   has_tApp ->
@@ -864,7 +864,7 @@ Proof.
   eapply H0.
 Qed.
 
-From MetaCoq.Erasure Require Import EGenericGlobalMap.
+From MetaRocq.Erasure Require Import EGenericGlobalMap.
 
 #[local]
 Instance GT : GenTransform := { gen_transform := transform_blocks; gen_transform_inductive_decl := id }.
@@ -959,7 +959,7 @@ Proof.
     (wellformed Σ) (Qpres := Qpreserves_wellformed efl _ cstrbl wfΣ)) => //; eauto.
   { intros. eapply EWcbvEval.eval_wellformed => //; tea. }
   all:intros *.
-  - intros; repeat match goal with [H : MCProd.and5 _ _ _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and5 _ _ _ _ _ |- _] => destruct H end.
     eapply transform_blocks_tApp; eauto. { cbn. rtoProp; eauto. }
     destruct decompose_app as [fn args] eqn:heq.
     destruct construct_viewc eqn:heqv.
@@ -974,7 +974,7 @@ Proof.
        eapply eval_mkApps_Construct_inv in H as (args'' & Ha1 & Ha2 & -> & ?); eauto.
         solve_discr.
     + econstructor; tea.
-  - intros; repeat match goal with [H : MCProd.and5 _ _ _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and5 _ _ _ _ _ |- _] => destruct H end.
     eapply transform_blocks_tApp; eauto. cbn. rtoProp; eauto.
     destruct decompose_app as [fn args] eqn:heq.
     destruct construct_viewc eqn:heqv.
@@ -996,11 +996,11 @@ Proof.
       * rewrite transform_blocks_csubst in e; eauto.
         1: now simp_eta in i10.
         now rewrite - transform_blocks_equation_1.
-  - intros; repeat match goal with [H : MCProd.and5 _ _ _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and5 _ _ _ _ _ |- _] => destruct H end.
     simp transform_blocks. rewrite -!transform_blocks_equation_1.
     econstructor; eauto.
     rewrite -transform_blocks_csubst; eauto.
-  - intros; repeat match goal with [H : MCProd.and5 _ _ _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and5 _ _ _ _ _ |- _] => destruct H end.
     simp transform_blocks. rewrite -!transform_blocks_equation_1.
     cbn [plus].
     rewrite transform_blocks_mkApps in e0 => //.
@@ -1026,7 +1026,7 @@ Proof.
       * solve_all.
       * eapply forallb_nth_error in H. rewrite -> H3 in H => //.
       * now rewrite H9.
-  - intros; repeat match goal with [H : MCProd.and5 _ _ _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and5 _ _ _ _ _ |- _] => destruct H end.
     eapply transform_blocks_tApp; eauto. eauto; cbn; rtoProp; eauto.
     destruct decompose_app as [ f args] eqn:heq.
     destruct construct_viewc eqn:heqv.
@@ -1090,7 +1090,7 @@ Proof.
     eapply closed_cofix_subst. now eapply wellformed_closed in wfcof.
     rewrite isEtaExp_mkApps_napp //= in i. move/andP: i => [] etacof etaargs. now simp_eta in etacof.
     now rewrite transform_blocks_mkApps_eta_fn in e.
-  - intros; repeat match goal with [H : MCProd.and5 _ _ _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and5 _ _ _ _ _ |- _] => destruct H end.
     rewrite transform_blocks_mkApps //= in e0.
     simp transform_blocks in e0. rewrite -!transform_blocks_equation_1 in e0. simpl in e0.
     simp transform_blocks. rewrite -!transform_blocks_equation_1.
@@ -1103,12 +1103,12 @@ Proof.
     now simp_eta in etacof.
     simp transform_blocks in e. rewrite -!transform_blocks_equation_1 in e.
     now rewrite transform_blocks_mkApps_eta_fn in e.
-  - intros; repeat match goal with [H : MCProd.and5 _ _ _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and5 _ _ _ _ _ |- _] => destruct H end.
     econstructor.
     eapply transform_blocks_declared_constant; eauto.
     destruct decl. cbn in *. now rewrite H0.
     eauto.
-  - intros; repeat match goal with [H : MCProd.and5 _ _ _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and5 _ _ _ _ _ |- _] => destruct H end.
     rewrite transform_blocks_mkApps //= in e0.
     simp transform_blocks in e0; rewrite -!transform_blocks_equation_1 in e0.
     simp transform_blocks; rewrite -!transform_blocks_equation_1.
@@ -1127,7 +1127,7 @@ Proof.
       rewrite hc //= H1 H6. reflexivity.
     + len.
     + rewrite nth_error_map /=. rewrite H6 in H2; rewrite -H2 in H4; rewrite H4; eauto.
-  - intros; repeat match goal with [H : MCProd.and5 _ _ _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and5 _ _ _ _ _ |- _] => destruct H end.
     eapply transform_blocks_tApp; eauto. cbn; rtoProp; eauto.
     destruct decompose_app as [f args] eqn:heq.
     destruct construct_viewc eqn:heqv.
@@ -1170,7 +1170,7 @@ Proof.
            rewrite !orb_false_r.
            destruct l1 using rev_case; cbn; eauto.
            rewrite mkApps_app; cbn; eauto.
-  - intros; repeat match goal with [H : MCProd.and5 _ _ _ _ _ |- _] => destruct H end.
+  - intros; repeat match goal with [H : MRProd.and5 _ _ _ _ _ |- _] => destruct H end.
     simp transform_blocks. rewrite -!transform_blocks_equation_1.
     rewrite !transform_blocks_mkApps => //.
     cbn [construct_viewc].

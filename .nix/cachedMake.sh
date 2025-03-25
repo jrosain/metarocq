@@ -1,9 +1,9 @@
 #! /usr/bin/bash
 
-# USAGE: To be run from the top directory of metacoq
+# USAGE: To be run from the top directory of metarocq
 
 # This whole file is a hack around coq-nix-toolbox to manage the
-# structure of metacoq directories
+# structure of metarocq directories
 
 export currentDir=$PWD
 export configDir=$currentDir/.nix
@@ -43,14 +43,14 @@ my-cachedMake (){
     fi
 }
 
-my-cachedMake 'utils' 'utils/theories' 'MetaCoq.Utils'
-my-cachedMake 'common' 'common/theories' 'MetaCoq.Common'
-my-cachedMake 'template-coq' 'template-coq/theories' 'MetaCoq.Template'
-my-cachedMake 'pcuic' 'pcuic/theories' 'MetaCoq.PCUIC'
-my-cachedMake 'safechecker' 'safechecker/theories' 'MetaCoq.SafeChecker'
-my-cachedMake 'template-pcuic' 'template-pcuic/theories' 'MetaCoq.TemplatePCUIC'
-my-cachedMake 'erasure' 'erasure/theories' 'MetaCoq.Erasure'
-my-cachedMake 'quotation' 'quotation/theories' 'MetaCoq.Quotation'
+my-cachedMake 'utils' 'utils/theories' 'MetaRocq.Utils'
+my-cachedMake 'common' 'common/theories' 'MetaRocq.Common'
+my-cachedMake 'template-rocq' 'template-rocq/theories' 'MetaRocq.Template'
+my-cachedMake 'pcuic' 'pcuic/theories' 'MetaRocq.PCUIC'
+my-cachedMake 'safechecker' 'safechecker/theories' 'MetaRocq.SafeChecker'
+my-cachedMake 'template-pcuic' 'template-pcuic/theories' 'MetaRocq.TemplatePCUIC'
+my-cachedMake 'erasure' 'erasure/theories' 'MetaRocq.Erasure'
+my-cachedMake 'quotation' 'quotation/theories' 'MetaRocq.Quotation'
 
 unset -f my-nix-build-with-target
 unset -f my-cachedMake

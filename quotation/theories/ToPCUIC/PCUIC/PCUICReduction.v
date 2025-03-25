@@ -1,10 +1,10 @@
-From MetaCoq.PCUIC Require Import PCUICAst PCUICReduction.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init.
-From MetaCoq.Quotation.ToPCUIC Require Import (hints) Equations.Type.
-From MetaCoq.Quotation.ToPCUIC.Utils Require Import (hints) All_Forall.
-From MetaCoq.Quotation.ToPCUIC.Common Require Import (hints) BasicAst Universes Kernames.
-From MetaCoq.Quotation.ToPCUIC.PCUIC Require Import (hints) PCUICAst PCUICPrimitive.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICReduction.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init.
+From MetaRocq.Quotation.ToPCUIC Require Import (hints) Equations.Type.
+From MetaRocq.Quotation.ToPCUIC.Utils Require Import (hints) All_Forall.
+From MetaRocq.Quotation.ToPCUIC.Common Require Import (hints) BasicAst Universes Kernames.
+From MetaRocq.Quotation.ToPCUIC.PCUIC Require Import (hints) PCUICAst PCUICPrimitive.
 
 #[export] Instance quote_red1 {Σ Γ t u} : ground_quotable (@red1 Σ Γ t u).
 Proof.

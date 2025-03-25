@@ -1,8 +1,8 @@
-From MetaCoq.Common Require Import Environment.
-From MetaCoq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Common Require Import Environment.
+From MetaRocq.Quotation.ToTemplate Require Import Init.
 
 Module Type QuotationOfTerm (T : Term).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "T").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "T").
 End QuotationOfTerm.
 
 Module Type QuoteTerm (T : Term).
@@ -10,11 +10,11 @@ Module Type QuoteTerm (T : Term).
 End QuoteTerm.
 
 Module Type QuotationOfTermDecide (T : Term) (TD : TermDecide T).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "TD").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "TD").
 End QuotationOfTermDecide.
 
 Module Type QuotationOfEnvironment (T : Term) (Import E : EnvironmentSig T).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "E").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "E").
 End QuotationOfEnvironment.
 
 Module Type QuoteEnvironmentSig (T : Term) (Import E : EnvironmentSig T).
@@ -54,9 +54,9 @@ Module Type QuoteEnvironmentSig (T : Term) (Import E : EnvironmentSig T).
 End QuoteEnvironmentSig.
 
 Module Type QuotationOfEnvironmentDecide (T : Term) (E : EnvironmentSig T) (ED : EnvironmentDecide T E).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "ED").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "ED").
 End QuotationOfEnvironmentDecide.
 
 Module Type QuotationOfTermUtils (T : Term) (E : EnvironmentSig T) (TU : TermUtils T E).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "TU").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "TU").
 End QuotationOfTermUtils.

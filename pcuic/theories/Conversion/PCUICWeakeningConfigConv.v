@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import MCUtils utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import MRUtils utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
   PCUICWeakeningConfig PCUICEquality PCUICReduction PCUICCumulativity PCUICCumulativitySpec
   (* PCUICContextSubst *) (* PCUICUnivSubst *) (* PCUICCases *) (* PCUICTyping *)
   (* PCUICGuardCondition *) (* PCUICGlobalEnv *).

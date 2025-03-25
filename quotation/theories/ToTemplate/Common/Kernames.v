@@ -1,7 +1,7 @@
-From MetaCoq.Common Require Import Kernames.
-From MetaCoq.Quotation.ToTemplate Require Import Init.
-From MetaCoq.Quotation.ToTemplate Require Import (hints) Stdlib.Init Stdlib.MSets Stdlib.FSets bytestring.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Common Require Import Kernames.Instances.
+From MetaRocq.Common Require Import Kernames.
+From MetaRocq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate Require Import (hints) Stdlib.Init Stdlib.MSets Stdlib.FSets bytestring.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Common Require Import Kernames.Instances.
 
 #[local] Hint Unfold ident qualid dirpath kername : quotation.
 #[export] Instance quote_ident : ground_quotable ident := _.

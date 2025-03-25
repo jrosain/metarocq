@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool Utf8 CRelationClasses.
 From Equations.Type Require Import Relation Relation_Properties.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
      PCUICLiftSubst PCUICEquality PCUICReduction PCUICCasesContexts PCUICTactics
      PCUICWeakeningConv PCUICWeakeningTyp PCUICUnivSubst PCUICTyping PCUICGlobalEnv
      PCUICClosedTyp PCUICGeneration PCUICConversion (* Needs transitivity of cumulativity *)
@@ -10,16 +10,16 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
      PCUICSafeLemmata PCUICInductives PCUICInductiveInversion.
 Set Warnings "-notation-overridden".
 
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.Template Require Import Ast TypingWf UnivSubst
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.Template Require Import Ast TypingWf UnivSubst
      TermEquality LiftSubst Reduction.
 Set Warnings "notation-overridden".
 
-From MetaCoq.PCUIC Require Import PCUICEquality.
-From MetaCoq.TemplatePCUIC Require Import PCUICToTemplate.
+From MetaRocq.PCUIC Require Import PCUICEquality.
+From MetaRocq.TemplatePCUIC Require Import PCUICToTemplate.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Implicit Types cf : checker_flags. (* Use {cf} to parameterize by checker_flags where needed *)
 Set Default Proof Using "Type*".
@@ -27,13 +27,13 @@ Set Default Proof Using "Type*".
 From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
 
-(** Translation from PCUIC back to template-coq terms.
+(** Translation from PCUIC back to template-rocq terms.
 
-  This translation is not direct due to two peculiarities of template-coq's syntax:
+  This translation is not direct due to two peculiarities of template-rocq's syntax:
   - applications are n-ary and not all terms are well-formed, so we have to
     use an induction on the size of derivations to transform the binary applications
     into n-ary ones.
-  - The representation of cases in template-coq is "compact" in the sense that
+  - The representation of cases in template-rocq is "compact" in the sense that
     the predicate and branches contexts do not appear in the syntax of terms but can
     be canonically rebuilt on-demand, as long as the environment has a declaration for the
     inductive type. In contrast, PCUIC has these contexts explicitely present in terms,
@@ -42,17 +42,17 @@ From Equations Require Import Equations.
     For example one couldn't do recursive calls on such "rebuilt" contexts using simple structural
     recursion, the new contexts having no structural relation to the terms at hand.
 
-    This means that.Common-Coq's `red1` reduction of cases requires well-formedness conditions
+    This means that.Common-Rocq's `red1` reduction of cases requires well-formedness conditions
     not readily available in PCUIC's. We solve this conundrum using subject reduction: indeed
     cumulativity is always called starting with two well-sorted types, and we can hence show
     that every one-step reduction in a PCUIC cumulativity derivation goes from a well-typed term
-    to a well-typed term. We can hence prove that.Common-Coq's `red1` reductions follow from the
+    to a well-typed term. We can hence prove that.Common-Rocq's `red1` reductions follow from the
     untyped PCUIC reduction when restricted to well-typed terms (which have many more invariants).
     We actually just need the term to be reduced to be well-typed to show that the interpretation
     preserves one-step reduction in [trans_red1}].
 *)
 
-(** Source = PCUIC, Target = Coq *)
+(** Source = PCUIC, Target = Rocq *)
 Module S := PCUICAst.
 Module SE := PCUICEnvironment.
 Module ST := PCUICTyping.
@@ -1478,7 +1478,7 @@ Proof.
   eapply trans_eq_term_upto_univ ; eauto.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICCumulativity.
+From MetaRocq.PCUIC Require Import PCUICCumulativity.
 
 Section wtcumul.
   Set Warnings "-notation-overridden".
@@ -1950,7 +1950,7 @@ Proof.
     * simpl. cbn in *. lia.
 Qed.
 
-(** Likewise, in.Common-Coq, we can append without re-typing the result *)
+(** Likewise, in.Common-Rocq, we can append without re-typing the result *)
 Lemma TT_typing_spine_app {cf:checker_flags} Σ Γ ty T' args na A B arg s :
   TT.typing Σ Γ (T.tProd na A B) (T.tSort s) ->
   TT.typing_spine Σ Γ ty args T' ->
@@ -2027,7 +2027,7 @@ Qed.
 
 (** Finally, for each typing spine built above, assuming we can apply the induction hypothesis
   of the translation to any of the typing derivations in the spine, then we can produce a typing
-  spine in the n-ary application template-coq spec.
+  spine in the n-ary application template-rocq spec.
 
   We have two cases to consider at the "end" of the spine: either we have the same translation of the
   PCUIC conclusion type, or there is exactly one cumulativity step to get to this type. *)
@@ -2175,7 +2175,7 @@ Proof.
     now rewrite trans_to_extended_list.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICClosed PCUICWeakeningEnvConv PCUICWeakeningEnvTyp.
+From MetaRocq.PCUIC Require Import PCUICClosed PCUICWeakeningEnvConv PCUICWeakeningEnvTyp.
 
 Lemma trans_subst_instance_decl u x : map_decl (subst_instance u) (trans_decl x) = trans_decl (map_decl (subst_instance u) x).
 Proof.

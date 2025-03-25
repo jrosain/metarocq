@@ -1,8 +1,8 @@
 From Stdlib Require Import ssreflect ssrbool.
 From Equations Require Import Equations.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTyping
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTyping
   PCUICReduction PCUICProgram PCUICLiftSubst PCUICCSubst PCUICUnivSubst.
 
 (* move *)
@@ -204,7 +204,7 @@ Proof.
   - eapply HPrim; eauto. now eapply (map_onPrim _ _ (f Γ)).
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICInductiveInversion PCUICLiftSubst PCUICSigmaCalculus.
+From MetaRocq.PCUIC Require Import PCUICInductiveInversion PCUICLiftSubst PCUICSigmaCalculus.
 
 Record expanded_constant_decl Σ (cb : constant_body) : Prop :=
   { expanded_body : on_Some_or_None (expanded Σ []) cb.(cst_body); }.

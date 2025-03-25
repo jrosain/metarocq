@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import RelationClasses.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
      PCUICGeneration PCUICLiftSubst
      PCUICUnivSubst PCUICTyping PCUICPosition PCUICNormal
      PCUICInversion PCUICSR PCUICSN
@@ -11,7 +11,7 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
      PCUICOnFreeVars PCUICWellScopedCumulativity
      PCUICClassification.
 
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICWfReduction PCUICWfEnv.
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICWfReduction PCUICWfEnv.
 
 From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
@@ -20,7 +20,7 @@ Set Equations With UIP.
 
 (** * Reduction machine for PCUIC without fuel
 
-  We implement the reduction machine of Coq without relying on fuel.
+  We implement the reduction machine of Rocq without relying on fuel.
   Instead we assume strong normalization of the system (for well-typed terms)
   and proceed by well-founded induction.
 
@@ -29,7 +29,7 @@ Set Equations With UIP.
  *)
 
 (* From Program *)
-Notation " `  t " := (proj1_sig t) (at level 10, t at next level) : metacoq_scope.
+Notation " `  t " := (proj1_sig t) (at level 10, t at next level) : metarocq_scope.
 
 Set Default Goal Selector "!".
 
@@ -165,7 +165,7 @@ Section Measure.
 
 End Measure.
 
-(* Added by Julien Forest on 13/11/20 in Coq stdlib, adapted to subset case by M. Sozeau *)
+(* Added by Julien Forest on 13/11/20 in Rocq stdlib, adapted to subset case by M. Sozeau *)
 Section Acc_sidecond_generator.
   Context {A : Type} {R : A -> A -> Prop} {P : A -> Prop}.
   Variable Pimpl : forall x y, P x -> R y x -> P y.
@@ -1097,7 +1097,7 @@ Corollary R_Acc_aux :
         forall Σ, abstract_env_ext_rel X Σ -> R Σ Γ (pr1 x, pr1 (pr2 x)) (pr1 y, pr1 (pr2 y))).
     Proof using normalization_in.
       intros [t [π wt]].
-      (* We fuel the accessibility proof to run reduction inside Coq. *)
+      (* We fuel the accessibility proof to run reduction inside Rocq. *)
       unshelve eapply (Acc_intro_generator
         (R:=fun x y : sigmaarg => forall Σ (wfΣ : abstract_env_ext_rel X Σ), R Σ Γ (x.(pr1), x.(pr2).(pr1)) (y.(pr1), y.(pr2).(pr1)))
         (P:=fun x : sigmaarg => forall Σ (wfΣ : abstract_env_ext_rel X Σ), welltyped Σ Γ (zip (x.(pr1), x.(pr2).(pr1))))
@@ -2038,7 +2038,7 @@ Section ReduceFns.
   Proof using Type.
     unfold arity_ass_context.
     rewrite rev_map_spec.
-    induction l using MCList.rev_ind; cbn.
+    induction l using MRList.rev_ind; cbn.
     - constructor.
     - rewrite map_app, rev_app_distr.
       cbn.

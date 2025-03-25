@@ -1,9 +1,9 @@
-From MetaCoq.Common Require Import Kernames.
-From MetaCoq.Quotation.ToTemplate Require Import Init.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Stdlib.FSets Require Import FMapFacts.Sig.
+From MetaRocq.Common Require Import Kernames.
+From MetaRocq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Stdlib.FSets Require Import FMapFacts.Sig.
 
 Module qKernameMapFact.
   Module qF <: QuotationOfWFacts_fun Kername.OT KernameMap KernameMapFact.F.
-    MetaCoq Run (tmMakeQuotationOfModule everything None "KernameMapFact.F").
+    MetaRocq Run (tmMakeQuotationOfModule everything None "KernameMapFact.F").
   End qF.
 End qKernameMapFact.

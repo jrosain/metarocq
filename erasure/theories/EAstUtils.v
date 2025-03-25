@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Equations Require Import Equations.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import BasicAst Kernames.
-From MetaCoq.Erasure Require Import EPrimitive EAst.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import BasicAst Kernames.
+From MetaRocq.Erasure Require Import EPrimitive EAst.
 From Stdlib Require Import ssreflect ssrbool.
 
 Global Hint Resolve app_tip_nil : core.

@@ -1,11 +1,11 @@
-From MetaCoq.PCUIC Require Import PCUICAst PCUICEquality.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.Numbers Stdlib.Floats.
-From MetaCoq.Quotation.ToPCUIC.Utils Require Import (hints) utils All_Forall.
-From MetaCoq.Quotation.ToPCUIC.Common Require Import (hints) config Reflect Environment Universes BasicAst Kernames.
-From MetaCoq.Quotation.ToPCUIC.PCUIC Require Import (hints) PCUICAst utils.PCUICPrimitive (*PCUICAstUtils*) (*Induction*).
+From MetaRocq.PCUIC Require Import PCUICAst PCUICEquality.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.Numbers Stdlib.Floats.
+From MetaRocq.Quotation.ToPCUIC.Utils Require Import (hints) utils All_Forall.
+From MetaRocq.Quotation.ToPCUIC.Common Require Import (hints) config Reflect Environment Universes BasicAst Kernames.
+From MetaRocq.Quotation.ToPCUIC.PCUIC Require Import (hints) PCUICAst utils.PCUICPrimitive (*PCUICAstUtils*) (*Induction*).
 
-#[export] Instance quote_on_rel {T T'} {R} {f: T -> T'} {x y : T} {qR : quotation_of R} {quoteR : forall x y, ground_quotable (R x y:Prop)}: ground_quotable (MCRelations.on_rel R f x y) := ltac:(cbv [MCRelations.on_rel]; exact _).
+#[export] Instance quote_on_rel {T T'} {R} {f: T -> T'} {x y : T} {qR : quotation_of R} {quoteR : forall x y, ground_quotable (R x y:Prop)}: ground_quotable (MRRelations.on_rel R f x y) := ltac:(cbv [MRRelations.on_rel]; exact _).
 
 #[export] Instance quote_cmp_universe_instance {R u u'} {qR : quotation_of R} {quoteR : forall x y, ground_quotable (R x y:Prop)} : ground_quotable (@cmp_universe_instance R u u') := ltac:(cbv [cmp_universe_instance]; exact _).
 Section with_R.

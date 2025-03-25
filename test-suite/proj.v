@@ -1,5 +1,5 @@
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All.
 
 Set Primitive Projections.
 
@@ -10,12 +10,12 @@ Record Sigma (A : Type) (B : A -> Type) : Type :=
 Arguments fst {A B}.
 Arguments snd {A B}.
 
-MetaCoq Quote Recursively Definition foo := (fst, snd).
+MetaRocq Quote Recursively Definition foo := (fst, snd).
 
 Program Definition eqnat : Eq nat := {| eq x y := true |}.
 Next Obligation. Admitted.
 
-MetaCoq Quote Recursively Definition eqnatr := eqnat.
+MetaRocq Quote Recursively Definition eqnatr := eqnat.
 
 Goal forall {A} {e : Eq A} x y, e.(eq _) x y = eq _ e x y.
 Proof.
@@ -34,19 +34,19 @@ Record prod' A B : Type :=
 Arguments fst' {A B} _.
 Arguments snd' {A B} _.
 
-MetaCoq Test Quote ((pair' _ _ true 4).(snd')).
+MetaRocq Test Quote ((pair' _ _ true 4).(snd')).
 
-MetaCoq Test Quote prod'.
+MetaRocq Test Quote prod'.
 
 From Stdlib Require Import List String.
 Import ListNotations.
 
 
-Definition qprod' := mkInd (MPfile ["proj"; "TestSuite"; "MetaCoq"], "prod'") 0.
+Definition qprod' := mkInd (MPfile ["proj"; "TestSuite"; "MetaRocq"], "prod'") 0.
 Definition qnat := mkInd (MPfile ["Datatypes"; "Init"; "Corelib"], "nat") 0.
 Definition qbool := mkInd (MPfile ["Datatypes"; "Init"; "Corelib"], "bool") 0.
 
-MetaCoq Unquote Definition x := (tProj (mkProjection qprod' 2 1)
+MetaRocq Unquote Definition x := (tProj (mkProjection qprod' 2 1)
    (tApp (tConstruct qprod' 0 nil)
       [tInd qbool nil;
       tInd qnat nil;

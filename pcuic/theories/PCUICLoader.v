@@ -1,4 +1,4 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Common Require Import Ast.CommonMonad.
+From MetaRocq.Common Require Import Ast.CommonMonad.
 
-Declare ML Module "coq-metacoq-template.template_coq".
+Declare ML Module "rocq-metarocq-template.template_rocq".

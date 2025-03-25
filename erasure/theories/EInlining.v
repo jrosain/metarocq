@@ -3,12 +3,12 @@ Import ListNotations.
 From Equations Require Import Equations.
 Set Equations Transparent.
 
-From MetaCoq.PCUIC Require Import PCUICAstUtils.
-From MetaCoq.Utils Require Import MCList bytestring utils monad_utils.
-From MetaCoq.Erasure Require Import EPrimitive EAst EEnvMap EInduction EGlobalEnv.
+From MetaRocq.PCUIC Require Import PCUICAstUtils.
+From MetaRocq.Utils Require Import MRList bytestring utils monad_utils.
+From MetaRocq.Erasure Require Import EPrimitive EAst EEnvMap EInduction EGlobalEnv.
 
 Import Kernames.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 (* Inlining hints *)
 Definition inlining := KernameSet.t.
@@ -76,8 +76,8 @@ Definition inline_program inlining (p : program) : inlined_program :=
   let '(Σ', inls) := inline_env inlining p.1 in
   (Σ', inls, inline inls p.2).
 
-From MetaCoq.Erasure Require Import EProgram EWellformed EWcbvEval.
-From MetaCoq.Common Require Import Transform.
+From MetaRocq.Erasure Require Import EProgram EWellformed EWcbvEval.
+From MetaRocq.Common Require Import Transform.
 
 Definition forget_inlining_info (pr : inlined_program) : eprogram :=
   let '((Σ', inls), p) := pr in

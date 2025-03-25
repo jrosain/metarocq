@@ -1,5 +1,5 @@
 (**************************************************************************
-* A user-customizable auto-naming scheme for hypothesis in Coq            *
+* A user-customizable auto-naming scheme for hypothesis in Rocq            *
 * Author: Pierre Courtieu                                                 *
 * Distributed under the terms of the LGPL-v3 license                      *
 ***************************************************************************)

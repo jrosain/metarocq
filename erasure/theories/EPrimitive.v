@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import Universes Primitive Reflect
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import Universes Primitive Reflect
      Environment EnvironmentTyping.
-(* From MetaCoq.Erasure Require Import BasicAst. *)
+(* From MetaRocq.Erasure Require Import BasicAst. *)
 From Equations Require Import Equations.
 From Stdlib Require Import ssreflect Utf8.
 From Stdlib Require Import Uint63 SpecFloat.

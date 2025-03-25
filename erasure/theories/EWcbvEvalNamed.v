@@ -1,12 +1,12 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8 Program.
-From MetaCoq.Common Require Import config BasicAst.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.PCUIC Require PCUICWcbvEval.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils ELiftSubst ECSubst EReflect EGlobalEnv
+From MetaRocq.Common Require Import config BasicAst.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.PCUIC Require PCUICWcbvEval.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils ELiftSubst ECSubst EReflect EGlobalEnv
   EWellformed EWcbvEval.
-From MetaCoq.Utils Require Import bytestring MCString.
-From MetaCoq.Erasure Require Import EWcbvEvalCstrsAsBlocksFixLambdaInd.
+From MetaRocq.Utils Require Import bytestring MRString.
+From MetaRocq.Erasure Require Import EWcbvEvalCstrsAsBlocksFixLambdaInd.
 From Stdlib Require Import BinaryString.
 Import String.
 
@@ -22,9 +22,9 @@ Set Default Proof Using "Type*".
   which conversion is defined. Hence two terms that reduce to the same
   wcbv head normal form are convertible.
 
-  This reduction strategy is supposed to mimick at the Coq level the
+  This reduction strategy is supposed to mimick at the Rocq level the
   reduction strategy of ML programming languages. It is used to state
-  the extraction conjecture that can be applied to Coq terms to produce
+  the extraction conjecture that can be applied to Rocq terms to produce
   (untyped) terms where all proofs are erased to a dummy value. *)
 
 
@@ -1687,7 +1687,7 @@ Proof.
       rewrite map_fst_add_multiple; first [ now rewrite List.length_rev length_map fix_env_length | eauto ].
       eapply sunny_subset. eauto.
       intros ?. cbn. rewrite !in_app_iff. now rewrite <- in_rev.
-  - assert (map fst (MCList.map2 (λ (n : ident) (d0 : def term), (n, EAst.dbody d0)) nms mfix) = nms) as EE. {
+  - assert (map fst (MRList.map2 (λ (n : ident) (d0 : def term), (n, EAst.dbody d0)) nms mfix) = nms) as EE. {
     clear - f6. induction f6; cbn; f_equal; eauto. }
     econstructor.
     + solve_all. clear H0.
@@ -1883,7 +1883,7 @@ Proof.
   1: eauto. 1:auto.
   all: try congruence.
   all: intros; rtoProp.
-  all: repeat match reverse goal with  [H : MCProd.and3 _ _ _ |- _] => destruct H end.
+  all: repeat match reverse goal with  [H : MRProd.and3 _ _ _ |- _] => destruct H end.
   - cbn in i0 => //. now rewrite i0 in nbox.
   - invs Hrep.
     + invs H3.
@@ -2110,9 +2110,9 @@ Proof.
         let H5 := multimatch goal with H : _ |- _ => H end in
         eapply All2_Set_All2 in H5.
         let X := match goal with H : All2 (EWcbvEval.eval _) _ _ |- _ => H end in
-        eapply All2_All2_mix in X. 2: let X0 := match goal with H : All2 (fun _ _ => MCProd.and3 _ _ _) _ _ |- _ => H end in exact X0.
+        eapply All2_All2_mix in X. 2: let X0 := match goal with H : All2 (fun _ _ => MRProd.and3 _ _ _) _ _ |- _ => H end in exact X0.
         solve_all. eapply All2_trans'. 2: eauto. 2: match goal with H : context[EWcbvEval.eval] |- _ => exact H end.
-        intros x y z [? [? ?]]. rdest; destruct_head' MCProd.and3. eapply eval_represents_value; tea.
+        intros x y z [? [? ?]]. rdest; destruct_head' MRProd.and3. eapply eval_represents_value; tea.
       * econstructor. eauto.
     + cbn in Hsunny.
       solve_all.
@@ -2122,7 +2122,7 @@ Proof.
       eapply All2_All_mix_left in H5; tea.
       toAll.
        cbn in *. match goal with H : All2 _ ?x ?y, H' : All2 _ ?y ?z |- _ => eapply All2_trans' in H'; [ | | exact H ]; cbv beta end.
-       2:{ intros x y z ?; destruct_head'_prod; destruct_head' MCProd.and3.
+       2:{ intros x y z ?; destruct_head'_prod; destruct_head' MRProd.and3.
            match goal with
            | [ H : context[y], H' : _ |- _ ] => eapply H' in H; [ | now eauto .. ]
            end.
@@ -2195,7 +2195,7 @@ Proof.
       3:{ eapply All2_Set_All2 in H3. solve_all. }
       2:{ unfold wf_fix in H8. rtoProp. eapply Nat.ltb_lt in H5. eapply All2_Set_All2, All2_length in H4. lia. }
       eapply All2_Set_All2 in H3, H4. eapply All2_All2_Set. solve_all.
-      assert (map fst (MCList.map2 (λ (n : ident) (d0 : def term), (n, dbody d0)) nms mfix) = nms) as ->. {
+      assert (map fst (MRList.map2 (λ (n : ident) (d0 : def term), (n, dbody d0)) nms mfix) = nms) as ->. {
         clear - H3. induction H3; cbn; f_equal; eauto. }
       eapply All2_map2_left. eapply All2_swap; eauto. eauto.
       symmetry. eapply All2_length; eauto.

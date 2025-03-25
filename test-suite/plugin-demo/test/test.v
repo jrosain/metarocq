@@ -1,5 +1,5 @@
 From Stdlib Require Import Strings.String.
-From MetaCoq.ExtractedPluginDemo Require Import Lens Loader.
+From MetaRocq.ExtractedPluginDemo Require Import Lens Loader.
 
 Set Primitive Projections.
 

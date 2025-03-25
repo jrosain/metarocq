@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICTyping PCUICAst PCUICAstUtils PCUICTactics
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICTyping PCUICAst PCUICAstUtils PCUICTactics
   PCUICWeakeningConv PCUICWeakeningTyp PCUICSubstitution PCUICGeneration PCUICArities
   PCUICWcbvEval PCUICSR PCUICInversion PCUICViews
   PCUICUnivSubstitutionConv PCUICUnivSubstitutionTyp
@@ -736,7 +736,7 @@ Section classification.
     axiom_free_value Σ' (map (axiom_free_value Σ' []) args' ++ args) hd.
   Proof.
     revert hd args.
-    induction args' using MCList.rev_ind; intros hd args; cbn; auto.
+    induction args' using MRList.rev_ind; intros hd args; cbn; auto.
     rewrite mkApps_app /=.
     rewrite IHargs'.
     now rewrite map_app /= -app_assoc.

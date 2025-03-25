@@ -1,9 +1,9 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All.
 
 Local Set Primitive Projections.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 #[universes(template)]
 Record sigma A B :=
@@ -29,13 +29,13 @@ Notation "'∃' x .. y , p" := (sigma _ (fun x => .. (sigma _ (fun y => p)) ..))
 Notation " A × B " := (sigma A (fun _ => B)) (at level 80, right associativity) : type_scope.
 
 
-MetaCoq Quote Definition tSigma := sigma.
-MetaCoq Quote Definition tPair := @mk_sig.
+MetaRocq Quote Definition tSigma := sigma.
+MetaRocq Quote Definition tPair := @mk_sig.
 Definition pair (typ1 typ2 t1 t2 : term) : term
   := tApp tPair [ typ1 ; typ2 ; t1 ; t2].
 Definition pack (t u : term) : term
   := tApp tSigma [ t ; u ].
-MetaCoq Run (t <- tmQuote sigma ;;
+MetaRocq Run (t <- tmQuote sigma ;;
             match t with
             | tInd i _ => tmDefinition "sigma_ind" i
             | _ => tmFail "bug"

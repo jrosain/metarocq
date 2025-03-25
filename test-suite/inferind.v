@@ -1,8 +1,8 @@
 From Stdlib Require Import List.
-From MetaCoq.Template Require Import All.
+From MetaRocq.Template Require Import All.
 
 Import ListNotations.
-Import MCMonadNotation.
+Import MRMonadNotation.
 Open Scope bs_scope.
 Definition qlist := Eval compute in match <% list %> with
     | tInd ind _ => ind.(inductive_mind)
@@ -73,8 +73,8 @@ Definition refresh_arity s :=
 
 
 
-Unset MetaCoq Strict Unquote Universe Mode.
-MetaCoq Run (tmQuoteInductive qlist >>= fun mib =>
+Unset MetaRocq Strict Unquote Universe Mode.
+MetaRocq Run (tmQuoteInductive qlist >>= fun mib =>
   let entry := mind_body_to_entry mib in
   entry <- tmEval all entry;;
   tmPrint entry ;;

@@ -1,15 +1,15 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config EnvMap.
-From MetaCoq.Template Require Ast TypingWf WfAst TermEquality.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCumulativity
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config EnvMap.
+From MetaRocq.Template Require Ast TypingWf WfAst TermEquality.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCumulativity
      PCUICLiftSubst PCUICEquality PCUICReduction
      PCUICUnivSubst PCUICTyping PCUICGlobalEnv
      PCUICWeakeningConv PCUICWeakeningTyp PCUICWeakeningEnv
      PCUICSubstitution PCUICGeneration PCUICCasesContexts
      PCUICProgram.
-From MetaCoq.TemplatePCUIC Require Import TemplateToPCUIC.
+From MetaRocq.TemplatePCUIC Require Import TemplateToPCUIC.
 
 From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
@@ -69,7 +69,7 @@ Tactic Notation "len" "in" hyp(id) :=
     rewrite !pclengths /= // in id);
   try lia.
 
-(* Source =Template, Target (unqualified) = Coq *)
+(* Source =Template, Target (unqualified) = Rocq *)
 
 Module S :=Template.Ast.
 Module SEq :=Template.TermEquality.
@@ -619,7 +619,7 @@ Lemma trans_ind_bodies mdecl : map (trans_one_ind_body trΣ) (Ast.Env.ind_bodies
   ind_bodies (trans_minductive_body (trans_global_env Σ) mdecl).
 Proof. reflexivity. Qed.
 
-(* From MetaCoq.PCUIC Require Import PCUICClosed PCUICInductiveInversion.
+(* From MetaRocq.PCUIC Require Import PCUICClosed PCUICInductiveInversion.
 
 Lemma instantiate_params_spec params paramsi concl ty :
   instantiate_params params paramsi (it_mkProd_or_LetIn params concl) = Some ty ->
@@ -2064,7 +2064,7 @@ Proof.
   now eapply eq_annots_expand_lets_ctx.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICValidity PCUICContexts PCUICInductives PCUICInductiveInversion.
+From MetaRocq.PCUIC Require Import PCUICValidity PCUICContexts PCUICInductives PCUICInductiveInversion.
 
 Lemma isType_mkApps_Ind_inv_spine {cf:checker_flags} {Σ : global_env_ext} {Γ ind u args} {wfΣ : wf Σ} {mdecl idecl} :
   declared_inductive Σ ind mdecl idecl ->
@@ -2117,7 +2117,7 @@ Proof.
   - solve_all. now eapply typing_wf_local in a0.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICOnFreeVars.
+From MetaRocq.PCUIC Require Import PCUICOnFreeVars.
 
 Lemma trans_cumulSpec {cf} {Σ : Ast.Env.global_env_ext} {wfΣ : Typing.wf Σ} {pb Γ T T'} :
   let Σ' := trans_global Σ in
@@ -2226,7 +2226,7 @@ Local Hint Transparent Ast.Env.global_env_ext : trans.
 Local Hint Transparent sort : trans.
 Local Hint Variables Transparent : trans.
 Ltac trans := try typeclasses eauto with trans.
-(* bug in Coq, typeclasses eauto tries exact with a quantified hypothesis starting with a let-in *)
+(* bug in Rocq, typeclasses eauto tries exact with a quantified hypothesis starting with a let-in *)
 Ltac simpl_let :=
   match goal with
   | [ H : let _ := _ in _ |- _ ] => progress (cbv zeta in H)
@@ -2556,7 +2556,7 @@ Proof.
   now rewrite trans_subst.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICInstDef PCUICInstConv.
+From MetaRocq.PCUIC Require Import PCUICInstDef PCUICInstConv.
 From Stdlib Require Import ssrbool.
 (* Lemma closed_ctx_map2_set_binder_name (n : nat) (bctx : list aname) (ctx : list context_decl) :
   closedn_ctx n ctx -> closedn_ctx n (map2_bias_left set_binder_name dummy_decl bctx ctx).
@@ -2651,7 +2651,7 @@ Proof.
   - solve_all.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICOnFreeVars.
+From MetaRocq.PCUIC Require Import PCUICOnFreeVars.
 
 Lemma trans_cumul_ctx_rel {cf} {Σ : Ast.Env.global_env_ext} Γ Δ Δ' :
   let Σ' := trans_global Σ in
@@ -2854,7 +2854,7 @@ Proof.
       eapply All_app_inv => //. }
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICClosed PCUICClosedTyp.
+From MetaRocq.PCUIC Require Import PCUICClosed PCUICClosedTyp.
 
 Lemma trans_ind_respects_variance {cf} Σ mdecl v idecl :
   let Σ' := trans_global_env Σ in

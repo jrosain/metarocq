@@ -1,36 +1,36 @@
 From Stdlib Require Import Program.
-From MetaCoq.Erasure.Typed Require Import Utils.
-From MetaCoq.Erasure.Typed Require Import ExAst.
+From MetaRocq.Erasure.Typed Require Import Utils.
+From MetaRocq.Erasure.Typed Require Import ExAst.
 From Equations Require Import Equations.
-From MetaCoq.Erasure Require Import EArities.
-From MetaCoq.Erasure Require Import EAstUtils.
-From MetaCoq.Erasure Require ErasureFunction.
-From MetaCoq.PCUIC Require Import PCUICArities.
-From MetaCoq.PCUIC Require Import PCUICAstUtils.
-From MetaCoq.PCUIC Require Import PCUICCanonicity.
-From MetaCoq.PCUIC Require Import PCUICConfluence.
-From MetaCoq.PCUIC Require Import PCUICContextConversion.
-From MetaCoq.PCUIC Require Import PCUICContexts.
-From MetaCoq.PCUIC Require Import PCUICConversion.
-From MetaCoq.PCUIC Require Import PCUICInductiveInversion.
-From MetaCoq.PCUIC Require Import PCUICInversion.
-From MetaCoq.PCUIC Require Import PCUICLiftSubst.
-From MetaCoq.PCUIC Require Import PCUICNormal.
-From MetaCoq.PCUIC Require Import PCUICSN.
-From MetaCoq.PCUIC Require Import PCUICSR.
-From MetaCoq.PCUIC Require Import PCUICSafeLemmata.
-From MetaCoq.PCUIC Require Import PCUICSubstitution.
-From MetaCoq.PCUIC Require Import PCUICTyping.
-From MetaCoq.PCUIC Require Import PCUICValidity.
-From MetaCoq.PCUIC Require Import PCUICWellScopedCumulativity.
-From MetaCoq.PCUIC Require Import PCUICCumulativity.
-From MetaCoq.SafeChecker Require Import PCUICSafeReduce.
-From MetaCoq.SafeChecker Require Import PCUICSafeRetyping.
-From MetaCoq.SafeChecker Require Import PCUICWfEnv.
-From MetaCoq.SafeChecker Require Import PCUICWfEnvImpl.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import Kernames.
-From MetaCoq.Common Require Import config.
+From MetaRocq.Erasure Require Import EArities.
+From MetaRocq.Erasure Require Import EAstUtils.
+From MetaRocq.Erasure Require ErasureFunction.
+From MetaRocq.PCUIC Require Import PCUICArities.
+From MetaRocq.PCUIC Require Import PCUICAstUtils.
+From MetaRocq.PCUIC Require Import PCUICCanonicity.
+From MetaRocq.PCUIC Require Import PCUICConfluence.
+From MetaRocq.PCUIC Require Import PCUICContextConversion.
+From MetaRocq.PCUIC Require Import PCUICContexts.
+From MetaRocq.PCUIC Require Import PCUICConversion.
+From MetaRocq.PCUIC Require Import PCUICInductiveInversion.
+From MetaRocq.PCUIC Require Import PCUICInversion.
+From MetaRocq.PCUIC Require Import PCUICLiftSubst.
+From MetaRocq.PCUIC Require Import PCUICNormal.
+From MetaRocq.PCUIC Require Import PCUICSN.
+From MetaRocq.PCUIC Require Import PCUICSR.
+From MetaRocq.PCUIC Require Import PCUICSafeLemmata.
+From MetaRocq.PCUIC Require Import PCUICSubstitution.
+From MetaRocq.PCUIC Require Import PCUICTyping.
+From MetaRocq.PCUIC Require Import PCUICValidity.
+From MetaRocq.PCUIC Require Import PCUICWellScopedCumulativity.
+From MetaRocq.PCUIC Require Import PCUICCumulativity.
+From MetaRocq.SafeChecker Require Import PCUICSafeReduce.
+From MetaRocq.SafeChecker Require Import PCUICSafeRetyping.
+From MetaRocq.SafeChecker Require Import PCUICWfEnv.
+From MetaRocq.SafeChecker Require Import PCUICWfEnvImpl.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import Kernames.
+From MetaRocq.Common Require Import config.
 
 Import PCUICAst.PCUICEnvTyping.
 Import PCUICErrors.

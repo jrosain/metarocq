@@ -1,9 +1,9 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTyping.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTyping.
 From Equations Require Import Equations.
-From MetaCoq.Utils Require Import LibHypsNaming.
+From MetaRocq.Utils Require Import LibHypsNaming.
 
 From Stdlib Require Import ssreflect.
 

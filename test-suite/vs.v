@@ -749,7 +749,7 @@ Proof. destruct clause_cspec'; auto. Qed.
 End OrderedClause.
 
 (* The clause database.  There are two alternate implementations.
-  The first uses MSetAVL from the Coq library, the second uses red-black trees.
+  The first uses MSetAVL from the Rocq library, the second uses red-black trees.
   Since red-black trees match an enhanced interface MSetPlus,
   in the first implementation we define the additional operator(s) in terms
   of what's available in MSetAVL.
@@ -1122,7 +1122,7 @@ Definition compare_clause2 (cl1 cl2 : clause) :=
 
 Inductive ce_type := CexpL | CexpR | CexpEf.
 
-(** Patch until Coq extraction of sharing constraints is fixed *)
+(** Patch until Rocq extraction of sharing constraints is fixed *)
 
 Module DebuggingHooks.
 
@@ -2181,7 +2181,7 @@ Defined.
 (* Print Assumptions the_loop. *)
 
 (* end show *)
-(* Required to work around Coq bug #2613 *)
+(* Required to work around Rocq bug #2613 *)
 
 Definition check_entailment (ent: entailment) : veristar_result :=
   let s := clause_list2set (pure_clauses (map order_eqv_clause (cnf ent)))

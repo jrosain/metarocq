@@ -1,28 +1,28 @@
-all: Makefile.coq
-	$(MAKE) -f Makefile.coq TIMED=$(TIMED)
+all: Makefile.rocq
+	$(MAKE) -f Makefile.rocq TIMED=$(TIMED)
 
-_CoqProject: _CoqProject.in metacoq-config
-	cat metacoq-config > _CoqProject
-	cat _CoqProject.in >> _CoqProject
+_RocqProject: _RocqProject.in metarocq-config
+	cat metarocq-config > _RocqProject
+	cat _RocqProject.in >> _RocqProject
 
-Makefile.coq: _CoqProject
-	rocq makefile -f _CoqProject -o Makefile.coq
+Makefile.rocq: _RocqProject
+	rocq makefile -f _RocqProject -o Makefile.rocq
 
-clean: Makefile.coq
-	$(MAKE) -f Makefile.coq clean
+clean: Makefile.rocq
+	$(MAKE) -f Makefile.rocq clean
 
 mrproper:
-	rm -f Makefile.coq
+	rm -f Makefile.rocq
 
-force Makefile _CoqProject.in metacoq-config: ;
+force Makefile _RocqProject.in metarocq-config: ;
 
-%: Makefile.coq force
-	+$(MAKE) -f Makefile.coq $@
+%: Makefile.rocq force
+	+$(MAKE) -f Makefile.rocq $@
 
 .PHONY: all clean mrproper force
 
-vos: Makefile.coq
-	$(MAKE) -f Makefile.coq vos
+vos: Makefile.rocq
+	$(MAKE) -f Makefile.rocq vos
 
-quick: Makefile.coq
-	$(MAKE) -f Makefile.coq COQEXTRAFLAGS="-unset \"Universe Checking\"" vos
+quick: Makefile.rocq
+	$(MAKE) -f Makefile.rocq COQEXTRAFLAGS="-unset \"Universe Checking\"" vos

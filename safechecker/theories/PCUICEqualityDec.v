@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ProofIrrelevance ssreflect ssrbool btauto.Algebra.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config uGraph.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive PCUICTactics
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config uGraph.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive PCUICTactics
      PCUICReflect PCUICLiftSubst PCUICUnivSubst PCUICTyping PCUICGlobalEnv
      PCUICCumulativity PCUICEquality PCUICWfUniverses
      PCUICInduction.

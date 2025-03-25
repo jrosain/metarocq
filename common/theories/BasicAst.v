@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect Morphisms Orders Setoid.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Export Kernames.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Export Kernames.
 From Stdlib Require Floats.SpecFloat.
 From Equations Require Import Equations.
 

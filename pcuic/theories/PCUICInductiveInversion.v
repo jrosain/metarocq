@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICInduction
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICInduction
      PCUICLiftSubst PCUICUnivSubst
      PCUICTyping PCUICGlobalEnv
      PCUICWeakeningEnv PCUICWeakeningEnvTyp
@@ -4496,7 +4496,7 @@ Proof.
   split; eauto.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICContextSubst.
+From MetaRocq.PCUIC Require Import PCUICContextSubst.
 
 Lemma conv_betas_typed `{cf:checker_flags} (Σ : global_env_ext) (wfΣ: wf Σ) Γ Δ l t :
   isType Σ (Γ ,,, Δ) t ->

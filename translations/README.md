@@ -1,6 +1,6 @@
 # Translation plugin
 
-The folder contains the translation plugin defined in Template Coq.
+The folder contains the translation plugin defined in Template Rocq.
 
 The plugin is defined in the file `translation_utils.v`.
 

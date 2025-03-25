@@ -1,15 +1,15 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Primitive.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Primitive.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive
   PCUICLiftSubst PCUICUnivSubst PCUICEquality PCUICUtils PCUICPosition.
-From MetaCoq.PCUIC Require Export PCUICCumulativitySpec.
-From MetaCoq.PCUIC Require Export PCUICCases.
+From MetaRocq.PCUIC Require Export PCUICCumulativitySpec.
+From MetaRocq.PCUIC Require Export PCUICCases.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 (* TODO: remove this export *)
-From MetaCoq.Utils Require Export LibHypsNaming.
+From MetaRocq.Utils Require Export LibHypsNaming.
 
 From Stdlib Require Import ssreflect ssrbool.
 From Equations.Type Require Import Relation.
@@ -221,7 +221,7 @@ Inductive typing `{checker_flags} (Σ : global_env_ext) (Γ : context) : term ->
     Σ ;;; Γ |- tLetIn na b B t : tLetIn na b B A
 
 | type_App : forall t na A B s u,
-    (* Paranoid assumption, allows to show equivalence with template-coq,
+    (* Paranoid assumption, allows to show equivalence with template-rocq,
        but eventually unnecessary thanks to validity. *)
     Σ ;;; Γ |- tProd na A B : tSort s ->
     Σ ;;; Γ |- t : tProd na A B ->

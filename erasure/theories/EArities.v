@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
   PCUICReduction
   PCUICClosed PCUICTyping PCUICWcbvEval PCUICLiftSubst PCUICInversion PCUICArities
   PCUICSR PCUICGeneration PCUICSubstitution PCUICElimination
@@ -12,7 +12,7 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
   PCUICSpine PCUICInductives PCUICInductiveInversion PCUICConfluence
   PCUICArities PCUICPrincipality PCUICFirstorder.
 
-From MetaCoq.Erasure Require Import Extract.
+From MetaRocq.Erasure Require Import Extract.
 
 Notation "Σ ⊢p s ⇓ t" := (eval Σ s t) (at level 50, s, t at next level) : type_scope.
 

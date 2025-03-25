@@ -1,6 +1,6 @@
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All.
-Import MCMonadNotation.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All.
+Import MRMonadNotation.
 
-MetaCoq Test Quote negb.
-MetaCoq Run (tmBind (tmEval (unfold (MPfile ["Datatypes"; "Init"; "Corelib"], "negb")) negb) tmPrint).
+MetaRocq Test Quote negb.
+MetaRocq Run (tmBind (tmEval (unfold (MPfile ["Datatypes"; "Init"; "Corelib"], "negb")) negb) tmPrint).

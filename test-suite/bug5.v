@@ -1,4 +1,4 @@
-From MetaCoq Require Import Template.Loader.
+From MetaRocq Require Import Template.Loader.
 
-MetaCoq Quote Recursively Definition aterm := Ast.term.
-(*Time MetaCoq Quote Recursively Definition aterm' := aterm.*)
+MetaRocq Quote Recursively Definition aterm := Ast.term.
+(*Time MetaRocq Quote Recursively Definition aterm' := aterm.*)

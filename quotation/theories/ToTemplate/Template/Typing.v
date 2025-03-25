@@ -1,14 +1,14 @@
-From MetaCoq.Template Require Import Ast Typing.
-From MetaCoq.Quotation.ToTemplate Require Import Init.
-From MetaCoq.Quotation.ToTemplate Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.Numbers Stdlib.Floats.
-From MetaCoq.Quotation.ToTemplate.Utils Require Import (hints) utils All_Forall (* MCProd*).
-From MetaCoq.Quotation.ToTemplate.Common Require Import (hints) config BasicAst Universes Kernames Environment EnvironmentTyping Primitive Reflect.
-From MetaCoq.Quotation.ToTemplate.Template Require Import (hints) AstUtils
+From MetaRocq.Template Require Import Ast Typing.
+From MetaRocq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.Numbers Stdlib.Floats.
+From MetaRocq.Quotation.ToTemplate.Utils Require Import (hints) utils All_Forall (* MRProd*).
+From MetaRocq.Quotation.ToTemplate.Common Require Import (hints) config BasicAst Universes Kernames Environment EnvironmentTyping Primitive Reflect.
+From MetaRocq.Quotation.ToTemplate.Template Require Import (hints) AstUtils
   LiftSubst UnivSubst ReflectAst TermEquality WfAst.
-From MetaCoq.Quotation.ToTemplate.Common Require Import Environment EnvironmentTyping.
-From MetaCoq.Quotation.ToTemplate.Template Require Import Ast.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Common Require Import EnvironmentTyping.Sig.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Template Require Import Ast.Instances Typing.Instances.
+From MetaRocq.Quotation.ToTemplate.Common Require Import Environment EnvironmentTyping.
+From MetaRocq.Quotation.ToTemplate.Template Require Import Ast.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Common Require Import EnvironmentTyping.Sig.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Template Require Import Ast.Instances Typing.Instances.
 
 #[export] Instance quote_instantiate_params_subst_spec {params pars s pty s' pty'} : ground_quotable (@instantiate_params_subst_spec params pars s pty s' pty').
 Proof.

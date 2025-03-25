@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICUtils PCUICOnOne
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICUtils PCUICOnOne
      PCUICLiftSubst PCUICUnivSubst PCUICTyping PCUICGlobalEnv PCUICWeakeningEnvConv
      PCUICWeakeningEnvTyp PCUICWeakeningConv PCUICWeakeningTyp
      PCUICSubstitution PCUICContextSubst PCUICCasesContexts PCUICClosed PCUICClosedTyp PCUICClosedConv
@@ -245,7 +245,7 @@ Proof.
   intros; now eapply conv_context_rel_reln.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICOnFreeVars.
+From MetaRocq.PCUIC Require Import PCUICOnFreeVars.
 
 Lemma eq_context_alpha_conv {cf} {Σ} {wfΣ : wf Σ} Γ Δ Δ' :
   eq_context_upto_names Δ Δ' ->
@@ -667,7 +667,7 @@ Proof.
     exists s'; eauto. specialize (H Γ t' b t). eapply H. eauto. exact Hs.
   - f_equal; auto.
 Qed. *)
-From MetaCoq.PCUIC Require Import PCUICContextReduction PCUICOnFreeVars.
+From MetaRocq.PCUIC Require Import PCUICContextReduction PCUICOnFreeVars.
 
 (* Lemma red_one_decl_conv_context {cf} {Σ} {wfΣ : wf Σ} {Γ Δ Δ'} :
   OnOne2_local_env (fun Δ : context => on_one_decl (red1 Σ (Γ ,,, Δ))) Δ Δ' ->

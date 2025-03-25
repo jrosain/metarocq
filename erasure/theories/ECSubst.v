@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Program.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils EInduction ELiftSubst.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils EInduction ELiftSubst.
 
 From Stdlib Require Import ssreflect ssrbool.
 From Equations Require Import Equations.

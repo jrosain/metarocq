@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
     PCUICLiftSubst.
 
 From Stdlib Require Import ssreflect.
@@ -284,7 +284,7 @@ Proof using Type.
     now rewrite lift0_id.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICSigmaCalculus.
+From MetaRocq.PCUIC Require Import PCUICSigmaCalculus.
 
 
 (**************************)
@@ -332,7 +332,7 @@ Proof.
 Qed.
 
 From Stdlib Require Import ssrbool.
-From MetaCoq.PCUIC Require Import PCUICClosed.
+From MetaRocq.PCUIC Require Import PCUICClosed.
 Lemma closedn_ctx_subst_forall n Δ l s :
   context_subst Δ l s ->
   closedn_ctx n Δ ->

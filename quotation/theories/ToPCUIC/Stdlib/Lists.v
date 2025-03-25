@@ -1,8 +1,8 @@
 From Stdlib Require Import Lists.List.
 From Stdlib Require Import Lists.ListDec.
-From MetaCoq.Utils Require Import ReflectEq.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init.
+From MetaRocq.Utils Require Import ReflectEq.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init.
 From Equations.Prop Require Import Classes.
 Import ListNotations.
 Local Open Scope list_scope.

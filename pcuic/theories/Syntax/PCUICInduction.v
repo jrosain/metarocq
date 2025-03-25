@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect Program Lia BinPos Compare_dec Bool.
-From MetaCoq.Utils Require Import utils LibHypsNaming.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICSize.
+From MetaRocq.Utils Require Import utils LibHypsNaming.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICSize.
 From Stdlib Require Import List.
 From Equations Require Import Equations.
 From Equations.Prop Require Import Subterm.
@@ -392,9 +392,9 @@ Proof.
   generalize (le_n #|Γ|).
   generalize #|Γ| at 2.
   induction n in Γ |- *.
-  destruct Γ using MCList.rev_ind; [|simpl; rewrite length_app; simpl; intros; exfalso; try lia].
+  destruct Γ using MRList.rev_ind; [|simpl; rewrite length_app; simpl; intros; exfalso; try lia].
   intros. apply p0.
-  destruct Γ using MCList.rev_ind; simpl in *; rewrite ?length_app; simpl; intros Hlen.
+  destruct Γ using MRList.rev_ind; simpl in *; rewrite ?length_app; simpl; intros Hlen.
   intros. apply p0.
   apply pS. intros. apply IHn. simpl. lia.
 Qed.

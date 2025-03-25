@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Morphisms.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICInduction
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICInduction
      PCUICLiftSubst PCUICSigmaCalculus PCUICTyping PCUICWeakeningEnv PCUICWeakeningEnvTyp
      PCUICWeakeningConv PCUICWeakeningTyp
      PCUICSubstitution PCUICReduction PCUICCumulativity PCUICGeneration
@@ -12,7 +12,7 @@ From Equations Require Import Equations.
 From Equations.Prop Require Import DepElim.
 From Stdlib Require Import ssreflect ssrbool.
 
-From MetaCoq.PCUIC Require Import PCUICInduction.
+From MetaRocq.PCUIC Require Import PCUICInduction.
 
 Lemma test_primu_mapu {term term'} pu pt fu (ft : term -> term') p :
   test_primu pu pt (mapu_prim fu ft p) =
@@ -1174,7 +1174,7 @@ Qed.
       * rewrite wf_universes_it_mkLambda_or_LetIn H6 andb_true_r.
         move: H4.
         rewrite /wf_ctx_universes forallb_app => /andP[hctx _].
-        apply (MCReflect.introT onctxP).
+        apply (MRReflect.introT onctxP).
         solve_all. unfold ondecl, wf_decl_universes, on_decl_universes in *.
         move/andP:H3 => [Hb Ht] //; split; tas.
         now destruct decl_body.

@@ -19,7 +19,7 @@ Class checker_flags := {
   lets_in_constructor_types : bool
 }.
 
-(** Should correspond to Coq *)
+(** Should correspond to Rocq *)
 Local Instance default_checker_flags : checker_flags := {|
   check_univs := true ;
   prop_sub_type := true;

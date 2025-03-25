@@ -3,13 +3,13 @@
 (* Eta expanded constructors only, see EEtaExpandedFix for the more involved definition where fixpoints are also eta-expanded. *)
 
 From Stdlib Require Import Utf8 Program btauto.Algebra.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames EnvMap BasicAst.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils EInduction EGlobalEnv EExtends EWellformed ELiftSubst ESpineView ECSubst EWcbvEval EWcbvEvalInd EProgram.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames EnvMap BasicAst.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils EInduction EGlobalEnv EExtends EWellformed ELiftSubst ESpineView ECSubst EWcbvEval EWcbvEvalInd EProgram.
 
 Local Open Scope string_scope.
 Set Asymmetric Patterns.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 From Equations Require Import Equations.
 Set Equations Transparent.
@@ -24,7 +24,7 @@ Ltac introdep := let H := fresh in intros H; depelim H.
 #[global]
 Hint Constructors eval : core.
 
-Import MCList (map_InP, map_InP_elim, map_InP_spec).
+Import MRList (map_InP, map_InP_elim, map_InP_spec).
 
 Equations discr_construct (t : term) : Prop :=
 discr_construct (tConstruct ind n block_args) := False ;
@@ -403,7 +403,7 @@ Proof.
   rewrite (extends_lookup wf ext hl) /= //.
 Qed.
 
-From MetaCoq.Erasure Require Import ELiftSubst.
+From MetaRocq.Erasure Require Import ELiftSubst.
 
 Lemma isEtaExp_extends {efl : EEnvFlags} Σ Σ' t :
   extends Σ Σ' ->
@@ -695,7 +695,7 @@ Proof.
     * now move/and4P => [].
 Qed.
 
-From MetaCoq.Erasure Require Import EEtaExpandedFix.
+From MetaRocq.Erasure Require Import EEtaExpandedFix.
 
 Local Ltac simp_eta ::= simp isEtaExp; rewrite -?isEtaExp_equation_1 -?EEtaExpanded.isEtaExp_equation_1.
 

@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ProofIrrelevance ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config uGraph.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config uGraph.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
      PCUICReflect PCUICLiftSubst PCUICUnivSubst PCUICTyping PCUICGlobalEnv
      PCUICCumulativity PCUICConversion PCUICEquality PCUICConversion
      PCUICSafeLemmata PCUICNormal PCUICInversion PCUICReduction PCUICPosition
@@ -11,7 +11,7 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
      PCUICWeakeningEnvConv PCUICWeakeningEnvTyp
      PCUICWeakeningConv PCUICWeakeningTyp
      PCUICClosed PCUICClosedTyp PCUICConvCumInversion .
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICSafeReduce PCUICEqualityDec.
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICSafeReduce PCUICEqualityDec.
 
 From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
@@ -5543,7 +5543,7 @@ Qed.
     exfalso.
     revert teq.
     induction X0 in args |- *; intros; solve_discr.
-    destruct args as [|? ? _] using MCList.rev_ind; [easy|].
+    destruct args as [|? ? _] using MRList.rev_ind; [easy|].
     rewrite mkApps_app in teq.
     cbn in teq. noconf teq.
     eauto.
@@ -6207,7 +6207,7 @@ Qed.
 End Conversion.
 
 (*
-From MetaCoq.SafeChecker Require Import PCUICWfEnvImpl.
+From MetaRocq.SafeChecker Require Import PCUICWfEnvImpl.
 Definition default_normal : @normalizing_flags default_checker_flags.
 now econstructor.
 Defined.

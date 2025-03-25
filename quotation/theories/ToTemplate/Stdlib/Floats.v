@@ -1,6 +1,6 @@
 From Stdlib.Floats Require Import FloatClass Floats PrimFloat SpecFloat.
-From MetaCoq.Quotation.ToTemplate Require Import Init.
-From MetaCoq.Quotation.ToTemplate Require Import (hints) Stdlib.Init Stdlib.Numbers.
+From MetaRocq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate Require Import (hints) Stdlib.Init Stdlib.Numbers.
 
 #[export] Instance quote_float : ground_quotable float := fun f => Ast.tFloat f.
 #[export] Instance quote_float_class : ground_quotable float_class := ltac:(destruct 1; exact _).

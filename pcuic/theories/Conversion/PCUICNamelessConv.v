@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import RelationClasses.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICOnOne PCUICAstUtils PCUICInduction PCUICCases
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICOnOne PCUICAstUtils PCUICInduction PCUICCases
      PCUICLiftSubst PCUICEquality PCUICReduction PCUICCumulativitySpec PCUICCumulativity PCUICPosition PCUICUnivSubst
      PCUICNamelessDef PCUICGuardCondition PCUICClosedConv PCUICClosedTyp PCUICUnivSubstitutionConv
      PCUICClosed PCUICSigmaCalculus PCUICTyping (* for context manipulations *).

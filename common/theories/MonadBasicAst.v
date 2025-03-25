@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils monad_utils MCList.
-From MetaCoq.Common Require Import BasicAst.
+From MetaRocq.Utils Require Import utils monad_utils MRList.
+From MetaRocq.Common Require Import BasicAst.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 Local Set Universe Polymorphism.
 Local Unset Universe Minimization ToSet.
 

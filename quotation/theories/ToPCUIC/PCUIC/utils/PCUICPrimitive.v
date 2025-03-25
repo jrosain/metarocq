@@ -1,9 +1,9 @@
-From MetaCoq.Utils.MCTactics Require Import DestructHead UniquePose.
-From MetaCoq.PCUIC Require Import utils.PCUICPrimitive.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Numbers Stdlib.Floats.
-From MetaCoq.Quotation.ToPCUIC.Common Require Import (hints) Universes Primitive.
-From MetaCoq.Quotation.ToPCUIC.Utils Require Import (hints) All_Forall.
+From MetaRocq.Utils.MRTactics Require Import DestructHead UniquePose.
+From MetaRocq.PCUIC Require Import utils.PCUICPrimitive.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Numbers Stdlib.Floats.
+From MetaRocq.Quotation.ToPCUIC.Common Require Import (hints) Universes Primitive.
+From MetaRocq.Quotation.ToPCUIC.Utils Require Import (hints) All_Forall.
 
 #[export] Instance quote_array_model {term} {qterm : quotation_of term} {quote_term : ground_quotable term} : ground_quotable (array_model term) := ltac:(destruct 1; exact _).
 

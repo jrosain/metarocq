@@ -1,15 +1,15 @@
 (* Distributed under the terms of the MIT license. *)
 Set Warnings "-notation-overridden".
 
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All.
 Unset Universe Checking.
-From MetaCoq.Translations Require Import translation_utils times_bool_fun MiniHoTT.
-Import MCMonadNotation.
+From MetaRocq.Translations Require Import translation_utils times_bool_fun MiniHoTT.
+Import MRMonadNotation.
 
-Unset MetaCoq Strict Unquote Universe Mode.
+Unset MetaRocq Strict Unquote Universe Mode.
 
-MetaCoq Run (TC <- ImplementExisting emptyTC "paths" ;;
+MetaRocq Run (TC <- ImplementExisting emptyTC "paths" ;;
                      TC <- ImplementExisting TC "idpath" ;;
                      TC <- ImplementExisting TC "paths_ind" ;;
                      TC <- ImplementExisting TC "transport" ;;
@@ -79,7 +79,7 @@ Defined.
 
 Definition UA := forall A B, isequiv (id2equiv A B).
 
-MetaCoq Run (TC <- Translate eqTC "isequiv" ;;
+MetaRocq Run (TC <- Translate eqTC "isequiv" ;;
                      TC <- Translate TC "equiv" ;;
                      TC <- ImplementExisting TC "eq" ;;
                      TC <- Translate TC "inverse" ;;
@@ -93,7 +93,7 @@ Definition contr A := exists x : A, forall y, x = y.
 Definition weakFunext
   := forall (A : Type) (P : A -> Type), (forall x, contr (P x)) -> contr (forall x, P x).
 
-MetaCoq Run (TC <- Translate eqTC2 "contr" ;;
+MetaRocq Run (TC <- Translate eqTC2 "contr" ;;
                      TC <- Translate TC "weakFunext" ;;
                      tmDefinition "eqTC3" TC).
 
@@ -157,7 +157,7 @@ Definition contr_retract_α : contr_retractα.
   - intro f; lazy. exact 1. (* uses eta! *)
 Defined.
 
-(* MetaCoq Run (TC <- TranslateRec eqTC3 contr_retractα ;; *)
+(* MetaRocq Run (TC <- TranslateRec eqTC3 contr_retractα ;; *)
 (*                      TC <- ImplementExisting TC "contr_retract_α" ;; *)
 (*                      tmDefinition "eqTC4" TC). *)
 (* Next Obligation. *)

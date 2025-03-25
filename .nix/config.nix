@@ -7,7 +7,7 @@
   ## The attribute to build from the local sources,
   ## either using nixpkgs data or the overlays located in `.nix/coq-overlays`
   ## Will determine the default main-job of the bundles defined below
-  attribute = "metacoq";
+  attribute = "metarocq";
 
   ## If you want to select a different attribute (to build from the local sources as well)
   ## when calling `nix-shell` and `nix-build` without the `--argstr job` argument
@@ -33,7 +33,7 @@
   ## defaults to "default"
   default-bundle = "coq-dev";
 
-  # MetaCoq is expected to be compatible with a single coq version
+  # MetaRocq is expected to be compatible with a single coq version
   # The name of the bundle should finish with the coq version to use
   # cachedMake.sh
   bundles."coq-dev" = {
@@ -91,7 +91,7 @@
   ## variable on GitHub. Then, you should give the variable
   ## name here. For instance, coq-community projects can use
   ## the following line instead of the one above:
-  cachix.metacoq.authToken = "CACHIX_AUTH_TOKEN";
+  cachix.metarocq.authToken = "CACHIX_AUTH_TOKEN";
 
   ## Or if you have a signing key for a given Cachix cache:
   # cachix.my-cache.signingKey = "CACHIX_SIGNING_KEY"

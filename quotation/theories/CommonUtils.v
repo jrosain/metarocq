@@ -1,6 +1,6 @@
-From MetaCoq.Utils Require Import utils monad_utils MCList.
-From MetaCoq.Common Require Import Kernames MonadBasicAst.
-From MetaCoq.Template Require MonadAst TemplateMonad Ast Loader.
+From MetaRocq.Utils Require Import utils monad_utils MRList.
+From MetaRocq.Common Require Import Kernames MonadBasicAst.
+From MetaRocq.Template Require MonadAst TemplateMonad Ast Loader.
 From Equations.Prop Require Import Classes.
 From Stdlib Require Import Lists.List.
 Import ListNotations.
@@ -8,7 +8,7 @@ Import ListNotations.
 Local Unset Universe Minimization ToSet.
 Local Set Primitive Projections.
 Local Open Scope bs.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Class debug_opt : Set := debug : bool.
 Class cls_is_true (b : bool) : Set := is_truev : is_true b.
@@ -50,7 +50,7 @@ Definition split_common_prefix (mp1 mp2 : modpath) : option ((dirpath * option (
      end.
 Definition common_prefix (mp1 mp2 : modpath) : option ((dirpath * option (ident * nat)) * list ident)
   := option_map (fun '(f, (common, _, _)) => (f, common)) (split_common_prefix mp1 mp2).
-(* Kludge for not having https://github.com/MetaCoq/metacoq/issues/839 *)
+(* Kludge for not having https://github.com/MetaRocq/metarocq/issues/839 *)
 Definition modpath_is_okay (cur_modpath : modpath) (mp : modpath) : bool
   := andb (modpath_is_absolute mp)
        match mp with
@@ -100,7 +100,7 @@ Definition rebase_global_reference (mp : modpath) (g : global_reference) : globa
      | ConstructRef ind idx => ConstructRef (replace_inductive_modpath mp ind) idx
      end.
 
-(* hack around https://github.com/MetaCoq/metacoq/issues/850 *)
+(* hack around https://github.com/MetaRocq/metarocq/issues/850 *)
 Fixpoint dedup_grefs' (g : list global_reference) (seen : KernameSet.t) : list global_reference
   := match g with
      | nil => nil
@@ -117,11 +117,11 @@ Definition dedup_grefs (g : list global_reference) : list global_reference
   := dedup_grefs' g KernameSet.empty.
 
 Module WithTemplate.
-  Import MetaCoq.Template.Loader.
-  Import MetaCoq.Template.Ast.
+  Import MetaRocq.Template.Loader.
+  Import MetaRocq.Template.Ast.
   Import MonadBasicAst MonadAst.
-  Import MetaCoq.Template.TemplateMonad.Common.
-  Import MetaCoq.Template.TemplateMonad.Core.
+  Import MetaRocq.Template.TemplateMonad.Common.
+  Import MetaRocq.Template.TemplateMonad.Core.
 
   (* versions that can be the same for both template and PCUIC, bypassing translation, for performance *)
   Polymorphic Definition tmQuoteConstantUniversesAndRelevance@{t u} (kn : kername) (bypass_opacity : bool) : TemplateMonad@{t u} (universes_decl * relevance)
@@ -334,11 +334,11 @@ Module WithTemplate.
   Polymorphic Definition tmRetypeRelaxOnlyType@{a t u} (prefix : string) {A : Type@{a}} (x : A) : TemplateMonad@{t u} A
     := tmRetypeMagicRelaxOnlyType@{a a t u} prefix A x.
 
-  (* Hack around https://github.com/MetaCoq/metacoq/issues/853 *)
-  Definition tmRetypeAroundMetaCoqBug853 (prefix : string) (t : typed_term) : TemplateMonad typed_term
+  (* Hack around https://github.com/MetaRocq/metarocq/issues/853 *)
+  Definition tmRetypeAroundMetaRocqBug853 (prefix : string) (t : typed_term) : TemplateMonad typed_term
     := let '{| my_projT1 := ty ; my_projT2 := v |} := t in
        ty <- tmRetypeRelaxOnlyType prefix ty;;
        v <- tmRetypeMagicRelaxOnlyType prefix ty v;;
        ret {| my_projT1 := ty ; my_projT2 := v |}.
 End WithTemplate.
-Export WithTemplate (transparentify, tmQuoteToGlobalReference, tmRetypeRelaxSetInCodomain, tmRetypeRelaxOnlyType, tmRetypeMagicRelaxSetInCodomain, tmRetypeMagicRelaxOnlyType, tmObj_magic, tmRetype, tmExtractBaseModPathFromMod, tmRetypeAroundMetaCoqBug853, tmQuoteConstantUniversesAndRelevance, tmQuoteInductiveUniverses).
+Export WithTemplate (transparentify, tmQuoteToGlobalReference, tmRetypeRelaxSetInCodomain, tmRetypeRelaxOnlyType, tmRetypeMagicRelaxSetInCodomain, tmRetypeMagicRelaxOnlyType, tmObj_magic, tmRetype, tmExtractBaseModPathFromMod, tmRetypeAroundMetaRocqBug853, tmQuoteConstantUniversesAndRelevance, tmQuoteInductiveUniverses).

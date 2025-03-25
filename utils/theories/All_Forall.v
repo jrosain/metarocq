@@ -1,5 +1,5 @@
 From Stdlib Require Import List Bool Arith ssreflect ssrbool Morphisms Lia Utf8.
-From MetaCoq.Utils Require Import MCPrelude MCReflect MCList MCRelations MCProd MCOption.
+From MetaRocq.Utils Require Import MRPrelude MRReflect MRList MRRelations MRProd MROption.
 From Equations Require Import Equations.
 
 Import ListNotations.
@@ -2813,7 +2813,7 @@ Proof.
   { exact (IHH' _). }
 Qed.
 
-From MetaCoq.Utils Require Import MCSquash.
+From MetaRocq.Utils Require Import MRSquash.
 
 Lemma All2_swap :
   forall A B R l l',

@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction.
 
 #[global]
 Instance subst_instance_list A `{UnivSubst A} : UnivSubst (list A) :=

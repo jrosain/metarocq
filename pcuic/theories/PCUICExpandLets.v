@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 (* From Stdlib Require Import Uint63 FloatOps FloatAxioms. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICTyping PCUICProgram.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICTyping PCUICProgram.
 
 (** This translation expands lets in constructor arguments, so that
   iota reduction reduces to a simple substitution operation with no

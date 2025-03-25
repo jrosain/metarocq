@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config uGraph EnvMap.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config uGraph EnvMap.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics
      PCUICLiftSubst PCUICUnivSubst PCUICSigmaCalculus PCUICTyping PCUICNormal PCUICSR
      PCUICWeakeningEnvConv PCUICWeakeningEnvTyp
      PCUICGeneration PCUICReflect PCUICEquality PCUICInversion PCUICValidity
@@ -17,7 +17,7 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics
      PCUICOnFreeVars PCUICWellScopedCumulativity
      BDTyping BDFromPCUIC BDToPCUIC.
 
-From MetaCoq.SafeChecker Require Import PCUICEqualityDec PCUICSafeReduce PCUICErrors
+From MetaRocq.SafeChecker Require Import PCUICEqualityDec PCUICSafeReduce PCUICErrors
   PCUICSafeConversion PCUICWfReduction PCUICWfEnv PCUICTypeChecker.
 
 From Equations Require Import Equations.
@@ -26,7 +26,7 @@ From Stdlib Require Import ssreflect ssrbool.
 Local Set Keyed Unification.
 Set Equations Transparent.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 From Stdlib Require Import Morphisms.
 
 Implicit Types (cf : checker_flags).
@@ -1564,7 +1564,7 @@ Section CheckEnv.
            Hence we cannot use check_cumul_ctx here to verify the variance up-to conversion: the terms to be
            converted would be in different, incompatible contexts.
 
-           TODO: do as in Coq's kernel and implement a routine that takes whnfs of both sides and compare
+           TODO: do as in Rocq's kernel and implement a routine that takes whnfs of both sides and compare
            syntactically the heads. *)
         check_args <- wrap_error _ X' (string_of_kername id)
           (check_compare_context Cumul X'
@@ -1946,7 +1946,7 @@ End monad_Alli_nth_forall.
     rename Heq_anonymous into eqp.
     sq. red. rewrite -eqp. exact I.
   Qed.
-  (* Obligation automatically solved in the presence of Coq PR #18921
+  (* Obligation automatically solved in the presence of Rocq PR #18921
   Next Obligation. specialize_Σ H. Show. sq. Show. rewrite Heq_x. eauto. Qed.
   *)
   Next Obligation.
@@ -2500,7 +2500,7 @@ End monad_Alli_nth_forall.
     discriminate.
   Defined.
 
-  (* This function is appropriate for live evaluation inside Coq:
+  (* This function is appropriate for live evaluation inside Rocq:
      it forgets about the derivation produced by typing and replaces it with an opaque constant. *)
 
   Program Definition check_type_wf_env_fast X_ext {normalization_in : forall Σ, wf_ext Σ -> Σ ∼_ext X_ext -> NormalizationIn Σ} Γ

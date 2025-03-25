@@ -1,7 +1,7 @@
 # Performance
 
 - change eq_kername to use comparison rather than eq_dec, check we're not using 
-  eq_dec unnecessarily so that erasure/typechecking runs faster inside Coq 
+  eq_dec unnecessarily so that erasure/typechecking runs faster inside Rocq 
   (and we avoid useless sumbool to bool conversions in ML/extracted code)
 # Small stuffs
 
@@ -36,15 +36,15 @@
 # Big projects
 
 - Cleaner version of the system for writing term manipulation and prooofs about them. 
-  - Develop a cleaned-up syntax profiting from Coq's type system, e.g.:
+  - Develop a cleaned-up syntax profiting from Rocq's type system, e.g.:
     - HOAS representation of binding or first-order well-scoped binding representation (using `fin` for example)
     - Well-bounded global references?
     - Using vectors and fin for fixpoint bodies lists and index (no ill-formed
     fixpoints by construction)
-  - Develop a proof mode for MetaCoq typing, à la Iris proof mode 
+  - Develop a proof mode for MetaRocq typing, à la Iris proof mode 
 
 - Refine the longest-simple-path algorithm on universes with the 
-  Bender & al algorithm used in Coq, extended with edges of negative weight.
+  Bender & al algorithm used in Rocq, extended with edges of negative weight.
   Alternatively prove the spec for that algorithm. Refinement might be easier:
   it amounts to show that the new algorithm calculates the longest simple
   path between two universes. 

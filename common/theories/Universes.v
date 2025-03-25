@@ -1,7 +1,7 @@
 From Stdlib Require Import OrdersAlt MSetList MSetAVL MSetFacts MSetProperties MSetDecide FMapAVL.
 From Equations Require Import Equations.
-From MetaCoq.Utils Require Import utils MCMSets MCFSets.
-From MetaCoq.Common Require Import BasicAst config.
+From MetaRocq.Utils Require Import utils MRMSets MRFSets.
+From MetaRocq.Common Require Import BasicAst config.
 From Stdlib Require Import ssreflect.
 
 Local Open Scope nat_scope.
@@ -2416,7 +2416,7 @@ End no_prop_leq_type.
 
 
 (* This level is a hack used in plugings to generate fresh levels *)
-Definition fresh_level : Level.t := Level.level     "__metacoq_fresh_level__".
+Definition fresh_level : Level.t := Level.level     "__metarocq_fresh_level__".
 (* This universe is a hack used in plugins to generate fresh universes *)
 Definition fresh_universe : Universe.t := Universe.make' fresh_level.
 

@@ -1,9 +1,9 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Uint63 FloatOps FloatAxioms.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Primitive EnvMap.
-From MetaCoq.Template Require AstUtils TemplateProgram.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICPrimitive PCUICCases PCUICProgram.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Primitive EnvMap.
+From MetaRocq.Template Require AstUtils TemplateProgram.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICPrimitive PCUICCases PCUICProgram.
 
 Lemma to_Z_bounded_bool (i : Uint63.int) :
   ((0 <=? Uint63.to_Z i) && (Uint63.to_Z i <? wB))%Z.

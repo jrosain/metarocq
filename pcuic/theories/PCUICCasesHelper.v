@@ -1,10 +1,10 @@
 From Stdlib Require Import ssreflect ssrbool ssrfun.
 Set Warnings "-notation-overridden".
-From MetaCoq.Utils Require Import utils monad_utils.
+From MetaRocq.Utils Require Import utils monad_utils.
 Set Warnings "notation-overridden".
-From MetaCoq.Common Require Import config.
+From MetaRocq.Common Require Import config.
 
-From MetaCoq.PCUIC Require Import PCUICTyping PCUICArities PCUICInductives PCUICSpine
+From MetaRocq.PCUIC Require Import PCUICTyping PCUICArities PCUICInductives PCUICSpine
   PCUICWeakeningTyp PCUICUnivSubstitutionConv PCUICValidity PCUICGeneration
   PCUICAst PCUICPrimitive PCUICCases PCUICProgram
   PCUICSubstitution PCUICConversion PCUICInductiveInversion

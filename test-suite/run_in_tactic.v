@@ -1,6 +1,6 @@
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All.
-Import MCMonadNotation.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All.
+Import MRMonadNotation.
 
 Goal True.
   let k x := pose (y := x) in

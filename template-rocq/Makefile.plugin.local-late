@@ -1,0 +1,1 @@
+FINDLIBFILESTOINSTALL += gen-src/metarocq_template_plugin.a

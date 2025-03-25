@@ -1,24 +1,24 @@
 From Stdlib Require Import List ssreflect ssrbool.
-From MetaCoq.Erasure.Typed Require Import ErasureCorrectness.
-From MetaCoq.Erasure.Typed Require Import ExAst.
-From MetaCoq.Erasure.Typed Require Import Extraction.
-From MetaCoq.Erasure.Typed Require Import Optimize.
-From MetaCoq.Erasure.Typed Require Import OptimizeCorrectness.
-From MetaCoq.Erasure.Typed Require Import OptimizePropDiscr.
-From MetaCoq.Erasure.Typed Require Import ResultMonad.
-From MetaCoq.Erasure.Typed Require Import WcbvEvalAux.
+From MetaRocq.Erasure.Typed Require Import ErasureCorrectness.
+From MetaRocq.Erasure.Typed Require Import ExAst.
+From MetaRocq.Erasure.Typed Require Import Extraction.
+From MetaRocq.Erasure.Typed Require Import Optimize.
+From MetaRocq.Erasure.Typed Require Import OptimizeCorrectness.
+From MetaRocq.Erasure.Typed Require Import OptimizePropDiscr.
+From MetaRocq.Erasure.Typed Require Import ResultMonad.
+From MetaRocq.Erasure.Typed Require Import WcbvEvalAux.
 From Equations Require Import Equations.
-From MetaCoq.Erasure Require Import ErasureCorrectness.
-From MetaCoq.Erasure Require Import ErasureFunction.
-From MetaCoq.Erasure Require Import ErasureFunctionProperties.
-From MetaCoq.Erasure Require Import EWcbvEval.
-From MetaCoq.Erasure Require Import Extract.
-From MetaCoq.PCUIC Require Import PCUICAstUtils.
-From MetaCoq.PCUIC Require Import PCUICSafeLemmata.
-From MetaCoq.PCUIC Require Import PCUICTyping.
-From MetaCoq.PCUIC Require Import PCUICInversion.
-From MetaCoq.Common Require Import Kernames.
-From MetaCoq.Utils Require Import utils.
+From MetaRocq.Erasure Require Import ErasureCorrectness.
+From MetaRocq.Erasure Require Import ErasureFunction.
+From MetaRocq.Erasure Require Import ErasureFunctionProperties.
+From MetaRocq.Erasure Require Import EWcbvEval.
+From MetaRocq.Erasure Require Import Extract.
+From MetaRocq.PCUIC Require Import PCUICAstUtils.
+From MetaRocq.PCUIC Require Import PCUICSafeLemmata.
+From MetaRocq.PCUIC Require Import PCUICTyping.
+From MetaRocq.PCUIC Require Import PCUICInversion.
+From MetaRocq.Common Require Import Kernames.
+From MetaRocq.Utils Require Import utils.
 
 Import ListNotations.
 
@@ -316,7 +316,7 @@ Proof.
       inversion Hdecl;subst;clear Hdecl.
       unfold trans_global_decl,trans_cst.
       cbn [EWellformed.wf_global_decl].
-      unfold MCOption.option_default.
+      unfold MROption.option_default.
       destruct EAst.cst_body eqn:heq => //.
       set (deps := KernameSet.union _ _).
       unshelve eapply (erase_constant_body_correct'' (X_type := X_type) (decls := decls) seeds) in heq as [[t0 [T [[] ?]]]].
@@ -403,7 +403,7 @@ Proof.
       inversion Hdecl;subst;clear Hdecl.
       unfold trans_global_decl,trans_cst.
       cbn [EWellformed.wf_global_decl].
-      unfold MCOption.option_default.
+      unfold MROption.option_default.
       destruct EAst.cst_body eqn:heq => //.
       set (deps := KernameSet.union _ _).
       destruct c as [ty [b|] cunivs rel]. 2:cbn in heq => //.
@@ -450,7 +450,7 @@ Proof.
   simpl.
   destruct a;simpl.
   destruct (KernameSet.mem _ _);cbn.
-  - unfold MCProd.test_snd;cbn.
+  - unfold MRProd.test_snd;cbn.
     constructor.
     * unfold trans_env in *;cbn in *.
       apply IHdecls.
@@ -489,7 +489,7 @@ Proof.
   simpl.
   destruct a;simpl.
   destruct (KernameSet.mem _ _);cbn.
-  - unfold MCProd.test_snd;cbn.
+  - unfold MRProd.test_snd;cbn.
     constructor.
     * unfold trans_env in *;cbn in *.
       depelim H0.
@@ -582,7 +582,7 @@ Qed.
 From Stdlib Require Import String.
 Local Open Scope string_scope.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Definition compute_masks overridden_masks do_trim_const_masks do_trim_ctor_masks Σ : result dearg_set bytestring.string :=
   let (const_masks, ind_masks) := Utils.timed "Dearg analysis" (fun _ => analyze_env overridden_masks Σ) in
@@ -731,17 +731,17 @@ Qed.
 
 (* Print Assumptions extract_correct. *)
 
-(** There are some assumptions of which almost all are in MetaCoq.
+(** There are some assumptions of which almost all are in MetaRocq.
     From this project is only assume_env_wellformed assumption which is
     used to assume that the environments we extract are
-    wellformed. MetaCoq's safe checker does not run from within Coq, so
+    wellformed. MetaRocq's safe checker does not run from within Rocq, so
     we cannot type check the environments. However, our environments
-    are unquoted directly from Coq's kernel where they are already
+    are unquoted directly from Rocq's kernel where they are already
     welltyped, so this is justified (and the same assumption is used in
-    MetaCoq when they run their erasure).
+    MetaRocq when they run their erasure).
 
-    The rest of the assumptions are normal MetaCoq assumptions
-    (which are justified in Coq Coq Correct!).
+    The rest of the assumptions are normal MetaRocq assumptions
+    (which are justified in Rocq Rocq Correct!).
 
     [JMeq.JMeq_eq] leaks from the use of some tactics and probably can be avoided.
  *)

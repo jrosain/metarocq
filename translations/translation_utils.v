@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
+From MetaRocq.Utils Require Import utils.
 
-From MetaCoq.Template Require Import Checker All.
-Import MCMonadNotation.
+From MetaRocq.Template Require Import Checker All.
+Import MRMonadNotation.
 
 Set Universe Checking.
 

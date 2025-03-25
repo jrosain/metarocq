@@ -1,20 +1,20 @@
 all: theory plugin
 
-_PluginProject: _PluginProject.in metacoq-config
-	cat metacoq-config > _PluginProject
+_PluginProject: _PluginProject.in metarocq-config
+	cat metarocq-config > _PluginProject
 	cat _PluginProject.in >> _PluginProject
 
-_CoqProject: _CoqProject.in metacoq-config
-	cat metacoq-config > _CoqProject
-	cat _CoqProject.in >> _CoqProject
+_RocqProject: _RocqProject.in metarocq-config
+	cat metarocq-config > _RocqProject
+	cat _RocqProject.in >> _RocqProject
 
 Makefile.plugin: _PluginProject
 	rocq makefile -f _PluginProject -o Makefile.plugin $(DEPS)
 # Avoid conflicting dependency file creation for the template plugin
 	sed -e s/coqdeps/coqdeps.plugin/g Makefile.plugin > Makefile.plugin.tmp && mv -f Makefile.plugin.tmp Makefile.plugin
 
-Makefile.safecheckerplugin: _CoqProject
-	rocq makefile -f _CoqProject -o Makefile.safecheckerplugin $(DEPS)
+Makefile.safecheckerplugin: _RocqProject
+	rocq makefile -f _RocqProject -o Makefile.safecheckerplugin $(DEPS)
 
 theory: Makefile.safecheckerplugin
 	$(MAKE) -f Makefile.safecheckerplugin
@@ -37,9 +37,9 @@ clean: Makefile.safecheckerplugin Makefile.plugin
 	make -f Makefile.plugin clean
 
 mrproper:
-	rm -f metacoq-config
+	rm -f metarocq-config
 	rm -f Makefile.plugin _PluginProject
-	rm -f Makefile.safecheckerplugin _CoqProject
+	rm -f Makefile.safecheckerplugin _RocqProject
 
 .merlin: Makefile.plugin
 	[ -e "src/pCUICsafecheckerplugin.ml" ] && make -f $< $@

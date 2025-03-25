@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect Morphisms.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction.
 Import Nat.
 
 (** * Commutation lemmas for the lifting and substitution operations.

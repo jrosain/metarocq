@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All.
-From MetaCoq.Translations Require Import translation_utils.
-Import MCMonadNotation.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All.
+From MetaRocq.Translations Require Import translation_utils.
+Import MRMonadNotation.
 
 Local Infix "<=" := Nat.leb.
 
@@ -210,7 +210,7 @@ Instance param : Translation :=
 
 (* EXAMPLES *)
 
-MetaCoq Run (
+MetaRocq Run (
   typ <- tmQuote (forall A, A -> A) ;;
   typ' <- tmEval all (tsl_rec1 [] typ) ;;
   tm <- tmQuote (fun A (x : A) => x) ;;
@@ -220,7 +220,7 @@ MetaCoq Run (
 ).
 
 Set Warnings "-unexpected-implicit-declaration".
-MetaCoq Run (
+MetaRocq Run (
   typ <- tmQuote (forall A B, B -> (A -> B -> B) -> B) ;;
   typ' <- tmEval all (tsl_rec1 [] typ) ;;
   t   <- tmQuote (fun {A B} (x:B) (f : A -> B -> B) => x) ;;
@@ -228,22 +228,22 @@ MetaCoq Run (
   tmUnquote (tApp typ' [t; t]) >>= tmDebug
 ).
 
-MetaCoq Run (TC <- Translate emptyTC "nat" ;;
+MetaRocq Run (TC <- Translate emptyTC "nat" ;;
                      tmDefinition "nat_TC" TC).
 
-MetaCoq Run (TC <- Translate nat_TC "bool" ;;
+MetaRocq Run (TC <- Translate nat_TC "bool" ;;
                      tmDefinition "bool_TC" TC).
 
-MetaCoq Run (TC <- Translate bool_TC "list" ;;
+MetaRocq Run (TC <- Translate bool_TC "list" ;;
                      tmDefinition "list_TC" TC).
 
 Module FreeTheorems.
 
   Definition HD := forall X, list X -> X.
-  MetaCoq Run (Translate list_TC "HD").
+  MetaRocq Run (Translate list_TC "HD").
 
   Definition MAP := forall X, list X -> list X.
-  MetaCoq Run (Translate list_TC "MAP").
+  MetaRocq Run (Translate list_TC "MAP").
 
   (* taken from coq-community/paramcoq *)
   Definition graph {A B} (f : A -> B) := fun x y => f x = y.

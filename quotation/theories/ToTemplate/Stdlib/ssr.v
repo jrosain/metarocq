@@ -1,4 +1,4 @@
-From MetaCoq.Quotation.ToTemplate Require Import Stdlib.Init.
+From MetaRocq.Quotation.ToTemplate Require Import Stdlib.Init.
 From Stdlib.ssr Require Import ssrbool ssreflect.
 
 #[export] Instance quote_if_spec {A b vT vF} {not_b:Prop} {b' a} {qA : quotation_of A} {qvT : quotation_of vT} {qvF : quotation_of vF} {qnot_b : quotation_of not_b} {quote_not_b : ground_quotable not_b} : ground_quotable (@if_spec A b vT vF not_b b' a) := ltac:(destruct 1; exact _).
