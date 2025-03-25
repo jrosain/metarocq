@@ -43,6 +43,8 @@ template-rocq: coq Makefile.template
 # ./update_plugin.sh after successfull extraction.
 
 plugin: coq template-rocq Makefile.plugin
+	# Ensure the cmxs is built before the loader file 
+	$(MAKE) -f Makefile.plugin gen-src/metarocq_template_plugin.cmxs
 	$(MAKE) -f Makefile.plugin
 
 .PHONY: install html clean mrproper all plugin
