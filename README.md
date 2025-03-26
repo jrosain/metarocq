@@ -210,9 +210,13 @@ See the Quotation [README](https://github.com/MetaRocq/metarocq/blob/-/quotation
 
 ## Papers
 
-- ["Correct and Complete Type Checking and Certified Erasure for Coq, in Coq"](https://inria.hal.science/hal-04077552) Matthieu Sozeau, Yannick Forster, Meven Lennon-Bertrand, Nicolas Tabareau and Théo Winterhalter. Submitted. April 2023.
+- ["Correct and Complete Type Checking and Certified Erasure for Coq, in Coq"](https://dl.acm.org/doi/10.1145/3706056) Matthieu Sozeau, Yannick Forster, Meven Lennon-Bertrand, Nicolas Tabareau and Théo Winterhalter. Journal of the ACM, Volume 72, Issue 1. January 2025.
 
   This paper presents the whole metatheoretical development of PCUIC and verified typechecking and erasure, as of version 1.2 of MetaRocq.
+
+- ["Verified Extraction from Coq to OCaml](https://dl.acm.org/doi/10.1145/3656379) Yannick Forster, Matthieu Sozeau and Nicolas Tabareau. PACMPL, Volume 8, Issue PLDI. June 2024. Distinguished Paper Award.
+
+  This presents our [verified extraction](https://github.com/yforster/coq-verified-extraction) pipeline from Coq to OCaml/Malfunction.
 
 - ["The Curious Case of Case"](https://sozeau.gitlabpages.inria.fr/www/research/publications/The_Curious_Case_of_Case-WITS22-220122.pdf) Matthieu Sozeau, Meven Lennon-Bertrand and Yannick Forster. WITS 2022 presentation, Philadelphia.
   This presents the challenges around the representation of cases in Coq and PCUIC.
