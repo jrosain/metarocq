@@ -4,7 +4,7 @@
 <img src="https://raw.githubusercontent.com/MetaRocq/metarocq.github.io/main/assets/LOGO.png" alt="MetaRocq" width="50px"/>
 </p>
 
-[![Build status](https://github.com/MetaRocq/metarocq/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/MetaRocq/metarocq/actions) [![MetaRocq Chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://coq.zulipchat.com)
+[![Build status](https://github.com/MetaRocq/metarocq/actions/workflows/build.yml/badge.svg)](https://github.com/MetaRocq/metarocq/actions) [![MetaRocq Chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://rocq-prover.zulipchat.com)
 [![Open in Visual Studio Code](https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc)](https://open.vscode.dev/metarocq/metarocq)
 
 MetaRocq is a project formalizing Rocq in Rocq and providing tools for
@@ -65,7 +65,7 @@ Statistics: ~300kLoC of Rocq, ~30kLoC of OCaml.
 
 ### [Template-Rocq](https://github.com/MetaRocq/metarocq/blob/-/template-rocq/theories)
 
-Template-Rocq is a quoting library for [Rocq](http://coq.inria.fr). It
+Template-Rocq is a quoting library for [Rocq](http://rocq-prover.org). It
 takes `Rocq` terms and constructs a representation of their syntax tree as
 an inductive data type. The representation is based on the kernel's
 term representation.
