@@ -34,7 +34,7 @@ manipulating Rocq terms and developing certified plugins
 
 ## Getting started
 
-- You may want to start with a [demo](https://github.com/MetaRocq/metarocq/tree/main/examples/demo.v).
+- You may want to start with a [demo](https://github.com/MetaRocq/metarocq/blob/-/examples/demo.v).
 
 - The current branch [documentation (as light coqdoc files)](https://metarocq.github.io/html/toc.html).
 
@@ -44,13 +44,13 @@ manipulating Rocq terms and developing certified plugins
 
 ## Installation instructions
 
-See [INSTALL.md](https://github.com/MetaRocq/metarocq/tree/main/INSTALL.md)
+See [INSTALL.md](https://github.com/MetaRocq/metarocq/blob/-/INSTALL.md)
 
 
 
 ## Documentation
 
-See [DOC.md](https://github.com/MetaRocq/metarocq/tree/main/DOC.md)
+See [DOC.md](https://github.com/MetaRocq/metarocq/blob/-/DOC.md)
 
 
 
@@ -63,7 +63,7 @@ The [dependency graph](https://raw.githubusercontent.com/MetaRocq/metarocq.githu
 might be useful to navigate the project.
 Statistics: ~300kLoC of Rocq, ~30kLoC of OCaml.
 
-### [Template-Rocq](https://github.com/MetaRocq/metarocq/tree/main/template-rocq/theories)
+### [Template-Rocq](https://github.com/MetaRocq/metarocq/blob/-/template-rocq/theories)
 
 Template-Rocq is a quoting library for [Rocq](http://coq.inria.fr). It
 takes `Rocq` terms and constructs a representation of their syntax tree as
@@ -89,7 +89,7 @@ In addition to this representation of terms, Template Rocq includes:
 - A formalization of the typing rules reflecting the ones of Rocq, covering all of Rocq
   except eta-expansion and template polymorphism.
 
-### [PCUIC](https://github.com/MetaRocq/metarocq/tree/main/pcuic/theories)
+### [PCUIC](https://github.com/MetaRocq/metarocq/blob/-/pcuic/theories)
 
 PCUIC, the Polymorphic Cumulative Calculus of Inductive Constructions is
 a cleaned up version of the term language of Rocq and its associated
@@ -122,10 +122,10 @@ calculus has proofs of standard metatheoretical results:
 - Weak call-by-value standardization: Normal forms of terms of first-order inductive type
 can be found via weak call-by-value evaluation.
 
-See the PCUIC [README](https://github.com/MetaRocq/metarocq/tree/main/pcuic/theories/README.md) for
+See the PCUIC [README](https://github.com/MetaRocq/metarocq/blob/-/pcuic/theories/README.md) for
 a detailed view of the development.
 
-### [Safe Checker](https://github.com/MetaRocq/metarocq/tree/main/safechecker/theories)
+### [Safe Checker](https://github.com/MetaRocq/metarocq/blob/-/safechecker/theories)
 
 Implementation of a fuel-free and verified reduction machine, conversion
 checker and type checker for PCUIC. This relies on a postulate of
@@ -145,10 +145,10 @@ type-checker, one can use:
 This also includes a verified, efficient re-typing procedure (useful in tactics) in
 `MetaRocq.SafeChecker.PCUICSafeRetyping`.
 
-See the SafeChecker [README](https://github.com/MetaRocq/metarocq/tree/main/safechecker/theories/README.md) for
+See the SafeChecker [README](https://github.com/MetaRocq/metarocq/blob/-/safechecker/theories/README.md) for
 a detailed view of the development.
 
-### [Erasure](https://github.com/MetaRocq/metarocq/tree/main/erasure/theories)
+### [Erasure](https://github.com/MetaRocq/metarocq/blob/-/erasure/theories)
 
 An erasure procedure to untyped lambda-calculus accomplishing the
 same as the type and proof erasure phase of the Extraction plugin of Rocq.
@@ -162,18 +162,18 @@ The erasure pipeline includes verified optimizations to remove lets in construct
 remove cases on propositional terms, switch to an unguarded fixpoint reduction rule and
 transform the higher-order constructor applications to first-order blocks for easier
 translation to usual programming languages. See the erasure
-[README](https://github.com/MetaRocq/metarocq/tree/main/erasure/theories/README.md) for
+[README](https://github.com/MetaRocq/metarocq/blob/-/erasure/theories/README.md) for
 a detailed view of the development.
 
-### [Translations](https://github.com/MetaRocq/metarocq/tree/main/translations)
+### [Translations](https://github.com/MetaRocq/metarocq/blob/-/translations)
 
 Examples of translations built on top of this:
 
-- a parametricity plugin in [translations/param_original.v](https://github.com/MetaRocq/metarocq/tree/main/translations/param_original.v)
+- a parametricity plugin in [translations/param_original.v](https://github.com/MetaRocq/metarocq/blob/-/translations/param_original.v)
 
-- a plugin to negate functional extensionality in [translations/times_bool_fun.v](https://github.com/MetaRocq/metarocq/tree/main/translations/times_bool_fun.v)
+- a plugin to negate functional extensionality in [translations/times_bool_fun.v](https://github.com/MetaRocq/metarocq/blob/-/translations/times_bool_fun.v)
 
-### [Quotation](https://github.com/MetaRocq/metarocq/tree/main/quotation/theories)
+### [Quotation](https://github.com/MetaRocq/metarocq/blob/-/quotation/theories)
 
 The `Quotation` module is geared at providing functions `□T → □□T` for
 `□T := Ast.term` (currently implemented) and for `□T := { t : Ast.term
@@ -185,27 +185,27 @@ and `×`), which is sufficient for proving Löb's theorem.
 
 The public-facing interface of this development is provided in [`MetaRocq.Quotation.ToTemplate.All`](./quotation/theories/ToTemplate/All.v) and [`MetaRocq.Quotation.ToPCUIC.All`](./quotation/theories/ToPCUIC/All.v).
 
-See the Quotation [README](https://github.com/MetaRocq/metarocq/tree/main/quotation/theories/README.md) for a more detailed view of the development.
+See the Quotation [README](https://github.com/MetaRocq/metarocq/blob/-/quotation/theories/README.md) for a more detailed view of the development.
 
 ### Examples
 
 - An example Rocq plugin built on the Template Monad, which can be used to
-  add a constructor to any inductive type is in [examples/add_constructor.v](https://github.com/MetaRocq/metarocq/tree/main/examples/add_constructor.v)
+  add a constructor to any inductive type is in [examples/add_constructor.v](https://github.com/MetaRocq/metarocq/blob/-/examples/add_constructor.v)
 
 - An example *extracted* Rocq plugin built on the extractable Template Monad, which can be used to
-  derive lenses associated to a record type is in [test-suite/plugin-demo](https://github.com/MetaRocq/metarocq/tree/main/test-suite/plugin-demo). The plugin runs in OCaml and is a template for writing extracted plugins.
+  derive lenses associated to a record type is in [test-suite/plugin-demo](https://github.com/MetaRocq/metarocq/blob/-/test-suite/plugin-demo). The plugin runs in OCaml and is a template for writing extracted plugins.
 
-- An example ``constructor`` tactic written using the Template Monad is in [examples/constructor_tac.v](https://github.com/MetaRocq/metarocq/tree/main/examples/constructor_tac.v),
-  and a more elaborate verified tautology checker is in [examples/tauto.v](https://github.com/MetaRocq/metarocq/tree/main/examples/tauto.v).
+- An example ``constructor`` tactic written using the Template Monad is in [examples/constructor_tac.v](https://github.com/MetaRocq/metarocq/blob/-/examples/constructor_tac.v),
+  and a more elaborate verified tautology checker is in [examples/tauto.v](https://github.com/MetaRocq/metarocq/blob/-/examples/tauto.v).
 
-- The test-suite files [test-suite/erasure_test.v](https://github.com/MetaRocq/metarocq/tree/main/test-suite/erasure_test.v)
-  and [test-suite/safechecker_test.v](https://github.com/MetaRocq/metarocq/tree/main/test-suite/safechecker_test.v) show example
+- The test-suite files [test-suite/erasure_test.v](https://github.com/MetaRocq/metarocq/blob/-/test-suite/erasure_test.v)
+  and [test-suite/safechecker_test.v](https://github.com/MetaRocq/metarocq/blob/-/test-suite/safechecker_test.v) show example
   uses (and current limitations of) the extracted verified checker and erasure.
 
-- The [test-suite/self_erasure.v](https://github.com/MetaRocq/metarocq/tree/main/test-suite/self_erasure.v) file checks that erasure
+- The [test-suite/self_erasure.v](https://github.com/MetaRocq/metarocq/blob/-/test-suite/self_erasure.v) file checks that erasure
   works on the verified typechecking and erasure programs themselves.
 
-- The test-suite file [test-suite/erasure_live_test.v](https://github.com/MetaRocq/metarocq/tree/main/test-suite/erasure_live_test.v)
+- The test-suite file [test-suite/erasure_live_test.v](https://github.com/MetaRocq/metarocq/blob/-/test-suite/erasure_live_test.v)
   shows uses of the verified erasure running *inside* Rocq.
 
 ## Papers
@@ -341,7 +341,7 @@ Copyright (c) 2023      Jason Gross
 ```
 
 This software is distributed under the terms of the MIT license.
-See [LICENSE](https://github.com/MetaRocq/metarocq/tree/main/LICENSE) for details.
+See [LICENSE](https://github.com/MetaRocq/metarocq/blob/-/LICENSE) for details.
 
 ## Bugs
 
