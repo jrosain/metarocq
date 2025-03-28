@@ -5037,11 +5037,11 @@ Qed.
   Next Obligation.
     destruct (abstract_env_ext_exists X) as [[Σ wfΣ]].
     destruct (H _ wfΣ) as [H']; depelim H'.
-  Qed.
+  Defined.
   Next Obligation.
     destruct (abstract_env_ext_exists X) as [[Σ wfΣ]].
     destruct (H _ wfΣ) as [H']; depelim H'.
-  Qed.
+  Defined.
   Next Obligation.
     split. 1: reflexivity.
     rewrite !stack_position_cons.
@@ -5056,7 +5056,7 @@ Qed.
   Qed.
   Next Obligation.
     rewrite length_app in h. cbn in h. lia.
-  Qed.
+  Defined.
   Next Obligation.
     rewrite length_app in h. cbn in h.
       simpl. split.
@@ -5073,7 +5073,7 @@ Qed.
         simpl.
         rewrite <- repeat_snoc.
         apply (h' #|d| (S #|l1|)).
-  Defined.
+  Qed.
   Next Obligation.
     specialize_Σ wfΣ.
     destruct (hΣ _ wfΣ) as [wΣ].
@@ -5088,13 +5088,13 @@ Qed.
     apply herr; clear herr. intros Σ wfΣ. specialize_Σ wfΣ.
     destruct H as [H]; depelim H.
     constructor; auto.
-  Qed.
+  Defined.
   Next Obligation.
     apply herr; cbn; clear herr. intros Σ wfΣ. specialize_Σ wfΣ.
     destruct H as [H]; depelim H.
     rewrite stack_context_appstack.
     constructor; auto.
-  Qed.
+  Defined.
 
   Equations(noeqns) _isconv_args (leq : conv_pb) (Γ : context)
            (t1 : term) (π1 : stack) (h1 : wtp Γ t1 π1)
