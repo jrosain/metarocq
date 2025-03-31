@@ -1,4 +1,4 @@
-name: MetaCoq CI
+name: MetaRocq CI
 
 on:
   push:
@@ -46,25 +46,22 @@ jobs:
         with:
           coq_version: ${{ matrix.coq_version }}
           ocaml_version: ${{ matrix.ocaml_version }}
-          before_script: |
-            startGroup "Workaround permission issue"
-              sudo chown -R coq:coq .  # <--
-              opam exec -- ocamlfind list
-            endGroup
           before_install: |
             startGroup "Print opam config"
-              sudo chown -R coq:coq .
               opam config list; opam repo list; opam list
+            endGroup
+            startGroup "Workaround permission issue"
+              sudo chown -R 1000:1000 .
             endGroup
           script: |
             startGroup "Build project"
               opam exec -- ./configure.sh --enable-${{matrix.target}}
               opam exec -- make -j 2 ci-${{matrix.target}}
             endGroup
+          # Already done by the ci-opam target
           uninstall: |
             startGroup "Clean project"
             endGroup
-
       - name: Revert permissions
         # to avoid a warning at cleanup time
         if: ${{ always() }}
