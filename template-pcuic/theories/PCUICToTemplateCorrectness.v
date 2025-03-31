@@ -27,6 +27,12 @@ Set Default Proof Using "Type*".
 From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
 
+(* MCPrelude.len gets overwritten by PCUICToTemplateCorrectness
+   then in Rocq < 9.1 it gets reset to its original value, which is the one below
+   for compat we do the reset explicitly
+ *)
+Local Ltac len ::= autorewrite with len; cbn.
+
 (** Translation from PCUIC back to template-coq terms.
 
   This translation is not direct due to two peculiarities of template-coq's syntax:

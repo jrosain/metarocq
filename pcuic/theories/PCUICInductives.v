@@ -15,8 +15,8 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICInduc
      PCUICParallelReduction PCUICWfUniverses PCUICSpine.
 
 From Stdlib Require Import ssreflect ssrbool.
-From Equations Require Import Equations.
 From Equations.Prop Require Import DepElim.
+From Equations Require Import Equations.
 
 Local Set SimplIsCbn.
 
@@ -1663,8 +1663,7 @@ Proof.
       split; auto.
     destruct (on_declared_inductive decli) as [onmind oib].
     eapply typing_spine_app; eauto.
-  - invs H0.
-    unshelve epose proof (d' := declared_inductive_to_gen d);
+  - unshelve epose proof (d' := declared_inductive_to_gen d);
     unshelve epose proof (decli' := declared_inductive_to_gen decli); eauto.
     destruct (declared_inductive_inj d' decli') as [-> ->].
     clear decli. split; auto.
