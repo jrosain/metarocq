@@ -26,6 +26,12 @@ Import ExAst.
 Import Kernames.
 Import ListNotations.
 
+(* MCPrelude.len gets overwritten by PCUICToTemplateCorrectness
+   then in Rocq < 9.1 it gets reset to its original value, which is the one below
+   for compat we do the reset explicitly
+ *)
+Local Ltac len ::= autorewrite with len; cbn.
+
 Unset SsrRewrite.
 
 Local Set Firstorder Solver auto.

@@ -1176,7 +1176,7 @@ Proof.
   move/andP => [] //. destruct decl_body; cbn => //.
 Qed.
 
-Ltac inv_on_free_vars :=
+Ltac inv_on_free_vars_orig :=
   repeat match goal with
   | [ H : is_true (on_free_vars_decl _ (vass _ _)) |- _ ] => apply inv_on_free_vars_decl in H; cbn in H
   | [ H : is_true (on_free_vars_decl _ (vdef _ _ _)) |- _ ] => apply inv_on_free_vars_decl in H as []
@@ -1191,6 +1191,12 @@ Ltac inv_on_free_vars :=
   | [ H : is_true (test_context_k _ _ _ ) |- _ ] =>
     rewrite -> test_context_k_closed_on_free_vars_ctx in H
   end.
+
+Ltac inv_on_free_vars := inv_on_free_vars_orig.
+
+(* cf https://github.com/rocq-prover/rocq/pull/20391
+   TODO somehow cleanup redefinitions of this tactic *)
+Ltac inv_on_free_vars ::= inv_on_free_vars_orig.
 
 Notation byfvs := (ltac:(cbn; eauto with fvs)) (only parsing).
 
