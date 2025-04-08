@@ -1,6 +1,6 @@
 (** Reported by Randy Pollack **)
 
-From MetaCoq Require Import Template.Loader.
+From MetaRocq Require Import Template.Loader.
 From Stdlib Require Import List.
 Fixpoint fibrec (n:nat) (fs:list nat) {struct n} : nat :=
   match n with
@@ -8,5 +8,5 @@ Fixpoint fibrec (n:nat) (fs:list nat) {struct n} : nat :=
     | (S n) => fibrec n (cons ((hd 0 fs) + (hd 0 (tl fs))) fs)
   end.
 Definition fib n := fibrec n (cons 0 (cons 1 nil)).
-MetaCoq Quote Definition qfib := fib.  (** works **)
-MetaCoq Quote Recursively Definition qfib_syntax := fib.
+MetaRocq Quote Definition qfib := fib.  (** works **)
+MetaRocq Quote Recursively Definition qfib_syntax := fib.

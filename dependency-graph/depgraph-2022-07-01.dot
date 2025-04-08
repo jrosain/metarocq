@@ -72,13 +72,13 @@ node[style=filled]
 "pcuic/PCUICSpine" -> "pcuic/PCUICInductives"
 "pcuic/PCUICConversion" -> "pcuic/PCUICInversion"
 "pcuic/PCUICSR" -> "pcuic/PCUICNormal"
-"template-coq/UnivSubst" -> "pcuic/PCUICNormal"
+"template-rocq/UnivSubst" -> "pcuic/PCUICNormal"
 "pcuic/PCUICSubstitution" -> "pcuic/PCUICParallelReduction"
 "pcuic/Syntax/PCUICDepth" -> "pcuic/PCUICParallelReduction"
 "pcuic/PCUICParallelReduction" -> "pcuic/PCUICParallelReductionConfluence"
 "pcuic/PCUICCumulProp" -> "pcuic/PCUICPrincipality"
 "pcuic/PCUICGlobalEnv" -> "pcuic/PCUICProgram"
-"template-coq/EnvMap" -> "pcuic/PCUICProgram"
+"template-rocq/EnvMap" -> "pcuic/PCUICProgram"
 "pcuic/PCUICContextReduction" -> "pcuic/PCUICRedTypeIrrelevance"
 "pcuic/Syntax/PCUICClosed" -> "pcuic/PCUICReduction"
 "pcuic/Syntax/PCUICPosition" -> "pcuic/PCUICReduction"
@@ -99,7 +99,7 @@ node[style=filled]
 "pcuic/PCUICCSubst" -> "pcuic/PCUICWcbvEval"
 "pcuic/Typing/PCUICClosedTyp" -> "pcuic/PCUICWcbvEval"
 "pcuic/utils/PCUICAstUtils" -> "pcuic/PCUICWeakeningEnv"
-"template-coq/utils/LibHypsNaming" -> "pcuic/PCUICWeakeningEnv"
+"template-rocq/utils/LibHypsNaming" -> "pcuic/PCUICWeakeningEnv"
 "pcuic/PCUICConfluence" -> "pcuic/PCUICWellScopedCumulativity"
 "pcuic/PCUICGeneration" -> "pcuic/PCUICWfUniverses"
 "pcuic/PCUICSubstitution" -> "pcuic/PCUICWfUniverses"
@@ -108,13 +108,13 @@ node[style=filled]
 "pcuic/Syntax/PCUICUnivSubst" -> "pcuic/Syntax/PCUICClosed"
 "pcuic/Syntax/PCUICInduction" -> "pcuic/Syntax/PCUICDepth"
 "pcuic/Syntax/PCUICCases" -> "pcuic/Syntax/PCUICInduction"
-"template-coq/utils/LibHypsNaming" -> "pcuic/Syntax/PCUICInduction"
+"template-rocq/utils/LibHypsNaming" -> "pcuic/Syntax/PCUICInduction"
 "pcuic/Syntax/PCUICRenameDef" -> "pcuic/Syntax/PCUICInstDef"
 "pcuic/Syntax/PCUICInduction" -> "pcuic/Syntax/PCUICLiftSubst"
 "pcuic/PCUICTyping" -> "pcuic/Syntax/PCUICNamelessDef"
 "pcuic/PCUICEquality" -> "pcuic/Syntax/PCUICOnFreeVars"
 "pcuic/Syntax/PCUICClosed" -> "pcuic/Syntax/PCUICOnFreeVars"
-"template-coq/utils/MCPred" -> "pcuic/Syntax/PCUICOnFreeVars"
+"template-rocq/utils/MRPred" -> "pcuic/Syntax/PCUICOnFreeVars"
 "pcuic/PCUICEquality" -> "pcuic/Syntax/PCUICPosition"
 "pcuic/Syntax/PCUICInduction" -> "pcuic/Syntax/PCUICReflect"
 "pcuic/PCUICTyping" -> "pcuic/Syntax/PCUICRenameDef"
@@ -123,7 +123,7 @@ node[style=filled]
 "pcuic/Syntax/PCUICReflect" -> "pcuic/Syntax/PCUICViews"
 "pcuic/utils/PCUICOnOne" -> "pcuic/Syntax/PCUICViews"
 "pcuic/PCUICProgram" -> "pcuic/TemplateToPCUIC"
-"template-coq/TemplateProgram" -> "pcuic/TemplateToPCUIC"
+"template-rocq/TemplateProgram" -> "pcuic/TemplateToPCUIC"
 "pcuic/Conversion/PCUICClosedConv" -> "pcuic/Typing/PCUICClosedTyp"
 "pcuic/Typing/PCUICWeakeningEnvTyp" -> "pcuic/Typing/PCUICClosedTyp"
 "pcuic/PCUICConversion" -> "pcuic/Typing/PCUICContextConversionTyp"
@@ -138,72 +138,72 @@ node[style=filled]
 "pcuic/Conversion/PCUICWeakeningConv" -> "pcuic/Typing/PCUICWeakeningTyp"
 "pcuic/Typing/PCUICRenameTyp" -> "pcuic/Typing/PCUICWeakeningTyp"
 "pcuic/utils/PCUICSize" -> "pcuic/utils/PCUICAstUtils"
-"template-coq/common/uGraph" -> "pcuic/utils/PCUICAstUtils"
+"template-rocq/common/uGraph" -> "pcuic/utils/PCUICAstUtils"
 "pcuic/PCUICAst" -> "pcuic/utils/PCUICOnOne"
 "pcuic/utils/PCUICAstUtils" -> "pcuic/utils/PCUICPretty"
-"template-coq/EnvironmentTyping" -> "pcuic/utils/PCUICPrimitive"
-"template-coq/Reflect" -> "pcuic/utils/PCUICPrimitive"
+"template-rocq/EnvironmentTyping" -> "pcuic/utils/PCUICPrimitive"
+"template-rocq/Reflect" -> "pcuic/utils/PCUICPrimitive"
 "pcuic/PCUICAst" -> "pcuic/utils/PCUICSize"
-"template-coq/config" -> "pcuic/utils/PCUICUtils"
-"template-coq/utils" -> "pcuic/utils/PCUICUtils"
-"template-coq/EnvironmentTyping" -> "template-coq/Ast"
-"template-coq/Ast" -> "template-coq/AstUtils"
-"template-coq/Kernames" -> "template-coq/BasicAst"
-"template-coq/Reflect" -> "template-coq/EnvMap"
-"template-coq/common/uGraph" -> "template-coq/EnvMap"
-"template-coq/utils/canonicaltries/CanonicalTries" -> "template-coq/EnvMap"
-"template-coq/Universes" -> "template-coq/Environment"
-"template-coq/Environment" -> "template-coq/EnvironmentTyping"
-"template-coq/Typing" -> "template-coq/EtaExpand"
-"template-coq/common/uGraph" -> "template-coq/EtaExpand"
-"template-coq/AstUtils" -> "template-coq/Induction"
-"template-coq/utils" -> "template-coq/Kernames"
-"template-coq/WfAst" -> "template-coq/LiftSubst"
-"template-coq/Universes" -> "template-coq/Reflect"
-"template-coq/Induction" -> "template-coq/ReflectAst"
-"template-coq/Reflect" -> "template-coq/ReflectAst"
-"template-coq/EtaExpand" -> "template-coq/TemplateProgram"
-"template-coq/Transform" -> "template-coq/TemplateProgram"
-"template-coq/WcbvEval" -> "template-coq/TemplateProgram"
-"template-coq/Induction" -> "template-coq/TermEquality"
-"template-coq/Reflect" -> "template-coq/TermEquality"
-"template-coq/utils" -> "template-coq/Transform"
-"template-coq/LiftSubst" -> "template-coq/Typing"
-"template-coq/ReflectAst" -> "template-coq/Typing"
-"template-coq/TermEquality" -> "template-coq/Typing"
-"template-coq/Typing" -> "template-coq/TypingWf"
-"template-coq/Induction" -> "template-coq/UnivSubst"
-"template-coq/BasicAst" -> "template-coq/Universes"
-"template-coq/config" -> "template-coq/Universes"
-"template-coq/TypingWf" -> "template-coq/WcbvEval"
-"template-coq/UnivSubst" -> "template-coq/WfAst"
-"template-coq/Universes" -> "template-coq/common/uGraph"
-"template-coq/utils/wGraph" -> "template-coq/common/uGraph"
-"template-coq/utils/All_Forall" -> "template-coq/monad_utils"
-"template-coq/monad_utils" -> "template-coq/utils"
-"template-coq/utils/MCUtils" -> "template-coq/utils"
-"template-coq/utils/MCOption" -> "template-coq/utils/All_Forall"
-"template-coq/utils/MCSquash" -> "template-coq/utils/All_Forall"
-"template-coq/utils/ByteCompare" -> "template-coq/utils/ByteCompareSpec"
-"template-coq/utils/MCCompare" -> "template-coq/utils/ByteCompareSpec"
-"template-coq/utils/ReflectEq" -> "template-coq/utils/ByteCompareSpec"
-"template-coq/utils/MCPrelude" -> "template-coq/utils/MCList"
-"template-coq/utils/MCRelations" -> "template-coq/utils/MCList"
-"template-coq/utils/ReflectEq" -> "template-coq/utils/MCList"
-"template-coq/utils/MCList" -> "template-coq/utils/MCOption"
-"template-coq/utils/MCProd" -> "template-coq/utils/MCOption"
-"template-coq/utils/MCReflect" -> "template-coq/utils/MCOption"
-"template-coq/utils/MCOption" -> "template-coq/utils/MCPred"
-"template-coq/utils/MCPrelude" -> "template-coq/utils/MCReflect"
-"template-coq/utils/bytestring" -> "template-coq/utils/MCString"
-"template-coq/utils/All_Forall" -> "template-coq/utils/MCUtils"
-"template-coq/utils/MCArith" -> "template-coq/utils/MCUtils"
-"template-coq/utils/MCEquality" -> "template-coq/utils/MCUtils"
-"template-coq/utils/MCString" -> "template-coq/utils/MCUtils"
-"template-coq/utils/ByteCompareSpec" -> "template-coq/utils/bytestring"
-"template-coq/utils/canonicaltries/String2pos" -> "template-coq/utils/canonicaltries/CanonicalTries"
-"template-coq/utils/MCUtils" -> "template-coq/utils/wGraph"
-"template-coq/utils/MC_ExtrOCamlZPosInt" -> "safechecker/Extraction"
+"template-rocq/config" -> "pcuic/utils/PCUICUtils"
+"template-rocq/utils" -> "pcuic/utils/PCUICUtils"
+"template-rocq/EnvironmentTyping" -> "template-rocq/Ast"
+"template-rocq/Ast" -> "template-rocq/AstUtils"
+"template-rocq/Kernames" -> "template-rocq/BasicAst"
+"template-rocq/Reflect" -> "template-rocq/EnvMap"
+"template-rocq/common/uGraph" -> "template-rocq/EnvMap"
+"template-rocq/utils/canonicaltries/CanonicalTries" -> "template-rocq/EnvMap"
+"template-rocq/Universes" -> "template-rocq/Environment"
+"template-rocq/Environment" -> "template-rocq/EnvironmentTyping"
+"template-rocq/Typing" -> "template-rocq/EtaExpand"
+"template-rocq/common/uGraph" -> "template-rocq/EtaExpand"
+"template-rocq/AstUtils" -> "template-rocq/Induction"
+"template-rocq/utils" -> "template-rocq/Kernames"
+"template-rocq/WfAst" -> "template-rocq/LiftSubst"
+"template-rocq/Universes" -> "template-rocq/Reflect"
+"template-rocq/Induction" -> "template-rocq/ReflectAst"
+"template-rocq/Reflect" -> "template-rocq/ReflectAst"
+"template-rocq/EtaExpand" -> "template-rocq/TemplateProgram"
+"template-rocq/Transform" -> "template-rocq/TemplateProgram"
+"template-rocq/WcbvEval" -> "template-rocq/TemplateProgram"
+"template-rocq/Induction" -> "template-rocq/TermEquality"
+"template-rocq/Reflect" -> "template-rocq/TermEquality"
+"template-rocq/utils" -> "template-rocq/Transform"
+"template-rocq/LiftSubst" -> "template-rocq/Typing"
+"template-rocq/ReflectAst" -> "template-rocq/Typing"
+"template-rocq/TermEquality" -> "template-rocq/Typing"
+"template-rocq/Typing" -> "template-rocq/TypingWf"
+"template-rocq/Induction" -> "template-rocq/UnivSubst"
+"template-rocq/BasicAst" -> "template-rocq/Universes"
+"template-rocq/config" -> "template-rocq/Universes"
+"template-rocq/TypingWf" -> "template-rocq/WcbvEval"
+"template-rocq/UnivSubst" -> "template-rocq/WfAst"
+"template-rocq/Universes" -> "template-rocq/common/uGraph"
+"template-rocq/utils/wGraph" -> "template-rocq/common/uGraph"
+"template-rocq/utils/All_Forall" -> "template-rocq/monad_utils"
+"template-rocq/monad_utils" -> "template-rocq/utils"
+"template-rocq/utils/MRUtils" -> "template-rocq/utils"
+"template-rocq/utils/MROption" -> "template-rocq/utils/All_Forall"
+"template-rocq/utils/MRSquash" -> "template-rocq/utils/All_Forall"
+"template-rocq/utils/ByteCompare" -> "template-rocq/utils/ByteCompareSpec"
+"template-rocq/utils/MRCompare" -> "template-rocq/utils/ByteCompareSpec"
+"template-rocq/utils/ReflectEq" -> "template-rocq/utils/ByteCompareSpec"
+"template-rocq/utils/MRPrelude" -> "template-rocq/utils/MRList"
+"template-rocq/utils/MRRelations" -> "template-rocq/utils/MRList"
+"template-rocq/utils/ReflectEq" -> "template-rocq/utils/MRList"
+"template-rocq/utils/MRList" -> "template-rocq/utils/MROption"
+"template-rocq/utils/MRProd" -> "template-rocq/utils/MROption"
+"template-rocq/utils/MRReflect" -> "template-rocq/utils/MROption"
+"template-rocq/utils/MROption" -> "template-rocq/utils/MRPred"
+"template-rocq/utils/MRPrelude" -> "template-rocq/utils/MRReflect"
+"template-rocq/utils/bytestring" -> "template-rocq/utils/MRString"
+"template-rocq/utils/All_Forall" -> "template-rocq/utils/MRUtils"
+"template-rocq/utils/MRArith" -> "template-rocq/utils/MRUtils"
+"template-rocq/utils/MREquality" -> "template-rocq/utils/MRUtils"
+"template-rocq/utils/MRString" -> "template-rocq/utils/MRUtils"
+"template-rocq/utils/ByteCompareSpec" -> "template-rocq/utils/bytestring"
+"template-rocq/utils/canonicaltries/String2pos" -> "template-rocq/utils/canonicaltries/CanonicalTries"
+"template-rocq/utils/MRUtils" -> "template-rocq/utils/wGraph"
+"template-rocq/utils/MR_ExtrOCamlZPosInt" -> "safechecker/Extraction"
 "safechecker/SafeTemplateChecker" -> "safechecker/Extraction"
 "safechecker/PCUICSafeReduce" -> "safechecker/PCUICConsistency"
 "safechecker/PCUICWfEnvImpl" -> "safechecker/PCUICConsistency"
@@ -224,7 +224,7 @@ node[style=filled]
 "pcuic/Bidirectional/BDUnique" -> "safechecker/PCUICTypeChecker"
 "safechecker/PCUICSafeConversion" -> "safechecker/PCUICTypeChecker"
 "pcuic/PCUICSafeLemmata" -> "safechecker/PCUICWfEnv"
-"template-coq/EnvMap" -> "safechecker/PCUICWfEnv"
+"template-rocq/EnvMap" -> "safechecker/PCUICWfEnv"
 "safechecker/PCUICEqualityDec" -> "safechecker/PCUICWfEnvImpl"
 "safechecker/PCUICWfEnv" -> "safechecker/PCUICWfEnvImpl"
 "pcuic/PCUICSN" -> "safechecker/PCUICWfReduction"
@@ -233,82 +233,82 @@ node[style=filled]
 "pcuic/TemplateToPCUIC" -> "safechecker/SafeTemplateChecker"
 "safechecker/PCUICSafeChecker" -> "safechecker/SafeTemplateChecker"
 "safechecker/PCUICWfEnvImpl" -> "safechecker/SafeTemplateChecker"
-"template-coq/Extraction"[label="Extraction", color=aquamarine]
-"template-coq/Constants"[label="Constants", color=aquamarine]
-"template-coq/monad_utils"[label="monad_utils", color=aquamarine]
-"template-coq/TemplateMonad/Extractable"[label="Extractable", color=aquamarine]
-"template-coq/TemplateMonad/Core"[label="Core", color=aquamarine]
-"template-coq/TemplateMonad/Common"[label="Common", color=aquamarine]
-"template-coq/TemplateMonad"[label="TemplateMonad", color=aquamarine]
-"template-coq/TemplateProgram"[label="TemplateProgram", color=aquamarine]
-"template-coq/EtaExpand"[label="EtaExpand", color=aquamarine]
-"template-coq/Checker"[label="Checker", color=aquamarine]
-"template-coq/WcbvEval"[label="WcbvEval", color=aquamarine]
-"template-coq/Normal"[label="Normal", color=aquamarine]
-"template-coq/TypingWf"[label="TypingWf", color=aquamarine]
-"template-coq/Reduction"[label="Reduction", color=aquamarine]
-"template-coq/Typing"[label="Typing", color=aquamarine]
-"template-coq/TermEquality"[label="TermEquality", color=aquamarine]
-"template-coq/Pretty"[label="Pretty", color=aquamarine]
-"template-coq/UnivSubst"[label="UnivSubst", color=aquamarine]
-"template-coq/LiftSubst"[label="LiftSubst", color=aquamarine]
-"template-coq/WfAst"[label="WfAst", color=aquamarine]
-"template-coq/EnvironmentTyping"[label="EnvironmentTyping", color=aquamarine]
-"template-coq/Induction"[label="Induction", color=aquamarine]
-"template-coq/EnvMap"[label="EnvMap", color=aquamarine]
-"template-coq/ReflectAst"[label="ReflectAst", color=aquamarine]
-"template-coq/Reflect"[label="Reflect", color=aquamarine]
-"template-coq/AstUtils"[label="AstUtils", color=aquamarine]
-"template-coq/Ast"[label="Ast", color=aquamarine]
-"template-coq/Environment"[label="Environment", color=aquamarine]
-"template-coq/BasicAst"[label="BasicAst", color=aquamarine]
-"template-coq/Universes"[label="Universes", color=aquamarine]
-"template-coq/Kernames"[label="Kernames", color=aquamarine]
-"template-coq/config"[label="config", color=aquamarine]
-"template-coq/utils"[label="utils", color=aquamarine]
-"template-coq/Transform"[label="Transform", color=aquamarine]
-"template-coq/common/uGraph"[label="uGraph", color=aquamarine]
-"template-coq/utils/ReflectEq"[label="ReflectEq", color=aquamarine]
-"template-coq/utils/MC_ExtrOCamlZPosInt"[label="MC_ExtrOCamlZPosInt", color=aquamarine]
-"template-coq/utils/MCUtils"[label="MCUtils", color=aquamarine]
-"template-coq/utils/wGraph"[label="wGraph", color=aquamarine]
-"template-coq/utils/MCString"[label="MCString", color=aquamarine]
-"template-coq/utils/MCSquash"[label="MCSquash", color=aquamarine]
-"template-coq/utils/MCRelations"[label="MCRelations", color=aquamarine]
-"template-coq/utils/MCPred"[label="MCPred", color=aquamarine]
-"template-coq/utils/MCProd"[label="MCProd", color=aquamarine]
-"template-coq/utils/MCOption"[label="MCOption", color=aquamarine]
-"template-coq/utils/MCList"[label="MCList", color=aquamarine]
-"template-coq/utils/LibHypsNaming"[label="LibHypsNaming", color=aquamarine]
-"template-coq/utils/MCEquality"[label="MCEquality", color=aquamarine]
-"template-coq/utils/MCCompare"[label="MCCompare", color=aquamarine]
-"template-coq/utils/MCArith"[label="MCArith", color=aquamarine]
-"template-coq/utils/All_Forall"[label="All_Forall", color=aquamarine]
-"template-coq/utils/MCReflect"[label="MCReflect", color=aquamarine]
-"template-coq/utils/MCPrelude"[label="MCPrelude", color=aquamarine]
-"template-coq/utils/bytestring"[label="bytestring", color=aquamarine]
-"template-coq/utils/ByteCompareSpec"[label="ByteCompareSpec", color=aquamarine]
-"template-coq/utils/ByteCompare"[label="ByteCompare", color=aquamarine]
-"template-coq/utils/canonicaltries/CanonicalTries"[label="CanonicalTries", color=aquamarine]
-"template-coq/utils/canonicaltries/String2pos"[label="String2pos", color=aquamarine]
-"template-coq/Typing" -> "template-coq/Checker"
-"template-coq/common/uGraph" -> "template-coq/Checker"
-"template-coq/TemplateMonad" -> "template-coq/Constants"
-"template-coq/TemplateMonad/Extractable" -> "template-coq/Constants"
-"template-coq/common/uGraph" -> "template-coq/Constants"
-"template-coq/Pretty" -> "template-coq/Extraction"
-"template-coq/TemplateMonad/Extractable" -> "template-coq/Extraction"
-"template-coq/TemplateProgram" -> "template-coq/Extraction"
-"template-coq/utils/MC_ExtrOCamlZPosInt" -> "template-coq/Extraction"
-"template-coq/Typing" -> "template-coq/Normal"
-"template-coq/LiftSubst" -> "template-coq/Pretty"
-"template-coq/Typing" -> "template-coq/Reduction"
-"template-coq/TemplateMonad/Core" -> "template-coq/TemplateMonad"
-"template-coq/Ast" -> "template-coq/TemplateMonad/Common"
-"template-coq/AstUtils" -> "template-coq/TemplateMonad/Core"
-"template-coq/TemplateMonad/Common" -> "template-coq/TemplateMonad/Core"
-"template-coq/AstUtils" -> "template-coq/TemplateMonad/Extractable"
-"template-coq/TemplateMonad/Common" -> "template-coq/TemplateMonad/Extractable"
+"template-rocq/Extraction"[label="Extraction", color=aquamarine]
+"template-rocq/Constants"[label="Constants", color=aquamarine]
+"template-rocq/monad_utils"[label="monad_utils", color=aquamarine]
+"template-rocq/TemplateMonad/Extractable"[label="Extractable", color=aquamarine]
+"template-rocq/TemplateMonad/Core"[label="Core", color=aquamarine]
+"template-rocq/TemplateMonad/Common"[label="Common", color=aquamarine]
+"template-rocq/TemplateMonad"[label="TemplateMonad", color=aquamarine]
+"template-rocq/TemplateProgram"[label="TemplateProgram", color=aquamarine]
+"template-rocq/EtaExpand"[label="EtaExpand", color=aquamarine]
+"template-rocq/Checker"[label="Checker", color=aquamarine]
+"template-rocq/WcbvEval"[label="WcbvEval", color=aquamarine]
+"template-rocq/Normal"[label="Normal", color=aquamarine]
+"template-rocq/TypingWf"[label="TypingWf", color=aquamarine]
+"template-rocq/Reduction"[label="Reduction", color=aquamarine]
+"template-rocq/Typing"[label="Typing", color=aquamarine]
+"template-rocq/TermEquality"[label="TermEquality", color=aquamarine]
+"template-rocq/Pretty"[label="Pretty", color=aquamarine]
+"template-rocq/UnivSubst"[label="UnivSubst", color=aquamarine]
+"template-rocq/LiftSubst"[label="LiftSubst", color=aquamarine]
+"template-rocq/WfAst"[label="WfAst", color=aquamarine]
+"template-rocq/EnvironmentTyping"[label="EnvironmentTyping", color=aquamarine]
+"template-rocq/Induction"[label="Induction", color=aquamarine]
+"template-rocq/EnvMap"[label="EnvMap", color=aquamarine]
+"template-rocq/ReflectAst"[label="ReflectAst", color=aquamarine]
+"template-rocq/Reflect"[label="Reflect", color=aquamarine]
+"template-rocq/AstUtils"[label="AstUtils", color=aquamarine]
+"template-rocq/Ast"[label="Ast", color=aquamarine]
+"template-rocq/Environment"[label="Environment", color=aquamarine]
+"template-rocq/BasicAst"[label="BasicAst", color=aquamarine]
+"template-rocq/Universes"[label="Universes", color=aquamarine]
+"template-rocq/Kernames"[label="Kernames", color=aquamarine]
+"template-rocq/config"[label="config", color=aquamarine]
+"template-rocq/utils"[label="utils", color=aquamarine]
+"template-rocq/Transform"[label="Transform", color=aquamarine]
+"template-rocq/common/uGraph"[label="uGraph", color=aquamarine]
+"template-rocq/utils/ReflectEq"[label="ReflectEq", color=aquamarine]
+"template-rocq/utils/MR_ExtrOCamlZPosInt"[label="MR_ExtrOCamlZPosInt", color=aquamarine]
+"template-rocq/utils/MRUtils"[label="MRUtils", color=aquamarine]
+"template-rocq/utils/wGraph"[label="wGraph", color=aquamarine]
+"template-rocq/utils/MRString"[label="MRString", color=aquamarine]
+"template-rocq/utils/MRSquash"[label="MRSquash", color=aquamarine]
+"template-rocq/utils/MRRelations"[label="MRRelations", color=aquamarine]
+"template-rocq/utils/MRPred"[label="MRPred", color=aquamarine]
+"template-rocq/utils/MRProd"[label="MRProd", color=aquamarine]
+"template-rocq/utils/MROption"[label="MROption", color=aquamarine]
+"template-rocq/utils/MRList"[label="MRList", color=aquamarine]
+"template-rocq/utils/LibHypsNaming"[label="LibHypsNaming", color=aquamarine]
+"template-rocq/utils/MREquality"[label="MREquality", color=aquamarine]
+"template-rocq/utils/MRCompare"[label="MRCompare", color=aquamarine]
+"template-rocq/utils/MRArith"[label="MRArith", color=aquamarine]
+"template-rocq/utils/All_Forall"[label="All_Forall", color=aquamarine]
+"template-rocq/utils/MRReflect"[label="MRReflect", color=aquamarine]
+"template-rocq/utils/MRPrelude"[label="MRPrelude", color=aquamarine]
+"template-rocq/utils/bytestring"[label="bytestring", color=aquamarine]
+"template-rocq/utils/ByteCompareSpec"[label="ByteCompareSpec", color=aquamarine]
+"template-rocq/utils/ByteCompare"[label="ByteCompare", color=aquamarine]
+"template-rocq/utils/canonicaltries/CanonicalTries"[label="CanonicalTries", color=aquamarine]
+"template-rocq/utils/canonicaltries/String2pos"[label="String2pos", color=aquamarine]
+"template-rocq/Typing" -> "template-rocq/Checker"
+"template-rocq/common/uGraph" -> "template-rocq/Checker"
+"template-rocq/TemplateMonad" -> "template-rocq/Constants"
+"template-rocq/TemplateMonad/Extractable" -> "template-rocq/Constants"
+"template-rocq/common/uGraph" -> "template-rocq/Constants"
+"template-rocq/Pretty" -> "template-rocq/Extraction"
+"template-rocq/TemplateMonad/Extractable" -> "template-rocq/Extraction"
+"template-rocq/TemplateProgram" -> "template-rocq/Extraction"
+"template-rocq/utils/MR_ExtrOCamlZPosInt" -> "template-rocq/Extraction"
+"template-rocq/Typing" -> "template-rocq/Normal"
+"template-rocq/LiftSubst" -> "template-rocq/Pretty"
+"template-rocq/Typing" -> "template-rocq/Reduction"
+"template-rocq/TemplateMonad/Core" -> "template-rocq/TemplateMonad"
+"template-rocq/Ast" -> "template-rocq/TemplateMonad/Common"
+"template-rocq/AstUtils" -> "template-rocq/TemplateMonad/Core"
+"template-rocq/TemplateMonad/Common" -> "template-rocq/TemplateMonad/Core"
+"template-rocq/AstUtils" -> "template-rocq/TemplateMonad/Extractable"
+"template-rocq/TemplateMonad/Common" -> "template-rocq/TemplateMonad/Extractable"
 "erasure/Erasure"[label="Erasure", color=tan]
 "erasure/EConstructorsAsBlocks"[label="EConstructorsAsBlocks", color=tan]
 "erasure/ETransform"[label="ETransform", color=tan]
@@ -364,13 +364,13 @@ node[style=filled]
 "pcuic/PCUICCanonicity" -> "erasure/EArities"
 "pcuic/PCUICPrincipality" -> "erasure/EArities"
 "erasure/Extract" -> "erasure/EArities"
-"template-coq/Universes" -> "erasure/EAst"
+"template-rocq/Universes" -> "erasure/EAst"
 "erasure/EAst" -> "erasure/EAstUtils"
 "erasure/ELiftSubst" -> "erasure/ECSubst"
 "erasure/EGenericMapEnv" -> "erasure/EConstructorsAsBlocks"
 "erasure/EExtends" -> "erasure/EDeps"
 "erasure/ESubstitution" -> "erasure/EDeps"
-"template-coq/EnvMap" -> "erasure/EEnvMap"
+"template-rocq/EnvMap" -> "erasure/EEnvMap"
 "erasure/EGlobalEnv" -> "erasure/EEnvMap"
 "erasure/EEtaExpandedFix" -> "erasure/EEtaExpanded"
 "erasure/EExtends" -> "erasure/EEtaExpandedFix"
@@ -392,7 +392,7 @@ node[style=filled]
 "erasure/EEtaExpanded" -> "erasure/EOptimizePropDiscr"
 "erasure/EGlobalEnv" -> "erasure/EPretty"
 "pcuic/PCUICProgram" -> "erasure/EProgram"
-"template-coq/Transform" -> "erasure/EProgram"
+"template-rocq/Transform" -> "erasure/EProgram"
 "erasure/EEnvMap" -> "erasure/EProgram"
 "erasure/EPretty" -> "erasure/EProgram"
 "erasure/EWcbvEval" -> "erasure/EProgram"
@@ -402,7 +402,7 @@ node[style=filled]
 "erasure/EReflect" -> "erasure/ESpineView"
 "erasure/Prelim" -> "erasure/ESubstitution"
 "pcuic/PCUICTransform" -> "erasure/ETransform"
-"template-coq/Pretty" -> "erasure/ETransform"
+"template-rocq/Pretty" -> "erasure/ETransform"
 "erasure/EConstructorsAsBlocks" -> "erasure/ETransform"
 "erasure/EInlineProjections" -> "erasure/ETransform"
 "erasure/EOptimizePropDiscr" -> "erasure/ETransform"
@@ -411,7 +411,7 @@ node[style=filled]
 "pcuic/PCUICWcbvEval" -> "erasure/EWcbvEval"
 "erasure/EWellformed" -> "erasure/EWcbvEval"
 "erasure/EEtaExpanded" -> "erasure/EWcbvEvalEtaInd"
-"template-coq/EnvMap" -> "erasure/EWcbvEvalInd"
+"template-rocq/EnvMap" -> "erasure/EWcbvEvalInd"
 "erasure/EWcbvEval" -> "erasure/EWcbvEvalInd"
 "pcuic/Syntax/PCUICTactics" -> "erasure/EWellformed"
 "erasure/EGlobalEnv" -> "erasure/EWellformed"
@@ -529,10 +529,10 @@ node[style=filled]
 "pcuic/Bidirectional/BDFromPCUIC" -> "pcuic/Bidirectional/BDStrengthening"
 "pcuic/Conversion/PCUICUnivSubstitutionConv" -> "pcuic/Conversion/PCUICNamelessConv"
 "pcuic/Typing/PCUICClosedTyp" -> "pcuic/Conversion/PCUICNamelessConv"
-"template-coq/AstUtils" -> "pcuic/PCUICToTemplate"
+"template-rocq/AstUtils" -> "pcuic/PCUICToTemplate"
 "pcuic/Syntax/PCUICCases" -> "pcuic/PCUICToTemplate"
-"template-coq/Reduction" -> "pcuic/PCUICToTemplateCorrectness"
-"template-coq/TypingWf" -> "pcuic/PCUICToTemplateCorrectness"
+"template-rocq/Reduction" -> "pcuic/PCUICToTemplateCorrectness"
+"template-rocq/TypingWf" -> "pcuic/PCUICToTemplateCorrectness"
 "pcuic/PCUICSafeLemmata" -> "pcuic/PCUICToTemplateCorrectness"
 "pcuic/PCUICToTemplate" -> "pcuic/PCUICToTemplateCorrectness"
 "pcuic/Conversion/PCUICNamelessConv" -> "pcuic/Typing/PCUICNamelessTyp"

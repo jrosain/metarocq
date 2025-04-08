@@ -1,10 +1,10 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Program.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config BasicAst Reflect.
-From MetaCoq.Erasure Require Import EAst EAstUtils ELiftSubst EReflect ECSubst.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config BasicAst Reflect.
+From MetaRocq.Erasure Require Import EAst EAstUtils ELiftSubst EReflect ECSubst.
 From Stdlib Require Import ssreflect.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 (** * Global environments
 

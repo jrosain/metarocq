@@ -1,10 +1,10 @@
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Floats Stdlib.Numbers.
-From MetaCoq.Quotation.ToPCUIC.Utils Require Import (hints) utils.
-From MetaCoq.Quotation.ToPCUIC.Common Require Import (hints) Kernames.
-From MetaCoq.Common Require Import BasicAst.
-From MetaCoq.Utils Require Import MCUtils.
-From MetaCoq.Template Require Import AstUtils (* for tFixType *).
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Floats Stdlib.Numbers.
+From MetaRocq.Quotation.ToPCUIC.Utils Require Import (hints) utils.
+From MetaRocq.Quotation.ToPCUIC.Common Require Import (hints) Kernames.
+From MetaRocq.Common Require Import BasicAst.
+From MetaRocq.Utils Require Import MRUtils.
+From MetaRocq.Template Require Import AstUtils (* for tFixType *).
 
 #[export] Instance quote_name : ground_quotable name := ltac:(destruct 1; exact _).
 #[export] Instance quote_relevance : ground_quotable relevance := ltac:(destruct 1; exact _).

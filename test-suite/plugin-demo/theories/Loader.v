@@ -1,2 +1,2 @@
-From MetaCoq.Template Require ExtractableLoader.
-Declare ML Module "coq-metacoq-demo-plugin.plugin".
+From MetaRocq.Template Require ExtractableLoader.
+Declare ML Module "rocq-metarocq-demo-plugin.plugin".

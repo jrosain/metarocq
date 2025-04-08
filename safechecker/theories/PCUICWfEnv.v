@@ -1,10 +1,10 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config uGraph EnvMap.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICEquality PCUICReduction
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config uGraph EnvMap.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICEquality PCUICReduction
      PCUICReflect PCUICSafeLemmata PCUICTyping PCUICGlobalEnv PCUICWfUniverses.
-From MetaCoq.SafeChecker Require Import PCUICEqualityDec.
+From MetaRocq.SafeChecker Require Import PCUICEqualityDec.
 
 Definition level_mem : global_env_ext -> Level.t -> bool
   := fun X l => LevelSet.mem l (global_ext_levels X).

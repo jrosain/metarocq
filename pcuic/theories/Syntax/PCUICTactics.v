@@ -1,8 +1,8 @@
 
 From Stdlib Require Import ssreflect.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config BasicAst.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICLiftSubst
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config BasicAst.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCases PCUICLiftSubst
   PCUICSigmaCalculus.
 
 #[global] Hint Extern 20 (#|?X| = #|?Y|) =>

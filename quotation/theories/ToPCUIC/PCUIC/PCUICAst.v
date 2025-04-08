@@ -1,11 +1,11 @@
-From MetaCoq.PCUIC Require Import PCUICAst Syntax.PCUICReflect Syntax.PCUICInduction.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.Numbers Stdlib.Floats.
-From MetaCoq.Quotation.ToPCUIC.Common Require Import (hints) Universes BasicAst Kernames.
-From MetaCoq.Quotation.ToPCUIC.Common Require Import Environment EnvironmentTyping.
-From MetaCoq.Quotation.ToPCUIC.PCUIC Require Import (hints) utils.PCUICPrimitive.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.Common Require Import Environment.Sig EnvironmentTyping.Sig.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.PCUIC Require Import PCUICAst.Instances Syntax.PCUICReflect.Instances.
+From MetaRocq.PCUIC Require Import PCUICAst Syntax.PCUICReflect Syntax.PCUICInduction.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.Numbers Stdlib.Floats.
+From MetaRocq.Quotation.ToPCUIC.Common Require Import (hints) Universes BasicAst Kernames.
+From MetaRocq.Quotation.ToPCUIC.Common Require Import Environment EnvironmentTyping.
+From MetaRocq.Quotation.ToPCUIC.PCUIC Require Import (hints) utils.PCUICPrimitive.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.Common Require Import Environment.Sig EnvironmentTyping.Sig.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.PCUIC Require Import PCUICAst.Instances Syntax.PCUICReflect.Instances.
 
 #[export] Instance quote_predicate {term} {qterm : quotation_of term} {quote_term : ground_quotable term} : ground_quotable (predicate term) := ltac:(destruct 1; exact _).
 #[export] Instance quote_branch {term} {qterm : quotation_of term} {quote_term : ground_quotable term} : ground_quotable (branch term) := ltac:(destruct 1; exact _).

@@ -1,6 +1,6 @@
 From Stdlib Require Import String List.
-From MetaCoq Require Import Template.All.
-Import ListNotations MCMonadNotation.
+From MetaRocq Require Import Template.All.
+Import ListNotations MRMonadNotation.
 
 Open Scope bs.
 
@@ -24,18 +24,18 @@ Inductive sle : nat -> nat -> SProp :=
 
 Definition zero_leq_zero : sle 0 0 := sle_0 _.
 
-MetaCoq Quote Recursively Definition zero_leq_zero_syn := (sbox zero_leq_zero).
-MetaCoq Unquote Definition zero_leq_zero' := (snd zero_leq_zero_syn).
+MetaRocq Quote Recursively Definition zero_leq_zero_syn := (sbox zero_leq_zero).
+MetaRocq Unquote Definition zero_leq_zero' := (snd zero_leq_zero_syn).
 
 Check eq_refl : sbox zero_leq_zero = zero_leq_zero'.
 
 Lemma sle_irrelevant n m (p q : sle n m) : sbox p = sbox q.
 Proof. reflexivity. Defined.
 
-MetaCoq Quote Definition sle_irrelevant_syn := (unfolded sle_irrelevant).
+MetaRocq Quote Definition sle_irrelevant_syn := (unfolded sle_irrelevant).
 Print sle_irrelevant_syn.
 
-MetaCoq Run (t <- tmUnquoteTyped (forall n m (p q: sle n m), sbox p = sbox q) sle_irrelevant_syn ;;
+MetaRocq Run (t <- tmUnquoteTyped (forall n m (p q: sle n m), sbox p = sbox q) sle_irrelevant_syn ;;
             tmDefinition "sle_irrelevant'" t).
 
 Example sle_irrelevant_sle_irrelevant' : forall n m p q, sle_irrelevant n m p q = sle_irrelevant' n m p q.
@@ -43,7 +43,7 @@ Proof. reflexivity. Qed.
 
 Module foo.
 
-  MetaCoq Run (t <- tmQuoteInductive (MPfile ["sprop_tests"; "TestSuite"; "MetaCoq"], "sle") ;;
+  MetaRocq Run (t <- tmQuoteInductive (MPfile ["sprop_tests"; "TestSuite"; "MetaRocq"], "sle") ;;
               t <- tmEval all (mind_body_to_entry t) ;;
               tmPrint t ;;
               tmMkInductive false t

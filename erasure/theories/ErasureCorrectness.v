@@ -1,10 +1,10 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Program.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.Erasure Require Import ELiftSubst EGlobalEnv EWcbvEval Extract Prelim
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.Erasure Require Import ELiftSubst EGlobalEnv EWcbvEval Extract Prelim
      ESubstitution EArities EDeps ErasureProperties.
-From MetaCoq.PCUIC Require Import PCUICTyping PCUICGlobalEnv PCUICAst
+From MetaRocq.PCUIC Require Import PCUICTyping PCUICGlobalEnv PCUICAst
   PCUICAstUtils PCUICConversion PCUICSigmaCalculus
   PCUICClosed PCUICClosedTyp
   PCUICWeakeningEnv PCUICWeakeningEnvConv PCUICWeakeningEnvTyp
@@ -20,7 +20,7 @@ From MetaCoq.PCUIC Require Import PCUICTyping PCUICGlobalEnv PCUICAst
   PCUICOnFreeVars PCUICWellScopedCumulativity PCUICValidity
   PCUICContexts PCUICEquality PCUICSpine
   PCUICInductives.
-From MetaCoq.PCUIC Require Import PCUICTactics.
+From MetaRocq.PCUIC Require Import PCUICTactics.
 
 From Equations.Prop Require Import DepElim.
 From Stdlib Require Import ssreflect.
@@ -68,7 +68,8 @@ Proof.
       eapply IHeval1 in H4 as (vf' & Hvf' & [He_vf']); eauto.
       eapply IHeval2 in H6 as (vu' & Hvu' & [He_vu']); eauto.
       pose proof (subject_reduction_eval t0 H).
-      eapply inversion_Lambda in X0 as (? & ? & ? & e0).
+      eapply inversion_Lambda in X0 as (? & h1 & ? & e0).
+      apply isTypeRel_isType in h1.
       assert (Σ ;;; [] |- a' : t). {
           eapply subject_reduction_eval; eauto.
           eapply PCUICConversion.ws_cumul_pb_Prod_Prod_inv in e0 as [? e1 e2].
@@ -836,7 +837,7 @@ Proof.
     eapply inversion_CoFix in t; destruct_sigma t; auto.
     pose proof (wfΣ' := wfΣ.1).
     eapply PCUICSpine.typing_spine_strengthen in t0; eauto.
-    2:{ now eapply nth_error_all in a; tea. }
+    2:{ now eapply nth_error_all, isTypeRel_isType in a; tea. }
     invs He.
     * edestruct IHeval1 as (? & ? & ?); eauto. now depelim Hed.
       depelim Hed. rename H5 into Hlen.
@@ -1333,8 +1334,8 @@ Proof.
   now eapply cstr_args_length in o.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICEtaExpand.
-From MetaCoq.Erasure Require Import EDeps EEtaExpandedFix.
+From MetaRocq.PCUIC Require Import PCUICEtaExpand.
+From MetaRocq.Erasure Require Import EDeps EEtaExpandedFix.
 Local Hint Constructors expanded : core.
 
 Lemma expanded_erases (cf := config.extraction_checker_flags) {Σ : global_env_ext} Σ' Γ Γ' t v :

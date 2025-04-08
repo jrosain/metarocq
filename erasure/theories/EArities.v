@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
   PCUICReduction
   PCUICClosed PCUICTyping PCUICWcbvEval PCUICLiftSubst PCUICInversion PCUICArities
   PCUICSR PCUICGeneration PCUICSubstitution PCUICElimination
@@ -12,7 +12,7 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
   PCUICSpine PCUICInductives PCUICInductiveInversion PCUICConfluence
   PCUICArities PCUICPrincipality PCUICFirstorder.
 
-From MetaCoq.Erasure Require Import Extract.
+From MetaRocq.Erasure Require Import Extract.
 
 Notation "Σ ⊢p s ⇓ t" := (eval Σ s t) (at level 50, s, t at next level) : type_scope.
 
@@ -77,6 +77,7 @@ Lemma isWfArity_prod_inv (Σ : global_env_ext) (Γ : context) (x : aname) (x0 x1
 Proof.
   intros wfΣ (? & ? & ? & ?). cbn in e.
   eapply isType_tProd in i as [dom codom]; auto.
+  apply isTypeRel_isType in dom.
   split; auto.
   split; auto.
   clear dom codom.
@@ -214,6 +215,7 @@ Proof.
       apply (X (subst_context [hd0] 0 Γ0) ltac:(len; reflexivity) _ _ sp).
       eapply isType_apply in i; tea.
       eapply (type_ws_cumul_pb (pb:=Conv)); tea. 2:now symmetry.
+      eapply isTypeRel_isType.
       now eapply isType_tProd in i as [].
 Qed.
 
@@ -300,7 +302,7 @@ Proof.
     eapply invert_cumul_arity_r in c0; eauto.
     eapply typing_spine_strengthen in t0. 3:eauto.
     eapply wf_cofixpoint_spine in i0; eauto.
-    2-3:eapply nth_error_all in a; eauto; simpl in a; eauto.
+    2-3:eapply nth_error_all, isTypeRel_isType in a; eauto; simpl in a; eauto.
     destruct i0 as (Γ' & T & DA & ind & u & indargs & (eqT & ck) & cum).
     destruct (Nat.ltb #|x1| (context_assumptions Γ')).
     eapply invert_cumul_arity_r_gen in c0; eauto.
@@ -858,7 +860,7 @@ Proof.
   eapply PCUICSpine.inversion_it_mkProd_or_LetIn in ty; eauto.
   epose proof (typing_spine_proofs _ _ [] _ _ _ [] _ _ wfΣ ty).
   forward H0 by constructor. eapply has_sort_isType; eauto.
-  simpl. now eapply has_sort_isType. eapply PCUICConversion.ws_cumul_pb_eq_le_gen, PCUICSR.wt_cumul_pb_refl; eauto.
+  simpl. now eapply has_sort_isType. eapply ws_cumul_eq_pb, PCUICSR.wt_cumul_pb_refl; eauto.
   destruct H0 as [_ sorts].
   specialize (sorts _ _ decli c) as [sorts sorts'].
   forward sorts' by constructor.

@@ -1,5 +1,5 @@
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.Common.Kernames Require Export
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.Common.Kernames Require Export
   Kername.Instances
   KernameSet.Instances
   KernameSetOrdProp.Instances

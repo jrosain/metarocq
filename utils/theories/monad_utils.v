@@ -1,5 +1,5 @@
 From Stdlib Require Import Arith List.
-From MetaCoq.Utils Require Import All_Forall MCSquash.
+From MetaRocq.Utils Require Import All_Forall MRSquash.
 From Equations Require Import Equations.
 Coercion is_true : bool >-> Sortclass.
 
@@ -19,7 +19,7 @@ Class MonadExc E (m : Type -> Type) : Type :=
 }.
 
 
-Module MCMonadNotation.
+Module MRMonadNotation.
   Declare Scope monad_scope.
   Delimit Scope monad_scope with monad.
 
@@ -40,9 +40,9 @@ Module MCMonadNotation.
 
   Notation "e1 ;; e2" := (_ <- e1%monad ;; e2%monad)%monad
     (at level 100, right associativity) : monad_scope.
-End MCMonadNotation.
+End MRMonadNotation.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 #[global] Instance option_monad : Monad option :=
   {| ret A a := Some a ;

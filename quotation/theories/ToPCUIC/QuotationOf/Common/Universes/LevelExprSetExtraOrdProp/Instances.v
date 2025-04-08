@@ -1,12 +1,12 @@
-From MetaCoq.Common Require Import Universes.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.Utils Require Import MCMSets.Sig.
+From MetaRocq.Common Require Import Universes.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.Utils Require Import MRMSets.Sig.
 Import List.ListNotations.
 Local Open Scope list_scope.
 
 Module qLevelExprSetExtraOrdProp <: QuotationOfExtraOrdProperties LevelExprSet LevelExprSetOrdProp LevelExprSetExtraOrdProp.
   Module qP <: QuotationOfWExtraPropertiesOn LevelExprSet.E LevelExprSet LevelExprSetOrdProp.P LevelExprSetExtraOrdProp.P.
-    MetaCoq Run (tmMakeQuotationOfModule everything None "LevelExprSetExtraOrdProp.P").
+    MetaRocq Run (tmMakeQuotationOfModule everything None "LevelExprSetExtraOrdProp.P").
   End qP.
-  MetaCoq Run (tmMakeQuotationOfModule (all_submodules_except [["P"]]%bs) None "LevelExprSetExtraOrdProp").
+  MetaRocq Run (tmMakeQuotationOfModule (all_submodules_except [["P"]]%bs) None "LevelExprSetExtraOrdProp").
 End qLevelExprSetExtraOrdProp.

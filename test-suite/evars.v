@@ -1,5 +1,5 @@
 From Stdlib Require Import String List.
-From MetaCoq.Template Require Import Ast Loader.
+From MetaRocq.Template Require Import Ast Loader.
 Import ListNotations.
 Definition bAnon := {| binder_name := nAnon; binder_relevance := Relevant |}.
 Definition bNamed s := {| binder_name := nNamed s; binder_relevance := Relevant |}.
@@ -17,9 +17,9 @@ Goal True.
 Qed.
 
 (** Evars *)
-MetaCoq Quote Definition lnil := @nil.
-MetaCoq Quote Definition listnat := (list nat).
-MetaCoq Unquote Definition foo := (tCast (tApp lnil [hole]) Cast listnat).
+MetaRocq Quote Definition lnil := @nil.
+MetaRocq Quote Definition listnat := (list nat).
+MetaRocq Unquote Definition foo := (tCast (tApp lnil [hole]) Cast listnat).
 
 Local Open Scope string_scope.
 

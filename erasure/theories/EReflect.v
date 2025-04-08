@@ -1,7 +1,7 @@
 From Stdlib Require Import ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import BasicAst Reflect.
-From MetaCoq.Erasure Require Import EPrimitive EAst EInduction.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import BasicAst Reflect.
+From MetaRocq.Erasure Require Import EPrimitive EAst EInduction.
 From Equations Require Import Equations.
 
 Local Ltac finish :=

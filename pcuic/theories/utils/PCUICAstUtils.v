@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import uGraph Reflect.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICSize.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import uGraph Reflect.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICSize.
 
 From Stdlib Require Import ssreflect.
 From Equations Require Import Equations.

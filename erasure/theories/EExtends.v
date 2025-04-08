@@ -1,8 +1,8 @@
 From Stdlib Require Import ssreflect.
 From Equations Require Import Equations.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames.
-From MetaCoq.Erasure Require Import EGlobalEnv EAst EWellformed.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames.
+From MetaRocq.Erasure Require Import EGlobalEnv EAst EWellformed.
 
 Section EEnvFlags.
   Context (efl : EEnvFlags).

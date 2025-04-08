@@ -1,4 +1,4 @@
-From MetaCoq Require Import Template.Loader.
+From MetaRocq Require Import Template.Loader.
 
 Section with_T.
   Variable T : Type.
@@ -24,4 +24,4 @@ End with_T.
 
 Local Open Scope string_scope.
 Local Open Scope positive_scope.
-MetaCoq Quote Recursively Definition count_tree_syntax := count_tree.
+MetaRocq Quote Recursively Definition count_tree_syntax := count_tree.

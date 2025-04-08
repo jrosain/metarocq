@@ -1,7 +1,7 @@
-From MetaCoq.Template Require Import Ast ReflectAst.
-From MetaCoq.Quotation.ToTemplate Require Import Init.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Common Require Import Environment.Sig.
+From MetaRocq.Template Require Import Ast ReflectAst.
+From MetaRocq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Common Require Import Environment.Sig.
 
 Module qTemplateTermDecide <: QuotationOfTermDecide TemplateTerm TemplateTermDecide.
-  MetaCoq Run (tmMakeQuotationOfModule everything None "TemplateTermDecide").
+  MetaRocq Run (tmMakeQuotationOfModule everything None "TemplateTermDecide").
 End qTemplateTermDecide.

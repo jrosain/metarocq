@@ -1,19 +1,19 @@
 From Stdlib Require Import Recdef.
 
-From MetaCoq.Template Require Import TemplateMonad Loader.
-(* From MetaCoq.SafeChecker Require Import SafeTemplateChecker. *)
-From MetaCoq.PCUIC Require Import PCUICEquality PCUICAst PCUICReflect PCUICSafeLemmata PCUICTyping PCUICNormal PCUICAstUtils PCUICSN.
-From MetaCoq.TemplatePCUIC Require Import TemplateToPCUIC PCUICToTemplate.
+From MetaRocq.Template Require Import TemplateMonad Loader.
+(* From MetaRocq.SafeChecker Require Import SafeTemplateChecker. *)
+From MetaRocq.PCUIC Require Import PCUICEquality PCUICAst PCUICReflect PCUICSafeLemmata PCUICTyping PCUICNormal PCUICAstUtils PCUICSN.
+From MetaRocq.TemplatePCUIC Require Import TemplateToPCUIC PCUICToTemplate.
 
-From MetaCoq.ErasurePlugin Require Import Erasure.
+From MetaRocq.ErasurePlugin Require Import Erasure.
 
 From Stdlib Require Import String.
 Local Open Scope string_scope.
 
-From MetaCoq.Utils Require Import utils bytestring.
-From MetaCoq.Common Require Import config.
-Import MCMonadNotation.
-Unset MetaCoq Debug.
+From MetaRocq.Utils Require Import utils bytestring.
+From MetaRocq.Common Require Import config.
+Import MRMonadNotation.
+Unset MetaRocq Debug.
 (* We're doing erasure assuming no Prop <= Type rule and lets can appear in constructor types. *)
 #[local] Existing Instance config.extraction_checker_flags.
 
@@ -23,14 +23,14 @@ Definition test (p : Ast.Env.program) : string :=
 Definition testty (p : Ast.Env.program) : string :=
   typed_erase_and_print_template_program p.
 
-MetaCoq Quote Recursively Definition zero := 0.
+MetaRocq Quote Recursively Definition zero := 0.
 
 Definition zerocst := Eval lazy in test zero.
 
-MetaCoq Quote Recursively Definition exproof := I.
+MetaRocq Quote Recursively Definition exproof := I.
 Definition exprooftest := Eval lazy in test exproof.
 
-MetaCoq Quote Recursively Definition exintro := (@exist _ _ 0 (@eq_refl _ 0) : {x : nat | x = 0}).
+MetaRocq Quote Recursively Definition exintro := (@exist _ _ 0 (@eq_refl _ 0) : {x : nat | x = 0}).
 Definition exintrotest := Eval lazy in test exintro.
 
 Definition ex_type_introtest := Eval lazy in testty exintro.
@@ -38,7 +38,7 @@ Definition ex_type_introtest := Eval lazy in testty exintro.
 Definition id := fun (X : Set) (x : X) => x.
 Definition idnat := (id nat).
 
-MetaCoq Quote Recursively Definition idnatc := idnat.
+MetaRocq Quote Recursively Definition idnatc := idnat.
 Time Definition test_idnat := Eval lazy in test idnatc.
 Time Definition testty_idnat := Eval lazy in testty idnatc.
 
@@ -53,13 +53,13 @@ Definition erase {A} (a : A) : TemplateMonad unit :=
   s <- tmEval lazy (erase_and_print_template_program default_erasure_config [] aq) ;;
   tmMsg s.
 
-MetaCoq Run (erase 0).
-MetaCoq Run (tmEval hnf idnat >>= erase).
-MetaCoq Run (tmEval hnf singlelim >>= erase).
-MetaCoq Run (erase (plus 0 1)).
+MetaRocq Run (erase 0).
+MetaRocq Run (tmEval hnf idnat >>= erase).
+MetaRocq Run (tmEval hnf singlelim >>= erase).
+MetaRocq Run (erase (plus 0 1)).
 
 (** vector addition **)
-Require Coq.Vectors.Vector.
+Require Stdlib.Vectors.Vector.
 
 Definition vplus {n:nat} :
   Vector.t nat n -> Vector.t nat n -> Vector.t nat n := (Vector.map2 plus).
@@ -69,14 +69,14 @@ Definition v23 : Vector.t nat 2 :=
   (Vector.cons nat 2 1 (Vector.cons nat 3 0 (Vector.nil nat))).
 Definition vplus0123 := (vplus v01 v23).
 
-Set MetaCoq Timing.
+Set MetaRocq Timing.
 
-Time MetaCoq Run (tmEval hnf vplus0123 >>= erase).
+Time MetaRocq Run (tmEval hnf vplus0123 >>= erase).
 
 (** Cofix *)
 From Stdlib Require Import StreamMemo.
 
-MetaCoq Quote Recursively Definition memo := memo_make.
+MetaRocq Quote Recursively Definition memo := memo_make.
 
 Definition testmemo := Eval lazy in test memo.
 
@@ -95,13 +95,13 @@ Fixpoint ack (n m:nat) {struct n} : nat :=
              in ackn m
   end.
 Definition ack35 := (ack 3 5).
-MetaCoq Quote Recursively Definition cbv_ack35 :=
+MetaRocq Quote Recursively Definition cbv_ack35 :=
   ltac:(let t:=(eval cbv delta [ack35] in ack35) in exact t).
 
 Time Definition testack35 := Eval lazy in test cbv_ack35.
 
 (* [program] of the program *)
-MetaCoq Quote Recursively Definition p_ack35 := ack35.
+MetaRocq Quote Recursively Definition p_ack35 := ack35.
 
 Time Definition testack352 := Eval lazy in test p_ack35. (* 0.041 *)
 
@@ -115,7 +115,7 @@ Arguments leaf {A}.
 Arguments fcons {A}.
 Arguments node {A}.
 Definition sf: forest bool := (fcons (node true (leaf false)) (leaf true)).
-MetaCoq Quote Recursively Definition p_sf := sf.
+MetaRocq Quote Recursively Definition p_sf := sf.
 Time Definition testp_sf := Eval lazy in test p_sf.
 
 Fixpoint tree_size (t:tree bool) : nat :=
@@ -132,14 +132,14 @@ Definition arden: forest bool :=
   fcons (node true (fcons (node true (leaf false)) (leaf true)))
         (fcons (node true (fcons (node true (leaf false)) (leaf true)))
                (leaf false)).
-MetaCoq Quote Recursively Definition p_arden := arden.
+MetaRocq Quote Recursively Definition p_arden := arden.
 Definition arden_size := (forest_size arden).
-MetaCoq Quote Recursively Definition cbv_arden_size :=
+MetaRocq Quote Recursively Definition cbv_arden_size :=
   ltac:(let t:=(eval cbv in arden_size) in exact t).
 Definition ans_arden_size :=
  Eval lazy in test cbv_arden_size.
 (* [program] of the program *)
-MetaCoq Quote Recursively Definition p_arden_size := arden_size.
+MetaRocq Quote Recursively Definition p_arden_size := arden_size.
 
 Definition P_arden_size := Eval lazy in test p_arden_size.
 
@@ -157,14 +157,14 @@ Fixpoint taut (n:nat) : tautArg n -> bool :=
   end.
 (* Pierce *)
 Definition pierce := taut 2 (fun x y => implb (implb (implb x y) x) x).
-MetaCoq Quote Recursively Definition cbv_pierce :=
+MetaRocq Quote Recursively Definition cbv_pierce :=
   ltac:(let t:=(eval cbv in pierce) in exact t).
 
 Definition ans_pierce :=
   Eval lazy in (test cbv_pierce).
 
 (* [program] of the program *)
-MetaCoq Quote Recursively Definition p_pierce := pierce.
+MetaRocq Quote Recursively Definition p_pierce := pierce.
 
 Definition P_pierce := Eval lazy in test p_pierce.
 
@@ -178,14 +178,14 @@ Qed.
 Definition Scomb := taut 3
          (fun x y z => implb (implb x (implb y z))
                              (implb (implb x y) (implb x z))).
-MetaCoq Quote Recursively Definition cbv_Scomb :=
+MetaRocq Quote Recursively Definition cbv_Scomb :=
   ltac:(let t:=(eval cbv in Scomb) in exact t).
 
 Definition ans_Scomb :=
   Eval lazy in (test cbv_Scomb).
 
 (* [program] of the program *)
-MetaCoq Quote Recursively Definition p_Scomb := Scomb.
+MetaRocq Quote Recursively Definition p_Scomb := Scomb.
 
 Definition P_Scomb := Eval lazy in (test p_Scomb).
 
@@ -206,12 +206,12 @@ Fixpoint slowFib (n:nat) : nat :=
              end
   end.
 Definition slowFib3 := (slowFib 3).
-MetaCoq Quote Recursively Definition cbv_slowFib3 :=
+MetaRocq Quote Recursively Definition cbv_slowFib3 :=
   ltac:(let t:=(eval cbv in slowFib3) in exact t).
 Definition ans_slowFib3 :=
  Eval lazy in (test cbv_slowFib3).
 (* [program] of the program *)
-MetaCoq Quote Recursively Definition p_slowFib3 := slowFib3.
+MetaRocq Quote Recursively Definition p_slowFib3 := slowFib3.
 Definition P_slowFib3 := Eval lazy in (test p_slowFib3).
 (* Goal
   let env := (env P_slowFib3) in
@@ -228,12 +228,12 @@ Fixpoint fibrec (n:nat) (fs:nat * nat) {struct n} : nat :=
   end.
 Definition fib : nat -> nat := fun n => fibrec n (pair 0 1).
 Definition fib9 := fib 9.
-MetaCoq Quote Recursively Definition cbv_fib9 :=
+MetaRocq Quote Recursively Definition cbv_fib9 :=
   ltac:(let t:=(eval cbv in fib9) in exact t).
 Time Definition ans_fib9 :=
   Eval lazy in (test cbv_fib9).
 (* [program] of the program *)
-MetaCoq Quote Recursively Definition p_fib9 := fib9.
+MetaRocq Quote Recursively Definition p_fib9 := fib9.
 Definition P_fib9 := Eval lazy in (test p_fib9).
 (*
 Goal
@@ -275,12 +275,12 @@ Fixpoint gen_sumPList {A:Set} (l:PList A) {struct l} : (A->nat)->nat :=
   end.
 Definition sumPList l := gen_sumPList l (fun x => x).
 Definition sumPL_myPL := (sumPList myPList).
-MetaCoq Quote Recursively Definition cbv_sumPL_myPL :=
+MetaRocq Quote Recursively Definition cbv_sumPL_myPL :=
   ltac:(let t:=(eval cbv in sumPL_myPL) in exact t).
 Definition ans_sumPL_myPL :=
   Eval lazy in (test cbv_sumPL_myPL).
 (* [program] of the program *)
-MetaCoq Quote Recursively Definition p_sumPL_myPL := sumPL_myPL.
+MetaRocq Quote Recursively Definition p_sumPL_myPL := sumPL_myPL.
 Definition P_sumPL_myPL := Eval lazy in (test p_sumPL_myPL).
 (* Goal
   let env := (env P_sumPL_myPL) in
@@ -311,12 +311,12 @@ Fixpoint size (t : Tree) : nat :=
 
 
 Definition size_myTree := size myTree.
-MetaCoq Quote Recursively Definition cbv_size_myTree :=
+MetaRocq Quote Recursively Definition cbv_size_myTree :=
   ltac:(let t:=(eval cbv in size_myTree) in exact t).
 Definition ans_size_myTree :=
   Eval lazy in (test cbv_size_myTree).
 (* [program] of the program *)
-MetaCoq Quote Recursively Definition p_size_myTree := size_myTree.
+MetaRocq Quote Recursively Definition p_size_myTree := size_myTree.
 Definition P_size_myTree := Eval lazy in (test p_size_myTree).
 (* Goal
   let env := (env P_size_myTree) in
@@ -336,27 +336,27 @@ Program Fixpoint provedCopy (n:nat) {wf lt n} : nat :=
   match n with 0 => 0 | S k => S (provedCopy k) end.
 
 Print Assumptions provedCopy.
-(* MetaCoq Quote Recursively Definition pCopy := provedCopy. program *)
+(* MetaRocq Quote Recursively Definition pCopy := provedCopy. program *)
 
 Definition x := 3.
 Definition provedCopyx := provedCopy x.
-(* Compute provedCopyx.  * evals correctly in Coq * *)
-MetaCoq Quote Recursively Definition cbv_provedCopyx :=
+(* Compute provedCopyx.  * evals correctly in Rocq * *)
+MetaRocq Quote Recursively Definition cbv_provedCopyx :=
   ltac:(let t:=(eval cbv delta [provedCopyx provedCopy] in provedCopyx) in exact t).
 Definition ans_provedCopyx :=
   Eval lazy in (test cbv_provedCopyx).
-MetaCoq Quote Recursively Definition p_provedCopyx := provedCopyx. (* program *)
+MetaRocq Quote Recursively Definition p_provedCopyx := provedCopyx. (* program *)
 Time Definition P_provedCopyx := Eval lazy in (test cbv_provedCopyx).
 (* We don't run this one every time as it is really expensive *)
 (*Time Definition P_provedCopyxvm := Eval vm_compute in (test p_provedCopyx).*)
 
-From MetaCoq.ErasurePlugin Require Import Loader.
+From MetaRocq.ErasurePlugin Require Import Loader.
 
-MetaCoq Erase provedCopyx.
-MetaCoq Erase -time -typed -unsafe provedCopyx.
+MetaRocq Erase provedCopyx.
+MetaRocq Erase -time -typed -unsafe provedCopyx.
 
-(* From MetaCoq.Erasure.Typed Require Import CertifyingEta.
-MetaCoq Run (eta_expand_def
+(* From MetaRocq.Erasure.Typed Require Import CertifyingEta.
+MetaRocq Run (eta_expand_def
 (fun _ => None)
 true true
 provedCopy). *)
@@ -367,10 +367,10 @@ From Stdlib Require Import Streams.
 
 CoFixpoint ones : Stream nat := Cons 1 ones.
 
-MetaCoq Erase ones.
-MetaCoq Erase -unsafe ones.
+MetaRocq Erase ones.
+MetaRocq Erase -unsafe ones.
 
-MetaCoq Erase -typed -time -unsafe (map S ones).
+MetaRocq Erase -typed -time -unsafe (map S ones).
 
 
 (* 0.2s purely in the bytecode VM *)
@@ -386,7 +386,7 @@ Qed.
 
  (* debug code in case something is stuck *)
  (*
- From MetaCoq.SafeChecker Require Import PCUICSafeChecker.
+ From MetaRocq.SafeChecker Require Import PCUICSafeChecker.
 
 Definition fold_matchdecl {A B} (e : EnvCheck A) (b : A -> B) (c : PCUICAst.global_env_ext -> env_error -> B) :=
     match e with
@@ -446,10 +446,10 @@ Proof.
 *)
 (* Debuggging
 
-From MetaCoq.Common Require Import Transform.
-From MetaCoq.Erasure.Typed Require Import ExtractionCorrectness.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICProgram.
-From MetaCoq.ErasurePlugin Require Import Erasure.
+From MetaRocq.Common Require Import Transform.
+From MetaRocq.Erasure.Typed Require Import ExtractionCorrectness.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICProgram.
+From MetaRocq.ErasurePlugin Require Import Erasure.
 Import Transform.
 
 Program Definition verified_typed_erasure_pipeline
@@ -493,14 +493,14 @@ Program Definition pipeline_upto (cf : checker_flags := extraction_checker_flags
 Program Definition exintro_typed_er p := Transform.Transform.run pipeline_upto p _.
 Next Obligation. cbn. todo "assum wt". Qed.
 
-MetaCoq Quote Recursively Definition exintro_proj :=
+MetaRocq Quote Recursively Definition exintro_proj :=
   (proj1_sig (@exist _ (fun x => x = 0) 0 (@eq_refl _ 0))).
 
 Eval lazy in testty cbv_provedCopyx.
 
 Definition exintro_before_checks := Eval compute in exintro_typed_er exintro_proj.
 
-MetaCoq Quote Recursively Definition quoted_provedCopyx := (provedCopy x).
+MetaRocq Quote Recursively Definition quoted_provedCopyx := (provedCopy x).
 
 Definition provedCop_before_checks' := Eval lazy in exintro_typed_er cbv_provedCopyx.
 
@@ -508,6 +508,6 @@ Definition provedCop_before_checks := Eval lazy in exintro_typed_er quoted_prove
 
 Import ETransform Optimize.
 
-MetaCoq Typed Erase provedCopyx.
+MetaRocq Typed Erase provedCopyx.
 Eval lazy in testty cbv_provedCopyx.
 *)

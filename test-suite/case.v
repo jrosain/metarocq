@@ -1,4 +1,4 @@
-From MetaCoq Require Import Template.Loader.
+From MetaRocq Require Import Template.Loader.
 
 Definition f := fun (n : nat) =>
   match n with
@@ -7,10 +7,10 @@ Definition f := fun (n : nat) =>
   end.
 
 
-MetaCoq Quote Definition f_quoted :=
+MetaRocq Quote Definition f_quoted :=
   ltac:(let t := eval cbv in f in exact t).
 
-MetaCoq Unquote Definition f_from_syntax :=
+MetaRocq Unquote Definition f_from_syntax :=
   ltac:(let t := eval cbv in f_quoted in exact t).
 
 Check eq_refl : f = f_from_syntax.

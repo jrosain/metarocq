@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import BasicAst Universes.
-From MetaCoq.Erasure Require Import EPrimitive.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import BasicAst Universes.
+From MetaRocq.Erasure Require Import EPrimitive.
 (** * Extracted terms
 
   These are the terms produced by extraction: compared to kernel terms,
@@ -129,7 +129,7 @@ Record mutual_inductive_entry := {
   mind_entry_inds      : list one_inductive_entry;
   mind_entry_private   : option bool
   (* Private flag for sealing an inductive definition in an enclosing
-     module. Not handled by Template Coq yet. *) }.
+     module. Not handled by Template Rocq yet. *) }.
 
 
 
@@ -222,6 +222,6 @@ Notation global_context := global_declarations.
 (** *** Programs
 
   A set of declarations and a term, as produced by extraction from
-  template-coq programs. *)
+  template-rocq programs. *)
 
 Definition program : Type := global_declarations * term.

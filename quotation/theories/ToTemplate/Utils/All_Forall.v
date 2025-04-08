@@ -1,5 +1,5 @@
-From MetaCoq.Quotation.ToTemplate Require Import Stdlib.Init Stdlib.Lists.
-From MetaCoq.Utils Require Import All_Forall.
+From MetaRocq.Quotation.ToTemplate Require Import Stdlib.Init Stdlib.Lists.
+From MetaRocq.Utils Require Import All_Forall.
 
 #[export] Instance quote_All {A R ls} {qA : quotation_of A} {qR : quotation_of R} {quoteA : ground_quotable A} {quoteR : forall x, ground_quotable (R x)} : ground_quotable (@All A R ls) := ltac:(induction 1; exact _).
 #[export] Instance quote_Alli {A P n ls} {qA : quotation_of A} {qP : quotation_of P} {quoteA : ground_quotable A} {quoteP : forall n x, ground_quotable (P n x)} : ground_quotable (@Alli A P n ls) := ltac:(induction 1; exact _).

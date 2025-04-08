@@ -1,13 +1,13 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Program ssreflect ssrbool.
-From MetaCoq.Common Require Import Transform config.
-From MetaCoq.Utils Require Import bytestring utils.
-From MetaCoq.PCUIC Require PCUICAst PCUICAstUtils PCUICProgram.
-From MetaCoq.PCUIC Require Import PCUICNormal.
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICWfEnvImpl.
-From MetaCoq.Erasure Require EAstUtils ErasureCorrectness EPretty Extract EProgram EConstructorsAsBlocks.
-From MetaCoq.Erasure Require Import EWcbvEvalNamed ErasureFunction ErasureFunctionProperties.
-From MetaCoq.ErasurePlugin Require Import ETransform Erasure.
+From MetaRocq.Common Require Import Transform config.
+From MetaRocq.Utils Require Import bytestring utils.
+From MetaRocq.PCUIC Require PCUICAst PCUICAstUtils PCUICProgram.
+From MetaRocq.PCUIC Require Import PCUICNormal.
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICWfEnvImpl.
+From MetaRocq.Erasure Require EAstUtils ErasureCorrectness EPretty Extract EProgram EConstructorsAsBlocks.
+From MetaRocq.Erasure Require Import EWcbvEvalNamed ErasureFunction ErasureFunctionProperties.
+From MetaRocq.ErasurePlugin Require Import ETransform Erasure.
 Import EProgram PCUICProgram.
 Import PCUICTransform (template_to_pcuic_transform, pcuic_expand_lets_transform).
 
@@ -160,8 +160,8 @@ Proof.
   now eapply rebuild_wf_env_irr.
 Qed.
 
-From MetaCoq.Erasure Require Import Erasure Extract ErasureFunction.
-From MetaCoq.PCUIC Require Import PCUICTyping.
+From MetaRocq.Erasure Require Import Erasure Extract ErasureFunction.
+From MetaRocq.PCUIC Require Import PCUICTyping.
 
 Lemma extends_erase_pcuic_program (efl := EWcbvEval.default_wcbv_flags) {guard : abstract_guard_impl} (Σ : global_env_ext_map) t v nin nin' nin0 nin0'
   wf wf' ty ty' i u args :
@@ -427,7 +427,7 @@ Proof.
   eapply erase_transform_fo_gen; tea. reflexivity.
 Qed.
 
-Import MetaCoq.Common.Transform.
+Import MetaRocq.Common.Transform.
 From Stdlib Require Import Morphisms.
 
 Module ETransformPresFO.

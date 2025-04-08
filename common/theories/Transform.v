@@ -5,7 +5,7 @@
 
 From Stdlib Require Import Program ssreflect ssrbool.
 From Equations Require Import Equations.
-From MetaCoq.Utils Require Import utils.
+From MetaRocq.Utils Require Import utils.
 Import bytestring.
 Local Open Scope bs.
 Local Open Scope string_scope2.

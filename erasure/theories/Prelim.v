@@ -1,13 +1,13 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.Erasure Require Import EAstUtils Extract EArities EWcbvEval.
-From MetaCoq.PCUIC Require Import PCUICTyping PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.Erasure Require Import EAstUtils Extract EArities EWcbvEval.
+From MetaRocq.PCUIC Require Import PCUICTyping PCUICAst PCUICAstUtils
      PCUICSubstitution PCUICLiftSubst PCUICClosedTyp
      PCUICReduction PCUICWcbvEval PCUICSR PCUICInversion PCUICGeneration
      PCUICContextConversion PCUICArities PCUICWellScopedCumulativity PCUICConversion
      PCUICWeakeningEnvTyp PCUICClassification.
-From MetaCoq.SafeChecker Require Import PCUICErrors.
+From MetaRocq.SafeChecker Require Import PCUICErrors.
 From Stdlib Require Import Program ssreflect.
 
 Local Existing Instance extraction_checker_flags.
@@ -213,7 +213,7 @@ Proof.
   eapply (substitution (Δ := [])) in a0'; eauto.
   2:{ eapply subslet_cofix_subst; pcuic. constructor; eauto. }
   rewrite PCUICLiftSubst.simpl_subst_k in a0'. now autorewrite with len.
-  eapply a0'. now eapply nth_error_all in a; tea.
+  eapply a0'. now eapply nth_error_all, isTypeRel_isType in a; tea.
 Qed.
 
 (** Assumption contexts: constructor arguments/case branches contexts contain only assumptions, no local definitions *)

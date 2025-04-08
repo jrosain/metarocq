@@ -1,9 +1,9 @@
-From MetaCoq.Common Require Import BasicAst Environment EnvironmentTyping Universes.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.ssr.
-From MetaCoq.Quotation.ToPCUIC.Utils Require Import (hints) All_Forall MCOption.
-From MetaCoq.Quotation.ToPCUIC.Common Require Import (hints) config BasicAst Kernames Universes Environment.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.Common Require Import Environment.Sig EnvironmentTyping.Sig.
+From MetaRocq.Common Require Import BasicAst Environment EnvironmentTyping Universes.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Lists Stdlib.ssr.
+From MetaRocq.Quotation.ToPCUIC.Utils Require Import (hints) All_Forall MROption.
+From MetaRocq.Quotation.ToPCUIC.Common Require Import (hints) config BasicAst Kernames Universes Environment.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.Common Require Import Environment.Sig EnvironmentTyping.Sig.
 From Equations.Prop Require Import EqDecInstances.
 
 Module QuoteLookup (Import T : Term) (Import E : EnvironmentSig T) (Import L : LookupSig T E) (Import EDec : EnvironmentDecide T E) (Import qE : QuotationOfEnvironment T E) (Import qL : QuotationOfLookup T E L) (Import qEDec : QuotationOfEnvironmentDecide T E EDec) (Import QuoteE : QuoteEnvironmentSig T E) <: QuoteLookupSig T E L.
@@ -55,7 +55,7 @@ Module QuoteEnvTyping (Import T : Term) (Import E : EnvironmentSig T) (Import TU
    {checking sorting cproperty sproperty Γ H}
    {qchecking : quotation_of checking} {qsorting : quotation_of sorting} {qcproperty : quotation_of cproperty} {qsproperty : quotation_of sproperty}
    {quote_checking : forall Γ t T, ground_quotable (checking Γ t T)} {quote_sorting : forall Γ T u, ground_quotable (sorting Γ T u)} {quote_sproperty : forall Γ all t u tu, ground_quotable (sproperty Γ all t u tu)} {quote_cproperty : forall Γ all b t tb, ground_quotable (cproperty Γ all b t tb)}
-    : ground_quotable (@All_local_env_over_sorting checking sorting cproperty sproperty Γ H) := ltac:(induction 1; cbv [lift_sorting j_term MCOption.option_default] in *; exact _).
+    : ground_quotable (@All_local_env_over_sorting checking sorting cproperty sproperty Γ H) := ltac:(induction 1; cbv [lift_sorting j_term MROption.option_default] in *; exact _).
   #[export] Instance quote_All_local_env_over {typing property Γ H}
    {qtyping : quotation_of typing} {qproperty : quotation_of property}
    {quote_typing : forall Γ t T, ground_quotable (typing Γ t T)} {quote_property : forall Γ all b t tb, ground_quotable (property Γ all b t tb)}
@@ -127,6 +127,8 @@ Module QuoteGlobalMaps (Import T : Term) (Import E : EnvironmentSig T) (Import T
 
     #[export] Instance quote_on_type {Σ Γ T} : ground_quotable (@on_type P Σ Γ T)
       := ltac:(cbv [on_type]; exact _).
+    #[export] Instance quote_on_type_rel {Σ Γ T r} : ground_quotable (@on_type_rel P Σ Γ T r)
+      := ltac:(cbv [on_type_rel]; exact _).
 
     #[export] Instance quote_satisfiable_udecl {univs ϕ} : ground_quotable (@satisfiable_udecl univs ϕ)
       := ltac:(cbv [satisfiable_udecl]; exact _).
@@ -166,6 +168,7 @@ Module QuoteGlobalMaps (Import T : Term) (Import E : EnvironmentSig T) (Import T
     quote_type_local_ctx
     quote_sorts_local_ctx
     quote_on_type
+    quote_on_type_rel
     quote_on_udecl
     quote_satisfiable_udecl
     quote_valid_on_mono_udecl

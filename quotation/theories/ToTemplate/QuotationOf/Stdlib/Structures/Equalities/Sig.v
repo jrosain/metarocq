@@ -1,28 +1,28 @@
 From Stdlib.Structures Require Import Equalities.
-From MetaCoq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate Require Import Init.
 
 Module Type QuotationOfTyp (Import T : Typ).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "T").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "T").
 End QuotationOfTyp.
 Module Type QuotationOfHasEq (T : Typ) (Import E : HasEq T).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "E").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "E").
 End QuotationOfHasEq.
 Module Type QuotationOfEq (E : Eq) := QuotationOfTyp E <+ QuotationOfHasEq E E.
 Module Type QuotationOfIsEq (E : Eq) (Import IE : IsEq E).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "IE").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "IE").
 End QuotationOfIsEq.
 Module Type QuotationOfIsEqOrig (E : Eq) (Import IEO : IsEqOrig E).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "IEO").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "IEO").
 End QuotationOfIsEqOrig.
 Module Type QuotationOfHasEqDec (E : Eq) (Import EDec : HasEqDec E).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "EDec").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "EDec").
 End QuotationOfHasEqDec.
 Module Type QuotationOfHasEqb (T : Typ) (Import E : HasEqb T).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "E").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "E").
 End QuotationOfHasEqb.
 
 Module Type QuotationOfEqbSpec (T : Typ) (X : HasEq T) (Y : HasEqb T) (Import ES : EqbSpec T X Y).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "ES").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "ES").
 End QuotationOfEqbSpec.
 
 Module Type QuotationOfHasEqBool (E : Eq) (EB : HasEqBool E) := QuotationOfHasEqb E EB <+ QuotationOfEqbSpec E E EB EB.
@@ -108,7 +108,7 @@ Module QuotationOfBool2Dec (E : BooleanEqualityType) (E' : Bool2DecSig E) (qE : 
 Module Type BoolEqualityFactsSig (E : BooleanEqualityType) := Nop <+ BoolEqualityFacts E.
 
 Module Type QuotationOfBoolEqualityFacts (Import E : BooleanEqualityType) (Import F : BoolEqualityFactsSig E).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "F").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "F").
 End QuotationOfBoolEqualityFacts.
 
 Module Type QuotationOfHasUsualEq (Import T : Typ) (Import E : HasUsualEq T) (Import qT : QuotationOfTyp T) <: QuotationOfHasEq T E.

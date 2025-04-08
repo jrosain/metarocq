@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ProofIrrelevance ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config uGraph.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config uGraph.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
      PCUICReflect PCUICLiftSubst PCUICUnivSubst PCUICTyping PCUICGlobalEnv
      PCUICCumulativity PCUICConversion PCUICEquality PCUICConversion
      PCUICSafeLemmata PCUICNormal PCUICInversion PCUICReduction PCUICPosition
@@ -11,7 +11,7 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
      PCUICWeakeningEnvConv PCUICWeakeningEnvTyp
      PCUICWeakeningConv PCUICWeakeningTyp
      PCUICClosed PCUICClosedTyp PCUICConvCumInversion .
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICSafeReduce PCUICEqualityDec.
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICSafeReduce PCUICEqualityDec.
 
 From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
@@ -3412,7 +3412,7 @@ Equations (noeqns) isconv_array_values_aux
                                A2 (Lambda_ty na' t2 :: π2) aux := {
       | Success h with inspect (eqb_binder_annot na na') := {
         | exist true _ :=
-          isconv_red leq
+          isconv_red Conv
                      t1 (Lambda_bd na A1 :: π1)
                      t2 (Lambda_bd na' A2 :: π2) aux ;
         | exist false e :=
@@ -3626,7 +3626,7 @@ Equations (noeqns) isconv_array_values_aux
     rename H into wfΣ; destruct (hΣ _ wfΣ). clear aux.
     specialize_Σ wfΣ.
     apply conv_cum_zipp; auto.
-    constructor. eapply ws_cumul_pb_eq_le_gen.
+    constructor. eapply ws_cumul_eq_pb.
     constructor. all:fvs.
     - destruct h. eapply welltyped_zipc_zipp in h1; auto. fvs.
     - constructor. eapply eqb_universe_instance_spec; eauto.
@@ -3922,7 +3922,7 @@ Qed.
     destruct convdiscr as [cdiscr]. cbn in cdiscr.
     unfold zipp in h1, h2. simpl in h1, h2.
     sq.
-    apply ws_cumul_pb_eq_le_gen.
+    apply ws_cumul_eq_pb.
     change (eq_dec_to_bool ci ci') with (eqb ci ci') in eq5.
     destruct (eqb_specT ci ci'). 2: discriminate.
     subst. eapply ws_cumul_pb_Case. all: tas.
@@ -4467,7 +4467,7 @@ Qed.
     * exact r.
     * auto.
     * specialize_Σ wfΣ. etransitivity; eauto.
-      split. eapply ws_cumul_pb_eq_le_gen. symmetry.
+      split. eapply ws_cumul_eq_pb. symmetry.
       eapply red_ws_cumul_pb.
       eapply into_closed_red.
       + eapply r1.
@@ -5543,7 +5543,7 @@ Qed.
     exfalso.
     revert teq.
     induction X0 in args |- *; intros; solve_discr.
-    destruct args as [|? ? _] using MCList.rev_ind; [easy|].
+    destruct args as [|? ? _] using MRList.rev_ind; [easy|].
     rewrite mkApps_app in teq.
     cbn in teq. noconf teq.
     eauto.
@@ -6207,7 +6207,7 @@ Qed.
 End Conversion.
 
 (*
-From MetaCoq.SafeChecker Require Import PCUICWfEnvImpl.
+From MetaRocq.SafeChecker Require Import PCUICWfEnvImpl.
 Definition default_normal : @normalizing_flags default_checker_flags.
 now econstructor.
 Defined.

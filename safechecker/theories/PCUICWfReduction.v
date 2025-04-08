@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config uGraph.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICOnOne
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config uGraph.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICOnOne
      PCUICLiftSubst PCUICUnivSubst PCUICTyping PCUICNormal PCUICSR
      PCUICGeneration PCUICReflect PCUICEquality PCUICInversion PCUICValidity
      PCUICWeakeningConv PCUICWeakeningTyp PCUICReduction PCUICConversion
@@ -9,7 +9,7 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICOnOne
      PCUICPretty PCUICArities PCUICConfluence PCUICSize
      PCUICContextConversion PCUICConversion PCUICWfUniverses.
 
-From MetaCoq.SafeChecker Require Import PCUICWfEnv.
+From MetaRocq.SafeChecker Require Import PCUICWfEnv.
 
 
 From Equations Require Import Equations.

@@ -1,24 +1,24 @@
 
-all: printconf template-coq pcuic safechecker erasure erasure-plugin safechecker-plugin quotation
+all: printconf template-rocq pcuic safechecker erasure erasure-plugin safechecker-plugin quotation
 
 -include Makefile.conf
 
-ifeq '$(METACOQ_CONFIG)' 'local'
+ifeq '$(METAROCQ_CONFIG)' 'local'
   ifeq ($(shell which cygpath 2>/dev/null),)
-  OCAMLPATH := $(shell pwd)/template-coq/:$(shell pwd)/safechecker-plugin/src:$(shell pwd)/erasure-plugin/src:$(OCAMLPATH)
+  OCAMLPATH := $(shell pwd)/template-rocq/:$(shell pwd)/safechecker-plugin/src:$(shell pwd)/erasure-plugin/src:$(OCAMLPATH)
   else
-  OCAMLPATH := $(shell cygpath -m `pwd`)/template-coq/;$(OCAMLPATH)
+  OCAMLPATH := $(shell cygpath -m `pwd`)/template-rocq/;$(OCAMLPATH)
   endif
   export OCAMLPATH
 endif
 
-.PHONY: printconf all utils template-coq pcuic erasure install uninstall html clean mrproper safechecker-plugin .merlin test-suite translations quotation
+.PHONY: printconf all utils template-rocq pcuic erasure install uninstall html clean mrproper safechecker-plugin .merlin test-suite translations quotation
 
 printconf:
-ifeq '$(METACOQ_CONFIG)' 'local'
+ifeq '$(METAROCQ_CONFIG)' 'local'
 	@echo "Local configuration"
 else
-ifeq '$(METACOQ_CONFIG)' 'global'
+ifeq '$(METAROCQ_CONFIG)' 'global'
 	@echo "Global configuration"
 else
 	@echo "Run ./configure.sh first"
@@ -29,7 +29,7 @@ endif
 install: all
 	$(MAKE) -C utils install
 	$(MAKE) -C common install
-	$(MAKE) -C template-coq install
+	$(MAKE) -C template-rocq install
 	$(MAKE) -C pcuic install
 	$(MAKE) -C safechecker install
 	$(MAKE) -C template-pcuic install
@@ -41,7 +41,7 @@ install: all
 uninstall:
 	$(MAKE) -C utils uninstall
 	$(MAKE) -C common uninstall
-	$(MAKE) -C template-coq uninstall
+	$(MAKE) -C template-rocq uninstall
 	$(MAKE) -C pcuic uninstall
 	$(MAKE) -C safechecker uninstall
 	$(MAKE) -C template-pcuic uninstall
@@ -54,23 +54,24 @@ uninstall:
 html: all
 	"coqdoc" --multi-index -toc -utf8 -html \
     --with-header ./html/resources/header.html --with-footer ./html/resources/footer.html \
-		-R utils/theories MetaCoq.Utils \
-		-R common/theories MetaCoq.Common \
-		-R template-coq/theories MetaCoq.Template \
-		-R pcuic/theories MetaCoq.PCUIC \
-		-R safechecker/theories MetaCoq.SafeChecker \
-		-R template-pcuic/theories MetaCoq.TemplatePCUIC \
-		-R quotation/theories MetaCoq.Quotation \
-		-R erasure/theories MetaCoq.Erasure \
-		-R erasure-plugin/theories MetaCoq.ErasurePlugin \
-		-R translations MetaCoq.Translations \
-		-R examples MetaCoq.Examples \
+		-R utils/theories MetaRocq.Utils \
+		-R common/theories MetaRocq.Common \
+		-R template-rocq/theories MetaRocq.Template \
+		-R template-pcuic/theories MetaRocq.TemplatePCUIC \
+		-R pcuic/theories MetaRocq.PCUIC \
+		-R safechecker/theories MetaRocq.SafeChecker \
+		-R safechecker-plugin/theories MetaRocq.SafeCheckerPlugin \
+		-R erasure/theories MetaRocq.Erasure \
+		-R erasure-plugin/theories MetaRocq.ErasurePlugin \
+		-R quotation/theories MetaRocq.Quotation \
+		-R translations MetaRocq.Translations \
+		-R examples MetaRocq.Examples \
 		-d html */theories/*.v */theories/*/*.v translations/*.v examples/*.v
 
 clean:
 	$(MAKE) -C utils clean
 	$(MAKE) -C common clean
-	$(MAKE) -C template-coq clean
+	$(MAKE) -C template-rocq clean
 	$(MAKE) -C pcuic clean
 	$(MAKE) -C safechecker clean
 	$(MAKE) -C safechecker-plugin clean
@@ -85,7 +86,7 @@ clean:
 vos:
 	$(MAKE) -C utils
 	$(MAKE) -C common
-	$(MAKE) -C template-coq
+	$(MAKE) -C template-rocq
 	$(MAKE) -C pcuic vos
 	$(MAKE) -C safechecker vos
 	$(MAKE) -C safechecker-plugin vos
@@ -98,7 +99,7 @@ vos:
 quick:
 	$(MAKE) -C utils
 	$(MAKE) -C common
-	$(MAKE) -C template-coq
+	$(MAKE) -C template-rocq
 	$(MAKE) -C pcuic quick
 	$(MAKE) -C safechecker quick
 	$(MAKE) -C safechecker-plugin quick
@@ -111,7 +112,7 @@ quick:
 mrproper:
 	$(MAKE) -C utils mrproper
 	$(MAKE) -C common mrproper
-	$(MAKE) -C template-coq mrproper
+	$(MAKE) -C template-rocq mrproper
 	$(MAKE) -C pcuic mrproper
 	$(MAKE) -C safechecker mrproper
 	$(MAKE) -C safechecker-plugin mrproper
@@ -126,7 +127,7 @@ mrproper:
 .merlin:
 	$(MAKE) -C utils .merlin
 	$(MAKE) -C common .merlin
-	$(MAKE) -C template-coq .merlin
+	$(MAKE) -C template-rocq .merlin
 	$(MAKE) -C pcuic .merlin
 	$(MAKE) -C safechecker .merlin
 	$(MAKE) -C safechecker-plugin .merlin
@@ -141,8 +142,8 @@ utils:
 common: utils
 	$(MAKE) -C common
 
-template-coq: common
-	$(MAKE) -C template-coq
+template-rocq: common
+	$(MAKE) -C template-rocq
 
 pcuic: common
 	$(MAKE) -C pcuic
@@ -150,10 +151,10 @@ pcuic: common
 safechecker: pcuic
 	$(MAKE) -C safechecker
 
-template-pcuic: template-coq pcuic
+template-pcuic: template-rocq pcuic
 	$(MAKE) -C template-pcuic
 
-quotation: template-coq pcuic template-pcuic
+quotation: template-rocq pcuic template-pcuic
 	$(MAKE) -C quotation
 
 safechecker-plugin: safechecker template-pcuic
@@ -168,7 +169,7 @@ erasure-plugin: erasure template-pcuic
 install-plugins: erasure-plugin safechecker-plugin
 	$(MAKE) -C utils install
 	$(MAKE) -C common install
-	$(MAKE) -C template-coq install
+	$(MAKE) -C template-rocq install
 	$(MAKE) -C pcuic install
 	$(MAKE) -C template-pcuic install
 	$(MAKE) -C erasure install
@@ -181,11 +182,11 @@ examples: safechecker-plugin erasure-plugin
 test-suite: safechecker-plugin erasure-plugin
 	$(MAKE) -C test-suite
 
-translations: template-coq
+translations: template-rocq
 	$(MAKE) -C translations
 
 cleanplugins:
-	$(MAKE) -C template-coq cleanplugin
+	$(MAKE) -C template-rocq cleanplugin
 	$(MAKE) -C safechecker-plugin cleanplugin
 	$(MAKE) -C erasure cleanplugin
 
@@ -203,7 +204,7 @@ ci-quick:
 ci-opam:
 # Use -v so that regular output is produced
 	opam install --with-test -v -y .
-	opam remove -y coq-metacoq coq-metacoq-template
+	opam remove -y rocq-metarocq rocq-metarocq-template
 
 checktodos:
 	sh checktodos.sh

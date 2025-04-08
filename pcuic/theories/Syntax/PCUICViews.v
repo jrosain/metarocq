@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require CMorphisms.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICOnOne PCUICAstUtils PCUICReflect.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICOnOne PCUICAstUtils PCUICReflect.
 
 From Stdlib Require Import ssreflect ssrbool.
 From Stdlib Require Import Morphisms CRelationClasses.

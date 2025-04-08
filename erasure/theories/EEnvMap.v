@@ -1,9 +1,9 @@
 From Stdlib Require Import ssreflect ssrbool Morphisms Setoid ProofIrrelevance.
 From Equations Require Import Equations.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import Kernames EnvMap BasicAst.
-From MetaCoq.Erasure Require Import EAst EGlobalEnv EAstUtils EGlobalEnv EAstUtils.
-Import MCMonadNotation.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import Kernames EnvMap BasicAst.
+From MetaRocq.Erasure Require Import EAst EGlobalEnv EAstUtils EGlobalEnv EAstUtils.
+Import MRMonadNotation.
 
 Lemma fresh_globals_cons_inv {Σ : global_context} {d} : EnvMap.fresh_globals (d :: Σ) -> EnvMap.fresh_globals Σ.
 Proof. intros H; now depelim H. Qed.

@@ -1,15 +1,15 @@
 From Equations Require Import Equations.
-From MetaCoq.Common Require Import BasicAst.
-From MetaCoq.Common Require Import Kernames.
-From MetaCoq.Template Require Import Ast.
-From MetaCoq.Template Require Import LiftSubst.
-From MetaCoq.Template Require Import AstUtils.
-From MetaCoq.Template Require Import Loader.
-From MetaCoq.Template Require Import TemplateMonad.
-From MetaCoq.Template Require Import Typing.
-From MetaCoq.Utils Require Import utils.
+From MetaRocq.Common Require Import BasicAst.
+From MetaRocq.Common Require Import Kernames.
+From MetaRocq.Template Require Import Ast.
+From MetaRocq.Template Require Import LiftSubst.
+From MetaRocq.Template Require Import AstUtils.
+From MetaRocq.Template Require Import Loader.
+From MetaRocq.Template Require Import TemplateMonad.
+From MetaRocq.Template Require Import Typing.
+From MetaRocq.Utils Require Import utils.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Derive Signature for Alli.
 Derive Signature for Forall.

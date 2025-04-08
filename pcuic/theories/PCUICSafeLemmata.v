@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
      PCUICLiftSubst PCUICUnivSubst PCUICTyping PCUICConfluence
      PCUICCumulativity PCUICSR PCUICPosition PCUICCasesContexts PCUICEquality
      PCUICGlobalEnv PCUICNamelessDef
@@ -119,10 +119,11 @@ Section Lemmata.
   Lemma ws_cumul_pb_zippx :
     forall {wfΣ : wf Σ} le Γ u v ρ,
       closedn_stack #|Γ| ρ ->
-      Σ ;;; (Γ ,,, stack_context ρ) ⊢ u ≤[le] v ->
+      Σ ;;; (Γ ,,, stack_context ρ) ⊢ u = v ->
       Σ ;;; Γ ⊢ zippx u ρ ≤[le] zippx v ρ.
   Proof using Type.
     intros wfΣ le Γ u v ρ cl h.
+    apply ws_cumul_eq_pb.
     induction ρ in u, v, cl, h |- *; auto.
     destruct a.
     all: try solve [
@@ -346,7 +347,7 @@ Section Lemmata.
       destruct mfix as ((?&[])&?); simpl in *.
       + eapply All_app in a as (_&a).
         depelim a.
-        eauto using isType_welltyped.
+        eauto using isTypeRel_welltyped.
       + eapply All_app in a0 as (_&a0).
         depelim a0. destruct o as (t0 & _); cbn in t0.
         rewrite fix_context_fix_context_alt in t0.
@@ -358,7 +359,7 @@ Section Lemmata.
       destruct mfix as ((?&[])&?); simpl in *.
       + eapply All_app in a as (_&a).
         depelim a.
-        eauto using isType_welltyped.
+        eauto using isTypeRel_welltyped.
       + eapply All_app in a0 as (_&a0).
         depelim a0. destruct o as (t0 & _); cbn in t0.
         rewrite fix_context_fix_context_alt in t0.
@@ -443,9 +444,9 @@ Section Lemmata.
       eapply closed_context_conversion; tea.
       now symmetry.
     - apply unlift_TypUniv in l. now econstructor.
-    - now eapply isType_welltyped.
+    - now eapply isTypeRel_welltyped.
     - apply unlift_TermTyp in l. now econstructor.
-    - apply lift_sorting_forget_body in l. now eapply isType_welltyped.
+    - apply lift_sorting_forget_body in l. now eapply isTypeRel_welltyped.
     - eapply inversion_Prim in typ as (?&?&[]); eauto.
       depelim p0. now eexists.
     - eapply inversion_Prim in typ as (?&?&[]); eauto.

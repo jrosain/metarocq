@@ -1,15 +1,15 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Primitive.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Primitive.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive
   PCUICLiftSubst PCUICUnivSubst PCUICEquality PCUICUtils PCUICPosition.
-From MetaCoq.PCUIC Require Export PCUICCumulativitySpec.
-From MetaCoq.PCUIC Require Export PCUICCases.
+From MetaRocq.PCUIC Require Export PCUICCumulativitySpec.
+From MetaRocq.PCUIC Require Export PCUICCases.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 (* TODO: remove this export *)
-From MetaCoq.Utils Require Export LibHypsNaming.
+From MetaRocq.Utils Require Export LibHypsNaming.
 
 From Stdlib Require Import ssreflect ssrbool.
 From Equations.Type Require Import Relation.
@@ -154,6 +154,7 @@ Variant case_side_conditions `{checker_flags} wf_local_fun typing Σ Γ ci p ps 
       global environment *)
     (conv_pctx : eq_context_upto_names p.(pcontext) (ind_predicate_context ci.(ci_ind) mdecl idecl))
     (allowed_elim : is_allowed_elimination Σ idecl.(ind_kelim) ps)
+    (elim_relevance : isSortRel ps ci.(ci_relevance))
     (ind_inst : ctx_inst (typing Σ) Γ (p.(pparams) ++ indices)
                          (List.rev (subst_instance p.(puinst)
                                                    (ind_params mdecl ,,, ind_indices idecl : context))))
@@ -221,7 +222,7 @@ Inductive typing `{checker_flags} (Σ : global_env_ext) (Γ : context) : term ->
     Σ ;;; Γ |- tLetIn na b B t : tLetIn na b B A
 
 | type_App : forall t na A B s u,
-    (* Paranoid assumption, allows to show equivalence with template-coq,
+    (* Paranoid assumption, allows to show equivalence with template-rocq,
        but eventually unnecessary thanks to validity. *)
     Σ ;;; Γ |- tProd na A B : tSort s ->
     Σ ;;; Γ |- t : tProd na A B ->
@@ -363,12 +364,26 @@ Proof.
 Qed.
 Global Hint Resolve isType_welltyped : pcuic.
 
+Definition isTypeRel_welltyped {cf Σ} {Γ T r}
+  : isTypeRel Σ Γ T r -> welltyped Σ Γ T.
+Proof.
+  intros [_ [s []]]. now econstructor.
+Qed.
+Global Hint Resolve isTypeRel_welltyped : pcuic.
+
 Definition has_sort_isType {cf Σ} {Γ T} s
   : Σ ;;; Γ |- T : tSort s -> isType Σ Γ T.
 Proof.
   repeat (eexists; tea).
 Defined.
 Global Hint Resolve has_sort_isType : pcuic.
+
+Definition has_sort_isTypeRel {cf Σ} {Γ T} s r
+  : isSortRel s r -> Σ ;;; Γ |- T : tSort s -> isTypeRel Σ Γ T r.
+Proof.
+  repeat (eexists; tea).
+Defined.
+Global Hint Resolve has_sort_isTypeRel : pcuic.
 
 Definition isWfArity {cf:checker_flags} Σ (Γ : context) T :=
   (isType Σ Γ T × { ctx & { s & (destArity [] T = Some (ctx, s)) } }).
@@ -613,7 +628,7 @@ Lemma wf_local_inv `{checker_flags} {Σ Γ'} (w : wf_local Σ Γ') :
   forall d Γ,
     Γ' = d :: Γ ->
     ∑ (w' : wf_local Σ Γ) u,
-      { ty : lift_typing1 (typing Σ) Γ (Judge d.(decl_body) d.(decl_type) (Some u)) |
+      { ty : lift_typing1 (typing Σ) Γ (j_decl_s d (Some u)) |
             All_local_env_size (@typing_size _ Σ) _ w' <
             All_local_env_size (@typing_size _ _) _ w /\
             lift_typing_size (@typing_size _ _ _) _ ty <= All_local_env_size (@typing_size _ _) _ w }.
@@ -737,6 +752,7 @@ Lemma typing_ind_env_app_size `{cf : checker_flags} :
         wf_local Σ (Γ ,,, predctx) ->
         PΓ Σ (Γ ,,, predctx) ->
         is_allowed_elimination Σ idecl.(ind_kelim) ps ->
+        isSortRel ps ci.(ci_relevance) ->
         ctx_inst (Prop_conj typing P Σ) Γ (p.(pparams) ++ indices)
           (List.rev (subst_instance p.(puinst) (mdecl.(ind_params) ,,, idecl.(ind_indices) : context))) ->
         Σ ;;; Γ |- c : mkApps (tInd ci.(ci_ind) p.(puinst)) (p.(pparams) ++ indices) ->
@@ -885,6 +901,7 @@ Proof.
             eapply type_local_ctx_impl. eapply Xg'. auto. intros ?? Hj. apply Xj; tas.
             apply lift_typing_impl with (1 := Hj); intros ?? HT. split; tas.
             apply (IH (_; _; _; HT)).
+           - apply Xg.(ind_relevance_compat).
            - apply (onIndices Xg). }
         { apply All_local_env_impl with (1 := onP); intros ?? Hj. apply Xj; tas.
           apply lift_typing_impl with (1 := Hj); intros ?? HT. split; tas.
@@ -1198,6 +1215,7 @@ Lemma typing_ind_env `{cf : checker_flags} :
       P Σ (Γ ,,, predctx) p.(preturn) (tSort ps) ->
       PΓ Σ (Γ ,,, predctx) ->
       is_allowed_elimination Σ idecl.(ind_kelim) ps ->
+      isSortRel ps ci.(ci_relevance) ->
       ctx_inst (Prop_conj typing P Σ) Γ (p.(pparams) ++ indices)
         (List.rev (subst_instance p.(puinst) (mdecl.(ind_params) ,,, idecl.(ind_indices) : context))) ->
       Σ ;;; Γ |- c : mkApps (tInd ci.(ci_ind) p.(puinst)) (p.(pparams) ++ indices) ->

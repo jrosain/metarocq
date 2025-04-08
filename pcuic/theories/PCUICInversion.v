@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICCases PCUICLiftSubst PCUICUnivSubst
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICCases PCUICLiftSubst PCUICUnivSubst
      PCUICTyping PCUICCumulativity PCUICConfluence PCUICConversion
      PCUICOnFreeVars PCUICClosedTyp PCUICWellScopedCumulativity.
 
@@ -255,6 +255,7 @@ Section Inversion.
        (conv_pctx : eq_context_upto_names p.(pcontext) (ind_predicate_context ci.(ci_ind) mdecl idecl))
        (pret_ty : Σ ;;; Γ ,,, predctx |- p.(preturn) : tSort ps)
        (allowed_elim : is_allowed_elimination Σ idecl.(ind_kelim) ps)
+       (elim_relevance : isSortRel ps ci.(ci_relevance))
        (ind_inst : ctx_inst (typing Σ) Γ (p.(pparams) ++ indices)
                             (List.rev (subst_instance p.(puinst)
                                                       (ind_params mdecl ,,, ind_indices idecl : context))))

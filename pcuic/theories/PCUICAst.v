@@ -1,13 +1,13 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool Morphisms.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Export Primitive Universes BasicAst Environment Reflect.
-From MetaCoq.Common Require EnvironmentTyping.
-From MetaCoq.PCUIC Require Export PCUICPrimitive.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Export Primitive Universes BasicAst Environment Reflect.
+From MetaRocq.Common Require EnvironmentTyping.
+From MetaRocq.PCUIC Require Export PCUICPrimitive.
 From Equations Require Import Equations.
 (** * AST of the Polymorphic Cumulative Calculus of Inductive Constructions
 
-   This AST is a cleaned-up version of Coq's internal AST better suited for
+   This AST is a cleaned-up version of Rocq's internal AST better suited for
    reasoning.
    In particular, it has binary applications and all terms are well-formed.
    Casts are absent as well. *)
@@ -1477,6 +1477,6 @@ Record mutual_inductive_entry := {
   mind_entry_universes : universes_decl;
   mind_entry_private   : option bool
   (* Private flag for sealing an inductive definition in an enclosing
-     module. Not handled by.Common Coq yet. *) }.
+     module. Not handled by.Common Rocq yet. *) }.
 
 Derive NoConfusion for local_entry one_inductive_entry mutual_inductive_entry.

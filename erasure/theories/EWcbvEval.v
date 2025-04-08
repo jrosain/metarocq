@@ -1,9 +1,9 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8 Program.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config BasicAst.
-From MetaCoq.PCUIC Require PCUICWcbvEval.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils ELiftSubst ECSubst EReflect EGlobalEnv
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config BasicAst.
+From MetaRocq.PCUIC Require PCUICWcbvEval.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils ELiftSubst ECSubst EReflect EGlobalEnv
   EWellformed.
 
 From Equations Require Import Equations.
@@ -18,9 +18,9 @@ Set Default Proof Using "Type*".
   which conversion is defined. Hence two terms that reduce to the same
   wcbv head normal form are convertible.
 
-  This reduction strategy is supposed to mimick at the Coq level the
+  This reduction strategy is supposed to mimick at the Rocq level the
   reduction strategy of ML programming languages. It is used to state
-  the extraction conjecture that can be applied to Coq terms to produce
+  the extraction conjecture that can be applied to Rocq terms to produce
   (untyped) terms where all proofs are erased to a dummy value. *)
 
 

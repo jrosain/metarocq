@@ -1,16 +1,16 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Uint63 FloatOps FloatAxioms.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Primitive EnvMap.
-From MetaCoq.Common Require Import MonadBasicAst.
-From MetaCoq.Template Require Import AstUtils MonadAst.
-From MetaCoq.Template Require TemplateProgram.
-From MetaCoq.Template Require TemplateMonad.Core.
-From MetaCoq.Template Require Import TemplateMonad.Common.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICPrimitive PCUICCases PCUICProgram.
-From MetaCoq.TemplatePCUIC Require Import TemplateToPCUIC.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Primitive EnvMap.
+From MetaRocq.Common Require Import MonadBasicAst.
+From MetaRocq.Template Require Import AstUtils MonadAst.
+From MetaRocq.Template Require TemplateProgram.
+From MetaRocq.Template Require TemplateMonad.Core.
+From MetaRocq.Template Require Import TemplateMonad.Common.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICPrimitive PCUICCases PCUICProgram.
+From MetaRocq.TemplatePCUIC Require Import TemplateToPCUIC.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 Local Set Universe Polymorphism.
 Local Unset Universe Minimization ToSet.
 

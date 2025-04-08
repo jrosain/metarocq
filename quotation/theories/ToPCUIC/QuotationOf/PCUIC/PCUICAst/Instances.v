@@ -1,5 +1,5 @@
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.PCUIC.PCUICAst Require Export
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.PCUIC.PCUICAst Require Export
   PCUICTerm.Instances
   PCUICEnvironmentHelper.Instances
   PCUICEnvironment.Instances

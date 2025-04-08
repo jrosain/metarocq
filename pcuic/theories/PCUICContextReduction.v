@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import CRelationClasses.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICOnOne PCUICAstUtils PCUICTactics
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICOnOne PCUICAstUtils PCUICTactics
      PCUICLiftSubst PCUICEquality PCUICUnivSubst PCUICInduction
      PCUICReduction PCUICCases PCUICWeakeningConv PCUICWeakeningTyp
      PCUICTyping PCUICOnFreeVars PCUICSubstitution

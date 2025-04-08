@@ -1,10 +1,10 @@
 From Stdlib Require Import Structures.Equalities Lists.List Lists.ListDec.
-From MetaCoq.Utils Require Import MCProd All_Forall ReflectEq MCRelations MCReflect.
-From MetaCoq.Common Require Import Environment Universes.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.ssr utils BasicAst Primitive Universes Kernames.
-From MetaCoq.Quotation.ToPCUIC.Utils Require Import (hints) MCOption MCProd All_Forall.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.Common Require Import Environment.Sig.
+From MetaRocq.Utils Require Import MRProd All_Forall ReflectEq MRRelations MRReflect.
+From MetaRocq.Common Require Import Environment Universes.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.ssr utils BasicAst Primitive Universes Kernames.
+From MetaRocq.Quotation.ToPCUIC.Utils Require Import (hints) MROption MRProd All_Forall.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.Common Require Import Environment.Sig.
 
 Module Retroknowledge.
   #[export] Instance quote_t : ground_quotable Retroknowledge.t := ltac:(destruct 1; exact _).
@@ -72,7 +72,7 @@ End QuoteEnvironmentHelper.
 Module Type QuoteEnvironmentHelperSig (T : Term) (E : EnvironmentSig T) := Nop <+ QuoteEnvironmentHelper T E.
 
 Module Type QuotationOfQuoteEnvironmentHelper (T : Term) (E : EnvironmentSig T) (QEH : QuoteEnvironmentHelperSig T E).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "QEH").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "QEH").
 End QuotationOfQuoteEnvironmentHelper.
 
 Module QuoteEnvironment (T : Term) (Import E : EnvironmentSig T) (Import QEH : QuoteEnvironmentHelperSig T E) (Import qT : QuotationOfTerm T) (Import qE : QuotationOfEnvironment T E) (Import qQEH : QuotationOfQuoteEnvironmentHelper T E QEH) (Import QuoteT : QuoteTerm T) <: QuoteEnvironmentSig T E.

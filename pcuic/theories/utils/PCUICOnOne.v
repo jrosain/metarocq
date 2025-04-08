@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst.
 
 From Stdlib Require Import ssreflect.
 From Equations.Prop Require Import DepElim.
@@ -37,7 +37,7 @@ Definition dummy_branch : branch term := mk_branch [] tDummy.
 
 (** *** One step strong beta-zeta-iota-fix-delta reduction
 
-  Inspired by the reduction relation from Coq in Coq [Barras'99].
+  Inspired by the reduction relation from Rocq in Rocq [Barras'99].
 *)
 
 Arguments OnOne2 {A} P%_type l l'.

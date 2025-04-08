@@ -1,9 +1,9 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Uint63 FloatOps FloatAxioms.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Primitive EnvMap.
-From MetaCoq.Template Require AstUtils TemplateProgram.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICPrimitive PCUICCases PCUICProgram.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Primitive EnvMap.
+From MetaRocq.Template Require AstUtils TemplateProgram.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICPrimitive PCUICCases PCUICProgram.
 
 Lemma to_Z_bounded_bool (i : Uint63.int) :
   ((0 <=? Uint63.to_Z i) && (Uint63.to_Z i <? wB))%Z.
@@ -72,7 +72,7 @@ Section Trans.
   | Ast.tLambda na T M => tLambda na (trans T) (trans M)
   | Ast.tApp u v => mkApps (trans u) (List.map trans v)
   | Ast.tProd na A B => tProd na (trans A) (trans B)
-  | Ast.tCast c kind t => tApp (tLambda (mkBindAnn nAnon Relevant) (trans t) (tRel 0)) (trans c)
+  | Ast.tCast c kind t => tApp (tLambda (mkBindAnn nAnon rel_of_Type) (trans t) (tRel 0)) (trans c)
   | Ast.tLetIn na b t b' => tLetIn na (trans b) (trans t) (trans b')
   | Ast.tCase ci p c brs =>
     let p' := Ast.map_predicate id trans trans p in

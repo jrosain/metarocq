@@ -1,5 +1,5 @@
-From MetaCoq.Quotation.ToTemplate Require Import Init.
-From MetaCoq.Quotation.ToTemplate.QuotationOf.Common.Kernames Require Export
+From MetaRocq.Quotation.ToTemplate Require Import Init.
+From MetaRocq.Quotation.ToTemplate.QuotationOf.Common.Kernames Require Export
   Kername.Instances
   KernameSet.Instances
   KernameSetOrdProp.Instances

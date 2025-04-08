@@ -1,8 +1,8 @@
 
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect RelationClasses OrderedTypeAlt FMapAVL FMapFacts.
-From MetaCoq.Utils Require Import utils String2pos CanonicalTries.
-From MetaCoq.Common Require Import config uGraph Reflect BasicAst Kernames.
+From MetaRocq.Utils Require Import utils String2pos CanonicalTries.
+From MetaRocq.Common Require Import config uGraph Reflect BasicAst Kernames.
 From Equations Require Import Equations.
 Import String2pos.
 

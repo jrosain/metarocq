@@ -1,15 +1,15 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config EnvMap.
-From MetaCoq.Template Require Ast TypingWf WfAst TermEquality.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCumulativity
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config EnvMap.
+From MetaRocq.Template Require Ast TypingWf WfAst TermEquality.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCumulativity
      PCUICLiftSubst PCUICEquality PCUICReduction
      PCUICUnivSubst PCUICTyping PCUICGlobalEnv
      PCUICWeakeningConv PCUICWeakeningTyp PCUICWeakeningEnv
      PCUICSubstitution PCUICGeneration PCUICCasesContexts
      PCUICProgram.
-From MetaCoq.TemplatePCUIC Require Import TemplateToPCUIC.
+From MetaRocq.TemplatePCUIC Require Import TemplateToPCUIC.
 
 From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
@@ -69,7 +69,7 @@ Tactic Notation "len" "in" hyp(id) :=
     rewrite !pclengths /= // in id);
   try lia.
 
-(* Source =Template, Target (unqualified) = Coq *)
+(* Source =Template, Target (unqualified) = Rocq *)
 
 Module S :=Template.Ast.
 Module SEq :=Template.TermEquality.
@@ -619,7 +619,7 @@ Lemma trans_ind_bodies mdecl : map (trans_one_ind_body trΣ) (Ast.Env.ind_bodies
   ind_bodies (trans_minductive_body (trans_global_env Σ) mdecl).
 Proof. reflexivity. Qed.
 
-(* From MetaCoq.PCUIC Require Import PCUICClosed PCUICInductiveInversion.
+(* From MetaRocq.PCUIC Require Import PCUICClosed PCUICInductiveInversion.
 
 Lemma instantiate_params_spec params paramsi concl ty :
   instantiate_params params paramsi (it_mkProd_or_LetIn params concl) = Some ty ->
@@ -1775,6 +1775,20 @@ Proof.
     eapply IHX2. auto. eapply wf_red1 in r; tea. now eapply typing_wf_sigma; auto.
 Qed.
 
+Lemma trans_lift_typing_it {P Q} {tm tm'} {t t'} {u r} :
+  forall tu: ST.lift_typing0 P (Judge tm t u r),
+  let s := tu.2.π1 in
+  match tm', tm with None, _ => unit | Some tm', Some tm => P tm t -> Q tm' t' | _, _ => False end ->
+  (P t (Ast.tSort s) -> Q t' (tSort s)) ->
+  lift_typing0 Q (Judge tm' t' u r).
+Proof.
+  intros (? & ? & Hs & e) s HPQc HPQs.
+  split.
+  - destruct tm, tm' => //=. now apply HPQc.
+  - eexists. split; [now apply HPQs|].
+    destruct u => //.
+Qed.
+
 Definition TTy_wf_local {cf : checker_flags} Σ Γ := ST.All_local_env (ST.lift_typing ST.typing Σ) Γ.
 
 Lemma trans_wf_local {cf}:
@@ -1794,9 +1808,9 @@ Proof.
   induction X0.
   - simpl. constructor.
   - simpl. econstructor; auto.
-    simpl. destruct tu as (? & ? & ? & ?); cbn in *. repeat (eexists; tea). eauto.
+    simpl. eapply trans_lift_typing_it with tu => //. eauto.
   - simpl. constructor; auto.
-    simpl. destruct tu as (? & ? & ? & ?); cbn in *. repeat (eexists; tea); cbn. all: eauto.
+    simpl. eapply trans_lift_typing_it with tu => //. all: eauto.
 Qed.
 
 Lemma trans_wf_local_env {cf} Σ Γ :
@@ -1812,9 +1826,9 @@ Proof.
   induction X.
   - simpl. constructor.
   - simpl. econstructor; auto.
-    simpl. destruct t0 as (_ & ? & (? & ?) & ?); cbn in *. repeat (eexists; tea).
+    simpl. eapply trans_lift_typing_it with t0 => // HT. now apply HT.
   - simpl. constructor; auto.
-    simpl. destruct t0 as ((? & ?) & ? & (? & ?) & ?); cbn in *. repeat (eexists; cbn; tea).
+    simpl. eapply trans_lift_typing_it with t0 => // HT. all: now apply HT.
 Qed.
 
 #[global]
@@ -2064,7 +2078,7 @@ Proof.
   now eapply eq_annots_expand_lets_ctx.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICValidity PCUICContexts PCUICInductives PCUICInductiveInversion.
+From MetaRocq.PCUIC Require Import PCUICValidity PCUICContexts PCUICInductives PCUICInductiveInversion.
 
 Lemma isType_mkApps_Ind_inv_spine {cf:checker_flags} {Σ : global_env_ext} {Γ ind u args} {wfΣ : wf Σ} {mdecl idecl} :
   declared_inductive Σ ind mdecl idecl ->
@@ -2095,6 +2109,7 @@ Lemma simpl_type_Case {H : checker_flags} {Σ : global_env_ext} {Γ} {ci : case_
   wf_local Σ (Γ,,, predctx) ->
   Σ;;; Γ,,, predctx |- preturn p : tSort ps ->
   is_allowed_elimination Σ (ind_kelim idecl) ps ->
+  isSortRel ps ci.(ci_relevance) ->
   Σ;;; Γ |- c : mkApps (tInd ci (puinst p)) (pparams p ++ indices) ->
   isCoFinite (ind_finite mdecl) = false ->
   let ptm := it_mkLambda_or_LetIn predctx (preturn p) in
@@ -2117,7 +2132,7 @@ Proof.
   - solve_all. now eapply typing_wf_local in a0.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICOnFreeVars.
+From MetaRocq.PCUIC Require Import PCUICOnFreeVars.
 
 Lemma trans_cumulSpec {cf} {Σ : Ast.Env.global_env_ext} {wfΣ : Typing.wf Σ} {pb Γ T T'} :
   let Σ' := trans_global Σ in
@@ -2226,7 +2241,7 @@ Local Hint Transparent Ast.Env.global_env_ext : trans.
 Local Hint Transparent sort : trans.
 Local Hint Variables Transparent : trans.
 Ltac trans := try typeclasses eauto with trans.
-(* bug in Coq, typeclasses eauto tries exact with a quantified hypothesis starting with a let-in *)
+(* bug in Rocq, typeclasses eauto tries exact with a quantified hypothesis starting with a let-in *)
 Ltac simpl_let :=
   match goal with
   | [ H : let _ := _ in _ |- _ ] => progress (cbv zeta in H)
@@ -2265,17 +2280,17 @@ Proof.
     f_equal.
 
   - (* Casts *)
-    assert (lift_typing0 (typing Σ' (trans_local (trans_global_env Σ.1) Γ)) (TypUniv (trans (trans_global_env Σ.1) t) s)).
+    assert (lift_typing0 (typing Σ' (trans_local (trans_global_env Σ.1) Γ)) (TypUnivRel (trans (trans_global_env Σ.1) t) s rel_of_Type)).
     { repeat (eexists; eauto). }
+    apply lift_sorting_forget_univ in X4 as X4'.
     eapply refine_type; cbn.
     * eapply type_App.
-      2:{ eapply type_Lambda; eauto. now eapply lift_sorting_forget_univ. eapply type_Rel. econstructor; eauto.
-        eapply typing_wf_local; eauto. now eapply has_sort_isType. reflexivity. }
+      2:{ eapply type_Lambda; eauto. eapply type_Rel. econstructor; eauto.
+        eapply typing_wf_local; eauto. reflexivity. }
       eapply type_Prod. eauto.
       instantiate (1 := s). simpl.
       eapply (weakening _ _ [_] _ (tSort _)); eauto.
       constructor; eauto. eapply typing_wf_local; eauto.
-      now eapply has_sort_isType.
       now eapply X2.
     * unfold subst1. rewrite simpl_subst; auto. now rewrite lift0_p.
 
@@ -2308,7 +2323,7 @@ Proof.
         2:apply WfAst.wf_subst; try constructor; auto. 2:now inv wfAB.
         specialize (p X2). specialize (p0 X2).
         eapply PCUICInversion.inversion_Prod in p as [s1 [s2 [HA [HB Hs]]]]; auto.
-        eapply (PCUICArities.isType_subst (Δ := [vass na (trans Σ' A)])); eauto.
+        eapply (isType_subst (Δ := [vass na (trans Σ' A)])); eauto.
         eapply subslet_ass_tip. eauto with pcuic.
         now eapply has_sort_isType.
 
@@ -2340,7 +2355,7 @@ Proof.
   - cbn; rewrite trans_mkApps; auto with wf trans.
     pose proof (forall_decls_declared_inductive _ _ _ _ _ _ isdecl).
     rewrite trans_lookup_inductive.
-    rewrite (declared_inductive_lookup _ H4).
+    rewrite (declared_inductive_lookup _ H5).
     rewrite trans_it_mkLambda_or_LetIn.
     rewrite -/(trans_local Σ' (Ast.case_predicate_context _ _ _ _)).
     have lenpctx : #|Ast.pcontext p| = S #|Ast.Env.ind_indices idecl|.
@@ -2355,9 +2370,9 @@ Proof.
       eapply eq_binder_annots_eq.
       now eapply trans_ind_predicate_context.
     + cbn. split. cbn.
-      { epose proof (declared_minductive_ind_npars (proj1 H4)).
+      { epose proof (declared_minductive_ind_npars (proj1 H5)).
         cbn in H4. len. rewrite -H0.
-        now rewrite context_assumptions_map in H5. }
+        now rewrite context_assumptions_map in H6. }
       cbn. rewrite map2_map2_bias_left.
       { rewrite PCUICCases.ind_predicate_context_length; len. }
       rewrite map_map2 /= map2_cst.
@@ -2437,14 +2452,13 @@ Proof.
     eapply fix_guard_trans. assumption.
     now rewrite nth_error_map H0.
     -- eapply All_map, (All_impl X1).
-       intros x (_ & s & Hts & _). assumption.
-       repeat (eexists; tea).
-    -- apply All_map. eapply (All_impl X3); eauto.
-       intros x (Htb & s & Hts & _). assumption.
+       intros d tu. now apply tu.
+    -- apply All_map. eapply (All_impl X3).
+       intros d tu. specialize (tu X4).
        unfold on_def_body, types in *; cbn in *.
-       rewrite H2. rewrite /trans_local !length_map map_app in Htb, Hts |- *.
+       rewrite H2. rewrite /trans_local !length_map map_app in tu |- *.
        rewrite <- trans_lift.
-       repeat (eexists; tea); cbn; eauto.
+       apply tu.
     -- eapply trans_wf_fixpoint => //. clear X1 X3.
        solve_all; destruct a as (_ & s & Hs & _), b as (Hs' & _).
        now eapply TypingWf.typing_wf in Hs.
@@ -2462,14 +2476,13 @@ Proof.
     -- now eapply cofix_guard_trans.
     -- now rewrite nth_error_map H0.
     -- eapply All_map, (All_impl X1).
-       intros x (_ & s & Hts & _). assumption.
-       repeat (eexists; tea).
-    -- apply All_map. eapply (All_impl X3); eauto.
-       intros x (Htb & s & Hts & _). assumption.
+       intros d tu. now apply tu.
+    -- apply All_map. eapply (All_impl X3).
+       intros d tu. specialize (tu X4).
        unfold on_def_body, types in *; cbn in *.
-       rewrite H2. rewrite /trans_local !length_map map_app in Htb, Hts |- *.
+       rewrite H2. rewrite /trans_local !length_map map_app in tu |- *.
        rewrite <- trans_lift.
-       repeat (eexists; tea); cbn; eauto.
+       apply tu.
     -- eapply trans_wf_cofixpoint => //. clear X1 X3.
        solve_all; destruct a as (_ & s & Hs & _), b as (Hs' & _).
        now eapply TypingWf.typing_wf in Hs.
@@ -2556,7 +2569,7 @@ Proof.
   now rewrite trans_subst.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICInstDef PCUICInstConv.
+From MetaRocq.PCUIC Require Import PCUICInstDef PCUICInstConv.
 From Stdlib Require Import ssrbool.
 (* Lemma closed_ctx_map2_set_binder_name (n : nat) (bctx : list aname) (ctx : list context_decl) :
   closedn_ctx n ctx -> closedn_ctx n (map2_bias_left set_binder_name dummy_decl bctx ctx).
@@ -2651,7 +2664,7 @@ Proof.
   - solve_all.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICOnFreeVars.
+From MetaRocq.PCUIC Require Import PCUICOnFreeVars.
 
 Lemma trans_cumul_ctx_rel {cf} {Σ : Ast.Env.global_env_ext} Γ Δ Δ' :
   let Σ' := trans_global Σ in
@@ -2854,7 +2867,7 @@ Proof.
       eapply All_app_inv => //. }
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICClosed PCUICClosedTyp.
+From MetaRocq.PCUIC Require Import PCUICClosed PCUICClosedTyp.
 
 Lemma trans_ind_respects_variance {cf} Σ mdecl v idecl :
   let Σ' := trans_global_env Σ in
@@ -2922,9 +2935,9 @@ Proof.
   destruct a as [na [b|] ty] => //;
   intros [? ?]; cbn.
   all: split; auto.
-  - eapply (IH _ _ (TermTyp _ _)) in l; auto.
+  - eapply (IH _ _ (TermTypRel _ _ _)) in l; auto.
     rewrite -trans_local_app //.
-  - eapply (IH _ _ (TypUniv _ _)) in l => //.
+  - eapply (IH _ _ (TypUnivRel _ _ _)) in l => //.
     rewrite -trans_local_app //.
 Qed.
 
@@ -3078,7 +3091,7 @@ Proof.
     { split; rewrite trans_env_env_universes //. }
     have wfdecl := on_global_decl_wf (Σ := (Σg, udecl)) X0 on_global_decl_d.
     destruct d eqn:eqd.
-    * eapply (X (Σg, _) [] (TermoptTyp _ _)); auto.
+    * eapply (X (Σg, _) [] (TermoptTypRel _ _ _)); auto.
     * destruct on_global_decl_d as [onI onP onNP].
       simpl.
       change (trans_env_env (trans_global_env Σg), Ast.Env.ind_universes m) with (global_env_ext_map_global_env_ext (trans_global (Σg, Ast.Env.ind_universes m))) in *.
@@ -3090,14 +3103,15 @@ Proof.
         { eapply closed_arities_context => //. clear -onu wfΣg X0 IHond X onI.
           eapply Alli_All; tea; cbv beta.
           move=> n x /Typing.onArity => o.
+          eapply isTypeRel_isType.
           apply (X (Σg, Ast.Env.ind_universes m) [] _ X0 o) => //. }
         eapply Alli_All_mix in onI; tea.
         eapply Alli_map. eapply Alli_impl. exact onI. eauto. intros n idecl [oni wf].
-        have onarity : on_type (PCUICEnvTyping.lift_typing typing)
+        have onarity : on_type_rel (PCUICEnvTyping.lift_typing typing)
           (trans_global (Σg, Ast.Env.ind_universes m)) []
-          (ind_type (trans_one_ind_body (trans_global_env Σg) idecl)).
-        { apply ST.onArity in oni. unfold on_type in *; simpl in *.
-          now apply (X (Σg, Ast.Env.ind_universes m) [] (Typ (Ast.Env.ind_type idecl))). }
+          (ind_type (trans_one_ind_body (trans_global_env Σg) idecl)) rel_of_Type.
+        { apply ST.onArity in oni. unfold on_type_rel in *; simpl in *.
+          now apply (X (Σg, Ast.Env.ind_universes m) [] (TypRel (Ast.Env.ind_type idecl) _)). }
         unshelve refine {| ind_cunivs := oni.(ST.ind_cunivs) |}; tea.
         --- cbn -[trans_global_env]. rewrite oni.(ST.ind_arity_eq).
             now rewrite ![trans _ _]trans_it_mkProd_or_LetIn.
@@ -3108,14 +3122,14 @@ Proof.
             rename b into onc. rename y into cs.
             rename a0 into wfctype. rename a into wfcargs. rename b1 into wfcindices.
             destruct onc.
-            have onty : on_type (PCUICEnvTyping.lift_typing typing)
+            have onty : on_type_rel (PCUICEnvTyping.lift_typing typing)
               (trans_global (Σg, Ast.Env.ind_universes m))
               (arities_context
               (ind_bodies (trans_minductive_body (trans_global_env Σg) m)))
-              (cstr_type (trans_constructor_body (trans_global_env Σg) x)).
+              (cstr_type (trans_constructor_body (trans_global_env Σg) x)) (Ast.Env.ind_relevance idecl).
             { unfold cstr_type, Ast.Env.cstr_type in on_ctype |- *; simpl in *. red.
               move: (X (Σg, Ast.Env.ind_universes m) (Ast.Env.arities_context (Ast.Env.ind_bodies m))
-                (Typ (Ast.Env.cstr_type x))).
+                (TypRel (Ast.Env.cstr_type x) (Ast.Env.ind_relevance idecl))).
               rewrite trans_arities_context.
               intros H'. apply H' => //. }
             have ceq : cstr_type (trans_constructor_body (trans_global_env Σg) x) =
@@ -3148,9 +3162,9 @@ Proof.
               specialize (foo
                 (Ast.Env.arities_context (Ast.Env.ind_bodies m) ,,, Ast.Env.ind_params m ,,, c));
               rewrite /trans_local !map_app in foo.
-              now apply (foo (TermTyp b ty)).
-              now apply (foo (TermTyp b ty)).
-              now apply (foo (TypUniv ty _)).
+              now apply (foo (TermTypRel b ty _)).
+              now apply (foo (TermTypRel b ty _)).
+              now apply (foo (TypUnivRel ty _ _)).
             + clear -X0 onu wfΣg IHond X on_cindices.
               revert on_cindices.
               rewrite -trans_lift_context /trans_local -map_rev.
@@ -3266,6 +3280,8 @@ Proof.
             rewrite trans_subst trans_lift. f_equal. now rewrite trans_projs.
         --- have inds := oni.(ST.ind_sorts).
             eapply trans_check_ind_sorts in inds; tea.
+        --- have compat := oni.(ST.ind_relevance_compat).
+            apply compat.
         --- have inds := oni.(ST.onIndices).
             simpl.
             destruct Ast.Env.ind_variance => //.

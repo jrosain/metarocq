@@ -1,14 +1,14 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.Template Require Ast TypingWf WfAst TermEquality TypingWf WcbvEval.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.Template Require Ast TypingWf WfAst TermEquality TypingWf WcbvEval.
 Set Warnings "-notation-overridden".
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCumulativity
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCumulativity
      PCUICLiftSubst PCUICEquality PCUICUnivSubst PCUICTyping
      PCUICWeakeningConv PCUICWeakeningTyp PCUICSubstitution PCUICGeneration
      PCUICClosed PCUICCSubst PCUICProgram PCUICCSubst PCUICCanonicity PCUICWcbvEval.
-From MetaCoq.TemplatePCUIC Require Import TemplateToPCUIC TemplateToPCUICCorrectness.
+From MetaRocq.TemplatePCUIC Require Import TemplateToPCUIC TemplateToPCUICCorrectness.
 
 Set Warnings "+notation-overridden".
 

@@ -1,6 +1,6 @@
 From Stdlib Require Import ssreflect Wellfounded.Inclusion.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICSN PCUICTyping PCUICSafeLemmata PCUICWeakeningConfigTyp.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICSN PCUICTyping PCUICSafeLemmata PCUICWeakeningConfigTyp.
 Import PCUICEnvironment.
 
 Lemma weakening_config_normalization_in {cf1 cf2} {no1 no2}

@@ -15,7 +15,7 @@ correctness/completeness proofs.
 | [PCUICTypeChecker]    | Type inference and type checking
 | [PCUICSafeRetyping]   | Fast type inference, assuming well-typedness
 | [PCUICSafeChecker]    | Checking of global environments
-| [SafeTemplateChecker] | Checking of Template Coq programs 
+| [SafeTemplateChecker] | Checking of Template Rocq programs 
 | [Extraction]          | Setup to extract the development
 | [Loader]              | For plugins
 

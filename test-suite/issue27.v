@@ -1,4 +1,4 @@
-From MetaCoq Require Import Template.All.
-Require Export List.
+From MetaRocq Require Import Template.All.
+From Stdlib Require Export List.
 Open Scope bs_scope.
-MetaCoq Run (tmLemma "test" (@nil nat = @nil nat)).
+MetaRocq Run (tmLemma "test" (@nil nat = @nil nat)).

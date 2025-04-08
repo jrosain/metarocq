@@ -1,12 +1,12 @@
 (* Distributed under the terms of the MIT license. *)
 
-(** ** This file exports utilities and notations used in MetaCoq. *)
+(** ** This file exports utilities and notations used in MetaRocq. *)
 (** If you don't want to have the following scopes opened you should *)
 (** not import this file or close them. *)
 
 From Stdlib Require Export Bool ZArith Arith Lia List.
 
-From MetaCoq.Utils Require Export MCUtils monad_utils.
+From MetaRocq.Utils Require Export MRUtils monad_utils.
 
 Global Set Asymmetric Patterns.
 
@@ -29,6 +29,6 @@ Declare Scope type_scope2.
 Notation "A * B" := (prod A B) : type_scope2.
 Global Open Scope type_scope2.
 
-Global Open Scope metacoq_scope.
+Global Open Scope metarocq_scope.
 
 #[global] Hint Constructors unit : core.

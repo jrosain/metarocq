@@ -6,7 +6,7 @@ From Stdlib.Numbers Require Import BinNums DecimalFacts HexadecimalFacts
 .
 
 From Stdlib Require Import ZArith.
-From MetaCoq.Quotation.ToPCUIC Require Import Stdlib.Init.
+From MetaRocq.Quotation.ToPCUIC Require Import Stdlib.Init.
 
 #[export] Instance quote_positive : ground_quotable positive := ltac:(induction 1; exact _).
 #[export] Instance quote_N : ground_quotable N := ltac:(induction 1; exact _).

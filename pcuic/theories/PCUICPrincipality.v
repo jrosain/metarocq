@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-  From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
+  From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
      PCUICLiftSubst PCUICTyping PCUICGlobalEnv
      PCUICWeakeningEnvTyp PCUICSubstitution PCUICEquality
      PCUICReduction PCUICCumulativity PCUICConfluence PCUICClosed PCUICClosedTyp
@@ -90,6 +90,7 @@ Section Principality.
       int inversion_Sort.
       repeat outsum. repeat outtimes. now subst.
     - apply inversion_Prod in hA as (dom1 & codom1 & t & t0 & w); auto.
+      pose proof (t.2.π2.2.p2) as Her. rewrite -t.2.π2.2.p1 /= in Her.
       apply unlift_TypUniv in t.
       specialize (IHu1 _ _ t) as [dom Hdom].
       specialize (IHu2 _ _ t0) as [codom Hcodom].
@@ -114,7 +115,9 @@ Section Principality.
         pose proof (closed_red_confluence cored redu'') as [v' [redl redr]].
         eapply invert_red_sort in redl.
         eapply invert_red_sort in redr. subst. now noconf redr.
-      + repeat (eexists; eauto). eapply type_reduction; eauto. eapply red.
+      + repeat (eexists; eauto).
+        2: eapply geq_relevance, Her; tea.
+        eapply type_reduction; eauto. eapply red.
       + eapply type_reduction; eauto. eapply cored.
 
     - apply inversion_Lambda in hA => //; eauto.
@@ -180,6 +183,7 @@ Section Principality.
       eapply (type_ws_cumul_pb (pb:=Cumul)); eauto.
       { eapply validity in t0; auto.
         eapply isType_red in t0; [|exact redA].
+        eapply isTypeRel_isType.
         eapply isType_tProd in t0 as [? ?]; eauto. }
       transitivity dom' => //. transitivity A''.
       all:apply ws_cumul_pb_eq_le; symmetry => //.
@@ -436,7 +440,7 @@ Proof.
   intros. now eapply eq_term_empty_eq_term.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICClassification.
+From MetaRocq.PCUIC Require Import PCUICClassification.
 
 Lemma typing_leq_term {cf:checker_flags} (Σ : global_env_ext) Γ t t' T T' :
   wf Σ.1 ->
@@ -484,7 +488,7 @@ Proof.
     2:{ pcuic. }
     specialize (X3 onu _ _ Hb X5_2).
     econstructor; eauto.
-    { specialize (X1 onu). apply lift_sorting_it_impl_gen with X1 => // IH. eapply IH; tea. 1: now eapply unlift_TypUniv in Ha. }
+    { specialize (X1 onu). rewrite e. apply lift_sorting_it_impl_gen with X1 => // IH. eapply IH; tea. 1: now eapply unlift_TypUniv in Ha. }
     apply leq_term_empty_leq_term in X5_2.
     eapply context_conversion; eauto.
     constructor; pcuic. 1: now eapply lift_sorting_forget_univ. constructor; try now symmetry; now constructor.
@@ -494,6 +498,7 @@ Proof.
 
   - eapply inversion_Lambda in X4 as (B & dom & codom & cum); auto.
     apply eq_term_empty_eq_term in X5_1.
+    apply eq_term_empty_leq_term in X5_2.
     assert(conv_context cumulAlgo_gen Σ (Γ ,, vass na0 ty) (Γ ,, vass na t)).
     { repeat constructor; pcuic. }
     specialize (X3 onu t0 B).
@@ -514,6 +519,7 @@ Proof.
     apply unlift_TermTyp in dombod as dombod', X0 as X0'.
     apply eq_term_empty_eq_term in X5_1.
     apply eq_term_empty_eq_term in X5_2.
+    apply eq_term_empty_leq_term in X5_3.
     assert(Σ ⊢ Γ ,, vdef na0 t ty = Γ ,, vdef na b b_ty).
     { constructor. eapply ws_cumul_ctx_pb_refl. fvs. constructor => //.
       constructor; fvs. constructor; fvs. }
@@ -638,7 +644,7 @@ Proof.
       rewrite /ptm. constructor. fvs.
       eapply PCUICGeneration.type_it_mkLambda_or_LetIn in pret_ty. subst predctx0; fvs.
       eapply PCUICGeneration.type_it_mkLambda_or_LetIn in pret. subst predctx; fvs.
-      eapply PCUICEquality.eq_term_upto_univ_it_mkLambda_or_LetIn; tea. tc.
+      eapply PCUICEquality.eq_term_upto_univ_it_mkLambda_or_LetIn; tea; tc.
       rewrite /predctx.
       rewrite /case_predicate_context /case_predicate_context_gen.
       eapply eq_context_upto_names_map2_set_binder_name. tea.
@@ -699,7 +705,7 @@ Proof.
   - eapply inversion_Fix in X4 as (decl' & fixguard' & Hnth & types' & bodies & wffix & cum); auto.
     eapply type_Cumul_alt.
     econstructor; eauto.
-    now eapply All_nth_error in X0.
+    eapply isTypeRel_isType; now eapply All_nth_error in X0.
     eapply All2_nth_error in e; eauto.
     destruct e as (eqty & _).
     constructor. eapply eq_term_empty_leq_term in eqty.
@@ -708,7 +714,7 @@ Proof.
   - eapply inversion_CoFix in X4 as (decl' & fixguard' & Hnth & types' & bodies & wfcofix & cum); auto.
     eapply type_Cumul_alt.
     econstructor; eauto.
-    now eapply All_nth_error in X0.
+    eapply isTypeRel_isType; now eapply All_nth_error in X0.
     eapply All2_nth_error in e; eauto.
     destruct e as (eqty & _).
     constructor. apply eq_term_empty_leq_term in eqty.

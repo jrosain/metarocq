@@ -1,9 +1,9 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import CRelationClasses.
 From Equations.Type Require Import Relation Relation_Properties.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config BasicAst.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config BasicAst.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
      PCUICLiftSubst PCUICEquality PCUICUnivSubst
      PCUICReduction.
 

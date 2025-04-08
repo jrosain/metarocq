@@ -1,10 +1,10 @@
-From MetaCoq.PCUIC Require Import PCUICAst PCUICCumulativitySpec.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Lists.
-From MetaCoq.Quotation.ToPCUIC.Utils Require Import (hints) All_Forall.
-From MetaCoq.Quotation.ToPCUIC.Common Require Import (hints) config BasicAst Universes Kernames.
-From MetaCoq.Quotation.ToPCUIC.PCUIC Require Import (hints) PCUICAst PCUICEquality utils.PCUICPrimitive.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.Common Require Import EnvironmentTyping.Sig.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICCumulativitySpec.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC Require Import (hints) Stdlib.Init Stdlib.Lists.
+From MetaRocq.Quotation.ToPCUIC.Utils Require Import (hints) All_Forall.
+From MetaRocq.Quotation.ToPCUIC.Common Require Import (hints) config BasicAst Universes Kernames.
+From MetaRocq.Quotation.ToPCUIC.PCUIC Require Import (hints) PCUICAst PCUICEquality utils.PCUICPrimitive.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.Common Require Import EnvironmentTyping.Sig.
 
 #[export] Instance quote_cumul_predicate {cumul Γ Re p p'} {qcumul : quotation_of cumul} {qRe : quotation_of Re} {quote_cumul : forall x y Γ, ground_quotable (cumul Γ x y)} {quote_Re : forall x y, ground_quotable (Re x y:Prop)} : ground_quotable (@cumul_predicate cumul Re Γ p p')
 := ltac:(cbv [cumul_predicate]; exact _).

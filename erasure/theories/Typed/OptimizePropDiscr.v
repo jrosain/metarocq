@@ -1,9 +1,9 @@
 (** Pass that removes discrimination (matches and projections) on things in Prop.
-    This uses MetaCoq's optimization but adapted to run on our environments. *)
+    This uses MetaRocq's optimization but adapted to run on our environments. *)
 
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Erasure.Typed Require Import ExAst.
-From MetaCoq.Erasure Require Import EOptimizePropDiscr.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Erasure.Typed Require Import ExAst.
+From MetaRocq.Erasure Require Import EOptimizePropDiscr.
 
 Definition remove_match_on_box_constant_body Σ cst :=
   {| cst_type := cst_type cst;
@@ -39,7 +39,7 @@ Proof.
 Qed.
 
 Program Definition remove_match_on_box_env (Σ : global_env) (fgΣ : fresh_globals Σ) : global_env :=
-  List.map (MCProd.on_snd (remove_match_on_box_decl (EEnvMap.GlobalContextMap.make (trans_env Σ) _))) Σ.
+  List.map (MRProd.on_snd (remove_match_on_box_decl (EEnvMap.GlobalContextMap.make (trans_env Σ) _))) Σ.
 Next Obligation.
   now apply trans_env_fresh_globals.
 Qed.
@@ -51,7 +51,7 @@ Proof.
   unfold trans_env.
   unfold EOptimizePropDiscr.remove_match_on_box_env.
   unfold remove_match_on_box_env.
-  unfold MCProd.on_snd. cbn.
+  unfold MRProd.on_snd. cbn.
   rewrite !List.map_map.
   apply List.map_ext.
   intros ((kn&has_deps)&decl).

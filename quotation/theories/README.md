@@ -8,13 +8,13 @@ Ultimately the goal of this development is to prove that `□` is a lax monoidal
 semicomonad (a functor with `cojoin : □T → □□T` that codistributes over `unit`
 and `×`), which is sufficient for proving Löb's theorem.
 
-The public-facing interface of this development is provided in [`MetaCoq.Quotation.ToTemplate.All`](./ToTemplate/All.v) and [`MetaCoq.Quotation.ToPCUIC.All`](./ToPCUIC/All.v).
+The public-facing interface of this development is provided in [`MetaRocq.Quotation.ToTemplate.All`](./ToTemplate/All.v) and [`MetaRocq.Quotation.ToPCUIC.All`](./ToPCUIC/All.v).
 
 ## Public-Facing Interface
 
 ### Template
 
-In [`MetaCoq.Quotation.ToTemplate.All`](./ToTemplate/All.v):
+In [`MetaRocq.Quotation.ToTemplate.All`](./ToTemplate/All.v):
 
 - `Raw.quote_term : Ast.term -> Ast.term` (the function `cojoin : □T → □□T` for `□T := Ast.term`)
 
@@ -33,7 +33,7 @@ In [`MetaCoq.Quotation.ToTemplate.All`](./ToTemplate/All.v):
 
 ### PCUIC
 
-In [`MetaCoq.Quotation.PCUIC.All`](./ToPCUIC/All.v):
+In [`MetaRocq.Quotation.PCUIC.All`](./ToPCUIC/All.v):
 
 - `Raw.quote_term : PCUICAst.term -> PCUICAst.term` (the function `cojoin : □T → □□T` for `□T := PCUICAst.term`)
 
@@ -68,7 +68,7 @@ Some design principles:
 
 - In most cases, inductive types are given explicit `ground_quotable` instances, while most defined constants are just made transparent to typeclass inference.  Defined constants containing `match`es or other constructions that make quoting non-trivial are the exception, and are given `ground_quotable` instances as well.  In general, either a constant is made transparent and added to the `quotation` unfolding hint database, *or* it is given a `ground_quotable` instance, (almost) never both.
 
-- Directory and file structure is mirrored between the `Quotation` development and the underlying Coq development for which quotation theory is being developed.  Sometimes directories are compressed into single files (e.g., [`ToTemplate/Stdlib/Init.v`](./ToTemplate/Stdlib/Init.v) contains quotation theory for everything in the `Stdlib.Init.*` namespace), and other times single files are expanded into a directory (e.g., [`ToTemplate/QuotationOf/Template/Ast/`](./ToTemplate/QuotationOf/Template/Ast/) contains `Foo/Instances.v` for every module `Foo` defined in `MetaCoq.Template.Ast` ([`template-coq/theories/Ast.v`](https://github.com/MetaCoq/metacoq/tree/coq-8.16/template-coq/theories/Ast.v))).  Directories are compressed into single files when the quotation theory is quick to typecheck and relatively short; files are expanded into directories when components of the quotation theory take a long time to typecheck, so that file-level parallelism can be better leveraged.
+- Directory and file structure is mirrored between the `Quotation` development and the underlying Rocq development for which quotation theory is being developed.  Sometimes directories are compressed into single files (e.g., [`ToTemplate/Stdlib/Init.v`](./ToTemplate/Stdlib/Init.v) contains quotation theory for everything in the `Stdlib.Init.*` namespace), and other times single files are expanded into a directory (e.g., [`ToTemplate/QuotationOf/Template/Ast/`](./ToTemplate/QuotationOf/Template/Ast/) contains `Foo/Instances.v` for every module `Foo` defined in `MetaRocq.Template.Ast` ([`template-rocq/theories/Ast.v`](https://github.com/MetaRocq/metarocq/tree/coq-8.16/template-rocq/theories/Ast.v))).  Directories are compressed into single files when the quotation theory is quick to typecheck and relatively short; files are expanded into directories when components of the quotation theory take a long time to typecheck, so that file-level parallelism can be better leveraged.
 
 - When possible, we try to minimize the content in `ground_quotable` proofs (in particular, using named induction principles rather than bare fixpoints and avoiding excess conversion, when easy), so that proving that these constructions are well-typed is easier.  (This is still very much a work in progress, and principles making the proving of well-typedness easy are still in the works.)
 
@@ -102,11 +102,11 @@ Almost all other strucucture is mirrored between the `ToTemplate/` and `ToPCUIC/
 
 - [`ToTemplate/QuotationOf/`](./ToTemplate/QuotationOf/), [`ToPCUIC/QuotationOf/`](./ToPCUIC/QuotationOf/) - These directories develop `quotation_of` instances for various `Module Type`s and functors.  The various `Sig.v` files contain `Module Type`s declaring the instances, while the various `Instances.v` files contain the definitions of `Module`s having these `Module Type`s defining the `quotation_of` instances.  The `Module`s in `Instances.v` files *do not* export `Instance`s, while the `Module Type`s in `Sig.v` files *do*; if the concrete constant needs to be quoted, it can be quoted with `<% ... %>` directly and does not need an instance; when functors take in a `Module Type` argument, by contrast, they do need access to the instances declared.  When `Module`s are nested inside `Module Type`s, the top-level `Module Type` exports all declared instances in the submodules.  Nearly all declarations and definitions in files under `QuotationOf` are fully automated; when well-typedness is eventually proven, that should be fully automated as well for these directories, likely by invoking the Safe Checker.
 
-- Under `ToTemplate/` / `ToPCUIC/`, folders `Stdlib/`, `Equations/`, `Utils/`, `Common/`, and `Template/` or `PCUIC/` develop the `ground_quotable` instances for `Stdlib.*`, `Equations.*`, `MetaCoq.Utils.*`, `MetaCoq.Common.*`, and `MetaCoq.Template.*` or `MetaCoq.PCUIC.*`, respectively.  In `Stdlib/` and `Equations/`, generally one file is given to each folder of the underlying development; in `Utils/`, `Common/`, `Template/`, and `PCUIC/`, files generally correspond one-to-one with the underlying development.
+- Under `ToTemplate/` / `ToPCUIC/`, folders `Stdlib/`, `Equations/`, `Utils/`, `Common/`, and `Template/` or `PCUIC/` develop the `ground_quotable` instances for `Stdlib.*`, `Equations.*`, `MetaRocq.Utils.*`, `MetaRocq.Common.*`, and `MetaRocq.Template.*` or `MetaRocq.PCUIC.*`, respectively.  In `Stdlib/` and `Equations/`, generally one file is given to each folder of the underlying development; in `Utils/`, `Common/`, `Template/`, and `PCUIC/`, files generally correspond one-to-one with the underlying development.
 
 ## Debugging Suggestions
 
-Since the quotation development is highly systematically automated, changing definitions in the rest of MetaCoq might break quotation files.
+Since the quotation development is highly systematically automated, changing definitions in the rest of MetaRocq might break quotation files.
 The general pattern is to add quotation instances for anything that is missing.
 
 ### `debug_opt`
@@ -213,7 +213,7 @@ Debug: calling eauto recursively at depth 3 on 1 subgoals
 Debug: 1.1-1.1-1: looking for (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) without backtracking
 Debug: 1.1-1.1-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Σ b (j_typ (TermTyp b t)))
 Debug: 1.1-1.1-1.1: (*external*) (is_var t; destruct t) on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: pattern-matching failed
@@ -340,7 +340,7 @@ Debug:
 1.1-1.2-1.1-1.1-1: looking for (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) with backtracking
 Debug: 1.1-1.2-1.1-1.1-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Σ b (j_typ (TermTyp b t)))
 Debug: 1.1-1.2-1.1-1.1-1.1: (*external*) (is_var t; destruct t) on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: pattern-matching failed
@@ -442,7 +442,7 @@ Debug: calling eauto recursively at depth 2 on 1 subgoals
 Debug: 1.2-1: looking for (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) without backtracking
 Debug: 1.2-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Σ b (j_typ (TermTyp b t)))
 Debug: 1.2-1.1: (*external*) (is_var t; destruct t) on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: pattern-matching failed
@@ -461,7 +461,7 @@ Debug: calling eauto recursively at depth 3 on 1 subgoals
 Debug: 1.2-1.1-1: looking for (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) without backtracking
 Debug: 1.2-1.1-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Σ b (j_typ (TermTyp b t)))
 Debug: 1.2-1.1-1.1: (*external*) (is_var t; destruct t) on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: pattern-matching failed
@@ -603,7 +603,7 @@ Debug:
 1.3-1.1-1.1-1.1-1: looking for (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) with backtracking
 Debug: 1.3-1.1-1.1-1.1-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Σ b (j_typ (TermTyp b t)))
 Debug: 1.3-1.1-1.1-1.1-1.1: (*external*) (is_var t; destruct t) on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: pattern-matching failed
@@ -701,7 +701,7 @@ Debug: calling eauto recursively at depth 4 on 1 subgoals
 Debug: 1.3-1.1-1.2-1: looking for (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) with backtracking
 Debug: 1.3-1.1-1.2-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Σ b (j_typ (TermTyp b t)))
 Debug: 1.3-1.1-1.2-1.1: (*external*) (is_var t; destruct t) on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: pattern-matching failed
@@ -721,7 +721,7 @@ Debug:
 1.3-1.1-1.2-1.1-1: looking for (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) with backtracking
 Debug: 1.3-1.1-1.2-1.1-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Σ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Σ b (j_typ (TermTyp b t)))
 Debug: 1.3-1.1-1.2-1.1-1.1: (*external*) (is_var t; destruct t) on
 (ground_quotable (cproperty Σ all b (j_typ (TermTyp b t)) (fst tu))) failed with: pattern-matching failed
@@ -788,11 +788,11 @@ The important lines are
 Debug: 1.1-1.1-1: looking for (ground_quotable (cproperty Γ all b (j_typ (TermTyp b t)) (fst tu))) without backtracking
 Debug: 1.1-1.1-1.1: simple apply quote_cproperty on
 (ground_quotable (cproperty Γ all b (j_typ (TermTyp b t)) (fst tu))) failed with: Cannot unify
-(MCOption.option_default (fun tm : term => checking Γ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
+(MROption.option_default (fun tm : term => checking Γ tm (j_typ (TermTyp b t))) (j_term (TermTyp b t)) unit) and
 (checking Γ b (j_typ (TermTyp b t)))
 ```
-The problem is that, for performance, we have told typeclass resolution to not unfold any constants, and so we fail to reduce `MCOption.option_default` and `j_term`.
-Adding something like `cbn [MCOption.option_default j_term] in *` to manually unfold these constants can resolve the issue.
+The problem is that, for performance, we have told typeclass resolution to not unfold any constants, and so we fail to reduce `MROption.option_default` and `j_term`.
+Adding something like `cbn [MROption.option_default j_term] in *` to manually unfold these constants can resolve the issue.
 
 Note that if it is not clear what's going wrong, you can also
 ```coq
@@ -801,7 +801,7 @@ Set Debug "tactic-unification".
 This setting will add, between the above lines, a unification trace ending in
 ```
 Debug:
-[tactic-unification] Starting unification: MCOption.option_default (fun tm : term => checking Γ tm (j_typ (TermTyp b t)))
+[tactic-unification] Starting unification: MROption.option_default (fun tm : term => checking Γ tm (j_typ (TermTyp b t)))
                                              (j_term (TermTyp b t)) unit ~= checking Γ b (j_typ (TermTyp b t))
 Debug: [tactic-unification] Leaving unification with failure
 ```

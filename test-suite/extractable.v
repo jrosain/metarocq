@@ -1,61 +1,61 @@
 From Stdlib Require Import Strings.String.
 From Stdlib Require Import Lists.List.
-From MetaCoq.Common Require Import
+From MetaRocq.Common Require Import
      BasicAst.
-From MetaCoq.Template Require Import
+From MetaRocq.Template Require Import
      Ast Loader.
-From MetaCoq.Utils Require Import
+From MetaRocq.Utils Require Import
      utils.
-From MetaCoq.Template.TemplateMonad Require Import
+From MetaRocq.Template.TemplateMonad Require Import
      Common Extractable.
 
 Local Open Scope bs_scope.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Notation "<% x %>" := (ltac:(let p y := exact y in quote_term x p))
    (only parsing).
 
-MetaCoq Run
+MetaRocq Run
     (tmBind (tmReturn 1) (fun x => tmMsg (string_of_nat x))).
 
-MetaCoq Run
+MetaRocq Run
     (tmPrint <% 1 + 1 : nat %>).
 
-Fail MetaCoq Run (tmFail "success").
+Fail MetaRocq Run (tmFail "success").
 
-MetaCoq Run
+MetaRocq Run
     (tmBind (tmEval cbv <% 1 + 1 %>)
             (fun t => tmPrint t)).
 
-MetaCoq Run
+MetaRocq Run
     (tmBind (tmDefinition "two"%bs None <% 1 + 1 %>)
             (fun kn => tmPrint (Ast.tConst kn nil))).
 
-MetaCoq Run
+MetaRocq Run
     (tmBind (tmAxiom "assume" <% nat %>)
             (fun kn => tmPrint (Ast.tConst kn nil))).
 
 
-MetaCoq Run
+MetaRocq Run
     (tmBind (tmFreshName "blah")
             (fun i => tmBind (tmMsg i)
                           (fun _ => tmAxiom i <% bool %>))).
 Print blah.
 Fail Print blah0.
-MetaCoq Run
+MetaRocq Run
     (tmBind (tmFreshName "blah0")
             (fun i => tmBind (tmMsg i)
                           (fun _ => tmAxiom i <% bool %>))).
 Print blah0.
 
-MetaCoq Test Quote nat.
-MetaCoq Run
+MetaRocq Test Quote nat.
+MetaRocq Run
     (tmBind (tmQuoteInductive (MPfile ["Datatypes"; "Init"; "Corelib"], "nat"))
             (fun mi => tmMsg (string_of_nat (length mi.(ind_bodies))))).
 
 Definition nAnon := {| binder_name := nAnon; binder_relevance := Relevant |}.
 
-MetaCoq Run
+MetaRocq Run
     (tmInductive true {| mind_entry_record := None
                   ; mind_entry_finite := Finite
                   ; mind_entry_params := nil
@@ -72,11 +72,11 @@ MetaCoq Run
                   ; mind_entry_private := None |}).
 Print thing.
 
-MetaCoq Run
+MetaRocq Run
     (tmBind tmCurrentModPath
             (fun s => tmMsg (string_of_modpath s))).
 
-MetaCoq Test Quote plus.
-MetaCoq Run (tmQuoteInductive (MPfile ["Datatypes"; "Init"; "Corelib"], "nat")).
+MetaRocq Test Quote plus.
+MetaRocq Run (tmQuoteInductive (MPfile ["Datatypes"; "Init"; "Corelib"], "nat")).
 
-MetaCoq Run (tmQuoteConstant (MPfile ["Nat"; "Init"; "Corelib"], "add") true).
+MetaRocq Run (tmQuoteConstant (MPfile ["Nat"; "Init"; "Corelib"], "add") true).

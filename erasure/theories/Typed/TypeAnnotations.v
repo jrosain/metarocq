@@ -1,26 +1,26 @@
-From MetaCoq.Erasure.Typed Require Import Annotations.
-From MetaCoq.Erasure.Typed Require Import Utils.
-From MetaCoq.Erasure.Typed Require Import Erasure.
-From MetaCoq.Erasure.Typed Require Import ExAst.
-From MetaCoq.Erasure.Typed Require Import Extraction.
-From MetaCoq.Erasure.Typed Require Import Optimize.
-From MetaCoq.Erasure.Typed Require Import Transform.
-From MetaCoq.Erasure.Typed Require Import ResultMonad.
+From MetaRocq.Erasure.Typed Require Import Annotations.
+From MetaRocq.Erasure.Typed Require Import Utils.
+From MetaRocq.Erasure.Typed Require Import Erasure.
+From MetaRocq.Erasure.Typed Require Import ExAst.
+From MetaRocq.Erasure.Typed Require Import Extraction.
+From MetaRocq.Erasure.Typed Require Import Optimize.
+From MetaRocq.Erasure.Typed Require Import Transform.
+From MetaRocq.Erasure.Typed Require Import ResultMonad.
 Local Set Warnings "-warn-library-file-stdlib-vector".
 From Stdlib Require Import VectorDef.
 From Equations Require Import Equations.
-From MetaCoq.Erasure Require Import Extract.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils.
-From MetaCoq.PCUIC Require Import PCUICInversion.
-From MetaCoq.PCUIC Require Import PCUICLiftSubst.
-From MetaCoq.PCUIC Require Import PCUICTyping.
-From MetaCoq.PCUIC Require Import PCUICValidity.
-From MetaCoq.PCUIC Require Import PCUICSafeLemmata.
-From MetaCoq.SafeChecker Require Import PCUICWfEnvImpl.
-From MetaCoq.SafeChecker Require Import PCUICSafeRetyping.
-From MetaCoq.SafeChecker Require Import PCUICWfEnv.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import Kernames.
+From MetaRocq.Erasure Require Import Extract.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils.
+From MetaRocq.PCUIC Require Import PCUICInversion.
+From MetaRocq.PCUIC Require Import PCUICLiftSubst.
+From MetaRocq.PCUIC Require Import PCUICTyping.
+From MetaRocq.PCUIC Require Import PCUICValidity.
+From MetaRocq.PCUIC Require Import PCUICSafeLemmata.
+From MetaRocq.SafeChecker Require Import PCUICWfEnvImpl.
+From MetaRocq.SafeChecker Require Import PCUICSafeRetyping.
+From MetaRocq.SafeChecker Require Import PCUICWfEnv.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import Kernames.
 
 Import VectorNotations.
 
@@ -63,7 +63,7 @@ Defined.
 Definition Sn_plus_one_transparent {n} : S n = n + 1.
 now induction n. Defined.
 
-(* NOTE: borrowed from metacoq's MCList. There it's defined for some other [rev] *)
+(* NOTE: borrowed from metarocq's MRList. There it's defined for some other [rev] *)
 Definition length_rev_transparent {A} (l : list A) :
   #|List.rev l| = #|l|.
 induction l.
@@ -292,11 +292,13 @@ Proof.
   all: try subst erΓ1.
   - depelim er0.
     now apply inversion_Evar in X.
-  - apply inversion_Lambda in X as (? & ? & ? & ?); auto.
-  - apply inversion_Lambda in X as (? & ? & ? & ?); auto.
+  - apply inversion_Lambda in X as (? & h1 & ? & ?); auto.
+    now apply isTypeRel_isType in h1.
+  - apply inversion_Lambda in X as (? & h1 & ? & ?); auto.
+    apply isTypeRel_isType in h1.
     econstructor; eauto.
-  - apply inversion_LetIn in X as (?&?&?&?); auto.
-    constructor; eapply lift_sorting_forget_body; eauto.
+  - apply inversion_LetIn in X as (?&h1&?&?); auto.
+    now apply lift_sorting_forget_body, isTypeRel_isType in h1.
   - apply inversion_LetIn in X as (?&?&?&?); auto.
     econstructor; eapply unlift_TermTyp; eauto.
   - apply inversion_LetIn in X as (?&?&?&?); auto.
@@ -332,7 +334,7 @@ Proof.
     apply rev_Forall.
     apply All_Forall.
     eapply All_impl. apply a.
-    intros. cbn in *;now constructor.
+    intros d X. cbn in *. apply isTypeRel_isType in X. now constructor.
   - apply inversion_Fix in t0 as (?&?&?&?&?&?&?); auto.
     depelim er0.
     clear -a0 X.
@@ -353,7 +355,7 @@ Proof.
     apply rev_Forall.
     apply All_Forall.
     eapply All_impl. apply a.
-    intros. cbn in *;now constructor.
+    intros d X. cbn in *. apply isTypeRel_isType in X. now constructor.
   - apply inversion_CoFix in t0 as (?&?&?&?&?&?&?); auto.
     depelim er0.
     clear -a0 X.

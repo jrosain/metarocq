@@ -1,4 +1,4 @@
-From MetaCoq.Template Require Import Extraction.
+From MetaRocq.Template Require Import Extraction.
 Require Import Lens MyPlugin.
 
 Set Warnings "-extraction-opaque-accessed".

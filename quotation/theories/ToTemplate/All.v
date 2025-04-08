@@ -1,7 +1,7 @@
-From MetaCoq.Common Require Import config.
-From MetaCoq.Template Require Import Ast Typing.
-From MetaCoq.Template Require WfAst TypingWf.
-From MetaCoq.Quotation.ToTemplate.Template Require Ast Typing WfAst TypingWf.
+From MetaRocq.Common Require Import config.
+From MetaRocq.Template Require Import Ast Typing.
+From MetaRocq.Template Require WfAst TypingWf.
+From MetaRocq.Quotation.ToTemplate.Template Require Ast Typing WfAst TypingWf.
 
 (* without typing derivations *)
 Module Raw.
