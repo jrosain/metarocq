@@ -383,7 +383,7 @@ Definition mkCase_old (Σ : global_env) (ci : case_info) (p : term) (c : term) (
       tt oib.(ind_ctors) brs ;;
   ret (tCase ci p' c brs').
 
-Definition default_sort_family (s : sort) : allowed_eliminations :=
+Definition default_sort_quality_or_set (s : sort) : allowed_eliminations :=
   match s with
   | sSProp => IntoSProp
   | sProp => IntoPropSProp
@@ -417,7 +417,7 @@ Definition make_inductive_body (id : ident) (params : context) (indices : contex
      ind_indices := indices;
      ind_sort := s;
      ind_type := it_mkProd_or_LetIn (params ,,, indices) (tSort s);
-     ind_kelim := default_sort_family s;
+     ind_kelim := default_sort_quality_or_set s;
      ind_ctors := ind_ctors;
      ind_projs := [];
      ind_relevance := relevance_of_sort s |}.

@@ -349,12 +349,12 @@ struct
   | Sorts.Type u -> constr_mkApp (sType, [| Lazy.force tuniverse; quote_universe u |])
   | Sorts.QSort (_, u) -> constr_mkApp (sType, [| Lazy.force tuniverse; quote_universe u |]) (* FIXME *)
 
-  let quote_sort_family = function
-    | Sorts.InProp -> Lazy.force sfProp
-    | Sorts.InSet -> Lazy.force sfSet
-    | Sorts.InType -> Lazy.force sfType
-    | Sorts.InQSort -> Lazy.force sfType (* FIXME *)
-    | Sorts.InSProp -> Lazy.force sfSProp
+  let quote_sort_quality_or_set = function
+    | UnivGen.QualityOrSet.(Qual (QConstant QProp)) -> Lazy.force sfProp
+    | UnivGen.QualityOrSet.Set -> Lazy.force sfSet
+    | UnivGen.QualityOrSet.(Qual (QConstant QType)) -> Lazy.force sfType
+    | UnivGen.QualityOrSet.(Qual (QVar _)) -> Lazy.force sfType (* FIXME *)
+    | UnivGen.QualityOrSet.(Qual (QConstant QSProp)) -> Lazy.force sfSProp
 
   let quote_context_decl na b t =
     constr_mkApp (tmkdecl, [| Lazy.force tTerm; na; quote_optionl tTerm b; t |])

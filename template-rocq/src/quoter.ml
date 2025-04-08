@@ -96,7 +96,7 @@ sig
   val quote_int : int -> quoted_int
   val quote_bool : bool -> quoted_bool
   val quote_sort : Sorts.t -> quoted_sort
-  val quote_sort_family : Sorts.family -> quoted_sort_family
+  val quote_sort_quality_or_set : UnivGen.QualityOrSet.t -> quoted_sort_quality_or_set
   val quote_cast_kind : Constr.cast_kind -> quoted_cast_kind
   val quote_kn : KerName.t -> quoted_kernel_name
   val quote_inductive : quoted_kernel_name * quoted_int -> quoted_inductive
@@ -143,7 +143,7 @@ sig
     quoted_context (* ind indices context *) *
     quoted_sort (* ind sort *) *
     t (* ind type *) *
-    quoted_sort_family *
+    quoted_sort_quality_or_set *
     (quoted_ident * quoted_context (* arguments context *) *
       t list (* indices in the conclusion *) *
       t (* constr type *) *
@@ -450,12 +450,12 @@ struct
                 in ps, acc
             | _ -> [], acc
           in
-          (* TODO quote the real squash data instead of approximating with a sort family *)
+          (* TODO quote the real squash data instead of approximating with a quality or set *)
           let kelim = match oib.Declarations.mind_squashed with
-            | None -> Sorts.InType
-            | Some _ -> Sorts.family oib.mind_sort
+            | None -> UnivGen.QualityOrSet.qtype
+            | Some _ -> UnivGen.QualityOrSet.of_sort oib.mind_sort
           in
-          let sf = Q.quote_sort_family kelim in
+          let sf = Q.quote_sort_quality_or_set kelim in
             (Q.quote_ident oib.mind_typename, indices, indsort, indty, sf,
              (List.rev reified_ctors), projs, Q.quote_relevance oib.mind_relevance) :: ls, acc)
         ([],acc) (Array.to_list mib.mind_packets)

@@ -26,7 +26,7 @@ struct
   type quoted_proj = projection
   type quoted_global_reference = global_reference
 
-  type quoted_sort_family = Universes0.allowed_eliminations
+  type quoted_sort_quality_or_set = Universes0.allowed_eliminations
   type quoted_constraint_type = Universes0.ConstraintType.t
   type quoted_univ_constraint = Universes0.UnivConstraint.t
   type quoted_univ_constraints = Universes0.ConstraintSet.t
@@ -105,12 +105,13 @@ struct
   | Sorts.Type u -> Universes0.Sort.Coq_sType (quote_universe u)
   | Sorts.QSort (_, u) -> Universes0.Sort.Coq_sType (quote_universe u) (* FIXME *)
 
-  let quote_sort_family s =
+  let quote_sort_quality_or_set s =
+    let open UnivGen.QualityOrSet in
     match s with
-    | Sorts.InSProp -> Universes0.IntoSProp
-    | Sorts.InProp -> Universes0.IntoPropSProp
-    | Sorts.InSet -> Universes0.IntoSetPropSProp
-    | Sorts.InType -> Universes0.IntoAny
+    | Qual (QConstant QSProp) -> Universes0.IntoSProp
+    | Qual (QConstant QProp) -> Universes0.IntoPropSProp
+    | Set -> Universes0.IntoSetPropSProp
+    | Qual (QConstant QType) -> Universes0.IntoAny
     | _ -> Universes0.IntoAny
 
   let quote_cast_kind = function

@@ -20,7 +20,7 @@ sig
 
   type quoted_global_reference
 
-  type quoted_sort_family
+  type quoted_sort_quality_or_set
   type quoted_constraint_type
   type quoted_univ_constraint
   type quoted_univ_constraints

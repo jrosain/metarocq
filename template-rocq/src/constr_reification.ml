@@ -20,7 +20,7 @@ struct
   type quoted_pstring = Constr.t (* of type Float64.t *)
   type quoted_global_reference = Constr.t (* of type Ast.global_reference *)
 
-  type quoted_sort_family = Constr.t (* of type Ast.sort_family *)
+  type quoted_sort_quality_or_set = Constr.t (* of type Ast.sort_family *)
   type quoted_constraint_type = Constr.t (* of type Universes.constraint_type *)
   type quoted_univ_constraint = Constr.t (* of type Universes.univ_constraint *)
   type quoted_univ_constraints = Constr.t (* of type Universes.constraints *)
