@@ -323,19 +323,18 @@ let declare_inductive (env: Environ.env) (evm: Evd.evar_map) (infer_univs : bool
     | Some (Some _) -> true
     | _ -> false
   in
-  let ind_kn = DeclareInd.declare_mutual_inductive_with_eliminations ~primitive_expected mind names [] in
+  let ind_kn = DeclareInd.declare_mutual_inductive_with_eliminations mind names [] in
   if primitive_expected
   then begin
     let open Record.Internal in
     let dflt_pf = { pf_coercion = false; pf_instance = false; pf_priority = None; pf_locality = OptDefault; pf_canonical = false; pf_reversible = false} in
     let decl_projs i oie =
       let ind = (ind_kn, i) in
-      let univs = (Entries.Monomorphic_entry, UnivNames.empty_binders) in
       let inhabitant_id = List.hd oie.mind_entry_consnames in
       let fields, _ = Term.decompose_prod_decls (List.hd oie.mind_entry_lc) in
       let fieldimpls = List.map (fun _ -> []) fields in
       let pfs = List.map (fun _ -> dflt_pf) fields in
-      let projections = Record.Internal.declare_projections ind univs ~kind:Decls.Definition inhabitant_id pfs fieldimpls fields in
+      let projections = Record.Internal.declare_projections ind ~kind:Decls.Definition ~inhabitant_id pfs fieldimpls in
       let struc = Structures.Structure.make (Global.env()) ind projections in
       Record.Internal.declare_structure_entry struc
     in
@@ -435,7 +434,7 @@ let rec run_template_program_rec ~poly ?(intactic=false) (k : Constr.t Plugin_co
     RetrieveObl.check_evars env evm;
     let obls, _, c, cty = RetrieveObl.retrieve_obligations env ident evm 0 c (EConstr.of_constr typ) in
     (* let evm = Evd.minimize_universes evm in *)
-    let uctx = Evd.evar_universe_context evm in
+    let uctx = Evd.ustate evm in
     let obl_hook = Declare.Hook.make_g (fun { Declare.Hook.S.dref = gr } pm ->
         let env = Global.env () in
         let evm = Evd.from_env env in
@@ -599,7 +598,7 @@ let rec run_template_program_rec ~poly ?(intactic=false) (k : Constr.t Plugin_co
           Plugin_core.reduce env evm red typ
         | None -> evm, typ in
       try
-        let (evm,t) = Typeclasses.resolve_one_typeclass env evm (EConstr.of_constr typ) in
+        let (evm,t) = Class_tactics.resolve_one_typeclass env evm (EConstr.of_constr typ) in
         let (evm, cSome_instance) = Evd.fresh_global env evm (Lazy.force cSome_instance) in
         k ~st env evm (Constr.mkApp (EConstr.to_constr evm cSome_instance, [| typ; EConstr.to_constr evm t|]))
       with

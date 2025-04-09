@@ -9,7 +9,6 @@ open PeanoNat.Nat
 open Datatypes
 open Vernacextend
 open Tm_util
-open Erasure0
 
 open Stdarg
 open Procq.Prim

@@ -5,7 +5,7 @@ open MyPlugin
 
 DECLARE PLUGIN "rocq-metarocq-demo-plugin.plugin"
 
-VERNAC COMMAND EXTEND Make_vernac CLASSIFIED AS QUERY STATE program
+VERNAC COMMAND EXTEND Make_vernac CLASSIFIED AS QUERY STATE program opaque_access
    | [ "Showoff" ] ->
      { Run_extractable.run_vernac showoff }
 END

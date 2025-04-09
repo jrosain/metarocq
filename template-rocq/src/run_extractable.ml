@@ -115,24 +115,24 @@ let of_mib (env : Environ.env) (t : Names.MutInd.t) (mib : Plugin_core.mutual_in
 let to_mie (x : Ast0.mutual_inductive_entry) : Plugin_core.mutual_inductive_entry =
   failwith "to_mie"
 
-let get_constant_body b =
+let get_constant_body ~opaque_access b =
   let open Declarations in
   match b with
   | Def b -> Some b
   | Undef inline -> None
   | OpaqueDef pr -> 
-    let proof, _ = Global.force_proof Library.indirect_accessor pr in
+    let proof, _ = Global.force_proof opaque_access pr in
     (* FIXME delayed univs skipped *)
     Some proof
   | Primitive _ -> failwith "Primitives not supported by TemplateRocq"
   | Symbol _ -> failwith "Symbols are not supported by TemplateRocq"
 
 (* note(gmm): code taken from quoter.ml (quote_entry_aux) *)
-let of_constant_body (env : Environ.env) (cd : Plugin_core.constant_body) : Ast0.Env.constant_body =
+let of_constant_body ~opaque_access (env : Environ.env) (cd : Plugin_core.constant_body) : Ast0.Env.constant_body =
   let open Declarations in
   let {const_body = body; const_type = typ; const_universes = univs; const_relevance = rel} = cd in
   Ast0.Env.({cst_type = quote_term env (Evd.from_env env) typ;
-         cst_body = Option.map (quote_term env (Evd.from_env env)) (get_constant_body body);
+         cst_body = Option.map (quote_term env (Evd.from_env env)) (get_constant_body ~opaque_access body);
          cst_universes = quote_universes_decl univs None;
          cst_relevance = quote_relevance rel})
 
@@ -161,8 +161,8 @@ let tmOfConstr (t : Constr.t) : Ast0.term tm =
 let tmOfMib (ti : Names.MutInd.t) (t : Plugin_core.mutual_inductive_body) : Ast0.Env.mutual_inductive_body tm =
   Plugin_core.with_env_evm (fun env _ -> tmReturn (of_mib env ti t))
 
-let tmOfConstantBody (t : Plugin_core.constant_body) : Ast0.Env.constant_body tm =
-  Plugin_core.with_env_evm (fun env _ -> tmReturn (of_constant_body env t))
+let tmOfConstantBody ~opaque_access (t : Plugin_core.constant_body) : Ast0.Env.constant_body tm =
+  Plugin_core.with_env_evm (fun env _ -> tmReturn (of_constant_body ~opaque_access env t))
 
 (*
 let dbg = function
@@ -188,7 +188,8 @@ let dbg = function
   | Coq_tmInferInstance t -> "tmInferInstance"
 *)
 
-let rec interp_tm (t : 'a coq_TM) : 'a tm =
+let interp_tm ~opaque_access (t : 'a coq_TM) : 'a tm =
+  let rec interp_tm t =
 (*  Feedback.msg_debug Pp.(str (dbg t)) ; *)
   match t with
   | Coq_tmReturn x -> tmReturn x
@@ -243,7 +244,7 @@ let rec interp_tm (t : 'a coq_TM) : 'a tm =
     tmMap (fun x -> Obj.magic (List.map quote_global_reference x)) (tmQuoteModType (to_qualid id))
   | Coq_tmQuoteConstant (kn, b) ->
     tmBind (tmQuoteConstant (unquote_kn kn) b)
-           (fun x -> Obj.magic (tmOfConstantBody x))
+           (fun x -> Obj.magic (tmOfConstantBody ~opaque_access x))
   | Coq_tmInductive (inferu, i) ->
     tmMap (fun _ -> Obj.magic ()) (tmInductive (unquote_bool inferu) (to_mie i))
   | Coq_tmExistingInstance (locality, k) ->
@@ -253,6 +254,7 @@ let rec interp_tm (t : 'a coq_TM) : 'a tm =
       (function
           None -> Obj.magic None
         | Some inst -> Obj.magic (tmMap (fun x -> Some x) (tmOfConstr inst)))
+  in interp_tm t
 
-let run_vernac ~pm (c : 'a coq_TM) : Plugin_core.coq_state =
-  Plugin_core.run_vernac ~st:pm (interp_tm (Obj.magic c))
+let run_vernac ~opaque_access ~pm (c : 'a coq_TM) : Plugin_core.coq_state =
+  Plugin_core.run_vernac ~st:pm (interp_tm ~opaque_access (Obj.magic c))

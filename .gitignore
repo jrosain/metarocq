@@ -410,6 +410,6 @@ erasure-plugin/Makefile.plugin.conf
 erasure-plugin/META
 safechecker-plugin/META
 template-rocq/_TemplateRocqProject
-.gitignore
 template-rocq/_PluginProject
 template-rocq/_RocqProject
+**/Makefile.*.conf

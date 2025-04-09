@@ -193,8 +193,9 @@ struct
   let quote_cast_kind k =
     match k with
       Constr.VMcast -> Lazy.force kVmCast
-    | Constr.DEFAULTcast -> Lazy.force kCast
     | Constr.NATIVEcast -> Lazy.force kNative
+    (* | Constr.DEFAULTcast -> Lazy.force kCast *)
+    | _ -> (* FIXME *) Lazy.force kCast
 
   let string_of_level s =
     to_string (Univ.Level.to_string s)
