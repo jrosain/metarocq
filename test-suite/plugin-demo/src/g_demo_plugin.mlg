@@ -5,20 +5,21 @@ open MyPlugin
 
 DECLARE PLUGIN "rocq-metarocq-demo-plugin.plugin"
 
-VERNAC COMMAND EXTEND Make_vernac CLASSIFIED AS QUERY STATE program opaque_access
+VERNAC COMMAND EXTEND Make_vernac CLASSIFIED AS QUERY STATE program
    | [ "Showoff" ] ->
-     { Run_extractable.run_vernac showoff }
+     { (* FIXME: indirect_accessor used in place of a STATE opaque_access *)
+     Run_extractable.run_vernac ~opaque_access:Library.indirect_accessor showoff }
 END
 
 
 VERNAC COMMAND EXTEND Make_lens_vernac CLASSIFIED AS SIDEFF STATE program
 | [ "Make" "Lens" ident(name) ] ->
-     { Run_extractable.run_vernac (genLensN (Caml_bytestring.bytestring_of_caml_string (Names.Id.to_string name))) }
+     { Run_extractable.run_vernac ~opaque_access:Library.indirect_accessor (genLensN (Caml_bytestring.bytestring_of_caml_string (Names.Id.to_string name))) }
 END
 
 
 VERNAC COMMAND EXTEND Unquote_vernac CLASSIFIED AS SIDEFF STATE program
 | [ "LookupPrint" ident(name) ] ->
      { let nstr = Names.Id.to_string name in
-       Run_extractable.run_vernac (lookupPrint (Caml_bytestring.bytestring_of_caml_string nstr)) }
+       Run_extractable.run_vernac ~opaque_access:Library.indirect_accessor (lookupPrint (Caml_bytestring.bytestring_of_caml_string nstr)) }
 END
