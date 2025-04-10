@@ -1,7 +1,7 @@
-From MetaCoq.PCUIC Require Import PCUICAst.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.Common Require Import Environment.Sig.
+From MetaRocq.PCUIC Require Import PCUICAst.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.Common Require Import Environment.Sig.
 
 Module qPCUICTermUtils <: QuotationOfTermUtils PCUICTerm PCUICEnvironment PCUICTermUtils.
-  MetaCoq Run (tmMakeQuotationOfModule everything None "PCUICTermUtils").
+  MetaRocq Run (tmMakeQuotationOfModule everything None "PCUICTermUtils").
 End qPCUICTermUtils.

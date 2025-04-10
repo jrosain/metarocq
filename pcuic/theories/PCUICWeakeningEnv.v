@@ -1,9 +1,9 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTyping.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTyping.
 From Equations Require Import Equations.
-From MetaCoq.Utils Require Import LibHypsNaming.
+From MetaRocq.Utils Require Import LibHypsNaming.
 
 From Stdlib Require Import ssreflect.
 
@@ -537,23 +537,31 @@ Arguments weaken_env_strictly_decls_prop {cf} (Pcmp P)%_function_scope _%_functi
 
 (* diamond dependency, but the proofs should never matter *)
 (* we export disabling this warning here so these coercions don't result in warnings, and then we re-enable it later to not suppress other warnings *)
-#[export] Set Warnings Append "-ambiguous-paths".
 Import CMorphisms CRelationClasses.
+#[export] Set Warnings "-ambiguous-paths".
+#[warning="-ambiguous-paths"]
 Global Coercion weaken_env_prop_full_to_decls {cf Pcmp P P0} : @weaken_env_prop_full cf Pcmp P P0 -> @weaken_env_decls_prop_full cf Pcmp P P0.
 Proof. eapply weaken_env_prop_full_gen_impl; repeat intro; tc; reflexivity. Qed.
+#[warnings="-ambiguous-paths"]
 Global Coercion weaken_env_prop_full_to_strictly_on_decls {cf Pcmp P P0} : @weaken_env_prop_full cf Pcmp P P0 -> @weaken_env_strictly_on_decls_prop_full cf Pcmp P P0.
 Proof. eapply weaken_env_prop_full_gen_impl; repeat intro; tc; reflexivity. Qed.
+#[warnings="-ambiguous-paths"]
 Global Coercion weaken_env_prop_full_decls_to_strictly_decls {cf Pcmp P P0} : @weaken_env_decls_prop_full cf Pcmp P P0 -> @weaken_env_strictly_decls_prop_full cf Pcmp P P0.
 Proof. eapply weaken_env_prop_full_gen_impl; repeat intro; tc; reflexivity. Qed.
+#[warnings="-ambiguous-paths"]
 Global Coercion weaken_env_prop_full_strictly_on_decls_to_strictly_decls {cf Pcmp P P0} : @weaken_env_strictly_on_decls_prop_full cf Pcmp P P0 -> @weaken_env_strictly_decls_prop_full cf Pcmp P P0.
 Proof. eapply weaken_env_prop_full_gen_impl; repeat intro; tc; reflexivity. Qed.
 
+#[warnings="-ambiguous-paths"]
 Global Coercion weaken_env_prop_to_decls {cf Pcmp P P0} : @weaken_env_prop cf Pcmp P P0 -> @weaken_env_decls_prop cf Pcmp P P0.
 Proof. eapply weaken_env_prop_gen_impl; repeat intro; tc; reflexivity. Qed.
+#[warnings="-ambiguous-paths"]
 Global Coercion weaken_env_prop_to_strictly_on_decls {cf Pcmp P P0} : @weaken_env_prop cf Pcmp P P0 -> @weaken_env_strictly_on_decls_prop cf Pcmp P P0.
 Proof. eapply weaken_env_prop_gen_impl; repeat intro; tc; reflexivity. Qed.
+#[warnings="-ambiguous-paths"]
 Global Coercion weaken_env_prop_decls_to_strictly_decls {cf Pcmp P P0} : @weaken_env_decls_prop cf Pcmp P P0 -> @weaken_env_strictly_decls_prop cf Pcmp P P0.
 Proof. eapply weaken_env_prop_gen_impl; repeat intro; tc; reflexivity. Qed.
+#[warnings="-ambiguous-paths"]
 Global Coercion weaken_env_prop_strictly_on_decls_to_strictly_decls {cf Pcmp P P0} : @weaken_env_strictly_on_decls_prop cf Pcmp P P0 -> @weaken_env_strictly_decls_prop cf Pcmp P P0.
 Proof. eapply weaken_env_prop_gen_impl; repeat intro; tc; reflexivity. Qed.
 #[export] Set Warnings Append "ambiguous-paths".

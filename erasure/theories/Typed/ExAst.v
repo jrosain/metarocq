@@ -1,9 +1,9 @@
 From Stdlib Require Import List.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import Kernames.
-From MetaCoq.Common Require Import BasicAst.
-From MetaCoq.Erasure Require Export EAst.
-From MetaCoq.Erasure Require EPretty.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import Kernames.
+From MetaRocq.Common Require Import BasicAst.
+From MetaRocq.Erasure Require Export EAst.
+From MetaRocq.Erasure Require EPretty.
 
 Import ListNotations.
 

@@ -3,8 +3,8 @@ From Stdlib Require Import Lists.List.
 From Stdlib Require Import Lia.
 From Stdlib Require Import Arith.
 From Stdlib Require Import NArith.
-From MetaCoq.Utils Require Import monad_utils.
-From MetaCoq.Template Require Import Loader TemplateMonad.Core.
+From MetaRocq.Utils Require Import monad_utils.
+From MetaRocq.Template Require Import Loader TemplateMonad.Core.
 
 Local Set Default Proof Mode "Classic".
 
@@ -15,7 +15,7 @@ Abort.
 
 (* Let's compare some timing numbers *)
 Module TCMonomorphic.
-  Import MCMonadNotation.
+  Import MRMonadNotation.
   Import bytestring.
   Local Unset Universe Polymorphism.
   (* We use monomorphic universes for performance *)
@@ -44,7 +44,7 @@ Module TC.
   Class HasFix : Prop := tmFix_ : forall {A B} (f : (A -> TemplateMonad B) -> (A -> TemplateMonad B)), A -> TemplateMonad B.
   (* idk why this is needed... *)
   #[local] Hint Extern 1 (Monad _) => refine TemplateMonad_Monad : typeclass_instances.
-  Import MCMonadNotation.
+  Import MRMonadNotation.
   Import bytestring.
   Local Unset Universe Checking.
   Definition tmFix {A B} (f : (A -> TemplateMonad B) -> (A -> TemplateMonad B)) : A -> TemplateMonad B
@@ -62,9 +62,9 @@ Module TC.
   Abort.
 End TC.
 Module Unquote.
-  Import MCMonadNotation.
-  Import MetaCoq.Common.Universes.
-  Import MetaCoq.Template.Ast.
+  Import MRMonadNotation.
+  Import MetaRocq.Common.Universes.
+  Import MetaRocq.Template.Ast.
   Import bytestring.
   Import ListNotations.
   Local Set Universe Polymorphism.
@@ -127,7 +127,7 @@ Module Unquote.
             bind@{t u} tmQuoteLevel@{b t u} (fun qb =>
             bind@{t u} tmQuoteLevel@{t t u} (fun qt =>
             bind@{t u} tmQuoteLevel@{u t u} (fun qu =>
-            let self := tConst (MPfile ["Core"; "TemplateMonad"; "Template"; "MetaCoq"], "tmFix'")%bs [qa;qb;qt;qu] in
+            let self := tConst (MPfile ["Core"; "TemplateMonad"; "Template"; "MetaRocq"], "tmFix'")%bs [qa;qb;qt;qu] in
             @tmFix'@{a b t u} A B (mkApps self [qA; qB]) f a))))))).
   Definition six := tmFix (fun f a => if (6 <? a) then ret 6 else f (S a))%nat 0%nat.
   Goal True.
@@ -136,16 +136,16 @@ Module Unquote.
 End Unquote.
 Module NoGuard.
   (* N.B. This version is inconsistent *)
-  Import MCMonadNotation.
-  Import MetaCoq.Common.Universes.
-  Import MetaCoq.Template.Ast.
+  Import MRMonadNotation.
+  Import MetaRocq.Common.Universes.
+  Import MetaRocq.Template.Ast.
   Import bytestring.
   Import ListNotations.
   Local Set Universe Polymorphism.
   Local Unset Universe Minimization ToSet.
   (* idk why this is needed... *)
   #[local] Hint Extern 1 (Monad _) => refine TemplateMonad_Monad : typeclass_instances.
-  Local Unset Guard Checking. (* Inconsistent!  See https://coq.zulipchat.com/#narrow/stream/237658-MetaCoq/topic/.60tmFix.60point.20combinator/near/311488798 *)
+  Local Unset Guard Checking. (* Inconsistent!  See https://coq.zulipchat.com/#narrow/stream/237658-MetaRocq/topic/.60tmFix.60point.20combinator/near/311488798 *)
   Definition tmFix {A B} (f : (A -> TemplateMonad B) -> (A -> TemplateMonad B)) : A -> TemplateMonad B
     := (fix tmFix (dummy : unit) {struct dummy} : A -> @TemplateMonad B
         := f (fun a => tmFix tt a)) tt.
@@ -155,38 +155,38 @@ Module NoGuard.
     run_template_program six (fun v => constr_eq v 6%nat).
   Abort.
 End NoGuard.
-Definition count_down_MC
+Definition count_down_MR
   := tmFix (fun f x => let x := N.pred x in
                        match x with
                        | 0 => ret 0
                        | _ => f x
                        end%N).
-Definition count_down_MC_tc
+Definition count_down_MR_tc
   := TC.tmFix (fun f x => let x := N.pred x in
                           match x with
                           | 0 => ret 0
                           | _ => f x
                           end%N).
-Definition count_down_MC_tc_monomorphic
+Definition count_down_MR_tc_monomorphic
   := TCMonomorphic.tmFix (fun f x => let x := N.pred x in
                                      match x with
                                      | 0 => ret 0
                                      | _ => f x
                                      end%N).
-Definition count_down_MC_unquote
+Definition count_down_MR_unquote
   := Unquote.tmFix (fun f x => let x := N.pred x in
                                match x with
                                | 0 => ret 0
                                | _ => f x
                                end%N).
 (* reference that uses the constant in Core, for equality comparison *)
-Definition count_down_MC_unquote_ref
+Definition count_down_MR_unquote_ref
   := Unquote.tmFix_ref (fun f x => let x := N.pred x in
                                    match x with
                                    | 0 => ret 0
                                    | _ => f x
                                    end%N).
-Definition count_down_MC_noguard
+Definition count_down_MR_noguard
   := NoGuard.tmFix (fun f x => let x := N.pred x in
                        match x with
                        | 0 => ret 0
@@ -248,7 +248,7 @@ Ltac2 count_down v :=
 
 (* Make sure that we're using the unquote-based fix *)
 Check eq_refl : @tmFix = @Unquote.tmFix_ref.
-Check eq_refl : @count_down_MC = @count_down_MC_unquote_ref.
+Check eq_refl : @count_down_MR = @count_down_MR_unquote_ref.
 
 (* --- *)
 
@@ -257,19 +257,19 @@ Definition smallnum := (2^15)%N.
 Definition extremelysmallnum := (2^8)%N.
 
 (* This is pretty slow :-( *)
-Time Check ltac:(run_template_program (count_down_MC_tc extremelysmallnum) (fun v => exact v)). (* 5.378 secs (5.378u,0.s) *)
+Time Check ltac:(run_template_program (count_down_MR_tc extremelysmallnum) (fun v => exact v)). (* 5.378 secs (5.378u,0.s) *)
 (* universes are apparently a bottleneck *)
-Time Check ltac:(run_template_program (count_down_MC_tc_monomorphic extremelysmallnum) (fun v => exact v)). (* 0.093 secs (0.093u,0.s) *)
-Time Check ltac:(run_template_program (count_down_MC_unquote extremelysmallnum) (fun v => exact v)). (* 0.093 secs (0.093u,0.s) *)
-Time Check ltac:(run_template_program (count_down_MC_noguard extremelysmallnum) (fun v => exact v)). (* 0.001 secs (0.001u,0.s) *)
+Time Check ltac:(run_template_program (count_down_MR_tc_monomorphic extremelysmallnum) (fun v => exact v)). (* 0.093 secs (0.093u,0.s) *)
+Time Check ltac:(run_template_program (count_down_MR_unquote extremelysmallnum) (fun v => exact v)). (* 0.093 secs (0.093u,0.s) *)
+Time Check ltac:(run_template_program (count_down_MR_noguard extremelysmallnum) (fun v => exact v)). (* 0.001 secs (0.001u,0.s) *)
 (* test the actually used one *)
-Time Check ltac:(run_template_program (count_down_MC extremelysmallnum) (fun v => exact v)).
+Time Check ltac:(run_template_program (count_down_MR extremelysmallnum) (fun v => exact v)).
 (* now we use bigger numbers *)
-Time Check ltac:(run_template_program (count_down_MC_tc_monomorphic smallnum) (fun v => exact v)). (* 7.64 secs (7.64u,0.s) *)
+Time Check ltac:(run_template_program (count_down_MR_tc_monomorphic smallnum) (fun v => exact v)). (* 7.64 secs (7.64u,0.s) *)
 (* unquote is a bit slower here *)
-Time Check ltac:(run_template_program (count_down_MC_unquote smallnum) (fun v => exact v)). (* 10.874 secs (10.874u,0.s) *)
-Time Check ltac:(run_template_program (count_down_MC_noguard smallnum) (fun v => exact v)). (* 0.115 secs (0.115u,0.s) *)
-Time Check ltac:(run_template_program (count_down_MC smallnum) (fun v => exact v)).
+Time Check ltac:(run_template_program (count_down_MR_unquote smallnum) (fun v => exact v)). (* 10.874 secs (10.874u,0.s) *)
+Time Check ltac:(run_template_program (count_down_MR_noguard smallnum) (fun v => exact v)). (* 0.115 secs (0.115u,0.s) *)
+Time Check ltac:(run_template_program (count_down_MR smallnum) (fun v => exact v)).
 Time Eval lazy in count_down_wf smallnum. (* 0.305 secs (0.305u,0.s) *)
 Time Eval cbv in count_down_wf smallnum. (* 0.328 secs (0.328u,0.s) *)
 Time Eval lazy in count_down_noguard smallnum. (* 0.138 secs (0.138u,0.s) *)

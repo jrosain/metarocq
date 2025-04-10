@@ -1,17 +1,17 @@
 From Stdlib Require Import List.
 From Stdlib Require Import String.
-From MetaCoq.TypedExtraction Require Import Utils.
-From MetaCoq.TypedExtraction Require Import Annotations.
-From MetaCoq.TypedExtraction Require Import ExAst.
-From MetaCoq.TypedExtraction Require Import Extraction.
-From MetaCoq.TypedExtraction Require Import Optimize.
-From MetaCoq.TypedExtraction Require Import ResultMonad.
-From MetaCoq.TypedExtraction Require Import TypeAnnotations.
-From MetaCoq.TypedExtraction.Tests Require Import ErasureTests.
-From MetaCoq.Template Require Import Kernames.
-From MetaCoq.Template Require Import Loader.
-From MetaCoq.Template Require Import config.
-From MetaCoq.Template Require Import MCUtils.
+From MetaRocq.TypedExtraction Require Import Utils.
+From MetaRocq.TypedExtraction Require Import Annotations.
+From MetaRocq.TypedExtraction Require Import ExAst.
+From MetaRocq.TypedExtraction Require Import Extraction.
+From MetaRocq.TypedExtraction Require Import Optimize.
+From MetaRocq.TypedExtraction Require Import ResultMonad.
+From MetaRocq.TypedExtraction Require Import TypeAnnotations.
+From MetaRocq.TypedExtraction.Tests Require Import ErasureTests.
+From MetaRocq.Template Require Import Kernames.
+From MetaRocq.Template Require Import Loader.
+From MetaRocq.Template Require Import config.
+From MetaRocq.Template Require Import MRUtils.
 
 
 Module P := PCUICAst.PCUICEnvironment.
@@ -74,8 +74,8 @@ Section printing.
     | tConstruct ind c (_ :: _) => fun _ => "Error(constructors_as_blocks_not_supported)"
     | tCase (mkInd mind i as ind, nparam) t brs =>
       fun '(bt, (ta, trs)) =>
-      "Case(" ++ string_of_inductive ind ++ "," ++ string_of_nat i ++ "," ++ MetaCoq.Erasure.EAstUtils.string_of_term t ++ ","
-                    ++ MCString.string_of_list (fun b => MetaCoq.Erasure.EAstUtils.string_of_term (snd b)) brs ++ ")"
+      "Case(" ++ string_of_inductive ind ++ "," ++ string_of_nat i ++ "," ++ MetaRocq.Erasure.EAstUtils.string_of_term t ++ ","
+                    ++ MRString.string_of_list (fun b => MetaRocq.Erasure.EAstUtils.string_of_term (snd b)) brs ++ ")"
     | _ => fun _ => "error: cannot print"
     end.
 
@@ -126,7 +126,7 @@ Definition extract_no_opt p := general_extract_typed p false [] [].
 
 Module ex1.
   Definition foo := 1.
-  MetaCoq Quote Recursively Definition ex := foo.
+  MetaRocq Quote Recursively Definition ex := foo.
   Example test :
     extract_opt ex = "(S : nat → nat) (O : nat) : nat".
   Proof. vm_compute. reflexivity. Qed.
@@ -135,7 +135,7 @@ End ex1.
 Module ex2.
   Definition foo : { n : nat | n = 0 } := exist 0 eq_refl.
   Definition bar := proj1_sig foo.
-  MetaCoq Quote Recursively Definition ex := bar.
+  MetaRocq Quote Recursively Definition ex := bar.
 
   Example test_no_opt :
     extract_no_opt ex =
@@ -152,7 +152,7 @@ Module ex3.
   Definition bar (p : 5 = 5) (n : nat) := n.
   (* bar must be eta expanded in the following *)
   Definition baz := foo bar.
-  MetaCoq Quote Recursively Definition ex := baz.
+  MetaRocq Quote Recursively Definition ex := baz.
 
   Example test_no_opt :
     extract_no_opt ex = "(foo : (□ → nat → nat) → nat) (bar : □ → nat → nat) : nat".
@@ -166,7 +166,7 @@ End ex3.
 
 Module ex4.
   Definition foo : option nat := None.
-  MetaCoq Quote Recursively Definition ex := foo.
+  MetaRocq Quote Recursively Definition ex := foo.
 
   Example test_no_opt :
     extract_no_opt ex = "(None : □ → option 'a0) (□ : □) : option nat".
@@ -179,7 +179,7 @@ End ex4.
 
 Module ex5.
   Definition foo : list nat := [0].
-  MetaCoq Quote Recursively Definition ex := foo.
+  MetaRocq Quote Recursively Definition ex := foo.
 
   Example test_no_opt :
     extract_no_opt ex = "(((cons : □ → 'a0 → list 'a0 → list 'a0) (□ : □) : nat → list nat → list nat) (O : nat) : list nat → list nat) ((nil : □ → list 'a0) (□ : □) : list nat) : list nat".
@@ -195,7 +195,7 @@ Module ex6.
     let inner (a : A0) : A1 := b in
     inner a.
 
-  MetaCoq Quote Recursively Definition ex := @poly_func.
+  MetaRocq Quote Recursively Definition ex := @poly_func.
 
   Example test_no_opt :
     extract_no_opt ex =

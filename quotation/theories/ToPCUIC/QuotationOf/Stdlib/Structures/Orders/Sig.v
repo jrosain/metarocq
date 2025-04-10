@@ -1,13 +1,13 @@
 From Stdlib.Structures Require Import Orders.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.Stdlib Require Export Structures.Equalities.Sig.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.Stdlib Require Export Structures.Equalities.Sig.
 
 Module Type QuotationOfHasLt (Import T : Typ) (Import E : HasLt T).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "E").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "E").
 End QuotationOfHasLt.
 
 Module Type QuotationOfHasLe (Import T : Typ) (Import E : HasLe T).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "E").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "E").
 End QuotationOfHasLe.
 
 Module Type QuotationOfEqLt (E : EqLt) := QuotationOfTyp E <+ QuotationOfHasEq E E <+ QuotationOfHasLt E E.
@@ -15,21 +15,21 @@ Module Type QuotationOfEqLe (E : EqLe) := QuotationOfTyp E <+ QuotationOfHasEq E
 Module Type QuotationOfEqLtLe (E : EqLtLe) := QuotationOfTyp E <+ QuotationOfHasEq E E <+ QuotationOfHasLt E E <+ QuotationOfHasLe E E.
 
 Module Type QuotationOfIsStrOrder (Import E : EqLt) (Import S : IsStrOrder E).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "S").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "S").
 End QuotationOfIsStrOrder.
 
 Module Type QuotationOfLeIsLtEq (Import E : EqLtLe) (Import S : LeIsLtEq E).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "S").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "S").
 End QuotationOfLeIsLtEq.
 
 Module Type QuotationOfStrOrder (E : StrOrder) := QuotationOfEqualityType E <+ QuotationOfHasLt E E <+ QuotationOfIsStrOrder E E.
 
 Module Type QuotationOfHasCmp (Import T : Typ) (S : HasCmp T).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "S").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "S").
 End QuotationOfHasCmp.
 
 Module Type QuotationOfCmpSpec (Import E : EqLt) (Import C : HasCmp E) (S : CmpSpec E C).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "S").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "S").
 End QuotationOfCmpSpec.
 
 Module Type QuotationOfHasCompare (E : EqLt) (C : HasCompare E) := QuotationOfHasCmp E C <+ QuotationOfCmpSpec E C C.
@@ -47,7 +47,7 @@ Module Type QuotationOfUsualOrderedType (E : UsualOrderedType) <: QuotationOfUsu
 Module Type QuotationOfUsualOrderedTypeFull (E : UsualOrderedTypeFull) := QuotationOfUsualOrderedType E <+ QuotationOfHasLe E E <+ QuotationOfLeIsLtEq E E.
 
 Module Type QuotationOfLtIsTotal (Import E : EqLt) (S : LtIsTotal E).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "S").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "S").
 End QuotationOfLtIsTotal.
 
 Module Type QuotationOfTotalOrder (E : TotalOrder) := QuotationOfStrOrder E <+ QuotationOfHasLe E E <+ QuotationOfLeIsLtEq E E <+ QuotationOfLtIsTotal E E.
@@ -86,32 +86,32 @@ Module QuotationOfOTF_to_TotalOrder (O : OrderedTypeFull) (S : OTF_to_TotalOrder
  := qO <+ QuotationOfOTF_LtIsTotal O S.
 
 Module Type QuotationOfHasLeb (Import T : Typ) (Import S : HasLeb T).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "S").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "S").
 End QuotationOfHasLeb.
 
 Module Type QuotationOfHasLtb (Import T : Typ) (Import S : HasLtb T).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "S").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "S").
 End QuotationOfHasLtb.
 
 Module Type QuotationOfLebSpec (T : Typ) (X : HasLe T) (Y : HasLeb T) (S : LebSpec T X Y).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "S").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "S").
 End QuotationOfLebSpec.
 
 Module Type QuotationOfLtbSpec (T : Typ) (X : HasLt T) (Y : HasLtb T) (S : LtbSpec T X Y).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "S").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "S").
 End QuotationOfLtbSpec.
 
 Module Type QuotationOfLeBool (E : LeBool) := QuotationOfTyp E <+ QuotationOfHasLeb E E.
 Module Type QuotationOfLtBool (E : LtBool) := QuotationOfTyp E <+ QuotationOfHasLtb E E.
 
 Module Type QuotationOfLebIsTotal (Import X : LeBool) (Import S : LebIsTotal X).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "S").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "S").
 End QuotationOfLebIsTotal.
 
 Module Type QuotationOfTotalLeBool (E : TotalLeBool) := QuotationOfLeBool E <+ QuotationOfLebIsTotal E E.
 
 Module Type QuotationOfLebIsTransitive (Import X : LeBool) (S : LebIsTransitive X).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "S").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "S").
 End QuotationOfLebIsTransitive.
 
 Module Type QuotationOfTotalTransitiveLeBool (E : TotalTransitiveLeBool) := QuotationOfTotalLeBool E <+ QuotationOfLebIsTransitive E E.

@@ -84,7 +84,7 @@ Definition eq_sym {A} {x y : A} (H : x = y) : y = x :=
 Class HSet A := {is_hset : forall (x y : A) (e e' : x = y), e = e'}.
 
 
-(* From HoTT/Coq *)
+(* From HoTT/Rocq *)
 
 Definition apD10 {A} {B:A->Type} {f g : forall x, B x} (h:f=g)
   : f == g

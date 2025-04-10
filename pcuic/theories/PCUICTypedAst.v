@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Morphisms.
-From MetaCoq.Common Require Export utils Universes BasicAst Environment Reflect.
-From MetaCoq.Common Require EnvironmentTyping.
-From MetaCoq.PCUIC Require Export PCUICPrimitive.
+From MetaRocq.Common Require Export utils Universes BasicAst Environment Reflect.
+From MetaRocq.Common Require EnvironmentTyping.
+From MetaRocq.PCUIC Require Export PCUICPrimitive.
 From Equations Require Import Equations.
 Require Vector Fin.
 (*

@@ -1,14 +1,14 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8 Program.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames Primitive BasicAst EnvMap.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils EInduction EArities
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames Primitive BasicAst EnvMap.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils EInduction EArities
     ELiftSubst ESpineView EGlobalEnv EWellformed EEnvMap
     EWcbvEval EEtaExpanded ECSubst EWcbvEvalEtaInd EProgram.
 
 Local Open Scope string_scope.
 Set Asymmetric Patterns.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 From Equations Require Import Equations.
 Set Equations Transparent.
@@ -23,7 +23,7 @@ Ltac introdep := let H := fresh in intros H; depelim H.
 #[global]
 Hint Constructors eval : core.
 
-Import MCList (map_InP, map_InP_spec).
+Import MRList (map_InP, map_InP_spec).
 
 Equations safe_hd {A} (l : list A) (nnil : l <> nil) : A :=
 | [] | nnil := False_rect _ (nnil eq_refl)
@@ -1051,7 +1051,7 @@ Proof.
     destruct lookup_constructor eqn:hl => //. destruct p as [[] ?] => //.
 Qed.
 
-From MetaCoq.Erasure Require Import EEtaExpanded.
+From MetaRocq.Erasure Require Import EEtaExpanded.
 
 Lemma unbox_declared_constructor {Σ : GlobalContextMap.t} {k mdecl idecl cdecl} :
   declared_constructor Σ.(GlobalContextMap.global_decls)  k mdecl idecl cdecl ->
@@ -1191,7 +1191,7 @@ Proof.
   now depelim H. depelim H. eauto.
 Qed.
 
-From MetaCoq.Erasure Require Import EProgram.
+From MetaRocq.Erasure Require Import EProgram.
 
 Program Fixpoint unbox_env' Σ : EnvMap.fresh_globals Σ -> global_context :=
   match Σ with
@@ -1274,7 +1274,7 @@ Proof.
   intros _ => //.
 Qed.
 
-From MetaCoq.Erasure Require Import EGenericGlobalMap.
+From MetaRocq.Erasure Require Import EGenericGlobalMap.
 
 #[local]
 Instance GT : GenTransform := { gen_transform := unbox; gen_transform_inductive_decl := unbox_inductive_decl }.
@@ -2037,7 +2037,7 @@ Proof.
     destruct args; cbn in *; eauto.
 Qed.
 
-From MetaCoq.Erasure Require Import EEtaExpanded.
+From MetaRocq.Erasure Require Import EEtaExpanded.
 
 Lemma unbox_expanded {Σ : GlobalContextMap.t} t : expanded Σ t -> expanded Σ (unbox Σ t).
 Proof.
@@ -2141,7 +2141,7 @@ Proof.
   now apply unbox_wellformed_term.
 Qed.
 
-From MetaCoq.Erasure Require Import EGenericGlobalMap.
+From MetaRocq.Erasure Require Import EGenericGlobalMap.
 
 #[local]
 Instance GT : GenTransform := { gen_transform := unbox; gen_transform_inductive_decl := id }.

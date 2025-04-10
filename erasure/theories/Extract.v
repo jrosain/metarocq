@@ -1,12 +1,12 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Program ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Primitive.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive PCUICTyping
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Primitive.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive PCUICTyping
      PCUICElimination PCUICWcbvEval PCUICFirstorder
      PCUICWellScopedCumulativity PCUICFirstorder PCUICNormalization PCUICReduction
      PCUICConversion PCUICPrincipality PCUICNormal.
-From MetaCoq.Erasure Require EPrimitive EAst EGlobalEnv.
+From MetaRocq.Erasure Require EPrimitive EAst EGlobalEnv.
 Import EPrimitive.
 Module E := EAst.
 

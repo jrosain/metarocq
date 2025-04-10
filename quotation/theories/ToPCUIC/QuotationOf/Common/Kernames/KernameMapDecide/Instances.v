@@ -1,7 +1,7 @@
-From MetaCoq.Common Require Import Kernames.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.Utils Require Import MCFSets.Sig.
+From MetaRocq.Common Require Import Kernames.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.Utils Require Import MRFSets.Sig.
 
 Module qKernameMapDecide <: FMapAVL.QuotationOfDecide KernameMap.E KernameMap KernameMapDecide.
-  MetaCoq Run (tmMakeQuotationOfModule everything None "KernameMapDecide").
+  MetaRocq Run (tmMakeQuotationOfModule everything None "KernameMapDecide").
 End qKernameMapDecide.

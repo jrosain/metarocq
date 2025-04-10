@@ -1,6 +1,0 @@
-META.coq-metacoq-demo-plugin
--R theories MetaCoq.ExtractedPluginDemo
-
-theories/Lens.v
-theories/MyPlugin.v
-theories/Extraction.v

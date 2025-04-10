@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Universes.
-From MetaCoq.PCUIC Require Import PCUICTyping PCUICAst PCUICAstUtils PCUICTactics
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Universes.
+From MetaRocq.PCUIC Require Import PCUICTyping PCUICAst PCUICAstUtils PCUICTactics
      PCUICLiftSubst PCUICInductives PCUICGeneration PCUICSpine
      PCUICGlobalEnv PCUICWeakeningEnvConv PCUICWeakeningEnvTyp
      PCUICSubstitution PCUICUnivSubst PCUICUnivSubstitutionConv
@@ -1136,7 +1136,7 @@ Proof using Type Hcf cf.
     unshelve eapply declared_inductive_to_gen in isdecl, isdecl'; eauto.
     destruct (declared_inductive_inj isdecl isdecl'). subst.
     destruct data.
-    specialize (X7 _ _ H5 scrut_ty _ _ X10).
+    specialize (X7 _ _ H6 scrut_ty _ _ X10).
     eapply cumul_prop_sym => //.
     destruct e as [eqpars [eqinst [eqpctx eqpret]]].
     rewrite /ptm.
@@ -1208,7 +1208,7 @@ Proof using Type Hcf cf.
     destruct e as (a & _).
     constructor; [fvs|..].
     { eapply nth_error_all in X0; tea.
-      now apply isType_is_open_term in X0. }
+      now apply isTypeRel_is_open_term in X0. }
     { now eapply cumul_prop_is_open in cum as []. }
     eapply eq_term_eq_term_prop_impl; eauto.
     now symmetry in a.
@@ -1220,7 +1220,7 @@ Proof using Type Hcf cf.
     destruct e as (a & _).
     constructor; [fvs|..].
     { eapply nth_error_all in X0; tea.
-      now apply isType_is_open_term in X0. }
+      now apply isTypeRel_is_open_term in X0. }
     { now eapply cumul_prop_is_open in cum as []. }
     eapply eq_term_eq_term_prop_impl; eauto.
     now symmetry in a.

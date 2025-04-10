@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICOnOne PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICOnOne PCUICAstUtils
      PCUICLiftSubst PCUICTyping PCUICWeakeningConv PCUICWeakeningTyp PCUICCases
      PCUICCumulativity PCUICReduction
      PCUICParallelReduction PCUICEquality PCUICUnivSubstitutionConv
@@ -1012,7 +1012,7 @@ Section ContextConversion.
 
 End ContextConversion.
 
-#[global] Hint Resolve isType_open PCUICClosedTyp.wf_local_closed_context : fvs.
+#[global] Hint Resolve isType_is_open_term isTypeRel_is_open_term PCUICClosedTyp.wf_local_closed_context : fvs.
 #[global] Hint Resolve conv_ctx_refl' : pcuic.
 #[global] Hint Constructors All_decls_alpha_pb : pcuic.
 

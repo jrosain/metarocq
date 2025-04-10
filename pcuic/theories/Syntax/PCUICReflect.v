@@ -2,10 +2,10 @@
 From Stdlib Require Import ssreflect.
 From Equations Require Import Equations.
 
-From MetaCoq.PCUIC Require Import PCUICAst PCUICInduction.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import EnvironmentReflect.
-From MetaCoq.Common Require Export Reflect.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICInduction.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import EnvironmentReflect.
+From MetaRocq.Common Require Export Reflect.
 
 Open Scope pcuic.
 

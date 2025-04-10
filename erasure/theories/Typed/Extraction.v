@@ -1,19 +1,19 @@
 (** This file provides the main function for invoking our extraction. *)
 From Stdlib Require Import String.
-From MetaCoq.Erasure.Typed Require Import Erasure.
-From MetaCoq.Erasure.Typed Require Import Optimize.
-From MetaCoq.Erasure.Typed Require OptimizePropDiscr.
-From MetaCoq.Erasure.Typed Require Import ResultMonad.
-From MetaCoq.Erasure.Typed Require Import Transform.
-From MetaCoq.Erasure.Typed Require Import Utils.
-From MetaCoq.Erasure.Typed Require Import Certifying.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import Kernames.
-From MetaCoq.Common Require Import config.
-From MetaCoq.Template Require Import TemplateMonad.
-From MetaCoq.PCUIC Require Import PCUICAst.
-From MetaCoq.PCUIC Require Import PCUICTyping.
-From MetaCoq.TemplatePCUIC Require Import TemplateToPCUIC.
+From MetaRocq.Erasure.Typed Require Import Erasure.
+From MetaRocq.Erasure.Typed Require Import Optimize.
+From MetaRocq.Erasure.Typed Require OptimizePropDiscr.
+From MetaRocq.Erasure.Typed Require Import ResultMonad.
+From MetaRocq.Erasure.Typed Require Import Transform.
+From MetaRocq.Erasure.Typed Require Import Utils.
+From MetaRocq.Erasure.Typed Require Import Certifying.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import Kernames.
+From MetaRocq.Common Require Import config.
+From MetaRocq.Template Require Import TemplateMonad.
+From MetaRocq.PCUIC Require Import PCUICAst.
+From MetaRocq.PCUIC Require Import PCUICTyping.
+From MetaRocq.TemplatePCUIC Require Import TemplateToPCUIC.
 
 #[export]
 Existing Instance extraction_checker_flags.
@@ -116,7 +116,7 @@ Record extract_template_env_params :=
     check_wf_env_func : forall Σ, result (∥wf Σ∥) string;
     pcuic_args : extract_pcuic_params }.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Definition check_wf_and_extract (params : extract_template_env_params)
            (Σ : global_env) (seeds : KernameSet.t) (ignore : kername -> bool) :=
@@ -161,16 +161,16 @@ Definition extract_template_env_certifying_passes
     | Err e => tmFail e
   end.
 
-(** MetaCoq's safe checker does not run from within Coq, only when extracting.
+(** MetaRocq's safe checker does not run from within Rocq, only when extracting.
     To work around this we assume environments are well formed when extracting
-    from within Coq. This is justified since our environments are produced by quoting
-    and thus come directly from Coq, where they have already been type checked. *)
+    from within Rocq. This is justified since our environments are produced by quoting
+    and thus come directly from Rocq, where they have already been type checked. *)
 Axiom assume_env_wellformed : forall Σ, ∥wf Σ∥.
 
 (** Extract an environment with some minimal checks. This assumes the environment
-    is well-formed (to make it computable from within Coq) but furthermore checks that the
+    is well-formed (to make it computable from within Rocq) but furthermore checks that the
     erased context is closed, expanded and that the masks are valid before dearging.
-    Suitable for extraction of programs **from within Coq**. *)
+    Suitable for extraction of programs **from within Rocq**. *)
 Definition extract_within_coq : extract_template_env_params :=
   {| template_transforms := [];
      check_wf_env_func Σ := Ok (assume_env_wellformed Σ);

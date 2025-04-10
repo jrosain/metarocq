@@ -1,36 +1,36 @@
 From Stdlib Require Import Program.
-From MetaCoq.Erasure.Typed Require Import Utils.
-From MetaCoq.Erasure.Typed Require Import ExAst.
+From MetaRocq.Erasure.Typed Require Import Utils.
+From MetaRocq.Erasure.Typed Require Import ExAst.
 From Equations Require Import Equations.
-From MetaCoq.Erasure Require Import EArities.
-From MetaCoq.Erasure Require Import EAstUtils.
-From MetaCoq.Erasure Require ErasureFunction.
-From MetaCoq.PCUIC Require Import PCUICArities.
-From MetaCoq.PCUIC Require Import PCUICAstUtils.
-From MetaCoq.PCUIC Require Import PCUICCanonicity.
-From MetaCoq.PCUIC Require Import PCUICConfluence.
-From MetaCoq.PCUIC Require Import PCUICContextConversion.
-From MetaCoq.PCUIC Require Import PCUICContexts.
-From MetaCoq.PCUIC Require Import PCUICConversion.
-From MetaCoq.PCUIC Require Import PCUICInductiveInversion.
-From MetaCoq.PCUIC Require Import PCUICInversion.
-From MetaCoq.PCUIC Require Import PCUICLiftSubst.
-From MetaCoq.PCUIC Require Import PCUICNormal.
-From MetaCoq.PCUIC Require Import PCUICSN.
-From MetaCoq.PCUIC Require Import PCUICSR.
-From MetaCoq.PCUIC Require Import PCUICSafeLemmata.
-From MetaCoq.PCUIC Require Import PCUICSubstitution.
-From MetaCoq.PCUIC Require Import PCUICTyping.
-From MetaCoq.PCUIC Require Import PCUICValidity.
-From MetaCoq.PCUIC Require Import PCUICWellScopedCumulativity.
-From MetaCoq.PCUIC Require Import PCUICCumulativity.
-From MetaCoq.SafeChecker Require Import PCUICSafeReduce.
-From MetaCoq.SafeChecker Require Import PCUICSafeRetyping.
-From MetaCoq.SafeChecker Require Import PCUICWfEnv.
-From MetaCoq.SafeChecker Require Import PCUICWfEnvImpl.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import Kernames.
-From MetaCoq.Common Require Import config.
+From MetaRocq.Erasure Require Import EArities.
+From MetaRocq.Erasure Require Import EAstUtils.
+From MetaRocq.Erasure Require ErasureFunction.
+From MetaRocq.PCUIC Require Import PCUICArities.
+From MetaRocq.PCUIC Require Import PCUICAstUtils.
+From MetaRocq.PCUIC Require Import PCUICCanonicity.
+From MetaRocq.PCUIC Require Import PCUICConfluence.
+From MetaRocq.PCUIC Require Import PCUICContextConversion.
+From MetaRocq.PCUIC Require Import PCUICContexts.
+From MetaRocq.PCUIC Require Import PCUICConversion.
+From MetaRocq.PCUIC Require Import PCUICInductiveInversion.
+From MetaRocq.PCUIC Require Import PCUICInversion.
+From MetaRocq.PCUIC Require Import PCUICLiftSubst.
+From MetaRocq.PCUIC Require Import PCUICNormal.
+From MetaRocq.PCUIC Require Import PCUICSN.
+From MetaRocq.PCUIC Require Import PCUICSR.
+From MetaRocq.PCUIC Require Import PCUICSafeLemmata.
+From MetaRocq.PCUIC Require Import PCUICSubstitution.
+From MetaRocq.PCUIC Require Import PCUICTyping.
+From MetaRocq.PCUIC Require Import PCUICValidity.
+From MetaRocq.PCUIC Require Import PCUICWellScopedCumulativity.
+From MetaRocq.PCUIC Require Import PCUICCumulativity.
+From MetaRocq.SafeChecker Require Import PCUICSafeReduce.
+From MetaRocq.SafeChecker Require Import PCUICSafeRetyping.
+From MetaRocq.SafeChecker Require Import PCUICWfEnv.
+From MetaRocq.SafeChecker Require Import PCUICWfEnvImpl.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import Kernames.
+From MetaRocq.Common Require Import config.
 
 Import PCUICAst.PCUICEnvTyping.
 Import PCUICErrors.
@@ -107,7 +107,7 @@ Proof.
   intros [(_ & s & typ & _)].
   sq.
   apply inversion_Prod in typ as (s' & ? & ? & ? & ?); [|now eauto].
-  now eapply lift_sorting_forget_univ.
+  now eapply lift_sorting_forget_univ, lift_sorting_forget_rel.
 Qed.
 
 Hint Resolve isType_prod_dom : erase.
@@ -1097,7 +1097,8 @@ Proof.
     sq.
     destruct r as [?? r].
     eapply subject_reduction in r; eauto.
-    apply inversion_Lambda in r as (?&?&?&?); auto.
+    apply inversion_Lambda in r as (?&h1&?&?); auto.
+    eapply isTypeRel_isType in h1; auto.
   - clear inf.
     destruct (typ _ wfΣ) as [typ0].
     reduce_term_sound.
@@ -1168,10 +1169,8 @@ Proof.
     subst.
     assert (∥ wf Σ0 ∥) by now apply HΣ.
     unfold on_constant_decl in wt.
-    destruct (PCUICEnvironment.cst_body cst); cbn in *.
-    + sq;eapply validity;eauto. now eapply unlift_TermTyp.
-    + destruct wt.
-      eexists; eassumption.
+    sq.
+    now apply lift_sorting_forget_body, lift_sorting_forget_rel in wt.
   - assert (rΣ = Σ).
     { eapply abstract_env_ext_irr;eauto. }
     easy.
@@ -1180,10 +1179,8 @@ Proof.
     subst.
     assert (∥ wf Σ ∥) by now apply HΣ.
     unfold on_constant_decl in wt.
-    destruct (PCUICEnvironment.cst_body cst).
-    + sq.
-      now eapply unlift_TermTyp, validity in wt.
-    + assumption.
+    sq.
+    now apply lift_sorting_forget_body, lift_sorting_forget_rel in wt.
 Qed.
 
 Import P.
@@ -1213,7 +1210,7 @@ Qed.
 
 Definition ind_aname (oib : PCUICEnvironment.one_inductive_body) :=
   {| binder_name := nNamed (PCUICEnvironment.ind_name oib);
-     binder_relevance := PCUICEnvironment.ind_relevance oib |}.
+     binder_relevance := rel_of_Type |}.
 
 Definition arities_contexts
          (mind : kername)
@@ -1343,6 +1340,7 @@ Proof.
   all: intros;assert (rΣ = Σ) by (eapply abstract_env_ext_irr;eauto);subst.
   - abstract (
       destruct wt as [wt];sq;
+      eapply isTypeRel_isType;
       exact (onArity wt.π2)).
   - abstract (
       destruct p;

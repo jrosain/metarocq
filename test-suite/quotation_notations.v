@@ -1,6 +1,6 @@
 (* Some tests for the notations of quoting *)
-From MetaCoq.Utils Require Import bytestring.
-From MetaCoq.Template Require Loader.
+From MetaRocq.Utils Require Import bytestring.
+From MetaRocq.Template Require Loader.
 Local Open Scope bs_scope.
 Local Open Scope nat_scope.
 Module template.
@@ -19,7 +19,7 @@ Module template.
    *)
 End template.
 
-From MetaCoq.TemplatePCUIC Require Loader.
+From MetaRocq.TemplatePCUIC Require Loader.
 
 Module pcuic.
   Import TemplatePCUIC.Loader.

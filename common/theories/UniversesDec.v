@@ -1,7 +1,7 @@
 From Stdlib Require Import PArith NArith ZArith Lia.
-From MetaCoq.Utils Require Import MCList MCOption MCUtils.
-From MetaCoq.Common Require Import uGraph.
-From MetaCoq.Common Require Import Universes.
+From MetaRocq.Utils Require Import MRList MROption MRUtils.
+From MetaRocq.Common Require Import uGraph.
+From MetaRocq.Common Require Import Universes.
 Import wGraph.
 
 Definition levels_of_cs (cstr : ConstraintSet.t) : LevelSet.t
@@ -700,7 +700,7 @@ Proof.
                    => split; [ reflexivity | intros _ ]
                  end
                | progress cbv [uGraph.is_graph_of_uctx monad_utils.bind monad_utils.ret monad_utils.option_monad] in *
-               | progress cbn [MCOption.on_Some fst snd] in *
+               | progress cbn [MROption.on_Some fst snd] in *
                | rewrite <- uGraph.is_consistent_spec2
                | progress subst
                | assert_fails (idtac; lazymatch goal with |- ?G => has_evar G end);
@@ -814,12 +814,12 @@ Proof.
   destruct (consistent_dec ϕ); [ | now left; cbv [valid_constraints valid_constraints0 consistent not] in *; destruct ?; intros; eauto; exfalso; eauto ].
   destruct_head'_and.
   specialize_under_binders_by assumption.
-  cbv [uGraph.is_graph_of_uctx MCOption.on_Some] in *.
+  cbv [uGraph.is_graph_of_uctx MROption.on_Some] in *.
   cbv [valid_constraints] in *; repeat destruct ?; auto.
   { specialize_under_binders_by reflexivity.
     destruct uGraph.check_constraints_gen; specialize_by reflexivity; auto. }
   { rewrite uGraph.gc_consistent_iff in *.
-    cbv [uGraph.gc_of_uctx monad_utils.bind monad_utils.ret monad_utils.option_monad MCOption.on_Some] in *; cbn [fst snd] in *.
+    cbv [uGraph.gc_of_uctx monad_utils.bind monad_utils.ret monad_utils.option_monad MROption.on_Some] in *; cbn [fst snd] in *.
     destruct ?.
     all: try congruence.
     all: exfalso; assumption. }

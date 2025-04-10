@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import CRelationClasses.
-From MetaCoq.Common Require Import config.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICLiftSubst
+From MetaRocq.Common Require Import config.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICLiftSubst
      PCUICUnivSubst PCUICTyping PCUICGlobalEnv PCUICReduction PCUICClosed PCUICCSubst
      PCUICClosedTyp PCUICEtaExpand. (* Due to reliance on wf Σ instead of closed_env Σ *)
 
@@ -16,9 +16,9 @@ From Equations Require Import Equations.
   which conversion is defined. Hence two terms that reduce to the same
   wcbv head normal form are convertible.
 
-  This reduction strategy is supposed to mimick at the Coq level the
+  This reduction strategy is supposed to mimick at the Rocq level the
   reduction strategy of ML programming languages. It is used to state
-  the extraction theorem that can be applied to Coq terms to produce
+  the extraction theorem that can be applied to Rocq terms to produce
   (untyped) terms where all proofs are erased to a dummy value. *)
 
 

@@ -1,8 +1,8 @@
 
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8 CRelationClasses ProofIrrelevance.
-From MetaCoq.Common Require Import config Universes utils BasicAst.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICInduction
+From MetaRocq.Common Require Import config Universes utils BasicAst.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICInduction
      PCUICReflect PCUICLiftSubst PCUICSigmaCalculus
      PCUICUnivSubst PCUICTyping PCUICUnivSubstitutionConv PCUICUnivSubstitutionTyp
      PCUICCumulativity PCUICPosition PCUICEquality

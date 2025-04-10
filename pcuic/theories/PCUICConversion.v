@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICCases PCUICLiftSubst PCUICTyping PCUICOnOne
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICTactics PCUICCases PCUICLiftSubst PCUICTyping PCUICOnOne
      PCUICSubstitution PCUICPosition PCUICCumulativity PCUICReduction PCUICOnFreeVars
      PCUICConfluence PCUICClosed PCUICClosedConv PCUICClosedTyp PCUICParallelReductionConfluence PCUICEquality
      PCUICSigmaCalculus PCUICContextReduction PCUICContextConversion
@@ -2687,14 +2687,6 @@ Section ConvRedConv.
     Σ ;;; Γ ⊢ tCoFix mfix idx = tCoFix mfix' idx.
   Proof using wfΣ. eapply (ws_cumul_pb_fix_or_cofix (b:=false)). Qed.
 
-  Lemma ws_cumul_pb_eq_le_gen {pb Γ T U} :
-    Σ ;;; Γ ⊢ T = U ->
-    Σ ;;; Γ ⊢ T ≤[pb] U.
-  Proof using Type.
-    destruct pb => //.
-    eapply ws_cumul_pb_eq_le.
-  Qed.
-
   Lemma ws_cumul_pb_Lambda_l {Γ na A b na' A' pb} :
     eq_binder_annot na na' ->
     is_open_term (Γ ,, vass na A) b ->
@@ -2702,7 +2694,7 @@ Section ConvRedConv.
     Σ ;;; Γ ⊢ tLambda na A b ≤[pb] tLambda na' A' b.
   Proof using wfΣ.
     intros hna hb h.
-    eapply ws_cumul_pb_eq_le_gen.
+    eapply ws_cumul_eq_pb.
     eapply into_ws_cumul_pb.
     { clear -h hna; induction h.
       - constructor; constructor; auto; reflexivity.
@@ -2713,7 +2705,7 @@ Section ConvRedConv.
   Qed.
 
   Lemma ws_cumul_pb_Lambda_r {pb Γ na A b b'} :
-    Σ ;;; Γ,, vass na A ⊢ b ≤[pb] b' ->
+    Σ ;;; Γ,, vass na A ⊢ b ≤[Conv] b' ->
     Σ ;;; Γ ⊢ tLambda na A b ≤[pb] tLambda na A b'.
   Proof using wfΣ.
     intros h.
@@ -2739,9 +2731,10 @@ Section ConvRedConv.
     rewrite /on_free_vars_decl /test_decl => /andP[] /= onty ont onu onu'.
     eapply into_ws_cumul_pb => //.
     { clear -h. induction h.
-      - destruct pb;
-        eapply cumul_refl; constructor.
-        all: try reflexivity; auto.
+      - eapply cumul_red_l; pcuic.
+        eapply cumul_red_r; [|pcuic].
+        eapply cumul_refl.
+        apply eq_term_upto_univ_subst; trea; tc.
       - destruct pb;
         eapply cumul_red_l; tea; pcuic.
       - destruct pb;
@@ -2751,12 +2744,12 @@ Section ConvRedConv.
   Qed.
 
   Lemma ws_cumul_pb_it_mkLambda_or_LetIn_codom {Δ Γ u v pb} :
-      Σ ;;; (Δ ,,, Γ) ⊢ u ≤[pb] v ->
+      Σ ;;; (Δ ,,, Γ) ⊢ u ≤[Conv] v ->
       Σ ;;; Δ ⊢ it_mkLambda_or_LetIn Γ u ≤[pb] it_mkLambda_or_LetIn Γ v.
   Proof using wfΣ.
     intros h. revert Δ u v h.
     induction Γ as [| [na [b|] A] Γ ih ] ; intros Δ u v h.
-    - assumption.
+    - by apply ws_cumul_eq_pb.
     - simpl. cbn. eapply ih.
       eapply ws_cumul_pb_LetIn_bo. assumption.
     - simpl. cbn. eapply ih.
@@ -2794,7 +2787,7 @@ Section ConvRedConv.
   Lemma ws_cumul_pb_Lambda {pb Γ na1 na2 A1 A2 t1 t2} :
     eq_binder_annot na1 na2 ->
     Σ ;;; Γ ⊢ A1 = A2 ->
-    Σ ;;; Γ ,, vass na1 A1 ⊢ t1 ≤[pb] t2 ->
+    Σ ;;; Γ ,, vass na1 A1 ⊢ t1 ≤[Conv] t2 ->
     Σ ;;; Γ ⊢ tLambda na1 A1 t1 ≤[pb] tLambda na2 A2 t2.
   Proof using wfΣ.
     intros eqna X.
@@ -2808,7 +2801,7 @@ Section ConvRedConv.
   Lemma conv_cum_Lambda leq Γ na1 na2 A1 A2 t1 t2 :
     eq_binder_annot na1 na2 ->
     Σ ;;; Γ ⊢ A1 = A2 ->
-    sq_ws_cumul_pb leq Σ (Γ ,, vass na1 A1) t1 t2 ->
+    sq_ws_cumul_pb Conv Σ (Γ ,, vass na1 A1) t1 t2 ->
     sq_ws_cumul_pb leq Σ Γ (tLambda na1 A1 t1) (tLambda na2 A2 t2).
   Proof using wfΣ.
     intros eqna X []; sq. now apply ws_cumul_pb_Lambda.
@@ -2860,7 +2853,7 @@ Section ConvRedConv.
     intros hna ont ona onu.
     etransitivity.
     { eapply ws_cumul_pb_LetIn_bo; tea. }
-    eapply ws_cumul_pb_eq_le_gen.
+    eapply ws_cumul_eq_pb.
     etransitivity.
     { eapply ws_cumul_pb_LetIn_ty; tea; eauto with fvs. }
     eapply ws_cumul_pb_LetIn_tm; tea; eauto with fvs.
@@ -2869,12 +2862,13 @@ Section ConvRedConv.
 
   Lemma ws_cumul_pb_it_mkLambda_or_LetIn {pb Γ Δ1 Δ2 t1 t2} :
     Σ ⊢ Γ ,,, Δ1 = Γ ,,, Δ2 ->
-    Σ ;;; Γ ,,, Δ1 ⊢ t1 ≤[pb] t2 ->
+    Σ ;;; Γ ,,, Δ1 ⊢ t1 = t2 ->
     Σ ;;; Γ ⊢ it_mkLambda_or_LetIn Δ1 t1 ≤[pb] it_mkLambda_or_LetIn Δ2 t2.
   Proof using wfΣ.
     induction Δ1 in Δ2, t1, t2 |- *; intros X Y.
     - apply All2_fold_length in X.
       destruct Δ2; cbn in *; [trivial|].
+      1: by apply ws_cumul_eq_pb.
       rewrite length_app in X; lia.
     - apply All2_fold_length in X as X'.
       destruct Δ2 as [|c Δ2]; simpl in *; [rewrite length_app in X'; lia|].
@@ -2919,7 +2913,7 @@ Section ConvRedConv.
   Lemma ws_cumul_pb_Lambda_inv :
     forall pb Γ na1 na2 A1 A2 b1 b2,
       Σ ;;; Γ ⊢ tLambda na1 A1 b1 ≤[pb] tLambda na2 A2 b2 ->
-      [× eq_binder_annot na1 na2, Σ ;;; Γ ⊢ A1 = A2 & Σ ;;; Γ ,, vass na1 A1 ⊢ b1 ≤[pb] b2].
+      [× eq_binder_annot na1 na2, Σ ;;; Γ ⊢ A1 = A2 & Σ ;;; Γ ,, vass na1 A1 ⊢ b1 = b2].
   Proof using wfΣ.
     intros *.
     move/ws_cumul_pb_red; intros (v & v' & [redv redv' eq]).
@@ -2954,7 +2948,7 @@ Section ConvRedConv.
   Lemma Lambda_conv_cum_inv :
     forall leq Γ na1 na2 A1 A2 b1 b2,
       sq_ws_cumul_pb leq Σ Γ (tLambda na1 A1 b1) (tLambda na2 A2 b2) ->
-      eq_binder_annot na1 na2 /\ ∥ Σ ;;; Γ ⊢ A1 = A2 ∥ /\ sq_ws_cumul_pb leq Σ (Γ ,, vass na1 A1) b1 b2.
+      eq_binder_annot na1 na2 /\ ∥ Σ ;;; Γ ⊢ A1 = A2 ∥ /\ sq_ws_cumul_pb Conv Σ (Γ ,, vass na1 A1) b1 b2.
   Proof using wfΣ.
     intros * []. eapply ws_cumul_pb_Lambda_inv in X as [].
     intuition auto. all:sq; auto.
@@ -3260,7 +3254,7 @@ Section ConvSubst.
       move: clctx. rewrite on_free_vars_ctx_app !app_context_length H => /andP[] //. }
     etransitivity.
     * eapply untyped_substitution_ws_cumul_pb; tea. fvs.
-    * eapply ws_cumul_pb_eq_le_gen.
+    * eapply ws_cumul_eq_pb.
       eapply (untyped_substitution_ws_cumul_pb_subst_conv (Δ := Γ0) (Δ' := Γ1)); tea; eauto.
   Qed.
 
@@ -3560,7 +3554,7 @@ Qed.
 
 Lemma ws_cumul_pb_rel_it_mkLambda_or_LetIn {cf pb Σ} {wfΣ : wf Σ} (Δ Γ Γ' : context) (B B' : term) :
   ws_cumul_ctx_pb_rel Conv Σ Δ Γ Γ' ->
-  Σ ;;; Δ ,,, Γ ⊢ B ≤[pb] B' ->
+  Σ ;;; Δ ,,, Γ ⊢ B = B' ->
   Σ ;;; Δ ⊢ it_mkLambda_or_LetIn Γ B ≤[pb] it_mkLambda_or_LetIn Γ' B'.
 Proof.
   move/ws_cumul_ctx_pb_rel_app => hc hb.
@@ -3690,7 +3684,7 @@ Section CumulSubst.
     Σ ;;; Γ ,,, subst_context s 0 Γ' ⊢ subst s #|Γ'| b ≤[pb] subst s' #|Γ'| b.
   Proof using wfΣ.
     move=> cl cl' clb eqsub subs subs'.
-    eapply ws_cumul_pb_eq_le_gen.
+    eapply ws_cumul_eq_pb.
     eapply substitution_ws_cumul_pb_subst_conv; tea; eauto with pcuic.
   Qed.
 
@@ -3960,7 +3954,7 @@ Proof.
       eapply (ws_cumul_pb_refl' (exist Γ _) (exist t _)) end.
   all: intros Γ pb; revert Γ.
   - intros; etransitivity; eauto.
-  - intros. apply ws_cumul_pb_eq_le_gen. apply symmetry.
+  - intros. apply ws_cumul_eq_pb. apply symmetry.
     eauto.
   - intros Γ t; intros. unshelve eapply (ws_cumul_pb_refl' (exist Γ _) (exist t _)); eauto.
   - intros Γ ev args args' Hargsargs' Hargsargs'_dep HΓ Hargs Hargs'. cbn in *. eapply ws_cumul_pb_Evar; eauto.
@@ -3982,7 +3976,7 @@ Proof.
   - intros Γ na na' t t' ty ty' u u' Hna _ Heqtt' _ Heqtyty' _ Hequu' HΓ HM HN.
     cbn in *. apply andb_andI in HM; apply andb_andI in HN; destruct HM as [Ht Htyu]; destruct HN as [Ht' Htyu'].
     apply andb_andI in Htyu; apply andb_andI in Htyu'; destruct Htyu as [Hty Hu]; destruct Htyu' as [Hty' Hu'].
-    eapply ws_cumul_pb_LetIn; eauto. eapply Hequu'; eauto.
+    eapply ws_cumul_pb_LetIn; eauto. apply ws_cumul_eq_pb. eapply Hequu'; eauto.
     * change (is_closed_context (Γ,, vdef na t ty)). rewrite on_free_vars_ctx_snoc. apply andb_and. split; eauto.
       rewrite /on_free_vars_decl /test_decl. apply andb_and. split; eauto.
     * rewrite shiftnP_S; eauto.
@@ -3992,7 +3986,7 @@ Proof.
     apply andb_andI in H; apply andb_andI in H'; destruct H as [Hreturn H]; destruct H' as [Hreturn' H'].
     apply andb_andI in H; apply andb_andI in H'; destruct H as [Hcontext H]; destruct H' as [Hcontext' H'].
     apply andb_andI in H; apply andb_andI in H'; destruct H as [Hc Hbrs]; destruct H' as [Hc' Hbrs'].
-    eapply ws_cumul_pb_eq_le_gen. eapply ws_cumul_pb_Case; eauto.
+    eapply ws_cumul_eq_pb. eapply ws_cumul_pb_Case; eauto.
     * rewrite is_open_case_split. repeat (apply andb_and; split); eauto.
     * rewrite is_open_case_split. repeat (apply andb_and; split); eauto.
     * unfold cumul_predicate in Hpp'. unfold ws_cumul_pb_predicate. destruct Hpp' as [Hpp' [Hinst [Hpcon Hpret]]].
@@ -4021,7 +4015,7 @@ Proof.
         rewrite <- length_app in *. tea.
   - intros; eapply ws_cumul_pb_Proj_c; eauto.
   - intros Γ mfix mfix' idx Hmfixmfix' Hmfixmfix'_dep HΓ H H'. cbn in *.
-    eapply ws_cumul_pb_eq_le_gen. eapply ws_cumul_pb_Fix; eauto. repeat toAll.
+    eapply ws_cumul_eq_pb. eapply ws_cumul_pb_Fix; eauto. repeat toAll.
     eapply All2_impl. 1: tea. cbn; intros; destruct_head'_prod.
     pose proof (Hfix := All2_length ltac:(eassumption)).
     unfold test_def in *; repeat toProp; destruct_head'_and.
@@ -4031,7 +4025,7 @@ Proof.
     * rewrite -> shiftnP_add, <- fix_context_length, <- length_app in *; tea.
     * rewrite -> shiftnP_add, <- Hfix, <- fix_context_length, <- length_app in *; tea.
   - intros Γ mfix mfix' idx Hmfixmfix' Hmfixmfix'_dep HΓ H H'. cbn in *.
-    eapply ws_cumul_pb_eq_le_gen. eapply ws_cumul_pb_CoFix; eauto. repeat toAll.
+    eapply ws_cumul_eq_pb. eapply ws_cumul_pb_CoFix; eauto. repeat toAll.
     eapply All2_impl. 1: tea. pose proof (Hfix := All2_length ltac:(eassumption)); cbn; intros. destruct_head'_prod.
     unfold test_def in *.
     repeat toProp; destruct_head'_and.
@@ -4096,7 +4090,7 @@ Qed.
 #[global] Hint Immediate cumulSpec_typed_cumulAlgo : pcuic.
 
 
-From MetaCoq.PCUIC Require Import PCUICContextSubst.
+From MetaRocq.PCUIC Require Import PCUICContextSubst.
 
 Lemma expand_lets_k_app (Γ Γ' : context) t k : expand_lets_k (Γ ++ Γ') k t =
   expand_lets_k Γ' (k + context_assumptions Γ) (expand_lets_k Γ k t).

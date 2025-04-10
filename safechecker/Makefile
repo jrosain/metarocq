@@ -1,11 +1,11 @@
 all: theory
 
-_CoqProject: _CoqProject.in metacoq-config
-	cat metacoq-config > _CoqProject
-	cat _CoqProject.in >> _CoqProject
+_RocqProject: _RocqProject.in metarocq-config
+	cat metarocq-config > _RocqProject
+	cat _RocqProject.in >> _RocqProject
 
-Makefile.safechecker: _CoqProject
-	rocq makefile -f _CoqProject -o Makefile.safechecker $(DEPS)
+Makefile.safechecker: _RocqProject
+	rocq makefile -f _RocqProject -o Makefile.safechecker $(DEPS)
 
 theory: Makefile.safechecker
 	$(MAKE) -f Makefile.safechecker
@@ -20,8 +20,8 @@ clean: Makefile.safechecker
 	make -f Makefile.safechecker clean
 
 mrproper:
-	rm -f metacoq-config
-	rm -f Makefile.safechecker _CoqProject
+	rm -f metarocq-config
+	rm -f Makefile.safechecker _RocqProject
 
 .merlin: Makefile.safechecker
 	make -f $< $@

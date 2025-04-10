@@ -1,7 +1,7 @@
 -I src
--Q src MetaCoq.ErasurePlugin
--R theories MetaCoq.ErasurePlugin
-src/META.coq-metacoq-erasure
+-Q src MetaRocq.ErasurePlugin
+-R theories MetaRocq.ErasurePlugin
+src/META.rocq-metarocq-erasure
 
 src/ssrbool.ml
 src/ssrbool.mli
@@ -133,7 +133,7 @@ src/eTransform.ml
 src/erasure0.mli
 src/erasure0.ml
 
-src/g_metacoq_erasure.mlg
-src/metacoq_erasure_plugin.mlpack
+src/g_metarocq_erasure.mlg
+src/metarocq_erasure_plugin.mlpack
 
 theories/Loader.v

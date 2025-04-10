@@ -4,7 +4,7 @@ shopt -s nullglob # make the for loop do nothnig when there is no *.ml* files
 
 echo "Cleaning result of extraction"
 
-files=`cat ../template-coq/_PluginProject.in ../checker/_PluginProject.in | grep "^[^#].*mli\?$" | sed -e s/gen-src/src/`
+files=`cat ../template-rocq/_PluginProject.in ../checker/_PluginProject.in | grep "^[^#].*mli\?$" | sed -e s/gen-src/src/`
 
 cd src
 # Move extracted modules to build the certicoq compiler plugin
@@ -21,7 +21,7 @@ do
 done
 cd ..
 
-# Remove extracted modules already linked in metacoq_template_plugin and checker.
+# Remove extracted modules already linked in metarocq_template_plugin and checker.
 echo "Removing:" $files
 
 rm -f $files

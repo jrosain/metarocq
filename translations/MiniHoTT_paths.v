@@ -1372,7 +1372,7 @@ Proof.
 Defined.
 
 (** It follows that any space of paths in a contractible space is contractible. *)
-(** Because [Contr] is a notation, and [Contr_internal] is the record, we need to iota expand to fool Coq's typeclass machinery into accepting supposedly "mismatched" contexts. *)
+(** Because [Contr] is a notation, and [Contr_internal] is the record, we need to iota expand to fool Rocq's typeclass machinery into accepting supposedly "mismatched" contexts. *)
 
 Global Instance contr_paths_contr `{Contr A} (x y : A) : Contr (x = y) | 10000 := let c := {|
   center := (contr x)^ @ contr y;
@@ -1585,7 +1585,7 @@ Notation "e ^-1" := (@equiv_inverse _ _ e) : equiv_scope.
 
 Global Instance symmetric_equiv : Symmetric Equiv | 0 := @equiv_inverse.
 
-(** If [g \o f] and [f] are equivalences, so is [g].  This is not an Instance because it would require Coq to guess [f]. *)
+(** If [g \o f] and [f] are equivalences, so is [g].  This is not an Instance because it would require Rocq to guess [f]. *)
 Definition cancelR_isequiv {A B C} (f : A -> B) {g : B -> C}
   `{IsEquiv A B f} `{IsEquiv A C (g o f)}
   : IsEquiv g
@@ -1868,7 +1868,7 @@ Definition equiv_composeR' {A B C} (f : A <~> B) (g : B <~> C)
 Ltac equiv_via mid :=
   apply @equiv_composeR' with (B := mid).
 
-(** It's often convenient when constructing a chain of equivalences to use [equiv_compose'], etc.  But when we treat an [Equiv] object constructed in that way as a function, via the coercion [equiv_fun], Coq sometimes needs a little help to realize that the result is the same as ordinary composition.  This tactic provides that help. *)
+(** It's often convenient when constructing a chain of equivalences to use [equiv_compose'], etc.  But when we treat an [Equiv] object constructed in that way as a function, via the coercion [equiv_fun], Rocq sometimes needs a little help to realize that the result is the same as ordinary composition.  This tactic provides that help. *)
 Ltac ev_equiv :=
   repeat match goal with
            | [ |- context[equiv_fun (equiv_compose' ?g ?f) ?a] ] =>
@@ -2858,7 +2858,7 @@ End AssumeFunext.
 
 (** In homotopy type theory, We think of elements of [Type] as spaces, homotopy types, or weak omega-groupoids. A type family [P : A -> Type] corresponds to a fibration whose base is [A] and whose fiber over [x] is [P x].
 
-From such a [P] we can build a total space over the base space [A] so that the fiber over [x : A] is [P x]. This is just Coq's dependent sum construction, written as [sigT P] or [{x : A & P x}]. The elements of [{x : A & P x}] are pairs, written [existT P x y] in Coq, where [x : A] and [y : P x].  In [Common.v] we defined the notation [(x;y)] to mean [existT _ x y].
+From such a [P] we can build a total space over the base space [A] so that the fiber over [x : A] is [P x]. This is just Rocq's dependent sum construction, written as [sigT P] or [{x : A & P x}]. The elements of [{x : A & P x}] are pairs, written [existT P x y] in Rocq, where [x : A] and [y : P x].  In [Common.v] we defined the notation [(x;y)] to mean [existT _ x y].
 
 The base and fiber components of a point in the total space are extracted with the two projections [pr1] and [pr2]. *)
 

@@ -7,7 +7,7 @@
   ## The attribute to build from the local sources,
   ## either using nixpkgs data or the overlays located in `.nix/coq-overlays`
   ## Will determine the default main-job of the bundles defined below
-  attribute = "metacoq";
+  attribute = "metarocq";
 
   ## If you want to select a different attribute (to build from the local sources as well)
   ## when calling `nix-shell` and `nix-build` without the `--argstr job` argument
@@ -33,7 +33,7 @@
   ## defaults to "default"
   default-bundle = "rocq-dev";
 
-  # MetaCoq is expected to be compatible with a single coq version
+  # MetaRocq is expected to be compatible with a single coq version
   # The name of the bundle should finish with the coq version to use
   # cachedMake.sh
   bundles."rocq-dev" = {
@@ -49,7 +49,6 @@
   ## Cachix caches to use in CI
   ## Below we list some standard ones
   cachix.coq = {};
-  # cachix.math-comp = {};
   cachix.coq-community = {};
 
   ## If you have write access to one of these caches you can

@@ -1,5 +1,5 @@
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All.
 
 Definition anonb := {| binder_name := nAnon; binder_relevance := Relevant |}.
 Definition bnamed n := {| binder_name := nNamed n; binder_relevance := Relevant |}.
@@ -32,7 +32,7 @@ Definition mut_pt_i : mutual_inductive_entry :=
   mind_entry_private := None;
 |}.
 
-MetaCoq Unquote Inductive mut_pt_i.
+MetaRocq Unquote Inductive mut_pt_i.
 
 Check fun p => p.(coordx _).
 Check {| coordx := 0 ; coordy := 1 |}.

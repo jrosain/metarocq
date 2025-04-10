@@ -1,9 +1,9 @@
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames uGraph.
-From MetaCoq.Erasure Require Import EGlobalEnv ErasureFunction.
-From MetaCoq.Erasure Require Import EAstUtils EArities Extract Prelim EDeps ErasureProperties ErasureCorrectness.
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICSafeReduce PCUICSafeRetyping PCUICRetypingEnvIrrelevance.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames uGraph.
+From MetaRocq.Erasure Require Import EGlobalEnv ErasureFunction.
+From MetaRocq.Erasure Require Import EAstUtils EArities Extract Prelim EDeps ErasureProperties ErasureCorrectness.
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICWfEnv PCUICSafeReduce PCUICSafeRetyping PCUICRetypingEnvIrrelevance.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICPrimitive
   PCUICReduction PCUICReflect PCUICWeakeningEnv PCUICWeakeningEnvTyp PCUICCasesContexts
   PCUICWeakeningConv PCUICWeakeningTyp PCUICContextConversionTyp PCUICTyping PCUICGlobalEnv PCUICInversion PCUICGeneration
   PCUICConfluence PCUICConversion PCUICUnivSubstitutionTyp PCUICCumulativity PCUICSR PCUICSafeLemmata PCUICNormalization

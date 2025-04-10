@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All.
-From MetaCoq.Translations Require Import translation_utils.
-Import MCMonadNotation.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All.
+From MetaRocq.Translations Require Import translation_utils.
+Import MRMonadNotation.
 
 Local Infix "<=" := Nat.leb.
 
@@ -158,7 +158,7 @@ Definition tsl_mind_body (E : tsl_table) (mp : modpath) (kn : kername)
 Defined.
 
 
-MetaCoq Run (typ <- tmQuote (forall A, A -> A) ;;
+MetaRocq Run (typ <- tmQuote (forall A, A -> A) ;;
                      typ' <- tmEval all (tsl_rec1 [] typ) ;;
                      tm <- tmQuote (fun A (x : A) => x) ;;
                      tm' <- tmEval all (tsl_rec1 [] tm) ;;
@@ -180,27 +180,27 @@ MetaCoq Run (typ <- tmQuote (forall A, A -> A) ;;
 
 
 Definition T := forall A, A -> A.
-MetaCoq Run (Translate emptyTC "T").
+MetaRocq Run (Translate emptyTC "T").
 
 
 Definition tm := ((fun A (x:A) => x) (Type -> Type) (fun x => x)).
-MetaCoq Run (Translate emptyTC "tm").
+MetaRocq Run (Translate emptyTC "tm").
 
-MetaCoq Run (TC <- Translate emptyTC "nat" ;;
+MetaRocq Run (TC <- Translate emptyTC "nat" ;;
                      tmDefinition "nat_TC" TC ).
 
-MetaCoq Run (TC <- Translate nat_TC "bool" ;;
+MetaRocq Run (TC <- Translate nat_TC "bool" ;;
                      tmDefinition "bool_TC" TC ).
 Import Init.Nat.
 (* todo "case" *)
 (*
-MetaCoq Run (Translate bool_TC "pred").
+MetaRocq Run (Translate bool_TC "pred").
 
 
 Module Id1.
   Definition ID := forall A, A -> A.
 
-  MetaCoq Run (Translate emptyTC "ID").
+  MetaRocq Run (Translate emptyTC "ID").
 
   Lemma param_ID_identity (f : ID)
     : IDᵗ f -> forall A x, f A x = x.
@@ -210,13 +210,13 @@ Module Id1.
   Qed.
 
   Definition toto := fun n : nat => (fun y => 0) (fun _ : Type =>  n).
-  MetaCoq Run (Translate nat_TC "toto").
+  MetaRocq Run (Translate nat_TC "toto").
 
 
   Definition my_id : ID :=
     let n := 12 in (fun (_ : nat) y => y) 4 (fun A x => (fun _ : nat => x) n).
 
-  MetaCoq Run (Translate nat_TC "my_id").
+  MetaRocq Run (Translate nat_TC "my_id").
 
 
   Definition free_thm_my_id : forall A x, my_id A x = x
@@ -226,7 +226,7 @@ End Id1.
 Module Id2.
   Definition ID := forall A x y (p : x = y :> A), x = y.
 
-  MetaCoq Run (TC <- TranslateRec emptyTC ID ;;
+  MetaRocq Run (TC <- TranslateRec emptyTC ID ;;
                        tmDefinition "TC" TC).
 
 
@@ -243,7 +243,7 @@ Module Id2.
   Definition myf : ID
     := fun A x y p => eq_trans (eq_trans p (eq_sym p)) p.
 
-  MetaCoq Run (TranslateRec TC myf).
+  MetaRocq Run (TranslateRec TC myf).
 
   Definition free_thm_myf : forall A x y p, myf A x y p = p
     := param_ID_identity myf myfᵗ.
@@ -254,14 +254,14 @@ End Id2.
 
 Module Vectors.
   Import Vector.
-  MetaCoq Run (Translate nat_TC "t").
+  MetaRocq Run (Translate nat_TC "t").
 End Vectors.
 
 From Stdlib Require Import Even.
-MetaCoq Run (Translate nat_TC "even").
+MetaRocq Run (Translate nat_TC "even").
 
 Definition rev_type := forall A, list A -> list A.
-MetaCoq Run (TC <- Translate emptyTC "list" ;;
+MetaRocq Run (TC <- Translate emptyTC "list" ;;
                      TC <- Translate TC "rev_type" ;;
                      tmDefinition "list_TC" TC ).
 
@@ -272,7 +272,7 @@ Module Axioms.
 
   Definition UIP := forall A (x y : A) (p q : x = y), p = q.
 
-  MetaCoq Run (TC <- TranslateRec emptyTC UIP ;;
+  MetaRocq Run (TC <- TranslateRec emptyTC UIP ;;
                        tmDefinition "eqTC" TC).
 
   Definition eqᵗ_eq {A Aᵗ x xᵗ y yᵗ p}
@@ -311,7 +311,7 @@ Module Axioms.
     := forall A (B : A -> Type) (f g : forall x, B x), (forall x, f x = g x) -> f = g.
 
 
-  MetaCoq Run (Translate eqTC "wFunext").
+  MetaRocq Run (Translate eqTC "wFunext").
 
   Theorem wFunext_provably_parametric : forall h : wFunext, wFunextᵗ h.
   Proof.
@@ -334,7 +334,7 @@ Module Axioms.
   (* Definition Funext *)
   (*   := forall A B (f g : forall x : A, B x), IsEquiv (@apD10 A B f g). *)
 
-  (* MetaCoq Run (TC <- TranslateRec eqTC Funext ;; *)
+  (* MetaRocq Run (TC <- TranslateRec eqTC Funext ;; *)
   (*                  tmDefinition "eqTC'" TC). *)
 
 
@@ -357,7 +357,7 @@ Module Axioms.
 
   Definition wUnivalence := forall A B, A <~> B -> A = B.
 
-  MetaCoq Run (TC <- TranslateRec eqTC wUnivalence ;;
+  MetaRocq Run (TC <- TranslateRec eqTC wUnivalence ;;
                           tmDefinition "eqTC1" TC).
 
   Theorem wUnivalence_provably_parametric : forall h, wUnivalenceᵗ h.
@@ -377,7 +377,7 @@ Module Axioms.
 
   Definition Univalence' := forall A B (p : A = B), IsEquiv (coe p).
 
-  MetaCoq Run (TC <- TranslateRec eqTC1 Univalence' ;;
+  MetaRocq Run (TC <- TranslateRec eqTC1 Univalence' ;;
                           tmDefinition "eqTC'" TC).
 
 
@@ -385,7 +385,7 @@ Module Axioms.
     intros H A B []; exact (H A A 1).
   Defined.
 
-  MetaCoq Run (TC <- TranslateRec eqTC' UU' ;;
+  MetaRocq Run (TC <- TranslateRec eqTC' UU' ;;
                           tmDefinition "eqTC''" TC).
 
   (* Goal (Univalence -> Univalence') * (Univalence' -> Univalence). *)

@@ -20,7 +20,7 @@ dot_file=$filename.dot
 
 # Associative arrays of the folders together with a color
 declare -A folders
-folders[template-coq]=aquamarine
+folders[template-rocq]=aquamarine
 folders[pcuic]=lemonchiffon1
 folders[safechecker]=paleturquoise1
 folders[erasure]=tan
@@ -33,7 +33,7 @@ do
     cd ../$folder
     echo `pwd`
     # WARNING: coqdep <= 8.11 only supports -dumpgraph
-    coqdep -f _CoqProject -dumpgraph ../dependency-graph/$folder.dot > /dev/null
+    coqdep -f _RocqProject -dumpgraph ../dependency-graph/$folder.dot > /dev/null
     cd ../dependency-graph
     # remove the first and last lines
     sed '1d' $folder.dot > $folder.dottmp && mv -f $folder.dottmp $folder.dot

@@ -1,4 +1,4 @@
-From MetaCoq.Quotation.ToPCUIC Require Import Stdlib.Init.
+From MetaRocq.Quotation.ToPCUIC Require Import Stdlib.Init.
 From Stdlib.Bool Require Import Bool IfProp.
 
 #[export] Instance quote_reflect {P : Prop} {qP : quotation_of P} {quoteP : ground_quotable P} {quote_negP : ground_quotable (~P)} {b} : ground_quotable (reflect P b) := ltac:(destruct 1; exact _).

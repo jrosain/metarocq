@@ -1,11 +1,11 @@
 all: theory
 
-_CoqProject: _CoqProject.in metacoq-config
-	cat metacoq-config > _CoqProject
-	cat _CoqProject.in >> _CoqProject
+_RocqProject: _RocqProject.in metarocq-config
+	cat metarocq-config > _RocqProject
+	cat _RocqProject.in >> _RocqProject
 
-Makefile.quotation: _CoqProject
-	rocq makefile -f _CoqProject -o Makefile.quotation $(DEPS)
+Makefile.quotation: _RocqProject
+	rocq makefile -f _RocqProject -o Makefile.quotation $(DEPS)
 
 theory: Makefile.quotation
 	$(MAKE) -f Makefile.quotation
@@ -20,8 +20,8 @@ clean: Makefile.quotation
 	make -f Makefile.quotation clean
 
 mrproper:
-	rm -f metacoq-config
-	rm -f Makefile.quotation _CoqProject
+	rm -f metarocq-config
+	rm -f Makefile.quotation _RocqProject
 
 .merlin: Makefile.quotation
 	make -f $< $@

@@ -5,8 +5,8 @@ make -f Makefile mrproper
 
 # Dependencies for local or global builds.
 # When building the packages separately, dependencies are not set as everything
-# should already be available in $(COQMF_LIB)/user-contrib/MetaCoq/*
-# For local builds, we set specific dependencies of each subproject in */metacoq-config
+# should already be available in $(COQMF_LIB)/user-contrib/MetaRocq/*
+# For local builds, we set specific dependencies of each subproject in */metarocq-config
 
 if command -v rocq >/dev/null 2>&1
 then
@@ -14,23 +14,23 @@ then
 
     if [[ "$1" = "local" ]] || [[ "$1" = "--enable-local" ]] || [[ "$1" = "--enable-quick" ]]
     then
-        echo "Building MetaCoq locally"
-        COMMON_DEPS="-R ../utils/theories MetaCoq.Utils"
-        TEMPLATE_COQ_DEPS="-R ../common/theories MetaCoq.Common"
-        PCUIC_DEPS="-R ../common/theories MetaCoq.Common"
-        SAFECHECKER_DEPS="-R ../pcuic/theories MetaCoq.PCUIC"
-        TEMPLATE_PCUIC_DEPS="-R ../pcuic/theories MetaCoq.PCUIC -R ../template-coq/theories MetaCoq.Template  -I ../template-coq"
-        QUOTATION_DEPS="-R ../template-pcuic/theories MetaCoq.TemplatePCUIC -R ../pcuic/theories MetaCoq.PCUIC -R ../template-coq/theories MetaCoq.Template"
-        SAFECHECKER_PLUGIN_DEPS="-R ../template-pcuic/theories MetaCoq.TemplatePCUIC -R ../safechecker/theories MetaCoq.SafeChecker  -I ../template-coq"
-        ERASURE_DEPS="-R ../safechecker-plugin/theories MetaCoq.SafeCheckerPlugin -R ../template-pcuic/theories MetaCoq.TemplatePCUIC -R ../template-coq/theories MetaCoq.Template -I ../template-coq -R ../safechecker/theories MetaCoq.SafeChecker"
-        ERASURE_PLUGIN_DEPS="-R ../template-coq/theories MetaCoq.Template -I ../template-coq -R ../template-pcuic/theories MetaCoq.TemplatePCUIC -R ../erasure/theories MetaCoq.Erasure"
-        TRANSLATIONS_DEPS="-R ../template-coq/theories MetaCoq.Template -I ../template-coq"
-        EXAMPLES_DEPS="-R ../safechecker-plugin/theories MetaCoq.SafeCheckerPlugin -R ../erasure-plugin/theories MetaCoq.ErasurePlugin -I ../erasure-plugin/src -I ../safechecker-plugin/src/"
-        TEST_SUITE_DEPS="-R ../safechecker-plugin/theories MetaCoq.SafeCheckerPlugin -R ../erasure-plugin/theories MetaCoq.ErasurePlugin -I ../erasure-plugin/src -I ../safechecker-plugin/src/"
-        PLUGIN_DEMO_DEPS="-R ../../utils/theories MetaCoq.Utils -R ../../common/theories MetaCoq.Common -R ../../template-coq/theories MetaCoq.Template -I ../../template-coq/  -I ../../erasure-plugin/src -I ../../safechecker-plugin/src/"
-        echo "METACOQ_CONFIG = local" > Makefile.conf
+        echo "Building MetaRocq locally"
+        COMMON_DEPS="-R ../utils/theories MetaRocq.Utils"
+        TEMPLATE_COQ_DEPS="-R ../common/theories MetaRocq.Common"
+        PCUIC_DEPS="-R ../common/theories MetaRocq.Common"
+        SAFECHECKER_DEPS="-R ../pcuic/theories MetaRocq.PCUIC"
+        TEMPLATE_PCUIC_DEPS="-R ../pcuic/theories MetaRocq.PCUIC -R ../template-rocq/theories MetaRocq.Template  -I ../template-rocq"
+        QUOTATION_DEPS="-R ../template-pcuic/theories MetaRocq.TemplatePCUIC -R ../pcuic/theories MetaRocq.PCUIC -R ../template-rocq/theories MetaRocq.Template"
+        SAFECHECKER_PLUGIN_DEPS="-R ../template-pcuic/theories MetaRocq.TemplatePCUIC -R ../safechecker/theories MetaRocq.SafeChecker  -I ../template-rocq"
+        ERASURE_DEPS="-R ../safechecker-plugin/theories MetaRocq.SafeCheckerPlugin -R ../template-pcuic/theories MetaRocq.TemplatePCUIC -R ../template-rocq/theories MetaRocq.Template -I ../template-rocq -R ../safechecker/theories MetaRocq.SafeChecker"
+        ERASURE_PLUGIN_DEPS="-R ../template-rocq/theories MetaRocq.Template -I ../template-rocq -R ../template-pcuic/theories MetaRocq.TemplatePCUIC -R ../erasure/theories MetaRocq.Erasure"
+        TRANSLATIONS_DEPS="-R ../template-rocq/theories MetaRocq.Template -I ../template-rocq"
+        EXAMPLES_DEPS="-R ../safechecker-plugin/theories MetaRocq.SafeCheckerPlugin -R ../erasure-plugin/theories MetaRocq.ErasurePlugin -I ../erasure-plugin/src -I ../safechecker-plugin/src/"
+        TEST_SUITE_DEPS="-R ../safechecker-plugin/theories MetaRocq.SafeCheckerPlugin -R ../erasure-plugin/theories MetaRocq.ErasurePlugin -I ../erasure-plugin/src -I ../safechecker-plugin/src/"
+        PLUGIN_DEMO_DEPS="-R ../../utils/theories MetaRocq.Utils -R ../../common/theories MetaRocq.Common -R ../../template-rocq/theories MetaRocq.Template -I ../../template-rocq/  -I ../../erasure-plugin/src -I ../../safechecker-plugin/src/"
+        echo "METAROCQ_CONFIG = local" > Makefile.conf
     else
-        echo "Building MetaCoq globally (default)"
+        echo "Building MetaRocq globally (default)"
         COMMON_DEPS=""
         TEMPLATE_COQ_DEPS=""
         PCUIC_DEPS=""
@@ -44,36 +44,36 @@ then
         EXAMPLES_DEPS=""
         TEST_SUITE_DEPS=""
         PLUGIN_DEMO_DEPS=""
-        echo "METACOQ_CONFIG = global" > Makefile.conf
+        echo "METAROCQ_CONFIG = global" > Makefile.conf
     fi
 
-    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > common/metacoq-config
-    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > template-coq/metacoq-config
-    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > pcuic/metacoq-config
-    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > safechecker/metacoq-config
-    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > erasure/metacoq-config
-    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > template-pcuic/metacoq-config
-    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > quotation/metacoq-config
-    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > safechecker-plugin/metacoq-config
-    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > erasure-plugin/metacoq-config
-    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > translations/metacoq-config
-    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > examples/metacoq-config
-    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > test-suite/metacoq-config
-    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > test-suite/plugin-demo/metacoq-config
+    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > common/metarocq-config
+    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > template-rocq/metarocq-config
+    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > pcuic/metarocq-config
+    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > safechecker/metarocq-config
+    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > erasure/metarocq-config
+    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > template-pcuic/metarocq-config
+    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > quotation/metarocq-config
+    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > safechecker-plugin/metarocq-config
+    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > erasure-plugin/metarocq-config
+    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > translations/metarocq-config
+    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > examples/metarocq-config
+    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > test-suite/metarocq-config
+    echo "# DO NOT EDIT THIS FILE: autogenerated from ./configure.sh" > test-suite/plugin-demo/metarocq-config
 
-    echo ${COMMON_DEPS} >> common/metacoq-config
-    echo ${COMMON_DEPS} ${TEMPLATE_COQ_DEPS} >> template-coq/metacoq-config
-    echo ${COMMON_DEPS} ${PCUIC_DEPS} >> pcuic/metacoq-config
-    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${SAFECHECKER_DEPS} >> safechecker/metacoq-config
-    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${TEMPLATE_PCUIC_DEPS} >> template-pcuic/metacoq-config
-    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${TEMPLATE_PCUIC_DEPS} ${QUOTATION_DEPS} >> quotation/metacoq-config
-    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${TEMPLATE_PCUIC_DEPS} ${SAFECHECKER_PLUGIN_DEPS} >> safechecker-plugin/metacoq-config
-    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${SAFECHECKER_DEPS} ${ERASURE_DEPS} >> erasure/metacoq-config
-    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${ERASURE_DEPS} ${TEMPLATE_PCUIC_DEPS} ${ERASURE_PLUGIN_DEPS} >> erasure-plugin/metacoq-config
-    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${TRANSLATIONS_DEPS} >> translations/metacoq-config
-    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${SAFECHECKER_DEPS} ${TEMPLATE_PCUIC_DEPS} ${ERASURE_DEPS} ${TRANSLATIONS_DEPS} ${ERASURE_PLUGIN_DEPS} ${EXAMPLES_DEPS} >> examples/metacoq-config
-    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${SAFECHECKER_DEPS} ${TEMPLATE_PCUIC_DEPS} ${ERASURE_DEPS} ${TRANSLATIONS_DEPS} ${ERASURE_PLUGIN_DEPS} ${TEST_SUITE_DEPS} >> test-suite/metacoq-config
-    echo ${PLUGIN_DEMO_DEPS} >> test-suite/plugin-demo/metacoq-config
+    echo ${COMMON_DEPS} >> common/metarocq-config
+    echo ${COMMON_DEPS} ${TEMPLATE_COQ_DEPS} >> template-rocq/metarocq-config
+    echo ${COMMON_DEPS} ${PCUIC_DEPS} >> pcuic/metarocq-config
+    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${SAFECHECKER_DEPS} >> safechecker/metarocq-config
+    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${TEMPLATE_PCUIC_DEPS} >> template-pcuic/metarocq-config
+    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${TEMPLATE_PCUIC_DEPS} ${QUOTATION_DEPS} >> quotation/metarocq-config
+    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${TEMPLATE_PCUIC_DEPS} ${SAFECHECKER_PLUGIN_DEPS} >> safechecker-plugin/metarocq-config
+    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${SAFECHECKER_DEPS} ${ERASURE_DEPS} >> erasure/metarocq-config
+    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${ERASURE_DEPS} ${TEMPLATE_PCUIC_DEPS} ${ERASURE_PLUGIN_DEPS} >> erasure-plugin/metarocq-config
+    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${TRANSLATIONS_DEPS} >> translations/metarocq-config
+    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${SAFECHECKER_DEPS} ${TEMPLATE_PCUIC_DEPS} ${ERASURE_DEPS} ${TRANSLATIONS_DEPS} ${ERASURE_PLUGIN_DEPS} ${EXAMPLES_DEPS} >> examples/metarocq-config
+    echo ${COMMON_DEPS} ${PCUIC_DEPS} ${SAFECHECKER_DEPS} ${TEMPLATE_PCUIC_DEPS} ${ERASURE_DEPS} ${TRANSLATIONS_DEPS} ${ERASURE_PLUGIN_DEPS} ${TEST_SUITE_DEPS} >> test-suite/metarocq-config
+    echo ${PLUGIN_DEMO_DEPS} >> test-suite/plugin-demo/metarocq-config
 
 else
     echo "Error: rocq not found in path"

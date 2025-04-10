@@ -2,13 +2,13 @@
 
 From Stdlib Require Import Bool List Arith Lia.
 From Stdlib Require String.
-From MetaCoq.Utils Require Import utils monad_utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils monad_utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
   PCUICLiftSubst PCUICUnivSubst PCUICEquality PCUICUtils
   PCUICPosition PCUICTyping PCUICCumulativity PCUICReduction.
 
-From MetaCoq.Utils Require Export LibHypsNaming.
+From MetaRocq.Utils Require Export LibHypsNaming.
 From Stdlib Require Import ssreflect.
 Set Asymmetric Patterns.
 From Equations.Type Require Import Relation.
@@ -82,6 +82,7 @@ Inductive infering `{checker_flags} (Σ : global_env_ext) (Γ : context) : term 
   consistent_instance_ext Σ (ind_universes mdecl) (puinst p) ->
   wf_local_bd_rel Σ Γ predctx ->
   is_allowed_elimination Σ (ind_kelim idecl) ps ->
+  isSortRel ps ci.(ci_relevance) ->
   ctx_inst (checking Σ) Γ (pparams p)
       (List.rev mdecl.(ind_params)@[p.(puinst)]) ->
   isCoFinite mdecl.(ind_finite) = false ->
@@ -415,6 +416,7 @@ Section BidirectionalInduction.
       wf_local_bd_rel Σ Γ predctx ->
       PΓ_rel Γ predctx ->
       is_allowed_elimination Σ (ind_kelim idecl) ps ->
+      isSortRel ps ci.(ci_relevance) ->
       ctx_inst (checking Σ) Γ (pparams p)
           (List.rev mdecl.(ind_params)@[p.(puinst)]) ->
       ctx_inst Pcheck Γ p.(pparams)

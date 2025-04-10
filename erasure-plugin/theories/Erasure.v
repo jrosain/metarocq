@@ -1,13 +1,13 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Program ssreflect ssrbool.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import Transform config.
-From MetaCoq.Template Require Import EtaExpand TemplateProgram.
-From MetaCoq.PCUIC Require PCUICAst PCUICAstUtils PCUICProgram.
-From MetaCoq.SafeChecker Require Import PCUICErrors PCUICWfEnvImpl.
-From MetaCoq.Erasure Require EAstUtils ErasureFunction ErasureCorrectness EPretty Extract.
-From MetaCoq.Erasure Require Import EProgram EInlining EBeta.
-From MetaCoq.ErasurePlugin Require Import ETransform.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import Transform config.
+From MetaRocq.Template Require Import EtaExpand TemplateProgram.
+From MetaRocq.PCUIC Require PCUICAst PCUICAstUtils PCUICProgram.
+From MetaRocq.SafeChecker Require Import PCUICErrors PCUICWfEnvImpl.
+From MetaRocq.Erasure Require EAstUtils ErasureFunction ErasureCorrectness EPretty Extract.
+From MetaRocq.Erasure Require Import EProgram EInlining EBeta.
+From MetaRocq.ErasurePlugin Require Import ETransform.
 
 Import PCUICProgram.
 Import PCUICTransform (template_to_pcuic_transform, pcuic_expand_lets_transform).
@@ -768,7 +768,7 @@ Qed.
 
 Next Obligation.
   unfold optional_unsafe_transforms. cbn.
-  destruct enable_unsafe as [[] ? ? ? ?]=> //.
+  destruct enable_unsafe as [[] ? ? ?]=> //.
 Qed.
 
 Local Obligation Tactic := intros; eauto.
@@ -1077,14 +1077,14 @@ Global Program Instance fake_guard_impl : abstract_guard_impl :=
 {| guard_impl := fake_guard_impl |}.
 Next Obligation. apply fake_guard_impl_properties. Qed.
 
-(** Ideally we'd have a MetaCoq template program that generates a proof of Strong Normalization for the particular program we're erasing.  For now we just axiomatize SN. *)
+(** Ideally we'd have a MetaRocq template program that generates a proof of Strong Normalization for the particular program we're erasing.  For now we just axiomatize SN. *)
 Axiom fake_normalization : PCUICSN.Normalization.
 Global Existing Instance fake_normalization.
 
 (** This uses the retyping-based erasure and assumes that the global environment and term
   are welltyped (for speed). As such this should only be used for testing, or when we know that
   the environment is wellformed and the term well-typed (e.g. when it comes directly from a
-  Coq definition). *)
+  Rocq definition). *)
 
 Axiom assume_that_we_only_erase_on_wellformed_inductive_mappings : forall {cf : checker_flags},
   forall (p : Ast.Env.program) (m : inductives_mapping), wf_template_inductives_mapping p.1 m.
@@ -1099,7 +1099,7 @@ Program Definition run_erase_program {guard : abstract_guard_impl} econf :=
 Next Obligation.
 Proof.
   unfold optional_unsafe_transforms; cbn.
-  destruct enable_unsafe as [[] ? ? ? ?]=> //.
+  destruct enable_unsafe as [[] ? ? ?]=> //.
 Qed.
 
 Program Definition erase_and_print_template_program econf (m : inductives_mapping) (p : Ast.Env.program) : string :=

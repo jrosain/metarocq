@@ -1,15 +1,15 @@
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Template Require Import All.
-Import MCMonadNotation.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Template Require Import All.
+Import MRMonadNotation.
 
 Section test.
 
-  MetaCoq Run (tmVariable "bla" nat).
+  MetaRocq Run (tmVariable "bla" nat).
   Check (bla : nat).
-  MetaCoq Run (tmDefinition "test" bla).
-  MetaCoq Run (tmDefinition "test2" 0).
+  MetaRocq Run (tmDefinition "test" bla).
+  MetaRocq Run (tmDefinition "test2" 0).
 
-  MetaCoq Run (tmVariable "toto" nat ;;
+  MetaRocq Run (tmVariable "toto" nat ;;
               gr <- tmLocate1 "toto" ;;
               match gr with
               | VarRef id => let term := tVar id in

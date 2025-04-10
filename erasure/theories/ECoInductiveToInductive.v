@@ -1,22 +1,22 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import Utf8 Program.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config Kernames.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config Kernames.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils
      PCUICReflect PCUICWeakeningEnvConv PCUICWeakeningEnvTyp
      PCUICTyping PCUICInversion
      PCUICSafeLemmata. (* for welltyped *)
-From MetaCoq.SafeChecker Require Import PCUICWfEnvImpl.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils EDeps EExtends
+From MetaRocq.SafeChecker Require Import PCUICWfEnvImpl.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils EDeps EExtends
     EEtaExpanded
     ELiftSubst ECSubst ESpineView EGlobalEnv EInduction EWellformed EWcbvEval Extract Prelim
     EEnvMap EArities EProgram.
 
-Import MCList (map_InP, map_InP_elim, map_InP_spec).
+Import MRList (map_InP, map_InP_elim, map_InP_spec).
 
 Local Open Scope string_scope.
 Set Asymmetric Patterns.
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 From Equations Require Import Equations.
 Set Equations Transparent.
@@ -594,17 +594,17 @@ Qed.
 Ltac destruct_times :=
   match goal with
   | [ H : pair _ _ |- _ ] => destruct H
-  | [ H : MCProd.and3 _ _ _ |- _ ] => destruct H
-  | [ H : MCProd.and4 _ _ _ _ |- _ ] => destruct H
-  | [ H : MCProd.and5 _ _ _ _ _ |- _ ] => destruct H
-  | [ H : MCProd.and6 _ _ _ _ _ _ |- _ ] => destruct H
-  | [ H : MCProd.and7 _ _ _ _ _ _ _ |- _ ] => destruct H
-  | [ H : MCProd.and8 _ _ _ _ _ _ _ _ |- _ ] => destruct H
-  | [ H : MCProd.and9 _ _ _ _ _ _ _ _ _ |- _ ] => destruct H
-  | [ H : MCProd.and10 _ _ _ _ _ _ _ _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and3 _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and4 _ _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and5 _ _ _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and6 _ _ _ _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and7 _ _ _ _ _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and8 _ _ _ _ _ _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and9 _ _ _ _ _ _ _ _ _ |- _ ] => destruct H
+  | [ H : MRProd.and10 _ _ _ _ _ _ _ _ _ _ |- _ ] => destruct H
   end.
 
-From MetaCoq.Erasure Require Import EWcbvEvalCstrsAsBlocksInd.
+From MetaRocq.Erasure Require Import EWcbvEvalCstrsAsBlocksInd.
 Lemma trans_correct {efl : EEnvFlags} {fl} {wcon : with_constructor_as_block = true}
   {wcb : cstr_as_blocks = true}
   {wpc : with_prop_case = false} (* Avoid tLazy tBox values *)
@@ -824,7 +824,7 @@ Qed.
     rewrite -lookup_constructor_trans //. destruct l => //.
 Qed.
 *)
-From MetaCoq.Erasure Require Import EEtaExpanded.
+From MetaRocq.Erasure Require Import EEtaExpanded.
 
 Lemma isLambda_trans Σ t : isLambda t -> isLambda (trans Σ t).
 Proof. destruct t => //. Qed.

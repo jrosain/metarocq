@@ -1,13 +1,13 @@
 From Stdlib Require Import ssreflect ssrbool.
 From Equations Require Import Equations.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICContextConversion PCUICContextReduction
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICContextConversion PCUICContextReduction
   PCUICCumulativity PCUICConversion PCUICEquality PCUICLiftSubst PCUICNormal PCUICReduction PCUICTyping
   PCUICGlobalEnv PCUICConfluence PCUICSubstitution PCUICClosed PCUICClosedTyp
   PCUICWeakeningEnvConv PCUICWeakeningEnvTyp
   PCUICWellScopedCumulativity PCUICOnFreeVars PCUICSR.
 
-From MetaCoq.Common Require Import config.
-From MetaCoq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.Utils Require Import utils.
 
 Local Set Keyed Unification.
 

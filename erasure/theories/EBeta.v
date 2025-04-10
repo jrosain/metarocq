@@ -1,8 +1,8 @@
 From Stdlib Require Import List.
 From Stdlib Require Import String.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import BasicAst.
-From MetaCoq.Erasure Require Import EPrimitive EAst EAstUtils ELiftSubst EProgram.
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import BasicAst.
+From MetaRocq.Erasure Require Import EPrimitive EAst EAstUtils ELiftSubst EProgram.
 
 Definition map_subterms (f : term -> term) (t : term) : term :=
   match t with
@@ -65,8 +65,8 @@ Definition betared_env (Σ : global_declarations) : global_declarations :=
 Definition betared_program (p : program) : program :=
   (betared_env p.1, betared p.2).
 
-From MetaCoq.Erasure Require Import EProgram EWellformed EWcbvEval.
-From MetaCoq.Common Require Import Transform.
+From MetaRocq.Erasure Require Import EProgram EWellformed EWcbvEval.
+From MetaRocq.Common Require Import Transform.
 
 Axiom trust_betared_wf :
   forall efl : EEnvFlags,

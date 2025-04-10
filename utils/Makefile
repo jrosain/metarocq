@@ -1,27 +1,27 @@
 all: coq
 
-coq: Makefile.coq
-	$(MAKE) -f Makefile.coq
+coq: Makefile.rocq
+	$(MAKE) -f Makefile.rocq
 
 .PHONY: install html clean mrproper all plugin
 
-install: Makefile.coq
-	$(MAKE) -f Makefile.coq install
+install: Makefile.rocq
+	$(MAKE) -f Makefile.rocq install
 
-uninstall: Makefile.coq
-	$(MAKE) -f Makefile.coq uninstall
+uninstall: Makefile.rocq
+	$(MAKE) -f Makefile.rocq uninstall
 
 html: all
-	$(MAKE) -f Makefile.coq html
+	$(MAKE) -f Makefile.rocq html
 
-clean: Makefile.coq
-	$(MAKE) -f Makefile.coq clean
+clean: Makefile.rocq
+	$(MAKE) -f Makefile.rocq clean
 
 mrproper:
-	rm -f Makefile.coq
+	rm -f Makefile.rocq
 
-Makefile.coq: _CoqProject
-	rocq makefile -f _CoqProject -o Makefile.coq
+Makefile.rocq: _RocqProject
+	rocq makefile -f _RocqProject -o Makefile.rocq
 
-.merlin: Makefile.coq
+.merlin: Makefile.rocq
 	$(MAKE) -f $< $@

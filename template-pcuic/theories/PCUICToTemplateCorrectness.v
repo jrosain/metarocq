@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool Utf8 CRelationClasses.
 From Equations.Type Require Import Relation Relation_Properties.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
      PCUICLiftSubst PCUICEquality PCUICReduction PCUICCasesContexts PCUICTactics
      PCUICWeakeningConv PCUICWeakeningTyp PCUICUnivSubst PCUICTyping PCUICGlobalEnv
      PCUICClosedTyp PCUICGeneration PCUICConversion (* Needs transitivity of cumulativity *)
@@ -10,16 +10,16 @@ From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICInduction
      PCUICSafeLemmata PCUICInductives PCUICInductiveInversion.
 Set Warnings "-notation-overridden".
 
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.Template Require Import Ast TypingWf UnivSubst
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.Template Require Import Ast TypingWf UnivSubst
      TermEquality LiftSubst Reduction.
 Set Warnings "notation-overridden".
 
-From MetaCoq.PCUIC Require Import PCUICEquality.
-From MetaCoq.TemplatePCUIC Require Import PCUICToTemplate.
+From MetaRocq.PCUIC Require Import PCUICEquality.
+From MetaRocq.TemplatePCUIC Require Import PCUICToTemplate.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 
 Implicit Types cf : checker_flags. (* Use {cf} to parameterize by checker_flags where needed *)
 Set Default Proof Using "Type*".
@@ -35,11 +35,11 @@ Local Ltac len ::= autorewrite with len; cbn.
 
 (** Translation from PCUIC back to template-coq terms.
 
-  This translation is not direct due to two peculiarities of template-coq's syntax:
+  This translation is not direct due to two peculiarities of template-rocq's syntax:
   - applications are n-ary and not all terms are well-formed, so we have to
     use an induction on the size of derivations to transform the binary applications
     into n-ary ones.
-  - The representation of cases in template-coq is "compact" in the sense that
+  - The representation of cases in template-rocq is "compact" in the sense that
     the predicate and branches contexts do not appear in the syntax of terms but can
     be canonically rebuilt on-demand, as long as the environment has a declaration for the
     inductive type. In contrast, PCUIC has these contexts explicitely present in terms,
@@ -48,17 +48,17 @@ Local Ltac len ::= autorewrite with len; cbn.
     For example one couldn't do recursive calls on such "rebuilt" contexts using simple structural
     recursion, the new contexts having no structural relation to the terms at hand.
 
-    This means that.Common-Coq's `red1` reduction of cases requires well-formedness conditions
+    This means that.Common-Rocq's `red1` reduction of cases requires well-formedness conditions
     not readily available in PCUIC's. We solve this conundrum using subject reduction: indeed
     cumulativity is always called starting with two well-sorted types, and we can hence show
     that every one-step reduction in a PCUIC cumulativity derivation goes from a well-typed term
-    to a well-typed term. We can hence prove that.Common-Coq's `red1` reductions follow from the
+    to a well-typed term. We can hence prove that.Common-Rocq's `red1` reductions follow from the
     untyped PCUIC reduction when restricted to well-typed terms (which have many more invariants).
     We actually just need the term to be reduced to be well-typed to show that the interpretation
     preserves one-step reduction in [trans_red1}].
 *)
 
-(** Source = PCUIC, Target = Coq *)
+(** Source = PCUIC, Target = Rocq *)
 Module S := PCUICAst.
 Module SE := PCUICEnvironment.
 Module ST := PCUICTyping.
@@ -1484,7 +1484,7 @@ Proof.
   eapply trans_eq_term_upto_univ ; eauto.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICCumulativity.
+From MetaRocq.PCUIC Require Import PCUICCumulativity.
 
 Section wtcumul.
   Set Warnings "-notation-overridden".
@@ -1537,6 +1537,21 @@ Proof.
     econstructor 3; tea.
 Qed.
 
+Lemma trans_lift_typing_it {P Q} {tm tm' t t'} {u r} :
+  forall tu: ST.lift_typing0 P (Judge tm t u r),
+  let s := tu.2.π1 in
+  match tm', tm with None, _ => unit | Some tm', Some tm => P tm t -> Q tm' t' | _, _ => False end ->
+  (P t (PCUICAst.tSort s) -> Q t' (tSort s)) ->
+  TT.lift_typing0 Q (Judge tm' t' u r).
+Proof.
+  intros (? & ? & Hs & e) s HPQc HPQs.
+  split.
+  - destruct tm, tm' => //=. now apply HPQc.
+  - eexists. split; [now apply HPQs|].
+    destruct u => //.
+Qed.
+
+
 Definition TTwf_local {cf} Σ Γ := TT.All_local_env (TT.lift_typing TT.typing Σ) Γ.
 
 Lemma trans_wf_local' {cf} :
@@ -1552,9 +1567,9 @@ Proof.
   induction X.
   - simpl. constructor.
   - simpl. econstructor; auto.
-    simpl. destruct tu as (? & ? & ? & ?); cbn in *. repeat (eexists; tea).
+    simpl. eapply trans_lift_typing_it with tu => //.
   - simpl. constructor; auto.
-    simpl. destruct tu as (? & ? & ? & ?); cbn in *. repeat (eexists; tea); cbn.
+    simpl. eapply trans_lift_typing_it with tu => //.
 Qed.
 
 Lemma trans_wf_local_env {cf} Σ Γ :
@@ -1569,9 +1584,9 @@ Proof.
   induction X.
   - simpl. constructor.
   - simpl. econstructor; auto.
-    simpl. destruct t0 as (_ & ? & (? & ?) & ?); cbn in *. repeat (eexists; tea).
+    simpl. eapply trans_lift_typing_it with t0 => // HT. now apply HT.
   - simpl. constructor; auto.
-    simpl. destruct t0 as ((? & ?) & ? & (? & ?) & ?); cbn in *. repeat (eexists; cbn; tea).
+    simpl. eapply trans_lift_typing_it with t0 => // HT. all: now apply HT.
 Qed.
 
 Lemma trans_branches {cf} Σ Γ brs btys ps:
@@ -1621,10 +1636,8 @@ Proof.
   }
 
   induction X;cbn;constructor;auto;cbn in *.
-  - destruct t0 as (_&?&(?&?)&?).
-    repeat (eexists; tea); eauto.
-  - destruct t0 as ((?&?)&?&(?&?)&?).
-    repeat (eexists; tea); eauto.
+  - eapply trans_lift_typing_it with t0 => // HT. now apply HT.
+  - eapply trans_lift_typing_it with t0 => // HT. all: now apply HT.
 Qed.
 
 Lemma trans_mfix_All2 {cf} Σ Γ mfix xfix:
@@ -1637,14 +1650,14 @@ Proof.
   induction 1.
   - constructor.
   - simpl; constructor; auto.
-    destruct p as (Hb & s & Ht & _). cbn in Hb, Ht.
-    unfold app_context in *.
-    rewrite /trans_local map_app trans_fix_context in Hb, Ht.
-    rewrite trans_lift in Hb, Ht.
-    replace(#|SE.fix_context xfix|) with
-        (#|TT.fix_context (map(map_def trans trans) xfix)|) in Hb, Ht.
-      2:now rewrite TT.fix_context_length length_map fix_context_length.
-    repeat (eexists; cbn; tea); eauto.
+    eapply trans_lift_typing_it with p => // HT. 2: set (_.2.π1) as s in *; clearbody s.
+    all: unfold app_context in *.
+    all: rewrite /trans_local map_app trans_fix_context in HT.
+    all: rewrite trans_lift in HT.
+    all: replace(#|SE.fix_context xfix|) with
+        (#|TT.fix_context (map(map_def trans trans) xfix)|) in HT; tas.
+
+    all: now rewrite TT.fix_context_length length_map fix_context_length.
 Qed.
 
 Lemma All_over_All {cf} Σ Γ wfΓ :
@@ -1956,7 +1969,7 @@ Proof.
     * simpl. cbn in *. lia.
 Qed.
 
-(** Likewise, in.Common-Coq, we can append without re-typing the result *)
+(** Likewise, in.Common-Rocq, we can append without re-typing the result *)
 Lemma TT_typing_spine_app {cf:checker_flags} Σ Γ ty T' args na A B arg s :
   TT.typing Σ Γ (T.tProd na A B) (T.tSort s) ->
   TT.typing_spine Σ Γ ty args T' ->
@@ -2033,7 +2046,7 @@ Qed.
 
 (** Finally, for each typing spine built above, assuming we can apply the induction hypothesis
   of the translation to any of the typing derivations in the spine, then we can produce a typing
-  spine in the n-ary application template-coq spec.
+  spine in the n-ary application template-rocq spec.
 
   We have two cases to consider at the "end" of the spine: either we have the same translation of the
   PCUIC conclusion type, or there is exactly one cumulativity step to get to this type. *)
@@ -2181,7 +2194,7 @@ Proof.
     now rewrite trans_to_extended_list.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICClosed PCUICWeakeningEnvConv PCUICWeakeningEnvTyp.
+From MetaRocq.PCUIC Require Import PCUICClosed PCUICWeakeningEnvConv PCUICWeakeningEnvTyp.
 
 Lemma trans_subst_instance_decl u x : map_decl (subst_instance u) (trans_decl x) = trans_decl (map_decl (subst_instance u) x).
 Proof.
@@ -2310,10 +2323,11 @@ Proof.
       now rewrite -trans_local_app.
     + rewrite <- trans_global_ext_constraints.
       eassumption.
+    + assumption.
     + now rewrite trans_mkApps map_app in X7.
     + rewrite (trans_case_predicate_context Γ); tea.
       eapply All2i_map. eapply All2i_map_right.
-      eapply Forall2_All2 in H4.
+      eapply Forall2_All2 in H5.
       eapply All2i_All2_mix_left in X8; tea.
       eapply All2i_impl ; tea.
       intros i cdecl br. cbv beta.
@@ -2323,10 +2337,10 @@ Proof.
       * rewrite /brctxty.
         now eapply trans_cstr_branch_context_eq.
       * pose proof (trans_case_branch_type ci mdecl idecl cdecl i p br isdecl H1 wf eqctx).
-        rewrite -/brctxty -/ptm in H5. cbn in H5. clearbody brctxty.
+        rewrite -/brctxty -/ptm in H6. cbn in H6. clearbody brctxty.
         subst brctxty. rewrite -trans_local_app. cbn. apply IHb.
       * pose proof (trans_case_branch_type ci mdecl idecl cdecl i p br isdecl H1 wf eqctx).
-        rewrite -/brctxty -/ptm in H5. cbn in H5. clearbody brctxty.
+        rewrite -/brctxty -/ptm in H6. cbn in H6. clearbody brctxty.
         subst brctxty. rewrite -trans_local_app. cbn. apply IHbty.
 
   - rewrite trans_subst trans_subst_instance /= map_rev.
@@ -2346,9 +2360,7 @@ Proof.
       reflexivity.
     + rewrite /trans_local map_app in X.
       now eapply TT.All_local_env_app_inv in X as [].
-    + eapply All_map, (All_impl X1).
-      intros d (_ & ? & ? & _) => //.
-      repeat (eexists; tea).
+    + eapply All_map, X1.
     + fold trans.
       subst types.
       eapply trans_mfix_All2. eassumption.
@@ -2364,9 +2376,7 @@ Proof.
     + rewrite /trans_local map_app in X.
       now eapply TT.All_local_env_app_inv in X as [].
     + fold trans.
-      eapply All_map, (All_impl X1).
-      intros d (_ & s & IHt & _).
-      repeat (eexists; tea); cbn.
+      eapply All_map, X1.
     + fold trans;subst types.
       now apply trans_mfix_All2.
     + now rewrite trans_wf_cofixpoint.

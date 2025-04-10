@@ -1,15 +1,15 @@
 From Equations Require Import Equations.
 From Stdlib Require Import ssreflect.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.Template Require Ast TypingWf WfAst TermEquality EtaExpand TemplateProgram.
-From MetaCoq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCumulativity
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.Template Require Ast TypingWf WfAst TermEquality EtaExpand TemplateProgram.
+From MetaRocq.PCUIC Require Import PCUICAst PCUICAstUtils PCUICCumulativity
      PCUICLiftSubst PCUICEquality PCUICReduction
      PCUICUnivSubst PCUICTyping PCUICGlobalEnv
      PCUICWeakeningConv PCUICWeakeningTyp PCUICSubstitution PCUICGeneration
      PCUICCasesContexts PCUICEtaExpand
      PCUICProgram.
-From MetaCoq.TemplatePCUIC Require Import TemplateToPCUIC TemplateToPCUICCorrectness.
+From MetaRocq.TemplatePCUIC Require Import TemplateToPCUIC TemplateToPCUICCorrectness.
 
 Tactic Notation "wf_inv" ident(H) simple_intropattern(p) :=
 (eapply WfAst.wf_inv in H; progress cbn in H; try destruct H as p) ||

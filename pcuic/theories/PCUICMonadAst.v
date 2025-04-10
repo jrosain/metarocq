@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
-From MetaCoq.Utils Require Import utils monad_utils.
-From MetaCoq.PCUIC Require Import PCUICAst.
+From MetaRocq.Utils Require Import utils monad_utils.
+From MetaRocq.PCUIC Require Import PCUICAst.
 
-Import MCMonadNotation.
+Import MRMonadNotation.
 Local Set Universe Polymorphism.
 Local Unset Universe Minimization ToSet.
 

@@ -1,8 +1,8 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect.
-From MetaCoq.Utils Require Import utils.
-From MetaCoq.Common Require Import config.
-From MetaCoq.PCUIC Require Import PCUICTyping PCUICEquality PCUICAst PCUICAstUtils
+From MetaRocq.Utils Require Import utils.
+From MetaRocq.Common Require Import config.
+From MetaRocq.PCUIC Require Import PCUICTyping PCUICEquality PCUICAst PCUICAstUtils
   PCUICWeakeningConv PCUICWeakeningTyp PCUICSubstitution PCUICGeneration PCUICArities
   PCUICWcbvEval PCUICSR PCUICInversion
   PCUICUnivSubstitutionConv PCUICUnivSubstitutionTyp
@@ -19,7 +19,7 @@ From MetaCoq.PCUIC Require Import PCUICTyping PCUICEquality PCUICAst PCUICAstUti
 
 From Equations Require Import Equations.
 
-From MetaCoq.PCUIC Require Import PCUICSN.
+From MetaRocq.PCUIC Require Import PCUICSN.
 
 Lemma wh_normalization {cf:checker_flags} {no:normalizing_flags} {Σ} {normalization:NormalizationIn Σ} {t} : wf Σ -> axiom_free Σ ->
 {A & Σ ;;; [] |- t : A}  -> { v & whnf RedFlags.default Σ [] v * red Σ [] t v}.
@@ -59,7 +59,7 @@ Proof.
   eapply SN_to_WN; eauto.
 Qed.
 
-From MetaCoq.PCUIC Require Import PCUICFirstorder.
+From MetaRocq.PCUIC Require Import PCUICFirstorder.
 
 Lemma firstorder_value_irred {cf:checker_flags} Σ t t' :
   firstorder_value Σ [] t ->

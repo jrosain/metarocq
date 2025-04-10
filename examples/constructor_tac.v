@@ -1,6 +1,6 @@
 From Stdlib Require Import List.
-From MetaCoq.Template Require Import All Loader.
-Import MCMonadNotation.
+From MetaRocq.Template Require Import All Loader.
+Import MRMonadNotation.
 Open Scope bs.
 
 Definition constructor (goal : Ast.term): TemplateMonad typed_term :=

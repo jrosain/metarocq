@@ -1,13 +1,13 @@
 From Stdlib.Structures Require Import Equalities Orders OrdersTac.
-From MetaCoq.Quotation.ToPCUIC Require Import Init.
-From MetaCoq.Quotation.ToPCUIC.QuotationOf.Stdlib Require Export Structures.Orders.Sig.
+From MetaRocq.Quotation.ToPCUIC Require Import Init.
+From MetaRocq.Quotation.ToPCUIC.QuotationOf.Stdlib Require Export Structures.Orders.Sig.
 
 Module Type QuotationOfIsTotalOrder (O : EqLtLe) (S : IsTotalOrder O) :=
  QuotationOfIsEq O S <+ QuotationOfIsStrOrder O S <+ QuotationOfLeIsLtEq O S <+ QuotationOfLtIsTotal O S.
 
 Module Type OrderFactsSig (O : EqLtLe) (P : IsTotalOrder O) := Nop <+ OrderFacts O P.
 Module Type QuotationOfOrderFacts (O : EqLtLe) (P : IsTotalOrder O) (S : OrderFactsSig O P).
-  MetaCoq Run (tmDeclareQuotationOfModule everything (Some export) "S").
+  MetaRocq Run (tmDeclareQuotationOfModule everything (Some export) "S").
 End QuotationOfOrderFacts.
 
 Module Type MakeOrderTacSig (O : EqLtLe) (P : IsTotalOrder O) := Nop <+ MakeOrderTac O P.
