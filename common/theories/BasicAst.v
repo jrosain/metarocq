@@ -11,6 +11,67 @@ Inductive name : Set :=
 | nNamed (_ : ident).
 Derive NoConfusion EqDec for name.
 
+Module QVar.
+  Inductive repr_ {V : Set} := Var (_ : V).
+  Derive NoConfusion for repr_.
+  Arguments repr_ : clear implicits.
+
+  Definition repr := repr_ nat.
+  Definition t := repr.
+
+  Definition eqb {V : Set} `{ReflectEq V} (v1 v2 : repr_ V) : bool :=
+    match v1, v2 with
+    | Var i, Var j => eqb i j
+    end.
+
+  #[global, program] Instance reflect_eq_qvar {V : Set} `{ReflectEq V} : ReflectEq (repr_ V) :=
+    { eqb := eqb }.
+  Next Obligation.
+    destruct x, y; cbn; destruct (eqb_spec v v0); constructor.
+    now f_equal. congruence.
+  Qed.
+
+  #[global] Instance eq_dec_qvar {V : Set} `{EqDec V} : EqDec (repr_ V) := ltac:(intros v v'; decide equality).
+
+  Inductive lt_ {V V_lt} : repr_ V -> repr_ V -> Prop :=
+  | ltVarVar i j : V_lt i j -> lt_ (Var i) (Var j).
+  Derive Signature for lt_.
+  Arguments lt_ {V} V_lt.
+
+  Definition lt := lt_ Nat.lt.
+  #[global] Instance lt_strorder : StrictOrder lt.
+  Proof.
+    constructor.
+    - intros v X; inversion X.
+      now eapply irreflexivity in H1.
+    - intros v1 v2 v3 X1 X2;
+        inversion X1; inversion X2; constructor.
+      subst. etransitivity; tea. inversion H3. now subst.
+  Qed.
+
+  Definition lt_compat : Proper (eq ==> eq ==> iff) lt.
+  Proof.
+    intros x y e z t e'. hnf in * |- ; subst. reflexivity.
+  Qed.
+
+  Definition compare (v1 v2 : t) : comparison
+    := match v1, v2 with
+       | Var i, Var j => Nat.compare i j
+       end.
+
+  Lemma compare_spec x y : CompareSpec (eq x y) (lt x y) (lt y x) (compare x y).
+  Proof.
+    cbv [compare].
+    destruct x, y.
+    all: lazymatch goal with
+         | [ |- context[Nat.compare ?x ?y] ]
+           => destruct (Nat.compare_spec x y)
+         | _ => idtac
+         end.
+    all: repeat constructor; try apply f_equal; try assumption.
+  Qed.
+End QVar.
+
 Inductive relevance : Set := Relevant | Irrelevant.
 Derive NoConfusion EqDec for relevance.
 
