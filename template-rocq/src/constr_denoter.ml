@@ -142,12 +142,23 @@ struct
       let ev = Evar.unsafe_of_int id in
       evm, Constr.mkEvar (ev, SList.of_full_list args)
 
+  let unquote_int = unquote_nat
+
+  let unquote_qvar q = Sorts.QVar.make_var (unquote_int q)
+
   let unquote_relevance trm =
     if Constr.equal trm (Lazy.force tRelevant) then
       Sorts.Relevant
     else if Constr.equal trm (Lazy.force tIrrelevant) then
       Sorts.Irrelevant
-    else raise (Failure "Invalid relevance")
+    else
+      match Constr.kind trm with
+      | Constr.App (c,[|q|]) ->
+	 if Constr.equal c (Lazy.force tRelevanceVar) then
+	   Sorts.RelevanceVar (unquote_qvar q)
+	 else
+	   raise (Failure "Invalid relevance")
+      | _ -> raise (Failure "Invalid relevance")
 
   let unquote_aname trm =
     let (h,args) = app_full trm [] in
@@ -335,7 +346,6 @@ struct
       not_supported_verb trm "unquote_inductive"
 
 
-  let unquote_int = unquote_nat
   let print_term x = Printer.pr_constr_env (Global.env ()) Evd.empty x
 
 

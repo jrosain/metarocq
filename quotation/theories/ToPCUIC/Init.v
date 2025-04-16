@@ -491,7 +491,7 @@ Polymorphic Definition tmMakeQuotationOfConstants_gen@{d t u _T _above_u'} {debu
                       | Some qname
                         => '(univs, rel) <- tmQuoteConstantUniversesAndRelevance cr false;;
                            match rel with
-                           | Irrelevant => on_bad_relevance cr
+                           | Irrelevant | RelevanceVar _ => on_bad_relevance cr
                            | Relevant
                              => inst <- match univs with
                                         | Monomorphic_ctx => tmReturn ([] : Instance.t)

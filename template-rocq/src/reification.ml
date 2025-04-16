@@ -8,6 +8,7 @@ sig
   type quoted_bool
   type quoted_name
   type quoted_aname
+  type quoted_qvar
   type quoted_relevance
   type quoted_sort
   type quoted_cast_kind

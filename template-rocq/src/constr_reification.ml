@@ -9,6 +9,7 @@ struct
   type quoted_bool = Constr.t (* of type bool *)
   type quoted_name = Constr.t (* of type BasicAst.name *)
   type quoted_aname = Constr.t (* of type BasicAst.aname (names with relevance) *)
+  type quoted_qvar = Constr.t (* of type BasicAst.QVar.t (integers representing variables) *)
   type quoted_relevance = Constr.t (* of type BasicAst.relevance *)
   type quoted_sort = Constr.t (* of type Ast.universe *)
   type quoted_cast_kind = Constr.t  (* of type Ast.cast_kind *)
@@ -118,7 +119,7 @@ struct
 
   (* reify the constructors in Template.Ast.v, which are the building blocks of reified terms *)
   let tRelevance = ast "relevance"
-  let (tRelevant,tIrrelevant) = (ast "Relevant", ast "Irrelevant")
+  let (tRelevant,tIrrelevant,tRelevanceVar) = (ast "Relevant", ast "Irrelevant", ast "RelevanceVar")
   let taname = ast "aname"
   let tmkBindAnn = ast "mkBindAnn"
   let nAnon = ast "nAnon"

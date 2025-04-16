@@ -7,6 +7,7 @@ From MetaRocq.Utils Require Import MRUtils.
 From MetaRocq.Template Require Import AstUtils (* for tFixType *).
 
 #[export] Instance quote_name : ground_quotable name := ltac:(destruct 1; exact _).
+#[export] Instance quote_qvar : ground_quotable QVar.t := ltac:(destruct 1; exact _).
 #[export] Instance quote_relevance : ground_quotable relevance := ltac:(destruct 1; exact _).
 #[export] Instance quote_binder_annot {A} {qA : quotation_of A} {quoteA : ground_quotable A} : ground_quotable (binder_annot A) := ltac:(destruct 1; exact _).
 #[export] Instance quote_cast_kind : ground_quotable cast_kind := ltac:(destruct 1; exact _).

@@ -72,7 +72,12 @@ Module QVar.
   Qed.
 End QVar.
 
-Inductive relevance : Set := Relevant | Irrelevant.
+Definition string_of_qvar (q : QVar.t) :=
+  match q with
+  | QVar.Var i => "α" ^ string_of_nat i
+  end.
+
+Inductive relevance : Set := Relevant | Irrelevant | RelevanceVar (_ : QVar.t).
 Derive NoConfusion EqDec for relevance.
 
 (** Binders annotated with relevance *)
@@ -113,6 +118,7 @@ Definition string_of_relevance (r : relevance) :=
   match r with
   | Relevant => "Relevant"
   | Irrelevant => "Irrelevant"
+  | RelevanceVar qv => "RelevanceVar(" ^ string_of_qvar qv ^ ")"
   end.
 
 (** The kind of a cast *)
