@@ -1487,12 +1487,6 @@ Module Sort.
 
   Definition t := t_ Universe.t.
 
-  Inductive family : Set :=
-  | fSProp
-  | fProp
-  | fType.
-  Derive NoConfusion EqDec for family.
-
   Definition eqb {univ} `{ReflectEq univ} (u1 u2 : t_ univ) : bool :=
     match u1, u2 with
     | sSProp, sSProp => true
@@ -1617,11 +1611,11 @@ Module Sort.
     | sType l => Universe.get_is_level l
     end.
 
-  Definition to_family {univ} (s : t_ univ) :=
+  Definition to_quality {univ} (s : t_ univ) :=
     match s with
-    | sSProp => fSProp
-    | sProp => fProp
-    | sType _ => fType
+    | sSProp => Quality.qSProp
+    | sProp => Quality.qProp
+    | sType _ => Quality.qType
     end.
 
   Definition to_csort v s :=
@@ -1631,18 +1625,18 @@ Module Sort.
     | sType u => sType (val v u)
     end.
 
-  Lemma to_family_to_csort s v :
-    to_family (to_csort v s) = to_family s.
+  Lemma to_quality_to_csort s v :
+    to_quality (to_csort v s) = to_quality s.
   Proof.
     destruct s; cbnr.
   Qed.
 
   Lemma sType_super_ {univ type1 univ_succ} (s : t_ univ) :
-    to_family (super_ type1 univ_succ s) = fType.
+    to_quality (super_ type1 univ_succ s) = Quality.qType.
   Proof. now destruct s. Qed.
 
   Lemma sType_super (s : t) :
-    to_family (super s) = fType.
+    to_quality (super s) = Quality.qType.
   Proof. apply sType_super_. Qed.
 
   Inductive lt_ {univ univ_lt} : t_ univ -> t_ univ -> Prop :=
@@ -2146,16 +2140,16 @@ End SortCompare.
 
 
 
-Definition relevance_of_family (s : Sort.family) :=
+Definition relevance_of_quality (s : Quality.t) :=
   match s with
-  | Sort.fSProp => Irrelevant
+  | Quality.qSProp => Irrelevant
   | _ => Relevant
   end.
 
-#[global] Opaque relevance_of_family.
+#[global] Opaque relevance_of_quality.
 
-Notation rel_of_Type := (relevance_of_family Sort.fType).
-Notation relevance_of_sort s := (relevance_of_family (Sort.to_family s)).
+Notation rel_of_Type := (relevance_of_quality Quality.qType).
+Notation relevance_of_sort s := (relevance_of_quality (Sort.to_quality s)).
 
 Notation isSortRel s rel := (relevance_of_sort s = rel).
 Notation isSortRelOpt s relopt :=
@@ -2540,8 +2534,8 @@ Notation "x @[ u ]" := (subst_instance u x) (at level 3,
           | sType u' => sType (subst_instance u u')
           end.
 
-Lemma subst_instance_to_family s u :
-  Sort.to_family s@[u] = Sort.to_family s.
+Lemma subst_instance_to_quality s u :
+  Sort.to_quality s@[u] = Sort.to_quality s.
 Proof.
   destruct s => //.
 Qed.

@@ -173,11 +173,12 @@ Proof using Type.
 Qed.
 
 Definition eq_univ_prop (u v : sort) :=
-  match Sort.to_family u, Sort.to_family v with
-  | Sort.fSProp, Sort.fSProp => true
-  | Sort.fProp, Sort.fProp => true
-  | Sort.fType, Sort.fType => true
-  | Sort.fType, Sort.fProp | Sort.fProp, Sort.fType => prop_sub_type
+  match Sort.to_quality u, Sort.to_quality v with
+  | Quality.qSProp, Quality.qSProp => true
+  | Quality.qProp, Quality.qProp => true
+  | Quality.qType, Quality.qType => true
+  | Quality.qType, Quality.qProp | Quality.qProp, Quality.qType => prop_sub_type
+  | Quality.qVar q, Quality.qVar q' => eqb q q'
   | _, _ => false
   end.
 

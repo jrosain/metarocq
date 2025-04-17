@@ -457,7 +457,7 @@ Section Typecheck.
       apply eqb_refl.
     Qed.
 
-    #[global] Transparent relevance_of_family. (* We need to compute it really now *)
+    #[global] Transparent relevance_of_quality. (* We need to compute it really now *)
 
     Equations infer_judgment0 Γ (HΓ : forall Σ (wfΣ : abstract_env_ext_rel X Σ), ∥ wf_local Σ Γ ∥) tm ty s (Hs : forall Σ (wfΣ : abstract_env_ext_rel X Σ), option_default (fun s => ∥ wf_sort Σ s ∥) s True) rel
     : typing_result_comp (∑ s', option_default (fun s => s = s') s True /\ forall Σ (wfΣ : abstract_env_ext_rel X Σ), ∥ lift_typing typing Σ Γ (Judge tm ty (Some s') rel) ∥) :=

@@ -741,7 +741,7 @@ Lemma unique_sorting_family {pb} {Σ : global_env_ext} {Γ T U s s'} :
   Σ ;;; Γ |- T : tSort s ->
   Σ ;;; Γ |- U : tSort s' ->
   Σ ;;; Γ ⊢ T ≤[pb] U ->
-  Sort.to_family s = Sort.to_family s'.
+  Sort.to_quality s = Sort.to_quality s'.
 Proof using Hcf.
   intros wfΣ HT HU cum.
   apply ws_cumul_pb_forget in cum.

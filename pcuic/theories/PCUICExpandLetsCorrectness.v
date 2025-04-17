@@ -5044,10 +5044,7 @@ Proof.
     }
     { cbn. move: ind_sorts.
       rewrite /check_ind_sorts.
-      destruct Sort.to_family => //.
-      intuition auto.
-      rewrite /PCUICLookup.global_ext_constraints.
-      destruct indices_matter => //.
+      destruct Sort.to_quality => //; intuition auto; destruct indices_matter => //; 
       now eapply (trans_type_local_ctx (Σ := (Σ0, ind_universes m))). }
     { simpl ind_variance in *.
       move: onIndices. rewrite /ind_respects_variance.

@@ -18,6 +18,7 @@ struct
   type quoted_bool = bool
   type quoted_name = BasicAst.name
   type quoted_aname = BasicAst.aname
+  type quoted_qvar = BasicAst.QVar.t
   type quoted_relevance = BasicAst.relevance
   type quoted_sort = Universes0.Sort.t
   type quoted_cast_kind = cast_kind

@@ -2972,11 +2972,10 @@ Lemma trans_check_ind_sorts {cf} Σ udecl kn mdecl n idecl
 Proof.
   intros wfΣ wfΣ' IH oni.
   unfold ST.check_ind_sorts, check_ind_sorts. cbn.
-  destruct Sort.to_family => //.
-  intros []. split => //.
-  now rewrite -global_ext_constraints_trans in c.
-  destruct indices_matter => //.
-  now eapply trans_type_local_ctx in y.
+  destruct Sort.to_quality => //;
+  intros []; split => //.
+  1, 3: now rewrite -global_ext_constraints_trans in c.
+  all: destruct indices_matter => //; now eapply trans_type_local_ctx in y.
 Qed.
 
 Lemma on_global_decl_wf {cf} {Σ : Ast.Env.global_env_ext} {kn d} :

@@ -896,11 +896,14 @@ Proof.
               apply (IH (_; _; _; Hs)). }
           - pose proof (onProjections Xg); auto.
           - pose proof (ind_sorts Xg) as Xg'. unfold check_ind_sorts in *.
-            destruct Sort.to_family; auto.
-            split. apply Xg'. destruct indices_matter; auto.
-            eapply type_local_ctx_impl. eapply Xg'. auto. intros ?? Hj. apply Xj; tas.
-            apply lift_typing_impl with (1 := Hj); intros ?? HT. split; tas.
-            apply (IH (_; _; _; HT)).
+            destruct Sort.to_quality; auto; split.
+            1, 3: apply Xg'.
+            all: destruct indices_matter; auto; eapply type_local_ctx_impl.
+            1, 4: eapply type_local_ctx_impl.
+            1, 4: eapply Xg'.
+            all: eauto.
+            all: intros ?? Hj; apply Xj; tas; apply lift_typing_impl with (1 := Hj);
+              intros ?? HT; split; tas; apply (IH (_; _; _; HT)).
            - apply Xg.(ind_relevance_compat).
            - apply (onIndices Xg). }
         { apply All_local_env_impl with (1 := onP); intros ?? Hj. apply Xj; tas.

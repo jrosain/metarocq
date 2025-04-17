@@ -1625,18 +1625,18 @@ Module GlobalMaps (T: Term) (E: EnvironmentSig T) (TU : TermUtils T E) (ET: EnvT
 
     Definition check_ind_sorts (Σ : global_env_ext)
               params kelim ind_indices cdecls ind_sort : Type :=
-      match Sort.to_family ind_sort with
-      | Sort.fProp =>
+      match Sort.to_quality ind_sort with
+      | Quality.qProp =>
         (** The inductive is declared in the impredicative sort Prop *)
         (** No universe-checking to do: any size of constructor argument is allowed,
             however elimination restrictions apply. *)
         (allowed_eliminations_subset kelim (elim_sort_prop_ind cdecls) : Type)
-      | Sort.fSProp =>
+      | Quality.qSProp =>
         (** The inductive is declared in the impredicative sort SProp *)
         (** No universe-checking to do: any size of constructor argument is allowed,
             however elimination restrictions apply. *)
         (allowed_eliminations_subset kelim (elim_sort_sprop_ind cdecls) : Type)
-      | _ =>
+      | Quality.qType | Quality.qVar _ =>
         (** The inductive is predicative: check that all constructors arguments are
             smaller than the declared universe. *)
         check_constructors_smaller Σ cdecls ind_sort
@@ -2123,15 +2123,13 @@ Module GlobalMaps (T: Term) (E: EnvironmentSig T) (TU : TermUtils T E) (ET: EnvT
           all: rewrite ?andb_false_r //=.
       + exact (onProjections X).
       + pose proof (ind_sorts X) as X1. unfold check_ind_sorts in *.
-        destruct Sort.to_family; auto.
-        destruct X1 as [constr_smaller type_local_ctx].
-        split.
-        * apply Xc, constr_smaller.
-        * unfold config.impl in Xcf.
-          revert type_local_ctx.
+        destruct Sort.to_quality; auto.
+        all: destruct X1 as [constr_smaller type_local_ctx]; split.
+        1, 3: apply Xc, constr_smaller.
+        all: unfold config.impl in Xcf; revert type_local_ctx;
           do 2 destruct indices_matter => //=.
-          2: now rewrite ?andb_false_r //= in Xcf.
-          intro. eapply type_local_ctx_impl; eauto.
+        2, 4: now rewrite ?andb_false_r //= in Xcf.
+        all: intro; eapply type_local_ctx_impl; eauto.
       + apply (ind_relevance_compat X).
       + generalize (X.(onIndices)). destruct ind_variance => //.
         apply ind_respects_variance_impl.
