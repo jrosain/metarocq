@@ -999,6 +999,31 @@ Proof.
   now apply eqs.
 Qed.
 
+Module Quality.
+  Inductive t :=
+    qProp | qSProp | qType | qVar (_ : QVar.t).
+  Derive NoConfusion EqDec for t.
+
+  Definition var (n : nat) := qVar (QVar.var n).
+  
+  Definition eqb (q1 q2 : t) : bool :=
+    match q1, q2 with
+    | qProp, qProp
+    | qSProp, qSProp
+    | qType, qType => true
+    | qVar q1, qVar q2 => eqb q1 q2
+    | _, _ => false
+    end.
+
+  #[global, program] Instance reflect_eq_quality : ReflectEq t :=
+    { eqb := eqb }.
+  Next Obligation.
+    destruct x, y; cbn; try constructor; auto; try congruence.
+    destruct (eqb_spec t0 t1); constructor. now f_equal.
+    congruence.
+  Qed.  
+End Quality.
+
 (** {6 Sort instances} *)
 
 Module Instance.

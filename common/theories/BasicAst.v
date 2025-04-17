@@ -19,6 +19,8 @@ Module QVar.
   Definition repr := repr_ nat.
   Definition t := repr.
 
+  Definition var (n : nat) : t := Var n.
+  
   Definition eqb {V : Set} `{ReflectEq V} (v1 v2 : repr_ V) : bool :=
     match v1, v2 with
     | Var i, Var j => eqb i j
