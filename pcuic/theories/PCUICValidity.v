@@ -333,14 +333,15 @@ Section Validity.
 
     - (* Primitive *)
       depelim X0; depelim X1; simp prim_type; cbn in *.
-      1-3:destruct H1 as [hty hbod huniv]; eapply has_sort_isType with (s := _@[[]]); change (tSort ?s@[[]]) with (tSort s)@[[]];
-          rewrite <- hty; refine (type_Const _ _ _ [] _ wfΓ H0 _); rewrite huniv //.
+      1-3: destruct H1 as [hty hbod huniv]; eapply has_sort_isType with (s := _@[Instance.empty]); change (tSort ?s@[Instance.empty]) with (tSort s)@[Instance.empty];
+          rewrite <- hty; refine (type_Const _ _ _ Instance.empty _ wfΓ H0 _); rewrite huniv //.
       set (s := sType (Universe.make' (array_level a))).
       destruct H1 as [hty' hbod huniv].
       eapply has_sort_isType with s.
       eapply (type_App _ _ _ _ (tSort s) (tSort s)); tea; cycle 1.
-      + eapply (type_Const _ _ _ [array_level a]) in H0; tea. rewrite hty' in H0. cbn in H0. exact H0.
-        red. rewrite huniv. simpl. rtoProp; intuition eauto. eapply LevelSet.mem_spec. eapply (wfl (array_level a, 0)). cbn. lsets.
+      + eapply (type_Const _ _ _ (Instance.make [] [array_level a])) in H0; tea. rewrite hty' in H0. cbn in H0. exact H0.
+        red. rewrite huniv. simpl. rtoProp; intuition eauto. rewrite andb_true_r.
+        eapply LevelSet.mem_spec. eapply (wfl (array_level a, 0)). cbn. lsets.
         cbn. red. destruct check_univs => //. red. red. intros v H c. csets.
       + econstructor. 2: econstructor; eauto. 2: constructor; tas.
         all: repeat (eexists; tea; cbn).

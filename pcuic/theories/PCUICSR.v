@@ -408,18 +408,18 @@ Qed.
 Lemma cmp_global_instance_cstr_irrelevant {cf} {Σ} {wfΣ  : wf Σ} {ci c} {mdecl idecl cdecl u u'} :
   declared_constructor Σ (ci, c) mdecl idecl cdecl ->
   cmp_ind_universes Σ ci (context_assumptions (ind_params mdecl) + #|cstr_indices cdecl|) u u' ->
-  cmp_global_instance Σ.1 (compare_universe Σ) Conv (ConstructRef ci c)
+  cmp_global_instance Σ.1 compare_quality (compare_universe Σ) Conv (ConstructRef ci c)
     (ind_npars mdecl + context_assumptions (cstr_args cdecl)) u u'.
 Proof.
   intros declc.
   pose proof (on_declared_constructor declc).
   pose proof (on_declared_constructor declc) as [[onind oib] [ctor_sorts [hnth onc]]].
-  intros Hu. pose proof (cmp_global_instance_length _ _ _ _ _ _ _ Hu).
+  intros Hu. pose proof (cmp_global_instance_length _ _ _ _ _ _ _ _ Hu).
   rewrite /cmp_global_instance_gen /cmp_opt_variance /= /lookup_constructor /lookup_constructor_gen.
   unshelve epose proof (declc' := declared_constructor_to_gen declc); eauto.
   rewrite (declared_inductive_lookup_gen declc'.p1) (proj2 declc').
   rewrite -(cstr_args_length onc).
-  case: leb_spec_Set; try lia.
+  case: leb_spec_Set; try lia. split; try lia.
 Qed.
 
 Lemma wf_pre_case_branch_context {cf} {Σ} {wfΣ : wf Σ} {Γ ci mdecl idecl p} {br : branch term} {cdecl} :

@@ -272,6 +272,27 @@ struct
       | _ -> bad_term_verb trm "unquote_universe 1")
     else not_supported_verb trm "unquote_universe 2"
 
+  let unquote_quality trm (* of type quality *) =
+    let open Sorts.Quality in
+    let (h,args) = app_full trm [] in
+    if constr_equall h qSProp then
+      match args with
+      | [] -> QConstant QSProp
+      | _ -> bad_term_verb trm "unquote_quality_qsprop_args"
+    else if constr_equall h qProp then
+      match args with
+      | [] -> QConstant QProp
+      | _ -> bad_term_verb trm "unquote_quality_qprop_args"
+    else if constr_equall h qType then
+      match args with
+      | [] -> QConstant QType
+      | _ -> bad_term_verb trm "unquote_quality_qtype_args"
+    else if constr_equall h qVar then
+      match args with
+      | [q] -> QVar (unquote_qvar q)
+      | _ -> bad_term_verb trm "unquote_quality_qvar_args"
+    else bad_term_verb trm "unquote_quality"
+
   let unquote_sort evm trm (* of type sort *) =
     let (h,args) = app_full trm [] in
     if constr_equall h sSProp then
@@ -290,10 +311,13 @@ struct
       | _ -> bad_term_verb trm "unquote_sort_type_too_many_args"
     else bad_term_verb trm "unquote_sort_type_no_args"
 
-  let unquote_universe_instance evm trm (* of type universe_instance *) =
-    let l = unquote_list trm in
-    let evm, l = map_evm unquote_level evm l in
-    evm, UVars.Instance.of_array ([||], Array.of_list l)
+  let unquote_instance evm trm (* of type instance *) =
+    let qs, us = unquote_pair trm in
+    let ql = unquote_list qs in
+    let ul = unquote_list us in
+    let ql = List.map unquote_quality ql in
+    let evm, ul = map_evm unquote_level evm ul in
+    evm, UVars.Instance.of_array (Array.of_list ql, Array.of_list ul)
 
   let unquote_variance v =
     let open UVars.Variance in
@@ -392,7 +416,7 @@ struct
 
   let inspect_term (t:Constr.t)
   : (Constr.t, quoted_int, quoted_ident, quoted_name, quoted_sort, quoted_cast_kind, quoted_kernel_name,
-    quoted_inductive, quoted_relevance, quoted_univ_level, quoted_univ_instance, quoted_proj,
+    quoted_inductive, quoted_relevance, quoted_univ_level, quoted_instance, quoted_proj,
     quoted_int63, quoted_float64, quoted_pstring) structure_of_term =
     (* debug (fun () -> Pp.(str "denote_term" ++ spc () ++ print_term t)) ; *)
     let (h,args) = app_full t [] in

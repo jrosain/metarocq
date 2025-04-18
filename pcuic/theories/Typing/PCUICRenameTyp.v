@@ -256,37 +256,41 @@ Proof.
      apply andb_andI in H; apply andb_andI in H'; destruct H as [Hcontext H]; destruct H' as [Hcontext' H'].
      apply andb_andI in H; apply andb_andI in H'; destruct H as [Hc Hbrs]; destruct H' as [Hc' Hbrs'].
      eapply cumul_Case.
-     * unfold cumul_predicate in *; destruct_head'_prod.
+     * unfold cumul_predicate in *; destruct_head'_prod; destruct c0.
        repeat split; eauto.
-       + eapply All2_map. apply forallb_All in Hp, Hp'. repeat toAll.
-         eapply All2_impl. 1: tea. cbn; intros. destruct X as [[X [X''' X']] X'']. apply X'; eauto.
-       + unfold preturn. cbn. unshelve erewrite (All2_length _ : #|pcontext _| = #|pcontext _|); shelve_unifiable; tea.
+       -- eapply All2_map. apply forallb_All in Hp, Hp'. repeat toAll.
+          eapply All2_impl_nth_error; eauto. cbn; intros. destruct X as [X _].
+          apply All2_undep in X. eapply All2_nth_error in X; eauto.
+          apply X; auto.
+          ** eapply @nth_error_all with (x := x) in Hp; eauto.
+          ** eapply @nth_error_all with (x := y) in Hp'; eauto.
+       -- unfold preturn. cbn. unshelve erewrite (All2_length _ : #|pcontext _| = #|pcontext _|); shelve_unifiable; tea.
          exactly_once (idtac; multimatch goal with H : _ |- _ => eapply H end); eauto.
-         ++ rewrite app_context_length.
+         ** rewrite app_context_length.
             eapply urenaming_ext; try apply shiftnP_add; try reflexivity.
             unshelve erewrite <- (All2_length _ : #|pcontext _| = #|pcontext _|); shelve_unifiable; tea.
             rewrite <- inst_case_predicate_context_length.
             rewrite test_context_k_closed_on_free_vars_ctx in Hcontext.
             rewrite inst_case_predicate_context_rename; eauto.
             apply urenaming_context; eauto.
-         ++ rewrite test_context_k_closed_on_free_vars_ctx in Hcontext.
+         ** rewrite test_context_k_closed_on_free_vars_ctx in Hcontext.
             unfold inst_case_predicate_context.
             apply on_free_vars_ctx_inst_case_context; eauto.
-         ++ unfold inst_case_predicate_context.
+         ** unfold inst_case_predicate_context.
             unfold is_open_term. rewrite length_app.
             rewrite <- shiftnP_add.
             rewrite inst_case_predicate_context_length.
             eassumption.
-         ++ unfold inst_case_predicate_context.
+         ** unfold inst_case_predicate_context.
             unfold is_open_term. rewrite length_app.
             rewrite <- shiftnP_add.
             rewrite inst_case_predicate_context_length.
             unshelve erewrite (All2_length _ : #|pcontext _| = #|pcontext _|); shelve_unifiable; tea.
-         ++ rewrite test_context_k_closed_on_free_vars_ctx in Hcontext.
+         ** rewrite test_context_k_closed_on_free_vars_ctx in Hcontext.
             unfold inst_case_predicate_context. apply on_free_vars_ctx_inst_case_context; eauto.
-            +++ eapply All_forallb. apply All_map. apply forallb_All in Hp; eapply All_impl. 1: tea.
-                cbn; intros. eapply urename_is_open_term; eauto.
-            +++ unfold pparams. cbn. rewrite length_map. exact Hcontext.
+            ++ eapply All_forallb. apply All_map. apply forallb_All in Hp; eapply All_impl. 1: tea.
+               cbn; intros. eapply urename_is_open_term; eauto.
+            ++ unfold pparams. cbn. rewrite length_map. exact Hcontext.
      * eauto.
      * unfold cumul_branches, cumul_branch in *.
        let X2 := match goal with H : All2 _ brs brs' |- _ => H end in

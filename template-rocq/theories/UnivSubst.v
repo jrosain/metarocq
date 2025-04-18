@@ -77,20 +77,31 @@ Proof.
 Qed.
 
 Lemma closedu_subst_instance u t
-  : closedu 0 t -> subst_instance u t = t.
+  : closedu 0 t -> closedq 0 t -> subst_instance u t = t.
 Proof.
   unfold subst_instance; cbn.
-  induction t in |- * using term_forall_list_ind; simpl; auto; intros H';
+  induction t in |- * using term_forall_list_ind; simpl; auto; intros Hu Hq;
     rewrite -> ?map_map_compose, ?compose_on_snd, ?compose_map_def, ?length_map,
                ?map_predicate_map_predicate, ?map_branch_map_branch;
     try f_equal; eauto with substu; unfold test_def, test_predicate in *;
       try solve [f_equal; eauto; repeat (rtoProp; solve_all; eauto with substu)].
 Qed.
 
-Lemma subst_instance_closedu (u : Instance.t) (Hcl : closedu_instance 0 u) t :
-  closedu #|u| t -> closedu 0 (subst_instance u t).
+Lemma subst_instance_closedu (u : Instance.t) (Hcl : closed_instance_universes 0 u) t :
+  closedu #|Instance.universes u| t -> closedu 0 (subst_instance u t).
 Proof.
-  induction t in |- * using term_forall_list_ind; simpl; auto; intros H';
+  induction t in |- * using term_forall_list_ind; simpl; auto; intros Hu;
+    rewrite -> ?map_map_compose, ?compose_on_snd, ?compose_map_def, ?length_map, ?forallb_map,
+               ?map_predicate_map_predicate;
+    try f_equal; auto with substu;
+      unfold test_def, test_predicate in *; simpl;
+      try solve [f_equal; eauto; repeat (rtoProp; solve_all); intuition auto with substu].
+Qed.
+
+Lemma subst_instance_closedq (u : Instance.t) (Hcl : closed_instance_qualities 0 u) t :
+  closedq #|Instance.qualities u| t -> closedq 0 (subst_instance u t).
+Proof.
+  induction t in |- * using term_forall_list_ind; simpl; auto; intros Hq;
     rewrite -> ?map_map_compose, ?compose_on_snd, ?compose_map_def, ?length_map, ?forallb_map,
                ?map_predicate_map_predicate;
     try f_equal; auto with substu;

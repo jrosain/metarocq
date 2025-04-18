@@ -1025,37 +1025,44 @@ Proof.
     destruct p; constructor; auto; constructor; tas.
 Qed.
 
-Lemma eq_context_upto_cumul_pb_context {cf:checker_flags} (Σ : global_env_ext) cmp_universe cmp_sort pb pb' :
+Lemma eq_context_upto_cumul_pb_context {cf:checker_flags} (Σ : global_env_ext) cmp_quality cmp_universe cmp_sort pb pb' :
+  RelationClasses.subrelation (cmp_quality Conv) eq_quality ->
   RelationClasses.subrelation (cmp_universe Conv) (eq_universe Σ) ->
   RelationClasses.subrelation (cmp_universe pb) (compare_universe Σ pb') ->
   RelationClasses.subrelation (cmp_sort Conv) (eq_sort Σ) ->
   RelationClasses.subrelation (cmp_sort pb) (compare_sort Σ pb') ->
-  subrelation (eq_context_upto Σ cmp_universe cmp_sort pb) (cumul_pb_context cumulAlgo_gen pb' Σ).
+  subrelation (eq_context_upto Σ cmp_quality cmp_universe cmp_sort pb) (cumul_pb_context cumulAlgo_gen pb' Σ).
 Proof.
   intros.
   etransitivity. 2: apply compare_context_cumul_pb_context.
   eapply eq_context_upto_impl; tc.
 Qed.
 
-Lemma eq_context_upto_conv_context {cf:checker_flags} (Σ : global_env_ext) cmp_universe cmp_sort :
+Lemma eq_context_upto_conv_context {cf:checker_flags} (Σ : global_env_ext) cmp_quality cmp_universe cmp_sort :
+  RelationClasses.subrelation (cmp_quality Conv) eq_quality ->
   RelationClasses.subrelation (cmp_universe Conv) (eq_universe Σ) ->
   RelationClasses.subrelation (cmp_sort Conv) (eq_sort Σ) ->
-  subrelation (eq_context_upto Σ cmp_universe cmp_sort Conv) (conv_context cumulAlgo_gen Σ).
+  subrelation (eq_context_upto Σ cmp_quality cmp_universe cmp_sort Conv) (conv_context cumulAlgo_gen Σ).
 Proof.
   intros.
   apply eq_context_upto_cumul_pb_context; tc.
 Qed.
 
-Lemma eq_context_upto_cumul_context {cf:checker_flags} (Σ : global_env_ext) cmp_universe cmp_sort :
+Lemma eq_context_upto_cumul_context {cf:checker_flags} (Σ : global_env_ext) cmp_quality cmp_universe cmp_sort :
+  RelationClasses.subrelation (cmp_quality Conv) eq_quality ->
   RelationClasses.subrelation (cmp_universe Conv) (eq_universe Σ) ->
   RelationClasses.subrelation (cmp_universe Cumul) (leq_universe Σ) ->
   RelationClasses.subrelation (cmp_sort Conv) (eq_sort Σ) ->
   RelationClasses.subrelation (cmp_sort Cumul) (leq_sort Σ) ->
-  subrelation (eq_context_upto Σ cmp_universe cmp_sort Cumul) (fun Γ Γ' => cumul_context cumulAlgo_gen Σ Γ Γ').
+  subrelation (eq_context_upto Σ cmp_quality cmp_universe cmp_sort Cumul) (fun Γ Γ' => cumul_context cumulAlgo_gen Σ Γ Γ').
 Proof.
   intros.
   apply eq_context_upto_cumul_pb_context; tc.
 Qed.
+
+#[global] Instance eq_subrel_eq_quality {cf:checker_flags} :
+  RelationClasses.subrelation eq eq_quality.
+Proof. intros ?? []. reflexivity. Qed.
 
 #[global]
 Instance eq_subrel_eq_univ {cf:checker_flags} Σ : RelationClasses.subrelation eq (eq_universe Σ).

@@ -1869,15 +1869,16 @@ Proof.
     eapply red_primArray_type; cbn; eauto.
 Defined.
 
-Lemma eq_term_upto_univ_inst Σ cmp_universe cmp_sort pb napp u v σ :
+Lemma eq_term_upto_univ_inst Σ cmp_quality cmp_universe cmp_sort pb napp u v σ :
+    RelationClasses.Reflexive (cmp_quality Conv) ->
     RelationClasses.Reflexive (cmp_universe Conv) ->
     RelationClasses.Reflexive (cmp_universe pb) ->
     RelationClasses.Reflexive (cmp_sort Conv) ->
     RelationClasses.Reflexive (cmp_sort pb) ->
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp u v ->
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp u.[σ] v.[σ].
+    eq_term_upto_univ_napp Σ cmp_quality cmp_universe cmp_sort pb napp u v ->
+    eq_term_upto_univ_napp Σ cmp_quality cmp_universe cmp_sort pb napp u.[σ] v.[σ].
 Proof using Type.
-  intros refl_univ_conv refl_univ_pb refl_sort_conv refl_sort_pb h.
+  intros refl_qual_conv refl_univ_conv refl_univ_pb refl_sort_conv refl_sort_pb h.
   induction u in v, pb, napp, σ, refl_univ_pb, refl_sort_pb, h |- * using term_forall_list_ind.
   all: dependent destruction h.
   all: try solve [

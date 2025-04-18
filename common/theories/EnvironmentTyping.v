@@ -235,6 +235,9 @@ Module Lookup (T : Term) (E : EnvironmentSig T).
   Definition global_ext_levels (Σ : global_env_ext) : LevelSet.t :=
     LevelSet.union (levels_of_udecl (snd Σ)) (global_levels Σ.1.(universes)).
 
+  Definition global_ext_qualities (Σ : global_env_ext) : QualitySet.t :=
+    QualitySet.union (qualities_of_udecl Σ.2) quality_constants_set.
+
   Definition global_ext_constraints (Σ : global_env_ext) : ConstraintSet.t :=
     ConstraintSet.union
       (constraints_of_udecl (snd Σ))
@@ -245,7 +248,32 @@ Module Lookup (T : Term) (E : EnvironmentSig T).
   Definition global_ext_uctx (Σ : global_env_ext) : ContextSet.t :=
     (global_ext_levels Σ, global_ext_constraints Σ).
 
+  Lemma global_ext_qsprop_InSet Σ :
+    QualitySet.In Quality.qSProp (global_ext_qualities Σ).
+  Proof.
+    apply QualitySet.union_spec; right.
+    do 2 rewrite QualitySetFact.add_iff.
+    rewrite QualitySetFact.singleton_iff; now repeat right.
+  Qed.    
 
+  Lemma global_ext_qprop_InSet Σ :
+    QualitySet.In Quality.qProp (global_ext_qualities Σ).
+  Proof.
+    apply QualitySet.union_spec; right.
+    do 2 rewrite QualitySetFact.add_iff; auto.
+  Qed.
+
+  Lemma global_ext_qtype_InSet Σ :
+    QualitySet.In Quality.qType (global_ext_qualities Σ).
+  Proof.
+    apply QualitySet.union_spec; right.
+    rewrite QualitySetFact.add_iff; auto.
+  Qed.
+
+  Ltac global_ext_qconst_InSet :=
+    try apply global_ext_qsprop_InSet; try apply global_ext_qprop_InSet;
+      try apply global_ext_qtype_InSet.
+  
   Lemma global_ext_levels_InSet Σ :
     LevelSet.In Level.lzero (global_ext_levels Σ).
   Proof.
@@ -256,25 +284,38 @@ Module Lookup (T : Term) (E : EnvironmentSig T).
   (** Check that [uctx] instantiated at [u] is consistent with
     the current universe graph. *)
 
-  Definition consistent_instance `{checker_flags} (lvs : LevelSet.t) (φ : ConstraintSet.t) uctx (u : Instance.t) :=
+  Definition consistent_instance `{checker_flags} (qs : QualitySet.t) (lvs : LevelSet.t) (φ : ConstraintSet.t) uctx (u : Instance.t) :=
     match uctx with
-    | Monomorphic_ctx => List.length u = 0
+    | Monomorphic_ctx => #|Instance.universes u| = 0 /\ #|Instance.qualities u| = 0
     | Polymorphic_ctx c =>
-      (* levels of the instance already declared *)
-      forallb (fun l => LevelSet.mem l lvs) u /\
-      List.length u = List.length c.1 /\
-      valid_constraints φ (subst_instance_cstrs u c.2)
+      (* qualities and levels of the instance already declared *)
+      forallb (fun q => QualitySet.mem q qs) (Instance.qualities u) = true /\
+        #|Instance.qualities u| = #|AUContext.qual_names c| /\
+        forallb (fun l => LevelSet.mem l lvs) (Instance.universes u) = true /\
+        #|Instance.universes u| = #|AUContext.univ_names c| /\
+        valid_constraints φ (subst_instance_cstrs u c.2)
     end.
 
   Definition consistent_instance_ext `{checker_flags} Σ :=
-    consistent_instance (global_ext_levels Σ) (global_ext_constraints Σ).
+    consistent_instance (global_ext_qualities Σ) (global_ext_levels Σ) (global_ext_constraints Σ).
 
-  Lemma consistent_instance_length {cf : checker_flags} {Σ : global_env_ext} {univs u} :
+  Lemma consistent_instance_univs_length {cf : checker_flags} {Σ : global_env_ext} {univs u} :
     consistent_instance_ext Σ univs u ->
-    #|u| = #|abstract_instance univs|.
+    #|Instance.universes u| = #|Instance.universes (abstract_instance univs)|.
   Proof.
     unfold consistent_instance_ext, consistent_instance.
-    destruct univs; simpl; auto.
+    destruct univs; simpl. tauto.
+    intros [_ [_ [_ [H _]]]].
+    destruct cst; simpl in *.
+    now rewrite H; cbn; autorewrite with len.
+  Qed.
+
+  Lemma consistent_instance_quals_length {cf : checker_flags} {Σ : global_env_ext} {univs u} :
+    consistent_instance_ext Σ univs u ->
+    #|Instance.qualities u| = #|Instance.qualities (abstract_instance univs)|.
+  Proof.
+    unfold consistent_instance_ext, consistent_instance.
+    destruct univs; simpl. tauto.
     intros [_ [H _]].
     destruct cst; simpl in *.
     now rewrite H; cbn; autorewrite with len.
@@ -1417,8 +1458,19 @@ Module GlobalMaps (T: Term) (E: EnvironmentSig T) (TU : TermUtils T E) (ET: EnvT
       | Level.lvar k => Level.lvar (n + k)
       end.
 
-    Definition lift_instance n l :=
-      map (lift_level n) l.
+    Definition lift_quality n q :=
+      match q with
+      | Quality.qVar (QVar.Var k) => Quality.var (n + k)
+      | Quality.qProp | Quality.qSProp | Quality.qType => q
+      end.
+
+    Definition lift_instance_universes n u :=
+      Instance.on_univs u (map (lift_level n)).
+
+    Definition lift_instance nq nu u :=
+      Instance.make
+        (map (lift_quality nq) (Instance.qualities u))
+        (map (lift_level nu) (Instance.universes u)).
 
     Definition lift_constraint n (c : Level.t * ConstraintType.t * Level.t) :=
       let '((l, r), l') := c in
@@ -1428,20 +1480,25 @@ Module GlobalMaps (T: Term) (E: EnvironmentSig T) (TU : TermUtils T E) (ET: EnvT
       ConstraintSet.fold (fun elt acc => ConstraintSet.add (lift_constraint n elt) acc)
         cstrs ConstraintSet.empty.
 
-    Definition level_var_instance n (inst : list name) :=
-      mapi_rec (fun i _ => Level.lvar i) inst n.
+    Definition var_instance n (inst : bound_names) :=
+      Instance.make
+        (mapi_rec (fun i _ => Quality.var i) inst.(Universes.qualities) n)
+        (mapi_rec (fun i _ => Level.lvar i) inst.(Universes.universes) n).
 
-    Fixpoint variance_cstrs (v : list Variance.t) (u u' : Instance.t) :=
+    Fixpoint variance_cstrs_ (v : list Variance.t) (u u' : list Level.t) :=
       match v, u, u' with
       | _, [], [] => ConstraintSet.empty
       | v :: vs, u :: us, u' :: us' =>
         match v with
-        | Variance.Irrelevant => variance_cstrs vs us us'
-        | Variance.Covariant => ConstraintSet.add (u, ConstraintType.Le 0, u') (variance_cstrs vs us us')
-        | Variance.Invariant => ConstraintSet.add (u, ConstraintType.Eq, u') (variance_cstrs vs us us')
+        | Variance.Irrelevant => variance_cstrs_ vs us us'
+        | Variance.Covariant => ConstraintSet.add (u, ConstraintType.Le 0, u') (variance_cstrs_ vs us us')
+        | Variance.Invariant => ConstraintSet.add (u, ConstraintType.Eq, u') (variance_cstrs_ vs us us')
         end
       | _, _, _ => (* Impossible due to on_variance invariant *) ConstraintSet.empty
       end.
+
+    Definition variance_cstrs (v : list Variance.t) (u u' : list Level.t) :=
+      variance_cstrs_ v u u'.
 
     (** This constructs a duplication of the polymorphic universe context of the inductive,
       where the two instances are additionally related according to the variance information.
@@ -1452,11 +1509,13 @@ Module GlobalMaps (T: Term) (E: EnvironmentSig T) (TU : TermUtils T E) (ET: EnvT
       | Monomorphic_ctx => None
       | Polymorphic_ctx auctx =>
         let (inst, cstrs) := auctx in
-        let u' := level_var_instance 0 inst in
-        let u := lift_instance #|inst| u' in
-        let cstrs := ConstraintSet.union cstrs (lift_constraints #|inst| cstrs) in
-        let cstrv := variance_cstrs v u u' in
-        let auctx' := (inst ++ inst, ConstraintSet.union cstrs cstrv) in
+        let u' := var_instance 0 inst in
+        let nq := #|inst.(Universes.qualities)| in
+        let nu := #|inst.(Universes.universes)| in
+        let u := lift_instance nq nu u' in
+        let cstrs := ConstraintSet.union cstrs (lift_constraints nu cstrs) in
+        let cstrv := variance_cstrs v (Instance.universes u) (Instance.universes u') in
+        let auctx' := (append_bound_names inst inst, ConstraintSet.union cstrs cstrv) in
         Some (Polymorphic_ctx auctx', u, u')
       end.
 
@@ -1699,7 +1758,7 @@ Module GlobalMaps (T: Term) (E: EnvironmentSig T) (TU : TermUtils T E) (ET: EnvT
             [/\ (variance_universes univs v = Some (univs', i, i')),
               consistent_instance_ext (Σ, univs') univs i,
               consistent_instance_ext (Σ, univs') univs i' &
-              List.length v = #|UContext.instance (AUContext.repr auctx)|]
+              List.length v = #|UContext.univs_instance (AUContext.repr auctx)|]
         end
       end.
 
