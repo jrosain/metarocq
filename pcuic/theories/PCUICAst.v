@@ -116,7 +116,8 @@ Section map_predicate_k.
   Definition test_predicate_ku (instp : nat -> Instance.t -> bool)
     (p : nat -> term -> bool) k (pred : predicate term) :=
     instp k pred.(puinst) && forallb (p k) pred.(pparams) &&
-    test_context (p #|pred.(puinst)|) pred.(pcontext) &&
+    test_context (p #|Instance.universes pred.(puinst)|) pred.(pcontext) &&
+    test_context (p #|Instance.qualities pred.(puinst)|) pred.(pcontext) &&
     p k pred.(preturn).
 
 End map_predicate_k.
@@ -433,18 +434,19 @@ Instance subst_instance_constr : UnivSubst term :=
 Fixpoint closedu (k : nat) (t : term) : bool :=
   match t with
   | tSort s => closedu_sort k s
-  | tInd _ u => closedu_instance k u
-  | tConstruct _ _ u => closedu_instance k u
-  | tConst _ u => closedu_instance k u
+  | tInd _ u => closed_instance k u
+  | tConstruct _ _ u => closed_instance k u
+  | tConst _ u => closed_instance k u
   | tRel i => true
   | tEvar ev args => forallb (closedu k) args
   | tLambda _ T M | tProd _ T M => closedu k T && closedu k M
   | tApp u v => closedu k u && closedu k v
   | tLetIn na b t b' => closedu k b && closedu k t && closedu k b'
   | tCase ind p c brs =>
-    let p' := test_predicate_ku closedu_instance closedu k p in
-    let brs' := forallb (test_branch (closedu #|p.(puinst)|) (closedu k)) brs in
-    p' && closedu k c && brs'
+    let p' := test_predicate_ku closed_instance closedu k p in
+    let brs' := forallb (test_branch (closedu #|Instance.universes p.(puinst)|) (closedu k)) brs in
+    let brs'' := forallb (test_branch (closedu #|Instance.qualities p.(puinst)|) (closedu k)) brs in
+    p' && closedu k c && brs' && brs''
   | tProj p c => closedu k c
   | tFix mfix idx =>
     forallb (test_def (closedu k) (closedu k)) mfix
@@ -548,7 +550,7 @@ Local Ltac fcase c :=
 
 Definition string_of_predicate {term} (f : term -> string) (p : predicate term) :=
   "(" ^ "(" ^ String.concat "," (map f (pparams p)) ^ ")"
-  ^ "," ^ string_of_universe_instance (puinst p)
+  ^ "," ^ string_of_instance (puinst p)
   ^ ",(" ^ String.concat "," (map (string_of_name ∘ binder_name ∘ decl_name) (pcontext p)) ^ ")"
   ^ "," ^ f (preturn p) ^ ")".
 

@@ -174,25 +174,25 @@ Module PrintTermTree.
                       print_term (na' :: Γ) true body)
   | tApp f l =>
     parens top (print_term Γ false f ^ " " ^ print_list (print_term Γ false) " " l)
-  | tConst c u => string_of_kername c ^ print_universe_instance u
+  | tConst c u => string_of_kername c ^ print_instance u
   | tInd (mkInd i k) u =>
     match lookup_ind_decl Σ i k with
-    | Some oib => oib.(ind_name) ^ print_universe_instance u
+    | Some oib => oib.(ind_name) ^ print_instance u
     | None =>
-      "UnboundInd(" ^ string_of_inductive (mkInd i k) ^ "," ^ string_of_universe_instance u ^ ")"
+      "UnboundInd(" ^ string_of_inductive (mkInd i k) ^ "," ^ string_of_instance u ^ ")"
     end
   | tConstruct (mkInd i k as ind) l u =>
     match lookup_ind_decl Σ i k with
     | Some oib =>
       match nth_error oib.(ind_ctors) l with
-      | Some cb => cb.(cstr_name) ^ print_universe_instance u
+      | Some cb => cb.(cstr_name) ^ print_instance u
       | None =>
         "UnboundConstruct(" ^ string_of_inductive ind ^ "," ^ string_of_nat l ^ ","
-                            ^ string_of_universe_instance u ^ ")"
+                            ^ string_of_instance u ^ ")"
       end
     | None =>
       "UnboundConstruct(" ^ string_of_inductive ind ^ "," ^ string_of_nat l ^ ","
-                          ^ string_of_universe_instance u ^ ")"
+                          ^ string_of_instance u ^ ")"
     end
   | tCase {| ci_ind := mkInd mind i as ind; ci_npar := pars |} p t brs =>
     match lookup_ind_decl Σ mind i with

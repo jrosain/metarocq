@@ -27,12 +27,13 @@ struct
   type quoted_proj = projection
   type quoted_global_reference = global_reference
 
+  type quoted_quality = Universes0.Quality.t
   type quoted_sort_family = Universes0.allowed_eliminations
   type quoted_constraint_type = Universes0.ConstraintType.t
   type quoted_univ_constraint = Universes0.UnivConstraint.t
   type quoted_univ_constraints = Universes0.ConstraintSet.t
   type quoted_univ_level = Universes0.Level.t
-  type quoted_univ_instance = Universes0.Instance.t
+  type quoted_instance = Universes0.Instance.t
   type quoted_univ_context = Universes0.UContext.t
   type quoted_univ_contextset = Universes0.ContextSet.t
   type quoted_abstract_univ_context = Universes0.AUContext.t
@@ -99,6 +100,19 @@ struct
       let levels = Univ.Universe.repr u |> List.map quote_level_expr in
       Universes0.Universe.from_kernel_repr (List.hd levels) (List.tl levels)
 
+  let quote_qvar q =
+    match Sorts.QVar.repr q with
+    | Sorts.QVar.Var i -> BasicAst.QVar.var (quote_int i)
+    | Sorts.QVar.Unif _ -> CErrors.anomaly (Pp.str "Cannot quote a non-instantiated quality variable")
+
+  let quote_quality q =
+    let open Sorts.Quality in
+    match q with
+    | QConstant QSProp -> Universes0.Quality.Coq_qSProp
+    | QConstant QProp -> Universes0.Quality.Coq_qProp
+    | QConstant QType -> Universes0.Quality.Coq_qType
+    | QVar q -> Universes0.Quality.Coq_qVar (quote_qvar q)
+
   let quote_sort s = match s with
   | Sorts.Set -> Universes0.Sort.type0
   | Sorts.SProp -> Universes0.Sort.Coq_sSProp
@@ -160,13 +174,12 @@ struct
 
   let quote_univ_level = quote_level
 
-  let quote_univ_instance (i : UVars.Instance.t) : quoted_univ_instance =
+  let quote_instance (i : UVars.Instance.t) : quoted_instance =
     let qarr, uarr = UVars.Instance.to_array i in
-    let () = if not (CArray.is_empty qarr) then
-        CErrors.user_err Pp.(str "Quoting sort polymorphic instances not yet supported.")
-    in
     (* we assume that valid instances do not contain [Prop] or [SProp] *)
-    try CArray.map_to_list quote_level uarr
+    try Universes0.Instance.make
+	  (CArray.map_to_list quote_quality qarr)
+	  (CArray.map_to_list quote_level uarr)
     with e -> assert false
 
    (* (Prop, Le | Lt, l),  (Prop, Eq, Prop) -- trivial, (l, c, Prop)  -- unsatisfiable  *)
@@ -188,13 +201,11 @@ struct
 
   let quote_univ_context (uctx : UVars.UContext.t) : quoted_univ_context =
     let qarr, uarr = (UVars.UContext.names uctx) in
-    let () = if not (CArray.is_empty qarr) then
-        CErrors.user_err Pp.(str "Quoting sort polymorphic ucontext not yet supported.")
-    in
-    let names = CArray.map_to_list quote_name uarr  in
-    let levels = UVars.UContext.instance uctx  in
+    let qnames = CArray.map_to_list quote_name qarr  in
+    let unames = CArray.map_to_list quote_name uarr  in
+    let inst = UVars.UContext.instance uctx  in
     let constraints = UVars.UContext.constraints uctx in
-    (names, (quote_univ_instance levels, quote_univ_constraints constraints))
+    (Universes0.mk_bound_names qnames unames, (quote_instance inst, quote_univ_constraints constraints))
 
   let quote_univ_contextset (uctx : Univ.ContextSet.t) : quoted_univ_contextset =
     let levels = List.map quote_level (Univ.Level.Set.elements (Univ.ContextSet.levels uctx)) in
@@ -202,13 +213,11 @@ struct
     (Universes0.LevelSetProp.of_list levels, quote_univ_constraints constraints)
 
   let quote_abstract_univ_context uctx : quoted_abstract_univ_context =
-    let qnames, unames = UVars.AbstractContext.names uctx in
-    let () = if not (CArray.is_empty qnames) then
-        CErrors.user_err Pp.(str "Quoting sort polymorphic abstract universe context not yet supported.")
-    in
-    let levels = CArray.map_to_list quote_name unames in
+    let qarr, uarr = UVars.AbstractContext.names uctx in
+    let qnames = CArray.map_to_list quote_name qarr in
+    let unames = CArray.map_to_list quote_name uarr in
     let constraints = UVars.UContext.constraints (UVars.AbstractContext.repr uctx) in
-    (levels, quote_univ_constraints constraints)
+    (Universes0.mk_bound_names qnames unames, quote_univ_constraints constraints)
 
   let quote_context_decl na b t =
     { decl_name = na;
@@ -382,7 +391,7 @@ struct
 
   let inspectTerm (t : term) :  (term, quoted_int, quoted_ident, quoted_name, quoted_sort, quoted_cast_kind,
     quoted_kernel_name, quoted_inductive, quoted_relevance, quoted_univ_level,
-    quoted_univ_instance, quoted_proj,
+    quoted_instance, quoted_proj,
     quoted_int63, quoted_float64, quoted_pstring) structure_of_term =
    match t with
   | Coq_tRel n -> ACoq_tRel n

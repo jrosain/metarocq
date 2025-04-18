@@ -87,8 +87,9 @@ Proof.
       try solve [f_equal; eauto; repeat (rtoProp; solve_all; eauto with substu)].
 Qed.
 
-Lemma subst_instance_closedu (u : Instance.t) (Hcl : closedu_instance 0 u) t :
-  closedu #|u| t -> closedu 0 (subst_instance u t).
+Lemma subst_instance_closedu (u : Instance.t) (Hcl : closed_instance 0 u) t :
+  closedu #|Instance.universes u| t -> closedu #|Instance.qualities u| t ->
+  closedu 0 (subst_instance u t).
 Proof.
   induction t in |- * using term_forall_list_ind; simpl; auto; intros H';
     rewrite -> ?map_map_compose, ?compose_on_snd, ?compose_map_def, ?length_map, ?forallb_map,

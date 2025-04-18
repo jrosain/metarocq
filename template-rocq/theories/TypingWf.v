@@ -980,6 +980,7 @@ Section TypingWf.
       apply wf_inds.
       apply wf_subst_instance.
       eapply declared_constructor_wf; eauto.
+      exact (Instance.universes u).
 
     - destruct X3 as [wfret wps].
       destruct X6 as [wfc wfapps].

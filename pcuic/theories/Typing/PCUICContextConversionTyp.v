@@ -228,11 +228,13 @@ Proof.
       unshelve eapply (@cumulAlgo_cumulSpec _ _ Cumul). apply into_ws_cumul_pb; eauto.
       now intuition.
   - constructor; pcuic.
-    eapply forall_Γ'0; constructor; pcuic. eapply lift_sorting_forget_univ. now eapply forall_Γ'.
+    eapply forall_Γ'0; constructor; pcuic.
+    1: { constructor; auto. constructor. reflexivity. }
+    eapply lift_sorting_forget_univ. now eapply forall_Γ'.
   - econstructor; pcuic.
-    eapply forall_Γ'0; repeat (constructor; pcuic).
+    eapply forall_Γ'0; repeat (constructor; pcuic). reflexivity.
   - econstructor; pcuic.
-    eapply forall_Γ'0; repeat (constructor; pcuic).
+    eapply forall_Γ'0; repeat (constructor; pcuic). reflexivity.
   - econstructor; eauto. 2,3: constructor; eauto.
     * eapply IHp0. rewrite /predctx.
       eapply All2_fold_app => //.

@@ -1358,9 +1358,9 @@ Lemma term_on_free_vars_ind :
     (forall p (t u : term),
       on_free_vars p t -> P p t ->
       on_free_vars p u -> P p u -> P p (tApp t u)) ->
-    (forall p s (u : list Level.t), P p (tConst s u)) ->
-    (forall p (i : inductive) (u : list Level.t), P p (tInd i u)) ->
-    (forall p (i : inductive) (c : nat) (u : list Level.t), P p (tConstruct i c u)) ->
+    (forall p s (u : Instance.t), P p (tConst s u)) ->
+    (forall p (i : inductive) (u : Instance.t), P p (tInd i u)) ->
+    (forall p (i : inductive) (c : nat) (u : Instance.t), P p (tConstruct i c u)) ->
     (forall p (ci : case_info) (pred : predicate term) discr brs,
       All (on_free_vars p) pred.(pparams) ->
       All (P p) pred.(pparams) ->

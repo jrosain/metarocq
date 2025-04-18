@@ -19,6 +19,7 @@ struct
   type quoted_aname = name binder_annot
   type quoted_qvar = BasicAst.QVar.t
   type quoted_relevance = relevance
+  type quoted_quality = Universes0.Quality.t
   type quoted_sort = Universes0.Sort.t
   type quoted_cast_kind = cast_kind
   type quoted_kernel_name = kername
@@ -31,7 +32,7 @@ struct
   type quoted_univ_constraint = Universes0.UnivConstraint.t
   type quoted_univ_constraints = Universes0.ConstraintSet.t
   type quoted_univ_level = Universes0.Level.t
-  type quoted_univ_instance = Universes0.Instance.t
+  type quoted_instance = Universes0.Instance.t
   type quoted_univ_context = Universes0.UContext.t
   type quoted_univ_contextset = Universes0.ContextSet.t
   type quoted_abstract_univ_context = Universes0.AUContext.t
@@ -87,7 +88,7 @@ struct
       rarg=rarg x
     }
 
-  let unquote_predicate (x: 't Ast0.predicate) : ('t, quoted_aname, quoted_univ_instance) apredicate =
+  let unquote_predicate (x: 't Ast0.predicate) : ('t, quoted_aname, quoted_instance) apredicate =
     {
       auinst = puinst x;
       apars = pparams x;
@@ -105,7 +106,7 @@ struct
       aci_relevance = x.ci_relevance }
 
   let inspect_term (tt: t):(t, quoted_int, quoted_ident, quoted_aname, quoted_sort, quoted_cast_kind,
-    quoted_kernel_name, quoted_inductive, quoted_relevance, quoted_univ_level, quoted_univ_instance, quoted_proj,
+    quoted_kernel_name, quoted_inductive, quoted_relevance, quoted_univ_level, quoted_instance, quoted_proj,
     quoted_int63, quoted_float64, quoted_pstring) structure_of_term =
     match tt with
     | Coq_tRel n -> ACoq_tRel n
@@ -147,6 +148,14 @@ struct
     | BasicAst.Relevant -> Sorts.Relevant
     | BasicAst.Irrelevant -> Sorts.Irrelevant
     | BasicAst.RelevanceVar q -> Sorts.RelevanceVar (unquote_qvar q)
+
+  let unquote_quality (q: quoted_quality) : Sorts.Quality.t =
+    let open Sorts.Quality in
+    match q with
+    | Universes0.Quality.Coq_qSProp -> QConstant QSProp
+    | Universes0.Quality.Coq_qProp -> QConstant QProp
+    | Universes0.Quality.Coq_qType -> QConstant QType
+    | Universes0.Quality.Coq_qVar q -> QVar (unquote_qvar q)
 
   let unquote_name (q: quoted_name) : Name.t =
     match q with
@@ -197,7 +206,7 @@ struct
     let { inductive_mind = kn; inductive_ind = i } = q in
     (MutInd.make1 (unquote_kn kn), unquote_int i)
 
-  (*val unquote_univ_instance :  quoted_univ_instance -> UVars.Instance.t *)
+  (*val unquote_instance :  quoted_instance -> UVars.Instance.t *)
   let unquote_proj (q : quoted_proj) : (quoted_inductive * quoted_int * quoted_int) =
     let { proj_ind = ind; proj_npars = ps; proj_arg = idx } = q in
     (ind, ps, idx)
@@ -237,8 +246,10 @@ struct
 
   let unquote_universe_level evm l = evm, unquote_level l
 
-  let unquote_universe_instance(evm: Evd.evar_map) (l: quoted_univ_instance): Evd.evar_map * UVars.Instance.t
-  = (evm,  UVars.Instance.of_array ([||], Array.of_list (List.map unquote_level l)))
+  let unquote_instance(evm: Evd.evar_map) (inst: quoted_instance): Evd.evar_map * UVars.Instance.t =
+    let qarr = Array.of_list (List.map unquote_quality (Universes0.Instance.qualities inst)) in
+    let uarr = Array.of_list (List.map unquote_level (Universes0.Instance.universes inst)) in
+    (evm, UVars.Instance.of_array (qarr, uarr))
 
 
   let unquote_global_reference (trm : Kernames.global_reference) : GlobRef.t =

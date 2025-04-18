@@ -17,7 +17,7 @@ Module string_of_term_tree.
 
   Definition string_of_predicate {term} (f : term -> t) (p : predicate term) :=
     "(" ^ "(" ^ concat "," (map f (pparams p)) ^ ")"
-    ^ "," ^ string_of_universe_instance (puinst p)
+    ^ "," ^ string_of_instance (puinst p)
     ^ ",(" ^ String.concat "," (map (string_of_name ∘ binder_name) (pcontext p)) ^ ")"
     ^ "," ^ f (preturn p) ^ ")".
 
@@ -54,10 +54,10 @@ Module string_of_term_tree.
                                  ^ string_of_term t' ^ ","
                                  ^ string_of_term t ^ ")"
   | tApp f l => "App(" ^ string_of_term f ^ "," ^ string_of_list string_of_term l ^ ")"
-  | tConst c u => "Const(" ^ string_of_kername c ^ "," ^ string_of_universe_instance u ^ ")"
-  | tInd i u => "Ind(" ^ string_of_inductive i ^ "," ^ string_of_universe_instance u ^ ")"
+  | tConst c u => "Const(" ^ string_of_kername c ^ "," ^ string_of_instance u ^ ")"
+  | tInd i u => "Ind(" ^ string_of_inductive i ^ "," ^ string_of_instance u ^ ")"
   | tConstruct i n u => "Construct(" ^ string_of_inductive i ^ "," ^ string_of_nat n ^ ","
-                                    ^ string_of_universe_instance u ^ ")"
+                                    ^ string_of_instance u ^ ")"
   | tCase ci p t brs =>
     "Case(" ^ string_of_case_info ci ^ ","
             ^ string_of_predicate string_of_term p ^ ","
