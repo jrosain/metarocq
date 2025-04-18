@@ -65,6 +65,8 @@ Qed.
 
 #[global] Existing Instance All2_reflexivity.
 
+Ltac split_cumul_pred := split; [|split]; [| |repeat split].
+
 Section CumulSpecIsCumulAlgo.
 
   Context {cf:checker_flags} (Σ : global_env_ext).
@@ -74,22 +76,22 @@ Section CumulSpecIsCumulAlgo.
   Proof.
   intro r. induction r using red1_ind_all; try (econstructor; eauto; reflexivity).
   - eapply cumul_Case; try reflexivity.
-    * destruct p as [p x]. cbn in *. try repeat split; cbn; try reflexivity.
+    * destruct p as [p x]. cbn in *. split_cumul_pred; cbn; try reflexivity.
       change (fun t u => Σ ;;; Γ ⊢ t ≤s[Conv] u) with (convSpec Σ Γ).
       induction X; econstructor; try reflexivity; try eassumption. exact (p.2).
     * apply All2_reflexivity. eapply Prod_reflexivity; intro x; reflexivity.
   - eapply cumul_Case; try reflexivity.
     * change (fun Γ t u => Σ ;;; Γ ⊢ t ≤s[Conv] u) with (convSpec Σ).
-      destruct p as [p x]. cbn in *. try repeat split; cbn; try reflexivity; eauto.
+      destruct p as [p x]. cbn in *. split_cumul_pred; cbn; try reflexivity; eauto.
     * apply All2_reflexivity. eapply Prod_reflexivity; intro x; reflexivity.
   - eapply cumul_Case; try reflexivity.
     * change (fun Γ t u => Σ ;;; Γ ⊢ t ≤s[Conv] u) with (convSpec Σ).
-      destruct p as [p x]. cbn in *. try repeat split; cbn; try reflexivity; eauto.
+      destruct p as [p x]. cbn in *. split_cumul_pred; cbn; try reflexivity; eauto.
     * eauto.
     * apply All2_reflexivity. eapply Prod_reflexivity; intro x; reflexivity.
   - eapply cumul_Case; try reflexivity.
     * change (fun Γ t u => Σ ;;; Γ ⊢ t ≤s[Conv] u) with (convSpec Σ).
-      destruct p as [p x]. cbn in *. try repeat split; cbn; try reflexivity; eauto.
+      destruct p as [p x]. cbn in *. split_cumul_pred; cbn; try reflexivity; eauto.
     * induction X; econstructor.
       + unfold cumul_branch. destruct p0 as [ [ _ hbody ] hhd ]. rewrite hhd. split; eauto. reflexivity.
       + apply All2_reflexivity. eapply Prod_reflexivity; intro x; reflexivity.
@@ -172,7 +174,7 @@ Section CumulSpecIsCumulAlgo.
     - eapply cumul_Construct; eauto.
     - apply cumul_mkApps; eauto. unfold tCasePredProp in X. destruct X as [ X [ Xctx Xreturn ]].
       eapply cumul_Case.
-      * unfold cumul_predicate, eq_predicate in *. repeat split.
+      * unfold cumul_predicate, eq_predicate in *. split_cumul_pred.
         + destruct e. eapply All2_All_mix_left in X. 2: tea.
           eapply All2_impl. 1: eassumption. cbn. intuition.
           try_with_nil.
@@ -1063,15 +1065,15 @@ Section Inversions.
   Qed.
 
   Lemma eq_term_upto_univ_conv_arity_l :
-    forall cmp_universe cmp_sort pb Γ u v,
+    forall cmp_quality cmp_universe cmp_sort pb Γ u v,
       isArity u ->
       is_closed_context Γ ->
       is_open_term Γ u ->
       is_open_term Γ v ->
-      eq_term_upto_univ Σ cmp_universe cmp_sort pb u v ->
+      eq_term_upto_univ Σ cmp_quality cmp_universe cmp_sort pb u v ->
       Is_conv_to_Arity Σ Γ v.
   Proof using Type.
-    intros cmp_universe cmp_sort pb Γ u v a clΓ clu clv e.
+    intros cmp_quality cmp_universe cmp_sort pb Γ u v a clΓ clu clv e.
     induction u in Γ, clΓ, clv, clu, a, v, pb, e |- *. all: try (cbn [isArity] in *; congruence).
     all: dependent destruction e.
     - eexists. split.
@@ -1098,15 +1100,15 @@ Section Inversions.
   Qed.
 
   Lemma eq_term_upto_univ_conv_arity_r :
-    forall cmp_universe cmp_sort pb Γ u v,
+    forall cmp_quality cmp_universe cmp_sort pb Γ u v,
     isArity u ->
     is_closed_context Γ ->
     is_open_term Γ u ->
     is_open_term Γ v ->
-    eq_term_upto_univ Σ cmp_universe cmp_sort pb v u ->
+    eq_term_upto_univ Σ cmp_quality cmp_universe cmp_sort pb v u ->
     Is_conv_to_Arity Σ Γ v.
   Proof using Type.
-    intros cmp_universe cmp_sort pb Γ u v a clΓ clu clv e.
+    intros cmp_quality cmp_universe cmp_sort pb Γ u v a clΓ clu clv e.
     induction u in Γ, clΓ, clv, clu, a, v, pb, e |- *. all: try (cbn [isArity] in *; congruence).
     all: dependent destruction e.
     - eexists. split.
@@ -1403,7 +1405,7 @@ Section Inversions.
     ∑ u' args',
       [× Σ ;;; Γ ⊢ T ⇝ mkApps (tConst cst u') args',
          All2 (fun args args' => Σ ;;; Γ ⊢ args ≤[Conv] args') args args' &
-         PCUICEquality.cmp_universe_instance (eq_universe Σ) u u'].
+         PCUICEquality.cmp_instance eq_quality (eq_universe Σ) u u'].
   Proof using wfΣ.
     intros hdecl hb H.
     eapply ws_cumul_pb_red in H as (v & v' & [tv tv' eqp]).
@@ -1425,7 +1427,7 @@ Section Inversions.
     ∑ u' args',
       [× Σ ;;; Γ ⊢ T ⇝ mkApps (tConst cst u') args',
          All2 (fun args args' => Σ ;;; Γ ⊢ args ≤[Conv] args') args' args &
-         PCUICEquality.cmp_universe_instance (eq_universe Σ) u' u].
+         PCUICEquality.cmp_instance eq_quality (eq_universe Σ) u' u].
   Proof using wfΣ.
     intros hdecl hb H.
     eapply ws_cumul_pb_red in H as (v & v' & [tv tv' eqp]).
@@ -1618,7 +1620,7 @@ Qed.
 
 Definition ws_cumul_pb_predicate {cf} Σ Γ p p' :=
   [× ws_cumul_pb_terms Σ Γ p.(pparams) p'.(pparams),
-     cmp_universe_instance (eq_universe Σ) (puinst p) (puinst p'),
+     cmp_instance eq_quality (eq_universe Σ) (puinst p) (puinst p'),
      eq_context_upto_names (pcontext p) (pcontext p') &
      Σ ;;; Γ ,,, inst_case_predicate_context p ⊢ preturn p = preturn p'].
 
@@ -1927,7 +1929,7 @@ Section ConvRedConv.
   Qed.
 
   #[global]
-  Instance all_eq_term_refl : Reflexive (All2 (eq_term_upto_univ Σ.1 (compare_universe Σ) (compare_sort Σ) Conv)).
+  Instance all_eq_term_refl : Reflexive (All2 (eq_term_upto_univ Σ.1 compare_quality (compare_universe Σ) (compare_sort Σ) Conv)).
   Proof using Type.
     intros x. apply All2_same. intros. reflexivity.
   Qed.
@@ -2081,7 +2083,7 @@ Section ConvRedConv.
 
   Instance eqbrs_refl : Reflexive (All2 (fun x y : branch term =>
       eq_context_upto_names (bcontext x) (bcontext y) *
-      eq_term_upto_univ Σ.1 (compare_universe Σ) (compare_sort Σ) Conv (bbody x) (bbody y))).
+      eq_term_upto_univ Σ.1 compare_quality (compare_universe Σ) (compare_sort Σ) Conv (bbody x) (bbody y))).
   Proof using Type. intros brs; eapply All2_refl; split; reflexivity. Qed.
 
   Lemma ws_cumul_pb_Case_p {Γ ci c brs p p'} :
@@ -2105,7 +2107,7 @@ Section ConvRedConv.
         eapply red_case; try reflexivity.
         cbn. apply redr.
       - constructor; try reflexivity.
-        repeat split; try reflexivity.
+        split_cumul_pred; try reflexivity.
         cbn. apply eq. }
     etransitivity; tea.
     set (pret := set_preturn p (preturn p')).
@@ -2154,13 +2156,13 @@ Section ConvRedConv.
           { cbn. eapply All2_app; try reflexivity.
             constructor; [apply redr|]; reflexivity. } }
         cbn; constructor; try reflexivity.
-        repeat split; try reflexivity.
+        split_cumul_pred; try reflexivity.
         cbn. eapply All2_app; try reflexivity.
         constructor => //; reflexivity. }
     etransitivity; tea.
     apply into_ws_cumul_pb; auto.
     { destruct p'; cbn in *; unfold set_pparams, ppuinst, pret; cbn.
-      repeat constructor; cbn; try reflexivity; tas. }
+      do 2 constructor; [split_cumul_pred|repeat constructor|repeat constructor]; cbn; try reflexivity; tas. }
     1:eauto with fvs.
     cbn.
     move/and3P: onp' => [] -> -> -> /=.
@@ -3373,7 +3375,7 @@ Qed.
 
 Lemma subst_instance_ws_cumul_ctx_pb {cf:checker_flags} {Σ : global_env_ext} {wfΣ : wf Σ} {Δ u u'} pb :
   wf_local Σ (subst_instance u Δ) ->
-  cmp_universe_instance (eq_universe (global_ext_constraints Σ)) u u' ->
+  cmp_instance eq_quality (eq_universe (global_ext_constraints Σ)) u u' ->
   ws_cumul_ctx_pb pb Σ (subst_instance u Δ) (subst_instance u' Δ).
 Proof.
   move=> wf equ.
@@ -3432,7 +3434,7 @@ Qed.
 
 Lemma subst_instance_ws_cumul_ctx_pb_rel {cf:checker_flags} {Σ} {wfΣ : wf Σ} {Γ Δ u u' pb} :
   is_closed_context (Γ ,,, Δ) ->
-  cmp_universe_instance (eq_universe Σ) u u' ->
+  cmp_instance eq_quality (eq_universe Σ) u u' ->
   ws_cumul_ctx_pb_rel pb Σ Γ (subst_instance u Δ) (subst_instance u' Δ).
 Proof.
   move=> equ.
@@ -3479,7 +3481,7 @@ Proof.
 Qed.
 
 Lemma eq_term_inds {cf:checker_flags} (Σ : global_env_ext) u u' ind mdecl :
-  cmp_universe_instance (eq_universe (global_ext_constraints Σ)) u u' ->
+  cmp_instance eq_quality (eq_universe (global_ext_constraints Σ)) u u' ->
   All2 (eq_term Σ Σ) (inds (inductive_mind ind) u (ind_bodies mdecl))
     (inds (inductive_mind ind) u' (ind_bodies mdecl)).
 Proof.
@@ -3492,7 +3494,7 @@ Proof.
 Qed.
 
 Lemma conv_inds {cf:checker_flags} (Σ : global_env_ext) Γ u u' ind mdecl :
-  cmp_universe_instance (eq_universe (global_ext_constraints Σ)) u u' ->
+  cmp_instance eq_quality (eq_universe (global_ext_constraints Σ)) u u' ->
   is_closed_context Γ ->
   ws_cumul_pb_terms Σ Γ (inds (inductive_mind ind) u (ind_bodies mdecl))
     (inds (inductive_mind ind) u' (ind_bodies mdecl)).
@@ -3505,15 +3507,21 @@ Proof.
   apply cmp_instance_opt_variance; simpl; assumption.
 Qed.
 
-Lemma cmp_global_instance_length Σ Req Rle ref napp i i' :
-  cmp_global_instance Σ Req Rle ref napp i i' -> #|i| = #|i'|.
+Lemma cmp_global_instance_length Σ Rq Req Rle ref napp i i' :
+  cmp_global_instance Σ Rq Req Rle ref napp i i' -> #|Instance.universes i| = #|Instance.universes i'|.
 Proof.
   apply cmp_opt_variance_length.
 Qed.
 
-Lemma cmp_universe_instance_variance_irrelevant cmp_universe pb i i' :
-  #|i| = #|i'| ->
-  cmp_opt_variance cmp_universe pb AllIrrelevant i i'.
+Lemma cmp_global_instance_length' Σ Rq Req Rle ref napp i i' :
+  cmp_global_instance Σ Rq Req Rle ref napp i i' -> #|Instance.qualities i| = #|Instance.qualities i'|.
+Proof.
+  apply cmp_opt_variance_length'.
+Qed.
+
+Lemma cmp_universe_instance_variance_irrelevant cmp_quality cmp_universe pb i i' :
+  Instance.eq_length i i' ->
+  cmp_opt_variance cmp_quality cmp_universe pb AllIrrelevant i i'.
 Proof.
   auto.
 Qed.

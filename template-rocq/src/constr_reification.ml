@@ -11,6 +11,7 @@ struct
   type quoted_aname = Constr.t (* of type BasicAst.aname (names with relevance) *)
   type quoted_qvar = Constr.t (* of type BasicAst.QVar.t (integers representing variables) *)
   type quoted_relevance = Constr.t (* of type BasicAst.relevance *)
+  type quoted_quality = Constr.t (* of type Universes.Quality.t *)
   type quoted_sort = Constr.t (* of type Ast.universe *)
   type quoted_cast_kind = Constr.t  (* of type Ast.cast_kind *)
   type quoted_kernel_name = Constr.t (* of type Ast.kername *)
@@ -26,7 +27,7 @@ struct
   type quoted_univ_constraint = Constr.t (* of type Universes.univ_constraint *)
   type quoted_univ_constraints = Constr.t (* of type Universes.constraints *)
   type quoted_univ_level = Constr.t (* of type Universes.Level.t *)
-  type quoted_univ_instance = Constr.t (* of type Universes.universe_instance *)
+  type quoted_instance = Constr.t (* of type Universes.universe_instance *)
   type quoted_univ_context = Constr.t (* of type Universes.UContext.t *)
   type quoted_univ_contextset = Constr.t (* of type Universes.ContextSet.t *)
   type quoted_abstract_univ_context = Constr.t (* of type Universes.AUContext.t *)
@@ -127,6 +128,11 @@ struct
   let kVmCast = ast "VmCast"
   let kNative = ast "NativeCast"
   let kCast = ast "Cast"
+  let qvVar = ast "qvar.var"
+  let qSProp = ast "quality.sprop"
+  let qProp = ast "quality.prop"
+  let qType = ast "quality.type"
+  let qVar = ast "quality.qvar"
   let sSProp = ast "sort.sprop"
   let sProp = ast "sort.prop"
   let sType = ast "sort.type"
@@ -158,6 +164,7 @@ struct
      ast "tLetIn", ast "tApp", ast "tCase", ast "tFix",
      ast "tConstruct", ast "tConst", ast "tInd", ast "tCoFix", ast "tProj", ast "tInt", ast "tFloat",
      ast "tString", ast "tArray")
+  let tquality = ast "quality.t"
   let tkername = ast "kername"
   let tmodpath = ast "modpath"
   let tMPfile = ast "MPfile"
@@ -186,6 +193,7 @@ struct
   let noprop_tLevel = ast "noproplevel.Level"
   let noprop_tLevelVar = ast "noproplevel.Var"
   let univexpr_lProp = ast "levelexpr.prop"
+  let tinstance_make = ast "universe.instance.make"
 
   (* let tunivcontext = resolve_symbol pkg_univ "universe_context" *)
   let tVariance = ast "variance.t"

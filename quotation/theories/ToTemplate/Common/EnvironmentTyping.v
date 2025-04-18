@@ -20,7 +20,7 @@ Module QuoteLookup (Import T : Term) (Import E : EnvironmentSig T) (Import L : L
     #[export] Polymorphic Instance quote_on_udecl_decl {F d} {quoteF1 : forall cb, d = ConstantDecl cb -> ground_quotable (F cb.(cst_universes))} {quoteF2 : forall mb, d = InductiveDecl mb -> ground_quotable (F mb.(ind_universes))} : ground_quotable (@on_udecl_decl _ F d) := ltac:(cbv [on_udecl_decl]; exact _).
   End with_refl.
 
-  #[export] Instance quote_consistent_instance {cf lvs ϕ uctx u} : ground_quotable (@consistent_instance cf lvs ϕ uctx u) := ltac:(cbv [consistent_instance]; exact _).
+  #[export] Instance quote_consistent_instance {cf quals lvs ϕ uctx u} : ground_quotable (@consistent_instance cf quals lvs ϕ uctx u) := ltac:(cbv [consistent_instance]; exact _).
   #[export] Instance quote_wf_universe {Σ u} : ground_quotable (@wf_universe Σ u)
     := ground_quotable_of_dec (@wf_universe_dec Σ u).
   #[export] Instance quote_wf_sort {Σ s} : ground_quotable (@wf_sort Σ s)

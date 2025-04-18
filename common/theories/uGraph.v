@@ -1252,7 +1252,8 @@ Section CheckLeqProcedure.
 
   Definition eqb_univ_instance_gen (u1 u2 : Instance.t) : bool :=
     forallb2 (fun l1 l2 => check_eqb_universe_gen
-        (Universe.make' l1) (Universe.make' l2)) u1 u2.
+        (Universe.make' l1) (Universe.make' l2)) 
+      (Instance.universes u1) (Instance.universes u2).
 
   Definition leqb_sort_gen (s1 s2 : Sort.t) :=
     leqb_sort_n_ (fun _ => check_leqb_universe_gen) false s1 s2.

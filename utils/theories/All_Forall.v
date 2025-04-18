@@ -2372,6 +2372,17 @@ Proof.
     eapply X0. now right. now right. eauto.
 Qed.
 
+Lemma All2_impl_nth_error {A B} {P Q : A -> B -> Type} {l l'} :
+  All2 P l l' ->
+  (forall x y n, nth_error l n = Some x -> nth_error l' n = Some y -> P x y -> Q x y) ->
+  All2 Q l l'.
+Proof.
+  intros. induction X; auto.
+  apply All2_cons.
+  * apply X0 with (n := 0); auto.
+  * apply IHX. intros ??????. apply X0 with (n := S n); auto.
+Qed.
+
 Lemma Forall2_skipn A B (P : A -> B -> Prop) l l' n:
   Forall2 P l l' -> Forall2 P (skipn n l) (skipn n l').
 Proof.

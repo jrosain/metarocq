@@ -94,6 +94,9 @@ Register MetaRocq.Common.BasicAst.fresh_evar_id as metarocq.ast.fresh_evar_id.
 
 (* Universes *)
 
+Register MetaRocq.Common.Universes.Quality.t as metarocq.ast.quality.t.
+Register MetaRocq.Common.Universes.Instance.make as metarocq.ast.universe.instance.make.
+
 Register MetaRocq.Common.Universes.allowed_eliminations as metarocq.ast.allowed_eliminations.
 Register MetaRocq.Common.Universes.fresh_level as metarocq.ast.fresh_level.
 Register MetaRocq.Common.Universes.fresh_universe as metarocq.ast.fresh_universe.

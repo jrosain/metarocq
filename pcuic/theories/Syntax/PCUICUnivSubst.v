@@ -8,11 +8,23 @@ Instance subst_instance_list A `{UnivSubst A} : UnivSubst (list A) :=
   fun u => List.map (subst_instance u).
 
 Lemma subst_instance_instance_length (u1 : Instance.t) u2 :
-  #|subst_instance u2 u1| = #|u1|.
+  Instance.eq_length (subst_instance u2 u1) u1.
 Proof.
-  unfold subst_instance.
-  now rewrite length_map.
+  unfold Instance.eq_length, subst_instance; split; now rewrite length_map.
 Qed.
+
+Lemma subst_instance_instance_length_univs (u1 : Instance.t) u2 :
+  #|Instance.universes (subst_instance u2 u1)| = #|Instance.universes u1|.
+Proof.
+  apply subst_instance_instance_length.
+Qed.
+
+Lemma subst_instance_instance_length_quals (u1 : Instance.t) u2 :
+  #|Instance.qualities (subst_instance u2 u1)| = #|Instance.qualities u1|.
+Proof.
+  apply subst_instance_instance_length.
+Qed.
+
 #[global]
 Hint Rewrite subst_instance_instance_length : len.
 
@@ -84,26 +96,24 @@ Proof.
   solve_all. now destruct H as [n [-> _]].
 Qed.
 
-Lemma closedu_subst_instance u t
-  : closedu 0 t -> subst_instance u t = t.
+Lemma closed_subst_instance u t
+  : closedu 0 t -> closedq 0 t -> subst_instance u t = t.
 Proof.
   unfold subst_instance; cbn.
-  induction t in |- * using term_forall_list_ind; simpl; auto; intros H';
+  induction t in |- * using term_forall_list_ind; simpl; auto; intros Hu Hq;
     autorewrite with map;
-    try f_equal; eauto with substu; unfold test_predicate_ku, test_branch, test_def in *;
-      try solve [f_equal; eauto; repeat (rtoProp; solve_all); eauto with substu].
+    try f_equal; eauto with substu; unfold test_predicate_ku, test_predicate_kq, test_branch, test_def in *;
+    try solve [f_equal; eauto; repeat (rtoProp; solve_all); eauto with substu].
 Qed.
 
-Lemma subst_instance_closedu (u : Instance.t) (Hcl : closedu_instance 0 u) t :
-  closedu #|u| t -> closedu 0 (subst_instance u t).
+Lemma subst_instance_closedu (u : Instance.t) (Hcl : closed_instance_universes 0 u) t :
+  closedu #|Instance.universes u| t -> closedu 0 (subst_instance u t).
 Proof.
-  induction t in |- * using term_forall_list_ind; simpl; auto; intros H';
+  induction t in |- * using term_forall_list_ind; simpl; auto; intros ?;
     autorewrite with map;
     try f_equal; auto with substu;
       unfold test_def, test_predicate_ku, test_branch in *; simpl;
-      try solve [f_equal; eauto; repeat (rtoProp; solve_all); intuition auto with substu].
-  rewrite [#|subst_instance_instance _ _|]subst_instance_instance_length. solve_all.
-  eauto with substu.
+    try solve [f_equal; eauto; repeat (rtoProp; solve_all); intuition auto with substu].
 Qed.
 
 Lemma rev_subst_instance {u Γ} :

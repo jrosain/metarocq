@@ -1402,9 +1402,9 @@ Proof.
     eapply OnOne2_map. solve_all.
 Qed.
 
-Lemma trans_cmp_global_instance Σ cmp_universe pb gref napp u u' :
-  PCUICEquality.cmp_global_instance Σ cmp_universe pb gref napp u u' ->
-  TermEquality.cmp_global_instance (trans_global_env Σ) cmp_universe pb gref napp u u'.
+Lemma trans_cmp_global_instance Σ cmp_quality cmp_universe pb gref napp u u' :
+  PCUICEquality.cmp_global_instance Σ cmp_quality cmp_universe pb gref napp u u' ->
+  TermEquality.cmp_global_instance (trans_global_env Σ) cmp_quality cmp_universe pb gref napp u u'.
 Proof.
   unfold PCUICEquality.cmp_global_instance, PCUICEquality.cmp_global_instance_gen, PCUICEquality.global_variance.
   unfold TermEquality.cmp_global_instance, TermEquality.global_variance.
@@ -1439,9 +1439,9 @@ Proof.
   destruct X; cbn; auto.
 Qed.
 
-Lemma trans_eq_term_upto_univ {cf} Σ cmp_universe cmp_sort pb napp t u :
-    PCUICEquality.eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp t u ->
-    TermEquality.eq_term_upto_univ_napp (trans_global_env Σ) cmp_universe cmp_sort pb napp (trans t) (trans u).
+Lemma trans_eq_term_upto_univ {cf} Σ cmp_quality cmp_universe cmp_sort pb napp t u :
+    PCUICEquality.eq_term_upto_univ_napp Σ cmp_quality cmp_universe cmp_sort pb napp t u ->
+    TermEquality.eq_term_upto_univ_napp (trans_global_env Σ) cmp_quality cmp_universe cmp_sort pb napp (trans t) (trans u).
 Proof.
   intros e.
   induction t using term_forall_list_ind in pb, napp, u, e |- *.
@@ -1456,7 +1456,7 @@ Proof.
   ].
   1,6,7: try solve [ constructor; unfold eq_mfixpoint in *; solve_all ].
   all: try solve [ constructor; now eapply trans_cmp_global_instance ].
-  - eapply (TermEquality.eq_term_upto_univ_mkApps _ _ _ _ _ _ [_] _ [_]); simpl; eauto.
+  - eapply (TermEquality.eq_term_upto_univ_mkApps _ _ _ _ _ _ _ [_] _ [_]); simpl; eauto.
   - destruct X1 as [Hpars [Huinst [Hctx Hret]]].
     destruct X as [IHpars [IHctx IHret]].
     unfold eq_branches, eq_branch in *.

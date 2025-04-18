@@ -3,7 +3,7 @@ From MetaRocq.Quotation.ToTemplate.Stdlib Require Import (hints) Init MSets Numb
 From MetaRocq.Quotation.ToTemplate.Utils Require Import (hints) MROption bytestring.
 From MetaRocq.Quotation.ToTemplate.Common Require Import (hints) BasicAst config.
 From MetaRocq.Quotation.ToTemplate.QuotationOf.Common Require Import Universes.Instances.
-From MetaRocq.Common Require Import Kernames Universes UniversesDec.
+From MetaRocq.Common Require Import Kernames BasicAst Universes UniversesDec.
 
 (* Grrr, [valuation]s cause so much trouble, because they're not quotable *)
 (*
@@ -117,6 +117,7 @@ Export (hints) QuoteUniverses2.
 
 #[export] Instance quote_nonEmptyLevelExprSet : ground_quotable nonEmptyLevelExprSet := ltac:(destruct 1; exact _).
 #[export] Instance quote_Universe : ground_quotable Universe.t := ltac:(destruct 1; exact _).
+#[export] Instance quote_quality : ground_quotable Quality.t := ltac:(destruct 1; exact _).
 
 #[export] Instance quote_concrete_sort : ground_quotable concrete_sort := ltac:(destruct 1; exact _).
 Import StrongerInstances.
@@ -124,6 +125,8 @@ Import StrongerInstances.
 #[export] Instance quote_allowed_eliminations : ground_quotable allowed_eliminations := ltac:(destruct 1; exact _).
 
 #[export] Instance quote_declared_cstr_levels {levels cstr} : ground_quotable (declared_cstr_levels levels cstr) := ltac:(cbv [declared_cstr_levels]; exact _).
+#[export] Instance quote_bound_names : ground_quotable bound_names := ltac:(destruct 1; exact _).
+#[export] Instance quote_auctx : ground_quotable AUContext.t := ltac:(destruct 1; exact _).
 #[export] Instance quote_universes_decl : ground_quotable universes_decl := ltac:(destruct 1; exact _).
 #[export] Instance quote_satisfies0 {v s} {qv : quotation_of v} : ground_quotable (@satisfies0 v s)
   := ground_quotable_of_iff (iff_sym (@uGraph.gc_of_constraint_spec config.default_checker_flags v s)).
@@ -136,6 +139,14 @@ Import StrongerInstances.
 #[export] Instance quote_leq_universe_n {cf n ϕ u u'} : ground_quotable (@leq_universe_n cf (uGraph.Z_of_bool n) ϕ u u')
   := ground_quotable_of_dec (@leq_universe_n_dec cf _ ϕ u u').
 #[export] Instance quote_leq_universe {cf ϕ s s'} : ground_quotable (@leq_universe cf ϕ s s') := @quote_leq_universe_n cf false ϕ s s'.
+#[export] Instance quote_leq_nat {n m} : ground_quotable (PeanoNat.Nat.le n m)
+  := ground_quotable_of_dec (Compare_dec.le_dec n m).
+#[export] Instance quote_leq_qvar {v v'} : ground_quotable (QVar.le v v').
+Proof. destruct v, v'; adjust_ground_quotable_by_econstructor_inversion (). Defined.
+#[export] Instance quote_leq_quality {cf q q'} : ground_quotable (@leq_quality cf q q').
+Proof. destruct q, q'; cbv [leq_quality]; try typeclasses eauto.
+       apply quote_leq_qvar.
+Defined.
 #[export] Instance quote_leq_sort_n_ {cf univ leq_universe_n n s s'} {quote_leq_universe_n : forall u u', ground_quotable (leq_universe_n n u u':Prop)} : ground_quotable (@leq_sort_n_ cf univ leq_universe_n n s s') := ltac:(cbv [leq_sort_n_]; exact _).
 #[export] Instance quote_leq_csort_n {cf n s s'} : ground_quotable (@leq_csort_n cf n s s') := @quote_leq_sort_n_ cf nat _ n s s' _.
 #[export] Instance quote_leq_sort_n {cf n ϕ s s'} : ground_quotable (@leq_sort_n cf (uGraph.Z_of_bool n) ϕ s s') := ltac:(cbv [leq_sort_n]; exact _).
@@ -145,6 +156,7 @@ Import StrongerInstances.
 #[export] Instance quote_eq_sort_ {univ eq_universe s s'} {quote_eq_universe : forall u u', ground_quotable (eq_universe u u':Prop)} : ground_quotable (@eq_sort_ univ eq_universe s s') := ltac:(cbv [eq_sort_]; exact _).
 #[export] Instance quote_eq_sort {cf ϕ s s'} : ground_quotable (@eq_sort cf ϕ s s') := ltac:(cbv [eq_sort]; exact _).
 #[export] Instance quote_compare_universe {cf univ pb u u'} : ground_quotable (@compare_universe cf univ pb u u') := ltac:(destruct pb; cbv [compare_universe]; exact _).
+#[export] Instance quote_compare_quality {cf pb q q'} : ground_quotable (@compare_quality cf pb q q') := ltac:(destruct pb; cbv [compare_quality]; exact _).
 #[export] Instance quote_compare_sort {cf univ pb u u'} : ground_quotable (@compare_sort cf univ pb u u') := ltac:(destruct pb; cbv [compare_sort]; exact _).
 #[export] Instance quote_valid_constraints0 {ϕ ctrs} : ground_quotable (@valid_constraints0 ϕ ctrs)
   := ground_quotable_of_dec (@valid_constraints0_dec ϕ ctrs).

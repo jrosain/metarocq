@@ -77,7 +77,7 @@ Section Eta.
     | Some (_, _,n,ty) =>
       let ind := mkInd ind.(inductive_mind) ind.(inductive_ind) in
       let Γind := map
-                    (fun i => tInd (mkInd ind.(inductive_mind) i) [])
+                    (fun i => tInd (mkInd ind.(inductive_mind) i) Instance.empty)
                     (seq 0 (ind_i.(ind_info_nmind))) in
       eta_single Γind (Ast.tConstruct ind c u) args ty n
     | None => mkApps (tConstruct ind c u) args

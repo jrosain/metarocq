@@ -8,23 +8,28 @@ From MetaRocq.Quotation.ToPCUIC.PCUIC Require Import (hints) PCUICAst utils.PCUI
 #[export] Instance quote_on_rel {T T'} {R} {f: T -> T'} {x y : T} {qR : quotation_of R} {quoteR : forall x y, ground_quotable (R x y:Prop)}: ground_quotable (MRRelations.on_rel R f x y) := ltac:(cbv [MRRelations.on_rel]; exact _).
 
 #[export] Instance quote_cmp_universe_instance {R u u'} {qR : quotation_of R} {quoteR : forall x y, ground_quotable (R x y:Prop)} : ground_quotable (@cmp_universe_instance R u u') := ltac:(cbv [cmp_universe_instance]; exact _).
+#[export] Instance quote_cmp_quality_instance {R u u'} {qR : quotation_of R} {quoteR : forall x y, ground_quotable (R x y:Prop)} : ground_quotable (@cmp_quality_instance R u u') := ltac:(cbv [cmp_quality_instance]; exact _).
+#[export] Instance quote_cmp_instance {R R' u u'} {qR : quotation_of R} {qR' : quotation_of R'} {quoteR : forall x y, ground_quotable (R x y:Prop)} {quoteR' : forall x y, ground_quotable (R' x y:Prop)} : ground_quotable (@cmp_instance R R' u u') := ltac:(cbv [cmp_instance]; exact _).
 Section with_R.
   Context {cmp_universe : conv_pb -> Universe.t -> Universe.t -> Prop}
+          {cmp_quality : conv_pb -> Quality.t -> Quality.t -> Prop}
           {qRe : quotation_of cmp_universe}
-          {quoteRe : forall pb x y, ground_quotable (cmp_universe pb x y)}.
+          {qRq : quotation_of cmp_quality}
+          {quoteRe : forall pb x y, ground_quotable (cmp_universe pb x y)}
+          {quoteRq : forall pb x y, ground_quotable (cmp_quality pb x y)}.
 
   #[export] Instance quote_cmp_universe_variance {pb v u u'} : ground_quotable (@cmp_universe_variance cmp_universe pb v u u') := ltac:(cbv [cmp_universe_variance]; exact _).
 
   #[export] Instance quote_cmp_universe_instance_variance {pb v u u'} : ground_quotable (@cmp_universe_instance_variance cmp_universe pb v u u') := ltac:(cbv [cmp_universe_instance_variance]; exact _).
 
-  #[export] Instance quote_cmp_opt_variance {pb v u u'} (subr : RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb)) : ground_quotable (@cmp_opt_variance cmp_universe pb v u u').
-  Proof using cmp_universe qRe quoteRe.
+  #[export] Instance quote_cmp_opt_variance {pb v u u'} (subr : RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb)) : ground_quotable (@cmp_opt_variance cmp_quality cmp_universe pb v u u').
+  Proof using cmp_universe qRe qRq quoteRe quoteRq.
     destruct v; cbv [cmp_opt_variance]; try exact _.
     eapply Stdlib.Init.quote_or_dec; try exact _.
     now apply cmp_opt_variance_var_dec.
   Defined.
 
-  #[export] Instance quote_cmp_global_instance {Σ pb gr napp u u'} (subr : RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb)) : ground_quotable (@cmp_global_instance Σ cmp_universe pb gr napp u u') := ltac:(cbv [cmp_global_instance]; exact _).
+  #[export] Instance quote_cmp_global_instance {Σ pb gr napp u u'} (subr : RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb)) : ground_quotable (@cmp_global_instance Σ cmp_quality cmp_universe pb gr napp u u') := ltac:(cbv [cmp_global_instance]; exact _).
 End with_R.
 #[export] Existing Instances
   quote_cmp_universe_variance
@@ -44,13 +49,14 @@ End with_R.
 .
 
 #[export] Instance quote_eq_term_upto_univ_napp
+ {cmp_quality : conv_pb -> Quality.t -> Quality.t -> Prop}
  {cmp_universe : conv_pb -> Universe.t -> Universe.t -> Prop}
  {cmp_sort : conv_pb -> sort -> sort -> Prop}
- {qRe : quotation_of cmp_universe} {qRle : quotation_of cmp_sort}
- {quoteRe : forall pb x y, ground_quotable (cmp_universe pb x y)} {quoteRle : forall pb x y, ground_quotable (cmp_sort pb x y)}
+ {qRe : quotation_of cmp_universe} {qRq : quotation_of cmp_quality} {qRle : quotation_of cmp_sort}
+ {quoteRe : forall pb x y, ground_quotable (cmp_universe pb x y)} {quoteRle : forall pb x y, ground_quotable (cmp_sort pb x y)} {quoteRq : forall pb x y, ground_quotable (cmp_quality pb x y)}
  {Σ pb napp x y}
  {subr : RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb)}
-  : ground_quotable (@eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp x y).
+  : ground_quotable (@eq_term_upto_univ_napp Σ cmp_quality cmp_universe cmp_sort pb napp x y).
 Proof.
   unfold ground_quotable; revert Σ cmp_universe cmp_sort pb napp x y qRe qRle quoteRe quoteRle subr.
   fix quote_eq_term_upto_univ_napp 13; intros.

@@ -235,5 +235,5 @@ Definition tmFix@{a b t u} {A : Type@{a}} {B : Type@{b}} (f : (A -> TemplateMona
             qb <- tmQuoteLevel@{b _ _};;
             qt <- tmQuoteLevel@{t _ _};;
             qu <- tmQuoteLevel@{u _ _};;
-            let self := tConst (MPfile ["Core"; "TemplateMonad"; "Template"; "MetaRocq"], "tmFix'")%bs [qa;qb;qt;qu] in
+            let self := tConst (MPfile ["Core"; "TemplateMonad"; "Template"; "MetaRocq"], "tmFix'")%bs (Instance.make [] [qa;qb;qt;qu]) in
             @tmFix'@{a b t u} A B (mkApps self [qA; qB]) f a)).

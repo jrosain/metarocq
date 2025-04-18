@@ -220,9 +220,9 @@ Section Renaming.
 
 Context `{cf : checker_flags}.
 
-Lemma eq_term_upto_univ_rename Σ cmp_universe cmp_sort pb napp u v f :
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp u v ->
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp (rename f u) (rename f v).
+Lemma eq_term_upto_univ_rename Σ cmp_quality cmp_universe cmp_sort pb napp u v f :
+    eq_term_upto_univ_napp Σ cmp_quality cmp_universe cmp_sort pb napp u v ->
+    eq_term_upto_univ_napp Σ cmp_quality cmp_universe cmp_sort pb napp (rename f u) (rename f v).
 Proof using Type.
   intros h.
   induction u in v, napp, pb, f, h |- * using term_forall_list_ind.

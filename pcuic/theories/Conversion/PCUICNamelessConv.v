@@ -39,7 +39,7 @@ Local Ltac anonify :=
 
 Local Ltac ih :=
   lazymatch goal with
-  | ih : forall (v : term) (napp : nat), _ -> _ -> eq_term_upto_univ_napp _ _ _ _ _ _ _ -> ?u = _
+  | ih : forall (v : term) (napp : nat), _ -> _ -> _ ⊢ _ <==[Conv,napp] _ -> ?u = _
     |- ?u = ?v =>
     eapply ih ; eassumption
   end.
@@ -71,7 +71,7 @@ Qed.
 
 Lemma eq_context_upto_names_eq_context_alpha ctx ctx' :
   eq_context_upto_names ctx ctx' ->
-  eq_context_upto empty_global_env (fun _ => eq) (fun _ => eq) Conv ctx ctx'.
+  eq_context_upto empty_global_env (fun _ => eq) (fun _ => eq) (fun _ => eq) Conv ctx ctx'.
 Proof.
   move/All2_fold_All2.
   intros a; eapply All2_fold_impl; tea; cbn.
@@ -82,7 +82,7 @@ Lemma nameless_eq_term_spec :
   forall u v napp,
     nameless u ->
     nameless v ->
-    eq_term_upto_univ_napp empty_global_env (fun _ => eq) (fun _ => eq) Conv napp u v ->
+    eq_term_upto_univ_napp empty_global_env (fun _ => eq) (fun _ => eq) (fun _ => eq) Conv napp u v ->
     u = v.
 Proof.
   intros u v napp hu hv e.
@@ -104,17 +104,17 @@ Proof.
       * eapply H0 ; eauto.
       * eapply IHl ; assumption.
   - f_equal ; try solve [ ih ].
-    apply cmp_universe_instance_eq. assumption.
+    apply cmp_instance_eq. assumption.
   - f_equal ; try solve [ ih ].
-    apply cmp_universe_instance_eq. assumption.
+    apply cmp_instance_eq. assumption.
   - f_equal ; try solve [ ih ].
-    apply cmp_universe_instance_eq. assumption.
+    apply cmp_instance_eq. assumption.
   - f_equal ; try solve [ ih ].
     * destruct e as [eqpar [eqinst [eqctx eqret]]].
       destruct X as [? [? ?]].
       destruct p, p'; simpl in *. f_equal.
       + apply All2_eq; solve_all.
-      + apply cmp_universe_instance_eq. assumption.
+      + apply cmp_instance_eq. assumption.
       + simpl in *.
         eapply nameless_eqctx_IH; eauto.
       + ih.
@@ -249,9 +249,9 @@ Proof.
     destruct nth_error => /= //.
 Qed.
 
-Lemma cmp_global_instance_nl Σ cmp_universe pb gr napp :
-  CRelationClasses.subrelation (cmp_global_instance Σ cmp_universe pb gr napp)
-       (cmp_global_instance (nl_global_env Σ) cmp_universe pb gr napp).
+Lemma cmp_global_instance_nl Σ cmp_quality cmp_universe pb gr napp :
+  CRelationClasses.subrelation (cmp_global_instance Σ cmp_quality cmp_universe pb gr napp)
+       (cmp_global_instance (nl_global_env Σ) cmp_quality cmp_universe pb gr napp).
 Proof.
   intros t t'.
   unfold cmp_global_instance, cmp_global_instance_gen.
@@ -269,9 +269,9 @@ Proof.
   all: assumption.
 Defined.
 
-Lemma nl_eq_term_upto_univ Σ cmp_universe cmp_sort pb napp t t' :
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp t t' ->
-    eq_term_upto_univ_napp (nl_global_env Σ) cmp_universe cmp_sort pb napp (nl t) (nl t').
+Lemma nl_eq_term_upto_univ Σ cmp_quality cmp_universe cmp_sort pb napp t t' :
+    eq_term_upto_univ_napp Σ cmp_quality cmp_universe cmp_sort pb napp t t' ->
+    eq_term_upto_univ_napp (nl_global_env Σ) cmp_quality cmp_universe cmp_sort pb napp (nl t) (nl t').
 Proof.
   induction t in napp, pb, t' |- * using term_forall_list_ind; intro e.
   all: dependent destruction e.
@@ -303,9 +303,9 @@ Proof.
     solve_all.
 Qed.
 
-Lemma eq_context_nl Σ cmp_universe cmp_sort pb ctx ctx' :
-  eq_context_gen (fun pb => eq_term_upto_univ Σ cmp_universe cmp_sort pb) pb ctx ctx' ->
-  eq_context_gen (fun pb => eq_term_upto_univ (nl_global_env Σ) cmp_universe cmp_sort pb) pb (nlctx ctx) (nlctx ctx').
+Lemma eq_context_nl Σ cmp_quality cmp_universe cmp_sort pb ctx ctx' :
+  eq_context_gen (fun pb => eq_term_upto_univ Σ cmp_quality cmp_universe cmp_sort pb) pb ctx ctx' ->
+  eq_context_gen (fun pb => eq_term_upto_univ (nl_global_env Σ) cmp_quality cmp_universe cmp_sort pb) pb (nlctx ctx) (nlctx ctx').
 Proof.
   intros H.
   induction H; constructor; simpl; destruct p; intuition
@@ -339,7 +339,7 @@ Qed.
 
 Corollary eq_term_nl_eq :
   forall u v,
-    eq_term_upto_univ empty_global_env (fun _ => eq) (fun _ => eq) Conv u v ->
+    eq_term_upto_univ empty_global_env (fun _ => eq) (fun _ => eq) (fun _ => eq) Conv u v ->
     nl u = nl v.
 Proof.
   intros u v h.

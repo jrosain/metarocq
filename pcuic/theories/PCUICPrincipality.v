@@ -416,9 +416,9 @@ Proof.
   eapply eq_term_upto_univ_empty_impl; auto; typeclasses eauto.
 Qed.
 
-Lemma eq_context_empty_eq_context {cf:checker_flags} {Σ : global_env_ext} {cmp_universe cmp_sort pb} {x y} :
-  eq_context_upto empty_global_env cmp_universe cmp_sort pb x y ->
-  eq_context_upto Σ cmp_universe cmp_sort pb x y.
+Lemma eq_context_empty_eq_context {cf:checker_flags} {Σ : global_env_ext} {cmp_qual cmp_universe cmp_sort pb} {x y} :
+  eq_context_upto empty_global_env cmp_qual cmp_universe cmp_sort pb x y ->
+  eq_context_upto Σ cmp_qual cmp_universe cmp_sort pb x y.
 Proof.
   intros.
   eapply All2_fold_impl; tea.
@@ -427,9 +427,9 @@ Proof.
 Qed.
 
 Lemma eq_context_upto_inst_case_context {cf : checker_flags} {Σ : global_env_ext} pars pars' puinst puinst' ctx :
-  All2 (eq_term_upto_univ empty_global_env (compare_universe Σ) (compare_sort Σ) Conv) pars pars' ->
-  cmp_universe_instance (eq_universe Σ) puinst puinst' ->
-  eq_context_upto Σ.1 (compare_universe Σ) (compare_sort Σ) Conv (inst_case_context pars puinst ctx)
+  All2 (eq_term_upto_univ empty_global_env compare_quality (compare_universe Σ) (compare_sort Σ) Conv) pars pars' ->
+  cmp_instance eq_quality (eq_universe Σ) puinst puinst' ->
+  eq_context_upto Σ.1 compare_quality (compare_universe Σ) (compare_sort Σ) Conv (inst_case_context pars puinst ctx)
     (inst_case_context pars' puinst' ctx).
 Proof.
   intros onps oninst.
@@ -732,10 +732,12 @@ Proof.
     simp prim_type in w |- *.
     eapply (ws_cumul_pb_Axiom_l_inv (args := [_])) in w as [u' [args' []]]; tea. 2:eapply declared_constant_from_gen, H0. 2:eapply p.
     eapply cumulAlgo_cumulSpec. etransitivity. now eapply red_ws_cumul_pb.
-    eapply All2_tip_l in a3 as [y' [-> Heq]]. red in c0.
-    eapply Forall2_tip_l in c0. cbn. eapply ws_cumul_pb_eq_le.
+    eapply All2_tip_l in a3 as [y' [-> Heq]]. red in c0. destruct c0 as [cq cu].
+    eapply Forall2_tip_l in cu. cbn. eapply ws_cumul_pb_eq_le.
     eapply (ws_cumul_pb_mkApps (args := [_]) (args' := [_])).
-    * constructor; fvs. constructor. red. destruct c0 as [? [-> eq]]. constructor. symmetry.
+    * constructor; fvs. constructor. red. split.
+      -- unfold cmp_quality_instance in cq |- *. cbn in cq |- *.  now symmetry.
+      -- red. destruct cu as [? [-> eq]]. constructor. symmetry.
       etransitivity; tea. now symmetry. constructor.
     * constructor; [|constructor]. symmetry. etransitivity; tea. constructor; fvs. symmetry.
       now eapply eq_term_empty_eq_term.

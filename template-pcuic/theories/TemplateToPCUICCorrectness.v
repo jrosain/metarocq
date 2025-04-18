@@ -797,9 +797,9 @@ Section Trans_Global.
   Context (wfΣ : Typing.wf Σ).
   Context (wfΣ' : wf Σ').
 
-  Lemma trans_cmp_global_instance {cmp_universe pb gref napp u u'} :
-    SEq.cmp_global_instance Σ cmp_universe pb gref napp u u' ->
-    cmp_global_instance (trans_global_env Σ) cmp_universe pb gref napp u u'.
+  Lemma trans_cmp_global_instance {cmp_quality cmp_universe pb gref napp u u'} :
+    SEq.cmp_global_instance Σ cmp_quality cmp_universe pb gref napp u u' ->
+    cmp_global_instance (trans_global_env Σ) cmp_quality cmp_universe pb gref napp u u'.
   Proof.
     unfold SEq.cmp_global_instance, SEq.global_variance.
     destruct gref; simpl; auto.
@@ -861,11 +861,11 @@ Section Trans_Global.
     induction 1 in l' |- *; intros H; depelim H; intros H'; depelim H'; cbn; constructor; auto.
   Qed.
 
-  Lemma trans_eq_term_upto_univ {cmp_universe cmp_sort pb napp t u} :
+  Lemma trans_eq_term_upto_univ {cmp_quality cmp_universe cmp_sort pb napp t u} :
     WfAst.wf Σ t ->
     WfAst.wf Σ u ->
-    SEq.eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp t u ->
-    eq_term_upto_univ_napp (trans_global_env Σ) cmp_universe cmp_sort pb napp (trans (trans_global_env Σ) t) (trans (trans_global_env Σ) u).
+    SEq.eq_term_upto_univ_napp Σ cmp_quality cmp_universe cmp_sort pb napp t u ->
+    eq_term_upto_univ_napp (trans_global_env Σ) cmp_quality cmp_universe cmp_sort pb napp (trans (trans_global_env Σ) t) (trans (trans_global_env Σ) u).
   Proof.
     intros wt wu e.
     induction t using Induction.term_forall_list_rect in pb, napp, wt, u, wu, e |- *.
@@ -907,7 +907,7 @@ Section Trans_Global.
           now eapply ih
         end
       ].
-      unfold trans_predicate, eq_predicate; cbn.
+      unfold trans_predicate, eq_predicate; cbn. destruct H4 as [Hq Hu].
       repeat split; solve_all; try typeclasses eauto with typeclass_instances core.
       * rewrite map2_map2_bias_left; len.
         eapply All2_length in hpctx. len in hpctx.
@@ -976,7 +976,7 @@ Section Trans_Global.
       simpl in *.
       intuition eauto.
     - constructor; eauto. intuition auto; constructor; cbn; eauto.
-      + inv H4. auto.
+      + destruct H4 as [Hq Hu]. inv Hu. auto.
       + solve_all.
   Qed.
 
@@ -2489,7 +2489,7 @@ Proof.
        now eapply TypingWf.typing_wf in Hs'.
     -- destruct decl; reflexivity.
 
-  - cbn. replace (tConst prim_ty []) with (prim_type (primInt; primIntModel p) prim_ty) by now simp prim_type.
+  - cbn. replace (tConst prim_ty Instance.empty) with (prim_type (primInt; primIntModel p) prim_ty) by now simp prim_type.
     econstructor; cbn; eauto.
     + rewrite trans_env_retroknowledge //.
     + now apply forall_decls_declared_constant.
@@ -2497,7 +2497,7 @@ Proof.
       intros []; split => //;
       destruct cdecl as [ty [?|] ?]; cbn in *; subst; auto => //.
     + constructor.
-  - cbn. replace (tConst prim_ty []) with (prim_type (primFloat; primFloatModel p) prim_ty) by now simp prim_type.
+  - cbn. replace (tConst prim_ty Instance.empty) with (prim_type (primFloat; primFloatModel p) prim_ty) by now simp prim_type.
     econstructor; cbn; eauto.
     + rewrite trans_env_retroknowledge //.
     + now apply forall_decls_declared_constant.
@@ -2505,7 +2505,7 @@ Proof.
       intros []; split => //;
       destruct cdecl as [ty [?|] ?]; cbn in *; subst; auto => //.
     + constructor.
-  - cbn. replace (tConst prim_ty []) with (prim_type (primString; primStringModel p) prim_ty) by now simp prim_type.
+  - cbn. replace (tConst prim_ty Instance.empty) with (prim_type (primString; primStringModel p) prim_ty) by now simp prim_type.
     econstructor; cbn; eauto.
     + rewrite trans_env_retroknowledge //.
     + now apply forall_decls_declared_constant.
@@ -2514,7 +2514,7 @@ Proof.
       destruct cdecl as [ty [?|] ?]; cbn in *; subst; auto => //.
     + constructor.
   - cbn. set (a := {| array_level := _ |}).
-    replace (tApp (tConst prim_ty [u]) (trans (trans_global_env Σ.1) ty)) with (prim_type (primArray; primArrayModel a) prim_ty) by now simp prim_type.
+    replace (tApp (tConst prim_ty (Instance.make [] [u])) (trans (trans_global_env Σ.1) ty)) with (prim_type (primArray; primArrayModel a) prim_ty) by now simp prim_type.
     econstructor; cbn; eauto.
     + rewrite trans_env_retroknowledge //.
     + now apply forall_decls_declared_constant.

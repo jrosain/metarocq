@@ -52,6 +52,7 @@ Program Global Instance canonical_abstract_env_struct {cf:checker_flags} {guard 
   abstract_env_lookup := fun Σ => lookup_env (reference_impl_env_ext Σ) ;
   abstract_env_leqb_level_n := fun Σ => leqb_level_n (reference_impl_ext_graph Σ) ;
   abstract_env_level_mem := fun Σ l => LevelSet.mem l (global_ext_levels (reference_impl_env_ext Σ));
+  abstract_env_quality_mem := fun Σ q => QualitySet.mem q (global_ext_qualities (reference_impl_env_ext Σ));
   abstract_env_guard := fun Σ fix_cofix => guard_impl fix_cofix (reference_impl_env_ext Σ);
   abstract_env_ext_rel := fun X Σ => Σ = reference_impl_env_ext X;
   abstract_env_init := fun cs retro H =>  {|
@@ -177,6 +178,7 @@ Program Global Instance optimized_abstract_env_struct {cf:checker_flags} {guard 
  abstract_env_lookup := fun Σ k => EnvMap.lookup k (wf_env_ext_map Σ);
  abstract_env_leqb_level_n X := abstract_env_leqb_level_n X.(wf_env_ext_reference);
  abstract_env_level_mem X := abstract_env_level_mem X.(wf_env_ext_reference);
+ abstract_env_quality_mem X := abstract_env_quality_mem X.(wf_env_ext_reference);
  abstract_env_guard := fun Σ fix_cofix => guard_impl fix_cofix (wf_env_ext_reference Σ);
  abstract_env_ext_rel X := abstract_env_ext_rel X.(wf_env_ext_reference);
 
@@ -310,6 +312,9 @@ Next Obligation.
 Qed.
 Next Obligation. pose (reference_impl_ext_wf X). sq. symmetry; apply LevelSet.Raw.mem_spec. typeclasses eauto. Defined.
 Next Obligation.
+  pose (reference_impl_ext_wf X). sq. symmetry; apply QualitySet.Raw.mem_spec. typeclasses eauto.
+Defined.
+Next Obligation.
   pose (reference_impl_wf X). sq.
   rename H0 into Hudecl. rename H1 into Hudecl'.
   assert (H0 : global_uctx_invariants (global_uctx X)).
@@ -372,6 +377,9 @@ Next Obligation.
 Qed.
 Next Obligation.
   now erewrite (abstract_env_level_mem_correct X.(wf_env_ext_reference)).
+Qed.
+Next Obligation.
+  now erewrite (abstract_env_quality_mem_correct X.(wf_env_ext_reference)).
 Qed.
 Next Obligation.
   now erewrite (abstract_env_is_consistent_correct X.(wf_env_reference)) with (udecl := (t,t0)); eauto.

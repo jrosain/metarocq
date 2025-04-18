@@ -494,10 +494,10 @@ Polymorphic Definition tmMakeQuotationOfConstants_gen@{d t u _T _above_u'} {debu
                            | Irrelevant | RelevanceVar _ => on_bad_relevance cr
                            | Relevant
                              => inst <- match univs with
-                                        | Monomorphic_ctx => tmReturn ([] : Instance.t)
+                                        | Monomorphic_ctx => tmReturn Instance.empty
                                         | (Polymorphic_ctx (univs, constraints)) as ctx
                                           => _ <- warn_bad_ctx cr ctx;;
-                                             tmReturn ([] : Instance.t)
+                                             tmReturn Instance.empty
                                         end;;
                                 let c := tConst cr inst in
                                 _ <- tmDebugMsg "tmMakeQuotationOfConstants_gen: tmUnquote";;
@@ -517,10 +517,10 @@ Polymorphic Definition tmMakeQuotationOfConstants_gen@{d t u _T _above_u'} {debu
                       | Some qname
                         => inst <- (univs <- tmQuoteInductiveUniverses r;;
                                     match univs with
-                                    | Monomorphic_ctx => tmReturn ([] : Instance.t)
+                                    | Monomorphic_ctx => tmReturn Instance.empty
                                     | (Polymorphic_ctx (univs, constraints)) as ctx
                                       => _ <- warn_bad_ctx r ctx;;
-                                         tmReturn ([] : Instance.t)
+                                         tmReturn Instance.empty
                                     end);;
                            let c := tInd ind inst in
                            _ <- tmDebugMsg "tmMakeQuotationOfConstants_gen: tmUnquote";;

@@ -1010,10 +1010,10 @@ Lemma prim_type_inv p prim_ty :
   ∑ u args, prim_type p prim_ty = mkApps (tConst prim_ty u) args.
 Proof.
   destruct p as [? []]; simp prim_type.
-  - eexists [], []. reflexivity.
-  - eexists [], []; reflexivity.
-  - eexists [], []; reflexivity.
-  - eexists [_], [_]; reflexivity.
+  - eexists Instance.empty, []. reflexivity.
+  - eexists Instance.empty, []; reflexivity.
+  - eexists Instance.empty, []; reflexivity.
+  - eexists (Instance.make [] [_]), [_]; reflexivity.
 Qed.
 
 Lemma primitive_invariants_axiom t decl : primitive_invariants t decl -> cst_body decl = None.

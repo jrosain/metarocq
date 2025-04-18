@@ -1462,7 +1462,7 @@ Qed.
 Lemma positive_cstr_arg_subst {cf} {Σ} {wfΣ : wf Σ} {ind mdecl idecl Γ t u u'} :
   declared_inductive Σ ind mdecl idecl ->
   consistent_instance_ext Σ (ind_universes mdecl) u ->
-  cmp_opt_variance (compare_universe Σ) Cumul (match ind_variance mdecl with Some var => Variance var | None => AllEqual end) u u' ->
+  cmp_opt_variance compare_quality (compare_universe Σ) Cumul (match ind_variance mdecl with Some var => Variance var | None => AllEqual end) u u' ->
   closed_ctx (ind_arities mdecl ,,, Γ)@[u] ->
   Σ ;;; subst_instance u (ind_arities mdecl) ,,, subst_instance u Γ ⊢ (subst_instance u t) ≤ (subst_instance u' t) ->
   positive_cstr_arg mdecl Γ t ->
@@ -1584,7 +1584,7 @@ Lemma positive_cstr_closed_args_subst_arities {cf} {Σ} {wfΣ : wf Σ} {u u' Γ}
   declared_inductive Σ ind mdecl idecl ->
   consistent_instance_ext Σ (ind_universes mdecl) u ->
   on_constructor cumulSpec0 (lift_typing typing) (Σ.1, ind_universes mdecl) mdecl i idecl ind_indices cdecl cs ->
-  cmp_opt_variance (compare_universe Σ) Cumul (match ind_variance mdecl with Some var => Variance var | None => AllEqual end) u u' ->
+  cmp_opt_variance compare_quality (compare_universe Σ) Cumul (match ind_variance mdecl with Some var => Variance var | None => AllEqual end) u u' ->
   closed_ctx (subst_instance u (ind_params mdecl)) ->
   wf_local Σ (subst_instance u (ind_arities mdecl ,,, smash_context [] (ind_params mdecl) ,,, Γ)) ->
   All_local_env (fun Γ j => positive_cstr_arg mdecl ([] ,,, (smash_context [] (ind_params mdecl) ,,, Γ)) (j_typ j)) Γ ->
@@ -1634,7 +1634,7 @@ Lemma positive_cstr_closed_args {cf} {Σ} {wfΣ : wf Σ} {u u'}
   {ind mdecl idecl cdecl} :
   declared_constructor Σ ind mdecl idecl cdecl ->
   consistent_instance_ext Σ (ind_universes mdecl) u ->
-  cmp_opt_variance (compare_universe Σ) Cumul (match ind_variance mdecl with Some var => Variance var | None => AllEqual end) u u' ->
+  cmp_opt_variance compare_quality (compare_universe Σ) Cumul (match ind_variance mdecl with Some var => Variance var | None => AllEqual end) u u' ->
  ws_cumul_ctx_pb_rel Cumul Σ (subst_instance u (ind_arities mdecl) ,,,
     subst_instance u
       (smash_context [] (PCUICEnvironment.ind_params mdecl)))
@@ -1728,22 +1728,30 @@ Section Betweenu.
     end.
 
   Definition betweenu_instance (u : Instance.t) :=
-    forallb betweenu_level u.
+    forallb betweenu_level (Instance.universes u).
 
 End Betweenu.
 
 (** Universe-closed terms are unaffected by universe substitution. *)
 Section UniverseClosedSubst.
-  Lemma closedu_subst_instance_level_app u u' l
-  : closedu_level #|u'| l -> subst_instance_level (u' ++ u) l = subst_instance_level u' l.
+  Lemma closedu_subst_instance_level_app qs u u' l
+  : closedu_level #|u'| l -> subst_instance_level (Instance.make qs (u' ++ u)) l = subst_instance_level (Instance.make qs u') l.
   Proof.
     destruct l; cbnr.
     intros Hn % Nat.ltb_lt.
     rewrite app_nth1 //.
   Qed.
 
-  Lemma closedu_subst_instance_level_lift u u' l
-  : closedu_level #|u| l -> subst_instance_level (u' ++ u) (lift_level #|u'| l) = subst_instance_level u l.
+  Lemma closedq_subst_instance_quality_app us qs qs' q
+  : closedq_quality #|qs'| q -> subst_instance_quality (Instance.make (qs' ++ qs) us) q = subst_instance_quality (Instance.make qs' us) q.
+  Proof.
+    destruct q; cbnr. destruct t.
+    intros Hn % Nat.ltb_lt.
+    rewrite app_nth1 //.
+  Qed.
+
+  Lemma closedu_subst_instance_level_lift qs u u' l
+  : closedu_level #|u| l -> subst_instance_level (Instance.make qs (u' ++ u)) (lift_level #|u'| l) = subst_instance_level (Instance.make qs u) l.
   Proof.
     destruct l; cbnr.
     intros Hn % Nat.ltb_lt.
@@ -1751,8 +1759,8 @@ Section UniverseClosedSubst.
     lia_f_equal.
   Qed.
 
-  Lemma closedu_subst_instance_level_expr_app u u' e
-    : closedu_level_expr #|u'| e -> subst_instance_level_expr (u' ++ u) e = subst_instance_level_expr u' e.
+  Lemma closedu_subst_instance_level_expr_app qs u u' e
+    : closedu_level_expr #|u'| e -> subst_instance_level_expr (Instance.make qs (u' ++ u)) e = subst_instance_level_expr (Instance.make qs u') e.
   Proof.
     destruct e as [[] b]; cbnr.
     intros Hn % Nat.ltb_lt.
@@ -1768,30 +1776,80 @@ Section UniverseClosedSubst.
     rewrite nth_error_app_lt //.
   Qed. *)
 
+  (* Lemma closedu_subst_instance_app qs u u' t *)
+  (*   : closed_instance_universes #|u'| t -> subst_instance (Instance.make qs (u' ++ u)) t = subst_instance (Instance.make qs u') t. *)
+  (* Proof. *)
+  (*   intro H. eapply forallb_All in H. unfold subst_instance, subst_instance_instance. *)
+  (*   f_equal. apply All_map_eq. solve_all. now eapply closedu_subst_instance_level_app. *)
+  (* Qed. *)
+
   Lemma closedu_subst_instance_app u u' t
-    : closedu_instance #|u'| t -> subst_instance (u' ++ u) t = subst_instance u' t.
+    : closed_instance #|Instance.qualities u'| #|Instance.universes u'| t ->
+      subst_instance (Instance.append u' u) t =
+        subst_instance u' t.
   Proof.
-    intro H. eapply forallb_All in H. apply All_map_eq.
-    solve_all. now eapply closedu_subst_instance_level_app.
+    move => /andP [/forallb_All Hq /forallb_All Hu].
+    unfold subst_instance, subst_instance_instance. f_equal.
+    - apply All_map_eq. solve_all. now eapply closedq_subst_instance_quality_app.
+    - apply All_map_eq. solve_all. now eapply closedu_subst_instance_level_app.
   Qed.
 
-  Lemma closedu_subst_instance_lift u u' t
-    : closedu_instance #|u| t -> subst_instance (u' ++ u) (lift_instance #|u'| t) = subst_instance u t.
+  Lemma closedu_subst_instance_univs_lift qs u u' t
+    : closed_instance_universes #|u| t -> subst_instance (Instance.make qs (u' ++ u)) (lift_instance_universes #|u'| t) = subst_instance (Instance.make qs u) t.
   Proof.
     intro H. eapply forallb_All in H.
-    rewrite /subst_instance /subst_instance_instance /lift_instance map_map_compose. apply All_map_eq.
+    rewrite /subst_instance /subst_instance_instance /lift_instance_universes map_map_compose.
+    f_equal. apply All_map_eq.
     solve_all. now eapply closedu_subst_instance_level_lift.
   Qed.
 
+  Lemma closedq_subst_instance_quality_lift us qs qs' q
+  : closedq_quality #|qs| q -> subst_instance_quality (Instance.make (qs' ++ qs) us) (lift_quality #|qs'| q) = subst_instance_quality (Instance.make qs us) q.
+  Proof.
+    destruct q; cbnr. destruct t.
+    intros Hn % Nat.ltb_lt. cbn.
+    rewrite app_nth2; try lia.
+    lia_f_equal.
+  Qed.
+
+  (* Lemma closedq_subst_instance_quality_lift us qs q n *)
+  (* : closedq_quality n q -> subst_instance_quality (Instance.make qs us) (lift_quality n q) = q. *)
+  (* Proof. *)
+  (*   destruct q; cbnr. destruct t. *)
+  (*   intros Hn % Nat.ltb_lt. *)
+  (*   unfold subst_instance_quality. unfold Quality.var, QVar.var. *)
+  (*   rewrite nth_nth_error. cbn. *)
+  (* Qed. *)
+
+  Lemma closedu_subst_instance_lift u u' t
+    : closed_instance #|Instance.qualities u| #|Instance.universes u| t ->
+      subst_instance (Instance.append u' u)
+        (lift_instance #|Instance.qualities u'| #|Instance.universes u'| t) = subst_instance u t.
+  Proof.
+    intro H. unfold closed_instance in H.
+    rewrite /subst_instance /subst_instance_instance map_map_compose. f_equal.
+    - apply All_map_eq, In_All. intros.
+      apply closedq_subst_instance_quality_lift.
+      move/andP: H => [Hq _]. red in Hq. rewrite forallb_forall in Hq.
+      now apply Hq.
+    - rewrite map_map. apply All_map_eq, In_All. intros.
+      apply closedu_subst_instance_level_lift.
+      move/andP: H => [_ Hu]. red in Hu. rewrite forallb_forall in Hu.
+      now apply Hu.
+  Qed.
 End UniverseClosedSubst.
 
-Lemma level_var_instance_length n i : #|level_var_instance n i| = #|i|.
-Proof. rewrite /level_var_instance; len. Qed.
-#[global]
-Hint Rewrite level_var_instance_length : len.
+Lemma level_var_instance_length n i : #|Instance.universes (var_instance n i)| = #|i.(Universes.universes)|.
+Proof. rewrite /var_instance; len. Qed.
 
-Lemma lift_instance_length n i : #|lift_instance n i| = #|i|.
-Proof. now rewrite /lift_instance; len. Qed.
+Lemma quality_var_instance_length n i : #|Instance.qualities (var_instance n i)| = #|i.(Universes.qualities)|.
+Proof. rewrite /var_instance; len. Qed.
+#[global]
+Hint Rewrite level_var_instance_length quality_var_instance_length : len.
+
+Lemma lift_instance_length n i :
+  #|Instance.universes (lift_instance_universes n i)| = #|Instance.universes i|.
+Proof. now rewrite /lift_instance_universes; len. Qed.
 #[global]
 Hint Rewrite lift_instance_length : len.
 
@@ -1802,15 +1860,16 @@ Lemma variance_universes_insts {cf} {Σ mdecl l} :
     match ind_universes mdecl with
     | Monomorphic_ctx => False
     | Polymorphic_ctx (inst, cstrs) =>
-      let cstrs := ConstraintSet.union (ConstraintSet.union cstrs (lift_constraints #|i| cstrs)) (variance_cstrs l i i')
-      in v = Polymorphic_ctx (inst ++ inst, cstrs)
+      let cstrs := ConstraintSet.union (ConstraintSet.union cstrs (lift_constraints #|Instance.universes i| cstrs)) (variance_cstrs l (Instance.universes i) (Instance.universes i'))
+      in v = Polymorphic_ctx (append_bound_names inst inst, cstrs)
     end,
     consistent_instance_ext (Σ.1, v) (ind_universes mdecl) i,
     consistent_instance_ext (Σ.1, v) (ind_universes mdecl) i',
-    #|i| = #|i'|, #|l| = #|i|,
+    #|Instance.universes i| = #|Instance.universes i'|, #|l| = #|Instance.universes i|,
+    #|Instance.qualities i| = #|Instance.qualities i'|,
     i' = abstract_instance (ind_universes mdecl),
-    closedu_instance #|i'| i' &
-    i = lift_instance #|i'| i'].
+    closed_instance #|Instance.qualities i'| #|Instance.universes i'| i' &
+    i = lift_instance #|Instance.qualities i'| #|Instance.universes i'| i'].
 Proof.
   unfold variance_universes.
   destruct (ind_universes mdecl); simpl => //.
@@ -1818,17 +1877,25 @@ Proof.
   intros [univs' [i [i' []]]].
   let e := match goal with H : Some _ = Some _ |- _ => H end in
   noconf e.
-  do 3 eexists; split. trea. all:eauto. 1-3:len.
+  do 3 eexists; split. trea. all:eauto. 1-4:len.
   repeat match goal with H : _ |- _ => progress len in H end.
   len.
-  rewrite /closedu_instance /level_var_instance forallb_mapi //.
-  intros i hi. simpl. now eapply Nat.ltb_lt.
+  rewrite /closed_instance /closed_instance_qualities /closed_instance_universes /var_instance !forallb_mapi //.
+  1-2: intros i hi; simpl; now eapply Nat.ltb_lt.
   now len.
 Qed.
 
-Lemma consistent_instance_poly_length {cf} {Σ} {wfΣ : wf Σ} {inst cstrs u} :
+Lemma consistent_instance_poly_univs_length {cf} {Σ} {wfΣ : wf Σ} {inst cstrs u} :
   consistent_instance_ext Σ (Polymorphic_ctx (inst, cstrs)) u ->
-  #|u| = #|inst|.
+  #|Instance.universes u| = #|inst.(Universes.universes)|.
+Proof.
+  rewrite /consistent_instance_ext /consistent_instance.
+  intuition auto.
+Qed.
+
+Lemma consistent_instance_poly_qualities_length {cf} {Σ} {wfΣ : wf Σ} {inst cstrs u} :
+  consistent_instance_ext Σ (Polymorphic_ctx (inst, cstrs)) u ->
+  #|Instance.qualities u| = #|inst.(Universes.qualities)|.
 Proof.
   rewrite /consistent_instance_ext /consistent_instance.
   intuition auto.
@@ -1838,7 +1905,7 @@ Lemma consistent_instance_valid {cf} {Σ} {wfΣ : wf Σ} {inst cstrs u} :
   consistent_instance_ext Σ (Polymorphic_ctx (inst, cstrs)) u ->
   check_univs ->
   forall v, satisfies v (global_ext_constraints Σ) -> satisfies v (subst_instance_cstrs u cstrs).
-Proof. rewrite /consistent_instance_ext /=; intros [_ [_ v]] cu.
+Proof. rewrite /consistent_instance_ext /=; intros [_ [_ [_ [_ v]]]] cu.
     red in v. now rewrite cu in v.
 Qed.
 
@@ -1850,18 +1917,18 @@ Definition closedu_cstrs k (cstrs : CS.t) :=
   CS.For_all (closedu_cstr k) cstrs.
 
 Lemma LSet_in_poly_bounded l inst cstrs : LevelSet.In l (levels_of_udecl (Polymorphic_ctx (inst, cstrs))) ->
-  closedu_level #|inst| l.
+  closedu_level #|inst.(Universes.universes)| l.
 Proof.
   simpl.
   rewrite /mapi.
-  change (#|inst|) with (0 + #|inst|).
+  change (#|inst.(Universes.universes)|) with (0 + #|inst.(Universes.universes)|).
   generalize 0.
-  induction inst; simpl; auto.
+  induction inst.(Universes.universes); simpl; auto.
   intros n emp. now eapply LevelSetFact.empty_iff in emp.
   intros n Hl.
   rewrite -> LS.add_spec in Hl.
   destruct Hl. subst.  simpl. apply Nat.ltb_lt; lia.
-  specialize (IHinst _ H). now rewrite Nat.add_succ_r.
+  specialize (IHl0 _ H). now rewrite Nat.add_succ_r.
 Qed.
 
 Lemma LSet_in_global_bounded {cf:checker_flags} {Σ : global_env} {l} k :
@@ -1877,7 +1944,7 @@ Qed.
 Lemma on_udecl_prop_poly_bounded {cf:checker_flags} Σ inst cstrs :
   wf Σ ->
   on_udecl_prop Σ (Polymorphic_ctx (inst, cstrs)) ->
-  closedu_cstrs #|inst| cstrs.
+  closedu_cstrs #|inst.(Universes.universes)| cstrs.
 Proof.
   rewrite /on_udecl_prop.
   intros wfΣ nlevs.
@@ -1891,17 +1958,17 @@ Proof.
   apply LevelSetProp.Dec.F.union_1 in H0.
   destruct H. eapply LSet_in_poly_bounded in H.
   destruct H0. eapply LSet_in_poly_bounded in H0. simpl. now rewrite H H0.
-  eapply (LSet_in_global_bounded #|inst|) in H0 => //. simpl.
+  eapply (LSet_in_global_bounded #|inst.(Universes.universes)|) in H0 => //. simpl.
   now rewrite H H0.
-  eapply (LSet_in_global_bounded #|inst|) in H => //. simpl.
+  eapply (LSet_in_global_bounded #|inst.(Universes.universes)|) in H => //. simpl.
   destruct H0. eapply LSet_in_poly_bounded in H0. simpl. now rewrite H H0.
-  eapply (LSet_in_global_bounded #|inst|) in H0 => //. simpl.
+  eapply (LSet_in_global_bounded #|inst.(Universes.universes)|) in H0 => //. simpl.
   now rewrite H H0.
 Qed.
 
-Lemma closedu_subst_instance_cstrs_app u u' cstrs :
+Lemma closedu_subst_instance_cstrs_app qs u u' cstrs :
   closedu_cstrs #|u| cstrs ->
-  CS.Equal (subst_instance_cstrs (u ++ u') cstrs) (subst_instance_cstrs u cstrs).
+  CS.Equal (subst_instance_cstrs (Instance.make qs (u ++ u')) cstrs) (subst_instance_cstrs (Instance.make qs u) cstrs).
 Proof.
   intros clcstra.
   intros c.
@@ -1959,9 +2026,9 @@ Proof.
 Qed.
 
 
-Lemma closedu_subst_instance_cstrs_lift u u' cstrs :
+Lemma closedu_subst_instance_cstrs_lift qs u u' cstrs :
   closedu_cstrs #|u'| cstrs ->
-  CS.Equal (subst_instance_cstrs (u ++ u') (lift_constraints #|u| cstrs)) (subst_instance_cstrs u' cstrs).
+  CS.Equal (subst_instance_cstrs (Instance.make qs (u ++ u')) (lift_constraints #|u| cstrs)) (subst_instance_cstrs (Instance.make qs u') cstrs).
 Proof.
   intros clcstra.
   intros c.
@@ -2016,9 +2083,9 @@ Proof.
   destruct i, i'; simpl => //.
   destruct a.
   - apply (IHl u i i').
-  - rewrite -IHl.
+  - fold (variance_cstrs l i@[u] i'@[u]). rewrite -IHl.
     now rewrite subst_instance_cstrs_add.
-  - rewrite -IHl.
+  - fold (variance_cstrs l i@[u] i'@[u]). rewrite -IHl.
     now rewrite subst_instance_cstrs_add.
 Qed.
 
@@ -2040,7 +2107,7 @@ Lemma ws_cumul_pb_inst_variance {cf} {le} {Σ} {wfΣ : wf Σ} {mdecl l v i i' u 
   variance_universes (PCUICEnvironment.ind_universes mdecl) l = Some (v, i, i') ->
   consistent_instance_ext Σ (ind_universes mdecl) u ->
   consistent_instance_ext Σ (ind_universes mdecl) u' ->
-  cmp_universe_instance_variance (compare_universe Σ) Cumul l u u' ->
+  cmp_universe_instance_variance (compare_universe Σ) Cumul l (Instance.universes u) (Instance.universes u') ->
   forall t t',
   (Σ.1, v) ;;; Γ@[i] ⊢ t@[i] ≤[le] t'@[i'] ->
   Σ ;;; Γ@[u] ⊢ t@[u] ≤[le] t'@[u'].
@@ -2048,22 +2115,26 @@ Proof.
   intros onu onv vari cu cu' Ru t t'.
   intros cum.
   destruct Σ as [Σ univs].
-  pose proof (variance_universes_insts onv) as (v' & ui & ui' & [hv cstrs cui cui' len0 len1 eqi']).
+  pose proof (variance_universes_insts onv) as (v' & ui & ui' & [hv cstrs cui cui' len0 len1 len2 eqi']).
   rewrite vari in hv; noconf hv.
   subst i.
-  pose proof (consistent_instance_length cu).
-  pose proof (consistent_instance_length cu').
-  rewrite -eqi' in H, H0.
-  rewrite -H0 in cum.
-  assert (subst_instance (u' ++ u) (lift_instance #|u'| i') = u) as subsu.
+  pose proof (consistent_instance_univs_length cu).
+  pose proof (consistent_instance_univs_length cu').
+  pose proof (consistent_instance_quals_length cu).
+  pose proof (consistent_instance_quals_length cu').
+  rewrite -eqi' in H, H0, H1, H2.
+  rewrite -H0 -H2 in cum.
+  assert (subst_instance
+            (Instance.append u' u)
+            (lift_instance #|Instance.qualities u'| #|Instance.universes u'| i') = u) as subsu.
   { rewrite closedu_subst_instance_lift //.
     now rewrite H. rewrite eqi'.
-    erewrite subst_instance_id_mdecl => //. eauto. }
-  assert (subst_instance (u' ++ u) i' = u') as subsu'.
+    erewrite subst_instance_id_mdecl => //; eauto. }
+  assert (subst_instance (Instance.append u' u) i' = u') as subsu'.
   { rewrite closedu_subst_instance_app //.
-    rewrite H0 //. rewrite eqi' //.
-    erewrite subst_instance_id_mdecl => //. eauto. }
-  eapply (subst_instance_ws_cumul_pb (Σ, v) _ (u' ++ u)) in cum; auto.
+    rewrite H0 //. rewrite H2 //.
+    rewrite eqi'. erewrite subst_instance_id_mdecl => //; eauto. }
+  eapply (subst_instance_ws_cumul_pb (Σ, v) _ (Instance.append u' u)) in cum; auto.
   rewrite !subst_instance_two in cum.
   rewrite subst_instance_two_context in cum.
   now rewrite subsu subsu' in cum.
@@ -2087,29 +2158,33 @@ Proof.
   intuition auto.
   - rewrite -satisfies_subst_instance_ctr //.
     assert(ConstraintSet.Equal (subst_instance_cstrs u' cstrs')
-        (subst_instance_cstrs (u' ++ u) cstrs')) as <-.
+        (subst_instance_cstrs (Instance.append u' u) cstrs')) as <-.
     { rewrite closedu_subst_instance_cstrs_app //.
-      rewrite (consistent_instance_poly_length cu').
+      rewrite (consistent_instance_poly_univs_length cu').
       eapply on_udecl_prop_poly_bounded; eauto. }
     eapply consistent_instance_valid in cu'; eauto.
   - rewrite -satisfies_subst_instance_ctr // -H0.
     assert(ConstraintSet.Equal (subst_instance_cstrs u cstrs')
-        (subst_instance_cstrs (u' ++ u) (lift_constraints #|u'| cstrs'))) as <-.
+        (subst_instance_cstrs (Instance.append u' u) (lift_constraints #|Instance.universes u'| cstrs'))) as <-.
     { rewrite closedu_subst_instance_cstrs_lift //.
-      rewrite H -H0 (consistent_instance_poly_length cu').
+      rewrite H -H0 (consistent_instance_poly_univs_length cu').
       eapply on_udecl_prop_poly_bounded; eauto. }
     eapply consistent_instance_valid in cu; eauto.
   - rewrite -satisfies_subst_instance_ctr //.
     rewrite subst_instance_variance_cstrs //.
-    rewrite -H0 subsu subsu'.
-    assert (#|u| = #|u'|) as lenu by lia.
-    assert (#|l| = #|u|) as lenlu. now rewrite len1 H.
+    unfold lift_instance, subst_instance, subst_instance_instance in subsu, subsu'.
+    destruct u. injection subsu => [hlevel _].
+    destruct u'. injection subsu' => [hlevel' _].
+    unfold subst_instance, subst_instance_list, subst_instance.
+    rewrite -H0 hlevel hlevel'. cbn in *.
+    assert (#|l1| = #|l3|) as lenu by lia.
+    assert (#|l| = #|l1|) as lenlu. now rewrite len1 H.
     clear -checku Ru sat lenu lenlu.
-    induction l in u, u', Ru, lenu, lenlu |- *. simpl in *. destruct u, u';
+    induction l in l1, l3, Ru, lenu, lenlu |- *. simpl in *. destruct l1, l3;
     intro; rewrite ConstraintSetFact.empty_iff //.
-    destruct u, u' => //; simpl in *.
+    destruct l1, l3 => //; simpl in *.
     depelim Ru. rename H into Ra.
-    specialize (IHl u u' Ru). do 2 forward IHl by lia.
+    specialize (IHl l1 l3 Ru). do 2 forward IHl by lia.
     destruct a => //; intros x; rewrite ConstraintSetFact.add_iff;
     intros [<-|inx]; auto.
     + do 5 red in Ra; rewrite checku in Ra;
@@ -2126,7 +2201,7 @@ Lemma All2_fold_inst {cf} {le} {Σ} {wfΣ : wf Σ} mdecl l v i i' u u' Γ' Γ :
   consistent_instance_ext Σ (ind_universes mdecl) u ->
   consistent_instance_ext Σ (ind_universes mdecl) u' ->
   variance_universes (PCUICEnvironment.ind_universes mdecl) l = Some (v, i, i') ->
-  cmp_universe_instance_variance (compare_universe Σ) Cumul l u u' ->
+  cmp_universe_instance_variance (compare_universe Σ) Cumul l (Instance.universes u) (Instance.universes u') ->
   ws_cumul_ctx_pb_rel le (Σ.1, v) (subst_instance i Γ') (subst_instance i Γ) (subst_instance i' Γ) ->
   ws_cumul_ctx_pb_rel le Σ (subst_instance u Γ') (subst_instance u Γ) (subst_instance u' Γ).
 Proof.
@@ -2308,14 +2383,15 @@ Proof.
   eapply on_free_vars_ctx_impl => //.
 Qed.
 
-Lemma cmp_global_instance_ind_inv {cf} {Σ} {wfΣ : wf Σ} cmp_universe pb ind mdecl idecl napp u u' :
+Lemma cmp_global_instance_ind_inv {cf} {Σ} {wfΣ : wf Σ} cmp_quality cmp_universe pb ind mdecl idecl napp u u' :
   RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb) ->
   declared_inductive Σ ind mdecl idecl ->
-  cmp_global_instance Σ cmp_universe pb (IndRef ind) napp u u' ->
+  cmp_global_instance Σ cmp_quality cmp_universe pb (IndRef ind) napp u u' ->
   ((context_assumptions (ind_indices idecl) + context_assumptions (ind_params mdecl) <= napp ×
     ∑ l, ind_variance mdecl = Some l ×
-      cmp_universe_instance_variance cmp_universe pb l u u') +
-  cmp_universe_instance (cmp_universe Conv) u u')%type.
+      cmp_quality_instance (cmp_quality Conv) u u' *
+        cmp_universe_instance_variance cmp_universe pb l (Instance.universes u) (Instance.universes u')) +
+  cmp_instance (cmp_quality Conv) (cmp_universe Conv) u u')%type.
 Proof.
   intros Hsub decli.
   destruct (on_declared_inductive decli) as [onmind oib].
@@ -2328,7 +2404,7 @@ Proof.
   elim: leb_spec_Set => // comp. 2: now right.
   destruct ind_variance eqn:indv => //. 2: now right.
   move/cmp_opt_variance_var_dec => [|H]. 1: now right.
-  left.
+  left. destruct H.
   now repeat eexists.
 Qed.
 
@@ -2405,7 +2481,9 @@ Proof.
         rewrite !on_free_vars_ctx_app is_closed_subst_inst.
         rewrite expand_lets_smash_context /= //. len. }
     eapply All2_fold_inst in respv.
-    7:eauto. all:eauto. move: respv.
+    4: exact cu.
+    4: exact cu'.
+    all:eauto. move: respv.
     rewrite !expand_lets_smash_context.
     autorewrite with pcuic.
     rewrite !subst_instance_smash /= => args. cbn in args.
@@ -2415,7 +2493,7 @@ Proof.
     pose proof (spine_subst_smash spu') as sspu'.
     eapply (substitution_ws_cumul_ctx_pb_subst_conv (Γ := Γ) (Γ'' := []) (s := List.rev pars) (s' := List.rev pars')) in args.
     2:{ eapply All2_rev => //. }
-    2:{ eapply subslet_untyped_subslet, sspu. }
+    2:{ eapply subslet_untyped_subslet, sspu.  }
     2:{ eapply subslet_untyped_subslet, sspu'. }
     2:{ eapply is_closed_context_smash_end => //. }
     move: args.
@@ -2431,7 +2509,7 @@ Proof.
     rewrite -(spine_subst_extended_subst spu').
     len. rewrite subst_context_lift_context_cancel.
     len. rewrite (context_subst_length2 spu'); len; lia.
-    now rewrite subst_context_nil. }
+    now rewrite subst_context_nil. apply Ru. }
   simpl. intros.
   { rewrite /pindctx /pindctx' /indctx /indctx'.
     rewrite !(smash_context_subst []).
@@ -2639,7 +2717,7 @@ Proof.
         rewrite !on_free_vars_ctx_app is_closed_subst_inst !on_free_vars_ctx_app.
         rewrite expand_lets_smash_context /= //. len. }
     split.
-    { eapply All2_fold_inst in args. 7:eauto. all:eauto.
+    { eapply All2_fold_inst in args. 7:apply Ru. all:eauto.
       rewrite !expand_lets_smash_context in args.
       autorewrite with pcuic in args.
       rewrite !subst_instance_smash /= in args.
@@ -2736,7 +2814,7 @@ Proof.
       eapply All2_All in idx.
       eapply All_mix in idx; tea. clear cli.
       eapply All_All2; tea. solve_all.
-      rename a into clx; rename b into cxy.
+      rename a0 into clx; rename b0 into cxy.
       rewrite -app_context_assoc. eapply weaken_ws_cumul_pb; eauto.
 
       (* eapply All_mix in idx; tea. clear cli. *)
@@ -2744,7 +2822,7 @@ Proof.
       (* rename a into clx; rename b into cxy.
       rewrite -app_context_assoc. eapply weaken_ws_cumul_pb; eauto.
       rewrite subst_instance_app_ctx in cxy. *)
-      eapply ws_cumul_pb_inst_variance in cxy. 7:eauto. all:eauto.
+      eapply ws_cumul_pb_inst_variance in cxy. 7:apply b. all:eauto.
       (* rewrite !app_context_nil_l in X3. eapply X3 in cxy; clear X3; cycle 1. *)
       rewrite subst_instance_app_ctx in cxy.
       epose proof (subst_conv_closed (Γ := [])) as X3.
@@ -3128,6 +3206,7 @@ Proof.
   rewrite projs_length !Nat.add_succ_r Nat.add_0_r /= //.
   rewrite !subst_instance_lift // projs_inst_0 //.
   rewrite p0.(onNpars) //.
+  apply Ru.
 Qed.
 
 Lemma wt_ind_app_variance {cf} {Σ} {wfΣ : wf Σ} {Γ ind u l}:

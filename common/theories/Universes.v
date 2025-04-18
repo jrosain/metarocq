@@ -1006,6 +1006,12 @@ Module Quality.
 
   Definition var (n : nat) := qVar (QVar.var n).
   
+  Definition is_var (q : t) :=
+    match q with
+    | qVar _ => true
+    | _ => false
+    end.
+  
   Definition eqb (q1 q2 : t) : bool :=
     match q1, q2 with
     | qProp, qProp
@@ -1021,8 +1027,154 @@ Module Quality.
     destruct x, y; cbn; try constructor; auto; try congruence.
     destruct (eqb_spec t0 t1); constructor. now f_equal.
     congruence.
-  Qed.  
+  Qed.
+
+  Definition eq (q1 q2 : t) : Prop :=
+    match q1, q2 with
+    | qSProp, qSProp | qProp, qProp | qType, qType => True
+    | qVar q1, qVar q2 => QVar.eq q1 q2
+    | (qSProp | qProp | qType | qVar _), _ => False
+    end.
+
+  #[global] Instance quality_eq_equiv : Equivalence eq.
+  Proof.
+    split.
+    - intros []; unfold eq; auto. apply QVar.eq_equiv.
+    - intros [] []; unfold eq; auto. apply QVar.eq_equiv.
+    - intros [] [] []; unfold eq; auto. apply QVar.eq_equiv.
+  Qed.
+
+  Module OT <: OrderedType.
+    Definition t := t.
+    #[local] Definition eq (q q' : t) : Prop := q = q'.
+    #[local] Definition eq_equiv : Equivalence eq := _.
+
+    Definition lt (q1 q2 : t) : Prop :=
+      match q1, q2 with
+      | qSProp, (qProp | qType | qVar _) => True
+      | qProp, (qType | qVar _) => True
+      | qType, qVar _ => True
+      | qVar q1, qVar q2 => QVar.lt q1 q2
+      | (qSProp | qProp | qType | qVar _), _ => False
+      end.
+
+    #[local] Instance lt_strorder : StrictOrder lt.
+    Proof.
+      constructor.
+      - intros [| | |] X; inversion X.
+        now eapply irreflexivity in H1.
+      - intros [| | |] [| | |] [| | |] X1 X2;
+          inversion X1; inversion X2; constructor.
+        subst.
+        etransitivity; tea. inversion X2. assumption.
+    Qed.
+
+    Definition lt_compat : Proper (eq ==> eq ==> iff) lt.
+    Proof.
+      intros [] [] e [] [] e'; unfold lt; unfold eq in *.
+      all: try tauto.
+      all: try inversion e.
+      all: try inversion e'.
+      reflexivity.
+    Qed.
+
+    Definition compare (x y : t) : comparison
+      := match x, y with
+         | qSProp, qSProp => Eq
+         | qSProp, _ => Lt
+         | _, qSProp => Gt
+         | qProp, qProp => Eq
+         | qProp, _ => Lt
+         | _, qProp => Gt
+         | qType, qType => Eq
+         | qType, _ => Lt
+         | _, qType => Gt
+         | qVar q, qVar q' => QVar.compare q q'
+          end.
+
+    Lemma compare_spec x y : CompareSpec (eq x y) (lt x y) (lt y x) (compare x y).
+    Proof.
+      cbv [compare eq].
+      destruct x, y.
+      all: lazymatch goal with
+            | [ |- context[QVar.compare ?x ?y] ]
+              => destruct (QVar.compare_spec x y)
+            | _ => idtac
+            end.
+      all: repeat constructor; try apply f_equal; try assumption.
+    Qed.
+    Definition eq_dec (x y : t) : {eq x y} + {~ (eq x y)}.
+    Proof. unfold eq; decide equality. destruct t0, t1. apply QVar.eq_dec_qvar. Defined.
+  End OT.
+  Module OTOrig <: OrderedTypeOrig := Backport_OT OT.                       
 End Quality.
+
+Module QualitySet := MSetAVL.Make Quality.OT.
+Module QualitySetFact := WFactsOn Quality.OT QualitySet.
+Module QualitySetOrdProp := MSetProperties.OrdProperties QualitySet.
+Module QualitySetProp := QualitySetOrdProp.P.
+Module QualitySetDecide := QualitySetProp.Dec.
+
+Ltac qsets := QualitySetDecide.fsetdec.
+
+Section QualitySetMoreFacts.
+
+  Definition QualitySet_pair x y :=
+    QualitySet.add y (QualitySet.singleton x).
+
+  Definition QualitySet_triple x y z :=
+    QualitySet.add z (QualitySet_pair x y).
+
+  Lemma QualitySet_pair_In x y z :
+    QualitySet.In x (QualitySet_pair y z) -> x = y \/ x = z.
+  Proof.
+    intro H. apply QualitySetFact.add_iff in H.
+    destruct H; [intuition|].
+    apply QualitySetFact.singleton_1 in H; intuition.
+  Qed.
+
+  Lemma QualitySet_triple_In x y z t :
+    QualitySet.In x (QualitySet_triple y z t) -> x = y \/ x = z \/ x = t.
+  Proof.
+    intro H. apply QualitySetFact.add_iff in H.
+    destruct H; [intuition|]. apply QualitySet_pair_In in H; destruct H; intuition.
+  Qed.
+
+  Definition QualitySet_mem_union (qs qs' : QualitySet.t) x :
+    QualitySet.mem x (QualitySet.union qs qs') <-> QualitySet.mem x qs \/ QualitySet.mem x qs'.
+  Proof.
+    rewrite QualitySetFact.union_b.
+    apply orb_true_iff.
+  Qed.
+
+  Lemma QualitySet_In_fold_right_add x qs :
+    In x qs <-> QualitySet.In x (fold_right QualitySet.add QualitySet.empty qs).
+  Proof.
+    split.
+    - induction qs; simpl => //. intros [<-|H].
+      * eapply QualitySet.add_spec; left; auto. 
+      * eapply QualitySet.add_spec; right; auto.
+    - induction qs; simpl => //.
+      * rewrite QualitySetFact.empty_iff //.
+      * rewrite QualitySet.add_spec. intuition auto.
+  Qed.
+
+  Lemma QualitySet_union_empty qs : QualitySet.Equal (QualitySet.union QualitySet.empty qs) qs.
+  Proof.
+    intros x; rewrite QualitySet.union_spec. qsets.
+  Qed.
+End QualitySetMoreFacts.
+
+Definition quality_constants_set :=
+  QualitySet_triple Quality.qSProp Quality.qProp Quality.qType.
+
+Definition string_of_quality q :=
+  match q with
+  | Quality.qSProp => "qSProp"
+  | Quality.qProp => "qProp"
+  | Quality.qType => "qType"
+  | Quality.qVar q => "qVar(" ^ string_of_qvar q ^ ")"
+  end.
 
 (** {6 Sort instances} *)
 
@@ -1030,54 +1182,118 @@ Module Instance.
 
   (** A universe instance represents a vector of argument concrete_sort
       to a polymorphic definition (constant, inductive or constructor). *)
-  Definition t : Set := list Level.t.
+  Definition t : Set := list Quality.t × list Level.t.
 
-  Definition empty : t := [].
+  Definition empty : t := ([], []).
   Definition is_empty (i : t) : bool :=
     match i with
-    | [] => true
-    | _ => false
+    | ([], []) => true
+    | (_, _) => false
     end.
 
-  Definition eqb (i j : t) :=
-    forallb2 Level.eqb i j.
+  Definition make : list Quality.t -> list Level.t -> t := pair.
+  Definition qualities (inst : t) : list Quality.t := inst.1.
+  Definition universes (inst : t) : list Level.t := inst.2.
 
-  Definition equal_upto (f : Level.t -> Level.t -> bool) (i j : t) :=
-    forallb2 f i j.
+  Definition on_univs (inst : t) (f : list Level.t -> list Level.t) : t :=
+    (inst.1, f inst.2).
+
+  Definition equal_upto (f : Quality.t -> Quality.t -> bool) (g : Level.t -> Level.t -> bool) (i j : t) :=
+    forallb2 f i.1 j.1 && forallb2 g i.2 j.2.
+
+  Definition eqb : t -> t -> bool := equal_upto Quality.eqb Level.eqb.
+
+  Definition equal_upto_lvl (f : Level.t -> Level.t -> bool) : t -> t -> bool := equal_upto Quality.eqb f.
+
+  Definition equal_upto_qual (f : Quality.t -> Quality.t -> bool) : t -> t -> bool := equal_upto f Level.eqb.
+
+  Lemma eq_instances : forall (i j : t), qualities i = qualities j -> universes i = universes j -> i = j.
+  Proof.
+    intros (qis&uis) (qjs&ujs) eq eu. rewrite pair_equal_spec. auto.
+  Qed.
+
+  Definition eq_length (inst inst' : t) : Prop :=
+    #|qualities inst| = #|qualities inst'| /\
+      #|universes inst| = #|universes inst'|.
+
+  Definition append (inst inst' : t) : t :=
+    (qualities inst ++ qualities inst',
+      universes inst ++ universes inst').
 End Instance.
 
+Record bound_names := mkBoundNames { qualities : list name; universes : list name }.
+
+Definition empty_bound_names := {| qualities := []; universes := [] |}.
+Definition mk_bound_names qs us := {| qualities := qs; universes := us |}.
+Definition append_bound_names (b b' : bound_names) :=
+  {| qualities := b.(qualities) ++ b'.(qualities);
+     universes := b.(universes) ++ b'.(universes) |}.
+
+Instance reflect_eq_name : ReflectEq name.
+Proof. apply EqDec_ReflectEq. exact name_EqDec. Qed.
+
+Definition eqb_bound_names (n n' : bound_names) : bool :=
+  eqb n.(qualities) n'.(qualities) &&
+    eqb n.(universes) n'.(universes).
+
+#[program] Instance reflect_eq_bound_names : ReflectEq bound_names := {
+    eqb := eqb_bound_names
+  }.
+Next Obligation.
+  destruct (eqb_bound_names x y) eqn:e; constructor; unfold eqb_bound_names in e.
+  - apply andb_true_iff in e; destruct e. destruct x, y; cbn in *. f_equal.
+    now apply (elimP (eqb_spec qualities0 qualities1)).
+    now apply (elimP (eqb_spec universes0 universes1)).
+  - apply andb_false_iff in e; destruct e; destruct x, y; cbn in *; intro e; injection e.
+    intros _ e'. rewrite e' in H. destruct (eqb_spec qualities1 qualities1). discriminate. now apply H0.
+    intros e' _. rewrite e' in H. destruct (eqb_spec universes1 universes1). discriminate. now apply H0.
+Qed.
+
 Module UContext.
-  Definition t := list name × (Instance.t × ConstraintSet.t).
+  Definition t := bound_names × (Instance.t × ConstraintSet.t).
 
   Definition make' : Instance.t -> ConstraintSet.t -> Instance.t × ConstraintSet.t := pair.
-  Definition make (ids : list name) (inst_ctrs : Instance.t × ConstraintSet.t) : t := (ids, inst_ctrs).
+  Definition make (ids : bound_names) (inst_ctrs : Instance.t × ConstraintSet.t) : t := (ids, inst_ctrs).
 
-  Definition empty : t := ([], (Instance.empty, ConstraintSet.empty)).
+  Definition empty : t := (empty_bound_names, (Instance.empty, ConstraintSet.empty)).
 
   Definition instance : t -> Instance.t := fun x => fst (snd x).
   Definition constraints : t -> ConstraintSet.t := fun x => snd (snd x).
 
-  Definition dest : t -> list name * (Instance.t * ConstraintSet.t) := fun x => x.
+  Definition univs_instance : t -> list Level.t := Instance.universes ∘ instance.
+  Definition quals_instance : t -> list Quality.t := Instance.qualities ∘ instance.
+
+  Definition dest : t -> bound_names * (Instance.t * ConstraintSet.t) := fun x => x.
 End UContext.
 
 Module AUContext.
-  Definition t := list name × ConstraintSet.t.
+  Definition t := bound_names × ConstraintSet.t.
 
-  Definition make (ids : list name) (ctrs : ConstraintSet.t) : t := (ids, ctrs).
+  Definition make (ids : bound_names) (ctrs : ConstraintSet.t) : t := (ids, ctrs).
   Definition repr (x : t) : UContext.t :=
     let (u, cst) := x in
-    (u, (mapi (fun i _ => Level.lvar i) u, cst)).
+    let qs := mapi (fun i _ => Quality.var i) u.(qualities) in
+    let us := mapi (fun i _ => Level.lvar i) u.(universes) in
+    (u, (Instance.make qs us, cst)).
+  
+  #[local] Existing Instance EqDec_ReflectEq.
+
+  Definition inter (au av : AUContext.t) : AUContext.t :=
+    let quals_prefix := (split_prefix au.1.(qualities) av.1.(qualities)).1.1 in
+    let univs_prefix := (split_prefix au.1.(universes) av.1.(universes)).1.1 in
+    let lvls := fold_left_i (fun s i _ => LevelSet.add (Level.lvar i) s) univs_prefix LevelSet.empty in
+    let filter := ConstraintSet.filter (is_declared_cstr_levels lvls) in
+    make (mk_bound_names quals_prefix univs_prefix) (ConstraintSet.union (filter au.2) (filter av.2)).
+
+  Definition univ_names (uctx : t) : list name := uctx.1.(universes).
+
+  Definition qual_names (uctx : t) : list name := uctx.1.(qualities).
 
   Definition levels (uctx : t) : LevelSet.t :=
-    LevelSetProp.of_list (fst (snd (repr uctx))).
+    LevelSetProp.of_list (Instance.universes (UContext.instance (repr uctx))).
 
-  #[local]
-  Existing Instance EqDec_ReflectEq.
-  Definition inter (au av : AUContext.t) : AUContext.t :=
-    let prefix := (split_prefix au.1 av.1).1.1 in
-    let lvls := fold_left_i (fun s i _ => LevelSet.add (Level.lvar i) s) prefix LevelSet.empty in
-    let filter := ConstraintSet.filter (is_declared_cstr_levels lvls) in
-    make prefix (ConstraintSet.union (filter au.2) (filter av.2)).
+  Definition qualities (uctx : t) : QualitySet.t :=
+    QualitySetProp.of_list (Instance.qualities (UContext.instance (repr uctx))).
 End AUContext.
 
 Module ContextSet.
@@ -1209,6 +1425,12 @@ Definition levels_of_udecl u :=
   match u with
   | Monomorphic_ctx => LevelSet.empty
   | Polymorphic_ctx ctx => AUContext.levels ctx
+  end.
+
+Definition qualities_of_udecl u :=
+  match u with
+  | Monomorphic_ctx => QualitySet.empty
+  | Polymorphic_ctx ctx => AUContext.qualities ctx
   end.
 
 Definition constraints_of_udecl u :=
@@ -1849,7 +2071,57 @@ Proof.
   intros;simpl in *;destruct x2;auto.
 Qed.
 
+Section QualityCompare.
+  Context {cf}.
 
+  (* JJJ This is about _conversion_ (for cumulativity)!!
+     The management of [QVar]s is unclear for now. *)
+  Definition leq_quality q q' : Prop :=
+    match q, q' with
+    | Quality.qProp, Quality.qProp
+    | Quality.qSProp, Quality.qSProp
+    | Quality.qType, Quality.qType => True
+    | Quality.qProp, Quality.qType => prop_sub_type
+    | Quality.qVar q, Quality.qVar q' => QVar.le q q'
+    | (Quality.qSProp | Quality.qProp | Quality.qType | Quality.qVar _), _ => False
+    end.
+
+  Definition leqb_quality q q' : bool :=
+    match q, q' with
+    | Quality.qProp, Quality.qProp
+    | Quality.qSProp, Quality.qSProp
+    | Quality.qType, Quality.qType => true
+    | Quality.qProp, Quality.qType => prop_sub_type
+    | Quality.qVar q, Quality.qVar q' => QVar.leqb q q'
+    | (Quality.qSProp | Quality.qProp | Quality.qType | Quality.qVar _), _ => false
+    end.
+
+  Definition eqb_quality q q' : bool :=
+    match q, q' with
+    | Quality.qProp, Quality.qProp
+    | Quality.qSProp, Quality.qSProp
+    | Quality.qType, Quality.qType => true
+    | Quality.qVar q, Quality.qVar q' => QVar.eqb q q'
+    | (Quality.qSProp | Quality.qProp | Quality.qType | Quality.qVar _), _ => false
+    end.
+
+  Definition compare_quality  (pb : conv_pb) q q' :=
+    match pb with
+    | Conv => q = q'
+    | Cumul => leq_quality q q'
+    end.
+
+  Definition eq_quality := compare_quality Conv.
+
+  #[global] Instance eq_quality_refl : Reflexive eq_quality.
+  Proof using Type. intros ?; cbn. reflexivity. Qed.
+
+  #[global] Instance leq_quality_refl : Reflexive leq_quality.
+  Proof using Type. intros ?. destruct x; unfold leq_quality; auto. apply QVar.le_preorder. Qed.
+
+  #[global] Instance eq_leq_quality : subrelation eq_quality leq_quality.
+  Proof using Type. intros ?? []. apply leq_quality_refl. Qed.
+End QualityCompare.
 
 Section SortCompare.
   Context {cf}.
@@ -2502,9 +2774,18 @@ Notation "x @[ u ]" := (subst_instance u x) (at level 3,
   format "x @[ u ]").
 
 #[global] Instance subst_instance_level : UnivSubst Level.t :=
-  fun u l => match l with
+  fun i l => match l with
             Level.lzero | Level.level     _ => l
-          | Level.lvar n => List.nth n u Level.lzero
+          | Level.lvar n => List.nth n (Instance.universes i) Level.lzero
+          end.
+
+#[global] Instance subst_instance_quality : UnivSubst Quality.t :=
+  fun i q => match q with
+          | Quality.qSProp | Quality.qProp | Quality.qType => q
+          | Quality.qVar v =>
+              match v with
+              | QVar.Var n => List.nth n (Instance.qualities i) Quality.qType
+              end
           end.
 
 #[global] Instance subst_instance_cstr : UnivSubst UnivConstraint.t :=
@@ -2519,7 +2800,7 @@ Notation "x @[ u ]" := (subst_instance u x) (at level 3,
           | (Level.lzero, _)
           | (Level.level     _, _) => e
           | (Level.lvar n, b) =>
-            match nth_error u n with
+            match nth_error (Instance.universes u) n with
             | Some l => (l,b)
             | None => (Level.lzero, b)
             end
@@ -2541,8 +2822,11 @@ Proof.
 Qed.
 
 #[global] Instance subst_instance_instance : UnivSubst Instance.t :=
-  fun u u' => List.map (subst_instance_level u) u'.
-
+  fun i i' =>
+    (* Maybe add substitution if does not exist *)
+    Instance.make
+      (List.map (subst_instance_quality i) (Instance.qualities i'))
+      (List.map (subst_instance_level i) (Instance.universes i')).
 
 Theorem relevance_subst_eq u s : relevance_of_sort (subst_instance_sort u s) = relevance_of_sort s.
 Proof.
@@ -2584,9 +2868,28 @@ Section Closedu.
     | sType l => closedu_universe l
     end.
 
-  Definition closedu_instance (u : Instance.t) :=
-    forallb closedu_level u.
 End Closedu.
+
+(** Tests that the term is closed over [k] quality variables *)
+Section Closedq.
+  Context (k : nat).
+
+  Definition closedq_quality (q : Quality.t) :=
+    match q with
+    | Quality.qSProp | Quality.qProp | Quality.qType => true
+    | Quality.qVar (QVar.Var n) => (n <? k)%nat
+    end.
+End Closedq.
+
+Definition closed_instance_qualities (k : nat) (i : Instance.t) :=
+  forallb (closedq_quality k) (Instance.qualities i).
+
+Definition closed_instance_universes (k : nat) (i : Instance.t) :=
+  forallb (closedu_level k) (Instance.universes i).
+
+Definition closed_instance (kq ku : nat) (i : Instance.t) :=
+  closed_instance_qualities kq i &&
+    closed_instance_universes ku i.
 
 (** Universe-closed terms are unaffected by universe substitution. *)
 Section UniverseClosedSubst.
@@ -2594,6 +2897,12 @@ Section UniverseClosedSubst.
   : closedu_level 0 l -> subst_instance_level u l = l.
   Proof.
     destruct l; cbnr. discriminate.
+  Qed.
+
+  Lemma closedu_subst_instance_quality u q
+  : closedq_quality 0 q -> subst_instance_quality u q = q.
+  Proof.
+    destruct q; cbnr. destruct t; discriminate.
   Qed.
 
   Lemma closedu_subst_instance_level_expr u e
@@ -2623,47 +2932,52 @@ Section UniverseClosedSubst.
   Qed.
 
   Lemma closedu_subst_instance u t
-    : closedu_instance 0 t -> subst_instance u t = t.
+    : closed_instance 0 0 t -> subst_instance u t = t.
   Proof.
-    intro H. apply forall_map_id_spec.
-    apply Forall_forall; intros l Hl.
-    apply closedu_subst_instance_level.
-    eapply forallb_forall in H; eassumption.
+    intros H. apply andb_and in H. destruct H as [Hq Hu].
+    apply Instance.eq_instances;
+      apply forall_map_id_spec; apply Forall_forall; intros l Hl.
+    - apply closedu_subst_instance_quality. eapply forallb_forall in Hq; eassumption.
+    - apply closedu_subst_instance_level. eapply forallb_forall in Hu; eassumption.
   Qed.
 
+  Lemma closedu_subst_instance' u t
+    : closed_instance_qualities 0 t -> closed_instance_universes 0 t -> subst_instance u t = t.
+  Proof.
+    intros. apply closedu_subst_instance. unfold closed_instance. toProp; auto.
+  Qed.
 End UniverseClosedSubst.
 
 #[global]
 Hint Resolve closedu_subst_instance_level closedu_subst_instance_level_expr
-     closedu_subst_instance_univ closedu_subst_instance : substu.
+     closedu_subst_instance_univ closedu_subst_instance closedu_subst_instance' : substu.
 
 (** Substitution of a universe-closed instance of the right size
     produces a universe-closed term. *)
-Section SubstInstanceClosed.
-  Context (u : Instance.t) (Hcl : closedu_instance 0 u).
+Section SubstUnivInstanceClosed.
+  Context (u : Instance.t) (Hcl : closed_instance_universes 0 u).
 
   Lemma subst_instance_level_closedu l
-    : closedu_level #|u| l -> closedu_level 0 (subst_instance_level u l).
+    : closedu_level #|Instance.universes u| l -> closedu_level 0 (subst_instance_level u l).
   Proof using Hcl.
     destruct l; cbnr.
-    unfold closedu_instance in Hcl.
-    destruct (nth_in_or_default n u Level.lzero).
+    destruct (nth_in_or_default n (Instance.universes u) Level.lzero).
     - intros _. eapply forallb_forall in Hcl; tea.
     - rewrite e; reflexivity.
   Qed.
 
   Lemma subst_instance_level_expr_closedu e :
-    closedu_level_expr #|u| e -> closedu_level_expr 0 (subst_instance_level_expr u e).
+    closedu_level_expr #|Instance.universes u| e -> closedu_level_expr 0 (subst_instance_level_expr u e).
   Proof using Hcl.
     destruct e as [l b]. destruct l;cbnr.
-    case_eq (nth_error u n); cbnr. intros [] Hl X; cbnr.
+    case_eq (nth_error (Instance.universes u) n); cbnr. intros [] Hl X; cbnr.
     apply nth_error_In in Hl.
     eapply forallb_forall in Hcl; tea.
     discriminate.
   Qed.
 
   Lemma subst_instance_univ_closedu s
-    : closedu_sort #|u| s -> closedu_sort 0 (subst_instance_sort u s).
+    : closedu_sort #|Instance.universes u| s -> closedu_sort 0 (subst_instance_sort u s).
   Proof using Hcl.
     intro H.
     destruct s as [| |t]; cbnr.
@@ -2675,20 +2989,56 @@ Section SubstInstanceClosed.
     apply LevelExprSet.for_all_spec in H; proper.
     now apply H.
   Qed.
+End SubstUnivInstanceClosed.
 
-  Lemma subst_instance_closedu t :
-    closedu_instance #|u| t -> closedu_instance 0 (subst_instance u t).
+Section SubstQualityInstanceClosed.
+  Context (u : Instance.t) (Hcl : closed_instance_qualities 0 u).
+
+  Lemma subst_instance_quality_closedq q
+    : closedq_quality #|Instance.qualities u| q -> closedq_quality 0 (subst_instance_quality u q).
   Proof using Hcl.
-    intro H. etransitivity. eapply forallb_map.
-    eapply forallb_impl; tea.
-    intros l Hl; cbn. apply subst_instance_level_closedu.
+    destruct q; cbnr. destruct t; cbnr.
+    destruct (nth_in_or_default n (Instance.qualities u) Quality.qType).
+    - intros _. eapply forallb_forall in Hcl; tea.
+    - intros H'. eapply forallb_nth in Hcl. destruct Hcl as [q [e' H]].
+      erewrite e in e'. rewrite e e' //. destruct #|Instance.qualities u|; auto.
+      now apply leb_complete in H'.
   Qed.
-End SubstInstanceClosed.
+End SubstQualityInstanceClosed.
+
+Lemma subst_instance_closedu t u (Hcl : closed_instance_universes 0 u) :
+  closed_instance_universes #|Instance.universes u| t ->
+  closed_instance_universes 0 (subst_instance u t).
+Proof.
+  unfold closed_instance_universes in Hcl. intros Hu.
+  etransitivity. cbn. eapply forallb_map. eapply forallb_impl.
+  intros l Hl; cbn. apply subst_instance_level_closedu; eauto.
+  assumption.
+Qed.
+
+Lemma subst_instance_closedq t u (Hcl : closed_instance_qualities 0 u) :
+  closed_instance_qualities #|Instance.qualities u| t ->
+  closed_instance_qualities 0 (subst_instance u t).
+Proof.
+  unfold closed_instance_qualities in Hcl. intros Hq.
+  etransitivity. eapply forallb_map. eapply forallb_impl; tea. intros q Hq'; cbn.
+  apply subst_instance_quality_closedq. assumption.
+Qed.
+
+Lemma subst_instance_closed t u (Hcl : closed_instance 0 0 u) :
+  closed_instance_qualities #|Instance.qualities u| t ->
+  closed_instance_universes #|Instance.universes u| t ->
+  closed_instance 0 0 (subst_instance u t).
+Proof.
+  unfold closed_instance in Hcl. rtoProp. intros Hq Hu. apply andb_and. split.
+  - apply subst_instance_closedq; auto.
+  - apply subst_instance_closedu; auto.
+Qed.
 
 #[global]
 Hint Resolve subst_instance_level_closedu subst_instance_level_expr_closedu
-     subst_instance_univ_closedu subst_instance_closedu : substu.
-
+subst_instance_univ_closedu subst_instance_closedu subst_instance_closedq
+  subst_instance_closed : substu.
 
 Definition string_of_level (l : Level.t) : string :=
   match l with
@@ -2707,8 +3057,9 @@ Definition string_of_sort (u : Sort.t) :=
   | sType l => "Type(" ^ string_of_list string_of_level_expr (LevelExprSet.elements l) ^ ")"
   end.
 
-Definition string_of_universe_instance u :=
-  string_of_list string_of_level u.
+Definition string_of_instance u :=
+  "Qualities: " ^ string_of_list string_of_quality (Instance.qualities u)
+  ^ ", universes: " ^ string_of_list string_of_level (Instance.universes u).
 
 Inductive universes_entry :=
 | Monomorphic_entry (ctx : ContextSet.t)
@@ -2733,10 +3084,18 @@ Definition abstract_instance decl :=
   | Polymorphic_ctx auctx => UContext.instance (AUContext.repr auctx)
   end.
 
-Definition print_universe_instance u :=
+Definition print_qualities qs :=
+  print_list string_of_quality " " qs.
+
+Definition print_universes us :=
+  print_list string_of_level " " us.
+
+Definition print_instance u :=
   match u with
-  | [] => ""
-  | _ => "@{" ^ print_list string_of_level " " u ^ "}"
+  | ([], []) => ""
+  | ([], us) => "@{" ^ print_universes us ^ "}"
+  | (qs, []) => "@{" ^ print_qualities qs ^ "|}"
+  | (qs, us) => "@{" ^ print_qualities qs ^ "|" ^ print_universes us ^ "}"
   end.
 
 Definition print_lset t :=

@@ -183,7 +183,7 @@ Definition eq_univ_prop (u v : sort) :=
   end.
 
 Definition eq_term_prop (Σ : global_env) napp :=
-  PCUICEquality.eq_term_upto_univ_napp Σ (fun _ _ _ => True) (fun _ => eq_univ_prop) Conv napp.
+  PCUICEquality.eq_term_upto_univ_napp Σ (fun _ _ _ => True) (fun _ _ _ => True) (fun _ => eq_univ_prop) Conv napp.
 
 Reserved Notation " Σ ;;; Γ |- t ~~ u " (at level 50, Γ, t, u at next level).
 
@@ -208,10 +208,10 @@ Inductive cumul_prop `{checker_flags} (Σ : global_env_ext) (Γ : context) : ter
 
 where " Σ ;;; Γ |- t ~~ u " := (cumul_prop Σ Γ t u) : type_scope.
 
-Lemma eq_term_prop_impl Σ cmp_universe cmp_sort pb napp t u :
+Lemma eq_term_prop_impl Σ cmp_qual cmp_universe cmp_sort pb napp t u :
   RelationClasses.subrelation (cmp_sort Conv) eq_univ_prop ->
   RelationClasses.subrelation (cmp_sort pb) eq_univ_prop ->
-  PCUICEquality.eq_term_upto_univ_napp Σ.1 cmp_universe cmp_sort pb napp t u ->
+  PCUICEquality.eq_term_upto_univ_napp Σ.1 cmp_qual cmp_universe cmp_sort pb napp t u ->
   eq_term_prop Σ napp t u.
 Proof using Type.
   intros hsub_conv hsub_pb.
@@ -339,13 +339,13 @@ Proof.
 Qed.
 
 #[global]
-Instance substu_f_True {T} `{UnivSubst T} f : SubstUnivPreserving f (fun _ _ => True).
+Instance substu_f_True {T} `{UnivSubst T} f : SubstUnivPreserving f (fun _ _ => True) (fun _ _ => True).
 Proof using Type.
   now intros ???.
 Qed.
 
 #[global]
-Instance substu_True_eq_univ_prop : SubstUnivPreserving (fun _ _ => True) eq_univ_prop.
+Instance substu_True_eq_univ_prop : SubstUnivPreserving (fun _ _ => True) (fun _ _ => True) eq_univ_prop.
 Proof using Type.
   now intros []???.
 Qed.
@@ -753,10 +753,10 @@ Lemma cmp_True_subst_instance Σ univs u u' (i : Instance.t) :
   wf Σ.1 ->
   consistent_instance_ext Σ univs u ->
   consistent_instance_ext Σ univs u' ->
-  cmp_universe_instance (fun _ _ => True) (subst_instance u i) (subst_instance u' i).
+  cmp_instance (fun _ _ => True) (fun _ _ => True) (subst_instance u i) (subst_instance u' i).
 Proof using Type.
-  intros wfΣ cu cu'. red.
-  eapply All2_Forall2, All2_map, All2_refl => ui.
+  intros wfΣ cu cu'. red. split;
+  eapply All2_Forall2, All2_map, All2_refl => ui; auto.
   unfold on_rel. auto.
 Qed.
 
@@ -784,7 +784,7 @@ Proof using Type.
   - constructor. now eapply cmp_instance_opt_variance, cmp_True_subst_instance.
   - constructor. now eapply cmp_instance_opt_variance, cmp_True_subst_instance.
   - cbn. constructor. splits; simpl; solve_all.
-    eapply cmp_True_subst_instance; tea. reflexivity.
+    1,2: eapply cmp_True_subst_instance; tea. reflexivity.
     apply IHT.
     eapply All2_map.
     eapply All_All2; tea. cbn. unfold eq_branch.
@@ -806,14 +806,19 @@ Lemma cmp_True_instance Σ univs u u' :
   wf Σ.1 ->
   consistent_instance_ext Σ univs u ->
   consistent_instance_ext Σ univs u' ->
-  cmp_universe_instance (fun _ _ => True) u u'.
+  cmp_instance (fun _ _ => True) (fun _ _ => True) u u'.
 Proof using Type.
   intros wfΣ cu cu'.
   destruct univs; simpl in *.
-  - destruct u, u' => //=.
-  - apply Forall2_triv.
+  - destruct cu as (cu&cq); destruct cu' as (cu'&cq'). destruct u, u'. split.
+    * destruct l, l1 => //.
+    * destruct l0, l2 => //.
+  - split; apply Forall2_triv.
     destruct cu as (_ & ? & _).
     destruct cu' as (_ & ? & _).
+    congruence.
+    destruct cu as (_ & _ & _ & ? & _).
+    destruct cu' as (_ & _ & _ & ? & _).
     congruence.
 Qed.
 
@@ -904,7 +909,7 @@ Proof using Type Hcf cf.
   - eapply closed_red_mkApps; auto.
   - eapply eq_term_upto_univ_mkApps.
     eapply eq_term_upto_univ_impl.
-    6:eapply eq. 5: lia.
+    7:eapply eq. 6: lia.
     all: tc.
     auto.
 Qed.

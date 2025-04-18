@@ -163,10 +163,10 @@ Proof.
     unfold consistent_instance_ext, consistent_instance.
     intros X.
     destruct ctrs; tas.
-    destruct X as (H0 & H1 & H2); repeat split; tas.
-    - eapply forallb_Forall in H0; eapply forallb_Forall, Forall_impl; tea.
+    destruct X as (H0 & H1 & H2 & H3 & H4); repeat split; tas.
+    - eapply forallb_Forall in H2; eapply forallb_Forall, Forall_impl; tea.
       intros x ?; now eapply weakening_env_global_ext_levels'.
-    - eapply valid_subset; tea;
+    - eapply valid_subset; tea.
       now eapply weakening_env_global_ext_constraints.
 Qed.
 #[global] Hint Resolve weakening_env_consistent_instance : extends.

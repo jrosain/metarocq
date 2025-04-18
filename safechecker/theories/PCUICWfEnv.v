@@ -36,6 +36,7 @@ Class abstract_env_struct {cf:checker_flags} (abstract_env_impl abstract_env_ext
 
   (* Primitive decision procedures *)
   abstract_env_level_mem : abstract_env_ext_impl -> Level.t -> bool;
+  abstract_env_quality_mem : abstract_env_ext_impl -> Quality.t -> bool;
   abstract_env_leqb_level_n : abstract_env_ext_impl -> Z -> Level.t -> Level.t -> bool;
   abstract_env_guard : abstract_env_ext_impl -> FixCoFix -> context -> mfixpoint term -> bool;
   abstract_env_is_consistent : abstract_env_impl -> LevelSet.t * GoodConstraintSet.t -> bool ;
@@ -47,6 +48,9 @@ Definition abstract_env_fixguard  {cf:checker_flags} {abstract_env_impl abstract
 
 Definition abstract_env_cofixguard  {cf:checker_flags} {abstract_env_impl abstract_env_ext_impl : Type} `{!abstract_env_struct abstract_env_impl abstract_env_ext_impl}
 (X:abstract_env_ext_impl) := abstract_env_guard X CoFix.
+
+Definition abstract_env_compare_quality {cf:checker_flags} : conv_pb -> Quality.t -> Quality.t -> bool :=
+  check_cmpb_quality_gen.
 
 Definition abstract_env_compare_universe {cf:checker_flags} {abstract_env_impl abstract_env_ext_impl : Type} `{!abstract_env_struct abstract_env_impl abstract_env_ext_impl}
 (X:abstract_env_ext_impl) : conv_pb -> Universe.t -> Universe.t -> bool :=
@@ -108,6 +112,8 @@ Class abstract_env_prop {cf:checker_flags} (abstract_env_impl abstract_env_ext_i
     leqb_level_n_spec_gen uctx (abstract_env_leqb_level_n X);
   abstract_env_level_mem_correct X {Σ} (wfΣ : abstract_env_ext_rel X Σ) l:
     LevelSet.In l (global_ext_levels Σ) <-> abstract_env_level_mem X l;
+  abstract_env_quality_mem_correct X {Σ} (wfΣ : abstract_env_ext_rel X Σ) q:
+    QualitySet.In q (global_ext_qualities Σ) <-> abstract_env_quality_mem X q;
   abstract_env_is_consistent_correct X Σ uctx udecl :
     abstract_env_rel X Σ ->
     ConstraintSet.For_all (declared_cstr_levels (LevelSet.union udecl.1 (global_levels Σ))) udecl.2 ->
@@ -213,6 +219,17 @@ Defined.
 Definition abstract_env_is_consistent_empty {cf:checker_flags} {X_type : abstract_env_impl}
   : VSet.t * GoodConstraintSet.t -> bool :=
   fun uctx => abstract_env_is_consistent (@abstract_env_empty cf X_type) uctx.
+
+Lemma abstract_env_compare_quality_correct {cf:checker_flags}
+  conv_pb u u' : compare_quality conv_pb u u' <->
+                   abstract_env_compare_quality conv_pb u u'.
+Proof.
+  split.
+  - eapply introT.
+    apply reflect_reflectT. now eapply compare_qualityP_gen with (pb := conv_pb).
+  - eapply elimT.
+    apply reflect_reflectT. now eapply compare_qualityP_gen with (pb := conv_pb).
+Qed.
 
 Lemma abstract_env_compare_universe_correct {cf:checker_flags} {X_type : abstract_env_impl}
   (X:X_type.π2.π1) {Σ} (wfΣ : abstract_env_ext_rel X Σ) conv_pb u u' :

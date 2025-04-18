@@ -78,9 +78,9 @@ Definition add_suffix_global_env (mpath : modpath) (suffix : string) (expansion_
 
 Definition generate_proof_term (ty : term) (kn1 kn2 : kername) : term × term :=
   let proof_ty :=
-      tApp <% @eq %> [ty; tConst kn1 []; tConst kn2 []] in
+      tApp <% @eq %> [ty; tConst kn1 Instance.empty; tConst kn2 Instance.empty] in
   let proof_body :=
-      tApp <% @eq_refl %> [ty; tConst kn2 []] in
+      tApp <% @eq_refl %> [ty; tConst kn2 Instance.empty] in
       (proof_ty, proof_body).
 
 Definition gen_prog (ty body : term) (kn : kername) : TemplateMonad unit :=

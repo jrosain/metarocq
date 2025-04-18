@@ -84,9 +84,9 @@ Section Alpha.
       + eapply cored_trans'. all: eassumption.
   Qed.
 
-  Local Instance substu_pres_eq {T} `{UnivSubst T} : SubstUnivPreserving eq (@eq T).
+  Local Instance substu_pres_eq {T} `{UnivSubst T} : SubstUnivPreserving eq eq (@eq T).
   Proof using Type.
-    move => s u u' /cmp_universe_instance_eq -> //.
+    move => s u u' /cmp_instance_eq -> //.
   Qed.
 
   Lemma cored'_postpone :

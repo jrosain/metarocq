@@ -1546,9 +1546,9 @@ Proof.
   now depelim r.
 Qed.
 
-Lemma whne_eq_term_upto_univ_napp f Σ Γ t cmp_universe cmp_sort pb napp t' :
+Lemma whne_eq_term_upto_univ_napp f Σ Γ t cmp_qual cmp_universe cmp_sort pb napp t' :
   whne f Σ Γ t ->
-  eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp t t' ->
+  eq_term_upto_univ_napp Σ cmp_qual cmp_universe cmp_sort pb napp t t' ->
   whne f Σ Γ t'.
 Proof.
   intros wh eq.
@@ -1559,7 +1559,7 @@ Proof.
     apply eq_term_upto_univ_napp_mkApps_l_inv in eq1 as (?&?&(eq_hds&?)&->).
     depelim eq_hds.
     rewrite <- mkApps_snoc.
-    assert (All2 (eq_term_upto_univ Σ cmp_universe cmp_sort Conv) (args ++ [x0]) (x1 ++ [u']))
+    assert (All2 (eq_term_upto_univ Σ cmp_qual cmp_universe cmp_sort Conv) (args ++ [x0]) (x1 ++ [u']))
            by (now apply All2_app).
     unfold unfold_fix in *.
     destruct (nth_error mfix idx) eqn:nth; [|easy].
@@ -1579,9 +1579,9 @@ Proof.
     now rewrite nth_error_nil in e0.
 Qed.
 
-Lemma whnf_eq_term_upto_univ_napp f Σ Γ t cmp_universe cmp_sort pb napp t' :
+Lemma whnf_eq_term_upto_univ_napp f Σ Γ t cmp_qual cmp_universe cmp_sort pb napp t' :
   whnf f Σ Γ t ->
-  eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp t t' ->
+  eq_term_upto_univ_napp Σ cmp_qual cmp_universe cmp_sort pb napp t t' ->
   whnf f Σ Γ t'.
 Proof.
   intros wh eq.

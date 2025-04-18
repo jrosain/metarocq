@@ -74,11 +74,11 @@ sig
   val mkLambda : quoted_aname -> t -> t -> t
   val mkLetIn : quoted_aname -> t -> t -> t -> t
   val mkApp : t -> t array -> t
-  val mkConst : quoted_kernel_name -> quoted_univ_instance -> t
-  val mkInd : quoted_inductive -> quoted_univ_instance -> t
-  val mkConstruct : quoted_inductive * quoted_int -> quoted_univ_instance -> t
+  val mkConst : quoted_kernel_name -> quoted_instance -> t
+  val mkInd : quoted_inductive -> quoted_instance -> t
+  val mkConstruct : quoted_inductive * quoted_int -> quoted_instance -> t
   val mkCase : (quoted_inductive * quoted_int * quoted_relevance) ->
-    (quoted_univ_instance * t array * quoted_aname array * t) -> (* predicate: instance, params, binder names, return type *)
+    (quoted_instance * t array * quoted_aname array * t) -> (* predicate: instance, params, binder names, return type *)
      t -> (quoted_aname array * t) list (* branches *) -> t
   val mkProj : quoted_proj -> t -> t
   val mkFix : (quoted_int array * quoted_int) * (quoted_aname array * t array * t array) -> t
@@ -98,6 +98,8 @@ sig
   val quote_relevance : Sorts.relevance -> quoted_relevance
   val quote_int : int -> quoted_int
   val quote_bool : bool -> quoted_bool
+  val quote_qvar : Sorts.QVar.t -> quoted_qvar
+  val quote_quality : Sorts.Quality.t -> quoted_quality
   val quote_sort : Sorts.t -> quoted_sort
   val quote_sort_family : Sorts.family -> quoted_sort_family
   val quote_cast_kind : Constr.cast_kind -> quoted_cast_kind
@@ -113,7 +115,7 @@ sig
   val quote_constraint_type : Univ.constraint_type -> quoted_constraint_type
   val quote_univ_constraint : Univ.univ_constraint -> quoted_univ_constraint
   val quote_univ_level : Univ.Level.t -> quoted_univ_level
-  val quote_univ_instance : UVars.Instance.t -> quoted_univ_instance
+  val quote_instance : UVars.Instance.t -> quoted_instance
   val quote_univ_constraints : Univ.Constraints.t -> quoted_univ_constraints
   val quote_univ_context : UVars.UContext.t -> quoted_univ_context
   val quote_univ_contextset : Univ.ContextSet.t -> quoted_univ_contextset
@@ -318,15 +320,15 @@ struct
 
       | Constr.Const (c,pu) ->
         let kn = Constant.canonical c in
-        (Q.mkConst (Q.quote_kn kn) (Q.quote_univ_instance pu), add_constant kn acc)
+        (Q.mkConst (Q.quote_kn kn) (Q.quote_instance pu), add_constant kn acc)
 
       | Constr.Construct ((mind,c),pu) ->
         let mib = Environ.lookup_mind (fst mind) (snd env) in
-         (Q.mkConstruct (quote_inductive' mind, Q.quote_int (c - 1)) (Q.quote_univ_instance pu),
+         (Q.mkConstruct (quote_inductive' mind, Q.quote_int (c - 1)) (Q.quote_instance pu),
           add_inductive mind mib acc)
 
       | Constr.Ind (mind,pu) ->
-         (Q.mkInd (quote_inductive' mind) (Q.quote_univ_instance pu),
+         (Q.mkInd (quote_inductive' mind) (Q.quote_instance pu),
           let mib = Environ.lookup_mind (fst mind) (snd env) in
           add_inductive mind mib acc)
 
@@ -336,7 +338,7 @@ struct
         let npar = Q.quote_int ci.Constr.ci_npar in
         let q_relevance = Q.quote_relevance relevance in
         let acc, q_pars = CArray.fold_left_map (fun acc par -> let (qt, acc) = quote_term acc env sigma par in acc, qt) acc pars in
-        let qu = Q.quote_univ_instance u in
+        let qu = Q.quote_instance u in
         let pctx = CaseCompat.case_predicate_context (snd env) ci u pars predctx in
         let qpctx = quote_name_annots predctx in
         let (qpred,acc) = quote_term acc (push_rel_context pctx env) sigma pred in

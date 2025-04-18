@@ -56,6 +56,56 @@ Module QVar.
     intros x y e z t e'. hnf in * |- ; subst. reflexivity.
   Qed.
 
+  Definition ltb_ {V V_ltb} (v1 v2 : repr_ V) : bool :=
+    match v1, v2 with
+    | Var i, Var j => V_ltb i j
+    end.
+  Arguments ltb_ {V} V_ltb.
+
+  Definition ltb := ltb_ Nat.ltb.
+
+  Lemma reflect_lt_qvar {V : Set} (x y : t) : reflectProp (lt x y) (ltb x y).
+  Proof.
+    destruct (ltb x y) eqn:e; constructor; destruct x, y; rewrite /ltb /ltb_ in e.
+    - constructor. now apply Nat.ltb_lt.
+    - intro f. inversion f. subst. apply Nat.ltb_lt in H1. congruence.
+  Qed.
+  
+  Inductive le_ {V V_le} : repr_ V -> repr_ V -> Prop :=
+  | leVarVar i j : V_le i j -> le_ (Var i) (Var j).
+  Derive Signature for le_.
+  Arguments le_ {V} V_le.
+
+  Definition le := le_ Nat.le.
+
+  #[global] Instance le_preorder : PreOrder le.
+  Proof.
+    constructor.
+    - intros i. destruct i. constructor. apply le_n.
+    - intros v1 v2 v3 X1 X2; inversion X1; inversion X2; constructor.
+      subst. etransitivity; tea. inversion H3. now subst.
+  Qed.
+
+  Definition le_compat : Proper (eq ==> eq ==> iff) le.
+  Proof.
+    intros x y e z t e'. subst; reflexivity.
+  Qed.
+
+  Definition leqb_ {V V_leqb} (v1 v2 : repr_ V) : bool :=
+    match v1, v2 with
+    | Var i, Var j => V_leqb i j
+    end.
+  Arguments leqb_ {V} V_leqb.
+
+  Definition leqb := leqb_ Nat.leb.
+
+  Lemma reflect_le_qvar {V : Set} (x y : t) : reflectProp (le x y) (leqb x y).
+  Proof.
+    destruct (leqb x y) eqn:e; constructor; destruct x, y; rewrite /leqb /leqb_ in e.
+    - constructor. now apply Nat.leb_le.
+    - intro f. inversion f. subst. apply Nat.leb_le in H1. congruence.
+  Qed.
+
   Definition compare (v1 v2 : t) : comparison
     := match v1, v2 with
        | Var i, Var j => Nat.compare i j
@@ -72,7 +122,36 @@ Module QVar.
          end.
     all: repeat constructor; try apply f_equal; try assumption.
   Qed.
+
+  Definition eq_ {V} eq_V (q1 q2 : repr_ V) : Prop :=
+    match q1, q2 with
+    | Var q1, Var q2 => eq_V q1 q2
+    end.
+
+  Definition eq : t -> t -> Prop := eq_ (fun n m => n = m).
+
+  #[global] Instance eq_equiv : Equivalence eq.
+  Proof.
+    split; unfold eq.
+    - intros []; now cbn.
+    - intros [] []; now cbn.
+    - intros [] [] []; now cbn.
+  Qed.
+
+  Definition eq_dec_ {V : Set} {eq_V} (eq_dec_V : forall v1 v2 : V, {eq_V v1 v2} + {~ (eq_V v1 v2)})
+    (v1 v2 : repr_ V) : {eq_ eq_V v1 v2} + {~ (eq_ eq_V v1 v2)}.
+  Proof. destruct v1, v2. unfold eq_. apply eq_dec_V. Defined.
+
+  Definition eq_dec (x y : t) := eq_dec_ Nat.eq_dec.
 End QVar.
+
+Definition leq_qvar_dec v v' : {QVar.le v v'} + {~QVar.le v v'}.
+Proof.
+  destruct v, v'. cbv[QVar.le].
+  destruct (le_dec n n0).
+  - left. now constructor.
+  - right. intro. inversion H. now apply n1.
+Qed.
 
 Definition string_of_qvar (q : QVar.t) :=
   match q with

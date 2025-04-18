@@ -103,11 +103,13 @@ Proof.
     repeat toAll.
     eapply All2_impl.  1: tea. cbn; intros. eapply X0.2; eauto.
   - eapply cumul_Case; try solve [intuition eauto; eauto].
-    * cbv [cumul_predicate] in *; destruct_head'_prod. repeat split; eauto; cbn.
+    * cbv [cumul_predicate cumul_predicate_dep] in *; destruct_head'_prod. split; [|split]; [| |repeat split]; eauto; cbn.
       + apply All2_map. repeat toAll. eapply All2_impl. 1: tea. cbn; intros. destruct_head'_prod; eauto.
-      + apply precompose_subst_instance. eapply cmp_universe_instance_impl.
-        1:now apply eq_universe_subst_instance.
-        eauto.
+      + apply precompose_subst_instance. eapply cmp_instance_impl.
+        2:now apply eq_universe_subst_instance.
+        Unshelve. 3: exact eq_quality.
+        1:intros ?? []; reflexivity.
+        auto.
       + rewrite -> subst_instance_app, inst_case_predicate_context_subst_instance in *.
         eauto.
     * unfold cumul_branches, cumul_branch in *.
@@ -127,6 +129,7 @@ Proof.
  - repeat rewrite subst_instance_mkApps. eapply cumul_Ind.
     * apply precompose_subst_instance_global.
       rewrite length_map. eapply cmp_global_instance_impl_same_napp; try eapply H; eauto.
+      { intros ?? []. reflexivity. }
       { now apply eq_universe_subst_instance. }
       { now apply compare_universe_subst_instance. }
     * eapply All2_map. repeat toAll. eapply All2_impl. 1: tea. cbn; intros.
@@ -134,13 +137,15 @@ Proof.
  - repeat rewrite subst_instance_mkApps. eapply cumul_Construct.
     * apply precompose_subst_instance_global. cbn.
       rewrite length_map. eapply cmp_global_instance_impl_same_napp; try eapply H; eauto.
+      { intros ?? []. reflexivity. }
       { now apply eq_universe_subst_instance. }
       { now apply compare_universe_subst_instance. }
     * eapply All2_map. repeat toAll. eapply All2_impl. 1: tea. cbn; intros.
       eapply X0.2; eauto.
   - eapply cumul_Sort. now apply compare_sort_subst_instance.
   - eapply cumul_Const. apply precompose_subst_instance.
-    eapply cmp_universe_instance_impl; eauto.
+    eapply cmp_instance_impl; eauto.
+    { intros ?? []. reflexivity. }
     now apply compare_universe_subst_instance.
 Defined.
 

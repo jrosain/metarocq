@@ -29,7 +29,7 @@ Fixpoint isArity T :=
   | _ => false
   end.
 
-Definition type_of_constructor mdecl cdecl (c : inductive * nat) (u : list Level.t) :=
+Definition type_of_constructor mdecl cdecl (c : inductive * nat) (u : Instance.t) :=
   let mind := inductive_mind (fst c) in
   subst0 (inds mind u mdecl.(ind_bodies)) (subst_instance u cdecl.(cstr_type)).
 
@@ -872,21 +872,21 @@ Inductive typing `{checker_flags} (Σ : global_env_ext) (Γ : context) : term ->
     primitive_constant Σ primInt = Some prim_ty ->
     declared_constant Σ prim_ty cdecl ->
     primitive_invariants primInt cdecl ->
-    Σ ;;; Γ |- tInt p : tConst prim_ty []
+    Σ ;;; Γ |- tInt p : tConst prim_ty Instance.empty
 
 | type_Float p prim_ty cdecl :
     wf_local Σ Γ ->
     primitive_constant Σ primFloat = Some prim_ty ->
     declared_constant Σ prim_ty cdecl ->
     primitive_invariants primFloat cdecl ->
-    Σ ;;; Γ |- tFloat p : tConst prim_ty []
+    Σ ;;; Γ |- tFloat p : tConst prim_ty Instance.empty
 
 | type_String p prim_ty cdecl :
     wf_local Σ Γ ->
     primitive_constant Σ primString = Some prim_ty ->
     declared_constant Σ prim_ty cdecl ->
     primitive_invariants primString cdecl ->
-    Σ ;;; Γ |- tString p : tConst prim_ty []
+    Σ ;;; Γ |- tString p : tConst prim_ty Instance.empty
 
 | type_Array prim_ty cdecl u arr def ty :
     wf_local Σ Γ ->
@@ -897,7 +897,7 @@ Inductive typing `{checker_flags} (Σ : global_env_ext) (Γ : context) : term ->
     Σ ;;; Γ |- ty : tSort s ->
     Σ ;;; Γ |- def : ty ->
     All (fun t => Σ ;;; Γ |- t : ty) arr ->
-    Σ ;;; Γ |- tArray u arr def ty : tApp (tConst prim_ty [u]) [ty]
+    Σ ;;; Γ |- tArray u arr def ty : tApp (tConst prim_ty (Instance.make [] [u])) [ty]
 
 | type_Conv t A B s :
     Σ ;;; Γ |- t : A ->
@@ -1288,21 +1288,21 @@ Lemma typing_ind_env `{cf : checker_flags} :
         primitive_constant Σ primInt = Some prim_ty ->
         declared_constant Σ prim_ty cdecl ->
         primitive_invariants primInt cdecl ->
-        P Σ Γ (tInt p) (tConst prim_ty [])) ->
+        P Σ Γ (tInt p) (tConst prim_ty Instance.empty)) ->
 
     (forall Σ (wfΣ : wf Σ) (Γ : context) (wfΓ : wf_local Σ Γ) p prim_ty cdecl,
         PΓ Σ Γ wfΓ ->
         primitive_constant Σ primFloat = Some prim_ty ->
         declared_constant Σ prim_ty cdecl ->
         primitive_invariants primFloat cdecl ->
-        P Σ Γ (tFloat p) (tConst prim_ty [])) ->
+        P Σ Γ (tFloat p) (tConst prim_ty Instance.empty)) ->
 
     (forall Σ (wfΣ : wf Σ) (Γ : context) (wfΓ : wf_local Σ Γ) p prim_ty cdecl,
         PΓ Σ Γ wfΓ ->
         primitive_constant Σ primString = Some prim_ty ->
         declared_constant Σ prim_ty cdecl ->
         primitive_invariants primString cdecl ->
-        P Σ Γ (tString p) (tConst prim_ty [])) ->
+        P Σ Γ (tString p) (tConst prim_ty Instance.empty)) ->
 
     (forall Σ (wfΣ : wf Σ) (Γ : context) (wfΓ : wf_local Σ Γ) u arr def ty prim_ty cdecl,
         PΓ Σ Γ wfΓ ->
@@ -1315,7 +1315,7 @@ Lemma typing_ind_env `{cf : checker_flags} :
         Σ ;;; Γ |- def : ty ->
         P Σ Γ def ty ->
         All (fun t => Σ ;;; Γ |- t : ty × P Σ Γ t ty) arr ->
-        P Σ Γ (tArray u arr def ty) (tApp (tConst prim_ty [u]) [ty])) ->
+        P Σ Γ (tArray u arr def ty) (tApp (tConst prim_ty (Instance.make [] [u])) [ty])) ->
 
     (forall Σ (wfΣ : wf Σ) (Γ : context) (wfΓ : wf_local Σ Γ) (t A B : term) s,
         PΓ Σ Γ wfΓ ->

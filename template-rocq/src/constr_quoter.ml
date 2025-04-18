@@ -232,13 +232,27 @@ struct
 
   let quote_univ_level u = quote_level u
   (* todo : can be deduced from quote_level, hence shoud be in the Reify module *)
-  let quote_univ_instance u =
+
+  let quote_qvar q =
+    match Sorts.QVar.repr q with
+    | Sorts.QVar.Var i -> constr_mkApp (qvVar, [| quote_int i |])
+    | Sorts.QVar.Unif _ -> CErrors.anomaly (str "Non-instanciated quality variables cannot be quoted.")
+
+  let quote_quality q =
+    let open Sorts.Quality in
+    match q with
+    | QConstant QSProp -> Lazy.force qSProp
+    | QConstant QProp -> Lazy.force qProp
+    | QConstant QType -> Lazy.force qType
+    | QVar q -> constr_mkApp (qVar, [| quote_qvar q |])
+
+  let quote_instance u =
     let qarr, uarr = UVars.Instance.to_array u in
-    let () = if not (CArray.is_empty qarr) then
-        CErrors.user_err Pp.(str "Quoting sort polymorphic instances not yet supported.")
-    in
     (* we assume that valid instances do not contain [Prop] or [SProp] *)
-    to_coq_listl tlevel (CArray.map_to_list quote_level uarr)
+	constr_mkApp
+	  (tinstance_make,
+	   [| to_coq_listl tquality (CArray.map_to_list quote_quality qarr)
+		; to_coq_listl tlevel (CArray.map_to_list quote_level uarr) |])
 
   let is_Lt = function
     | Univ.Lt -> true
@@ -286,7 +300,7 @@ struct
         CErrors.user_err Pp.(str "Quoting sort polymorphic ucontext not yet supported.")
     in
     let idents = to_coq_listl tname (CArray.map_to_list quote_name uarr) in
-    let inst' = quote_univ_instance (UVars.UContext.instance uctx) in
+    let inst' = quote_instance (UVars.UContext.instance uctx) in
     let const' = quote_univ_constraints (UVars.UContext.constraints uctx) in
     let p = constr_mkApp (tUContextmake', [|inst'; const'|]) in
     constr_mkApp (tUContextmake, [|idents; p |])
@@ -330,11 +344,10 @@ struct
       constr_mkApp (cPolymorphic_entry, [| ctx |])
 
   let quote_ugraph (g : UGraph.t) =
-    let inst' = quote_univ_instance UVars.Instance.empty in
+    let inst' = quote_instance UVars.Instance.empty in
     let const' = quote_univ_constraints (fst (UGraph.constraints_of_universes g)) in
     let uctx = constr_mkApp (tUContextmake, [|inst' ; const'|]) in
     constr_mkApp (tadd_global_constraints, [|constr_mkApp (cMonomorphic_ctx, [| uctx |]); Lazy.force tinit_graph|])
-
 
   let sprop =
     lazy (constr_mkApp (sSProp, [|Lazy.force tuniverse |]))

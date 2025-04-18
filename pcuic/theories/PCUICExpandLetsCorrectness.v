@@ -2217,9 +2217,9 @@ Proof.
   - cbn; depelim wt. eapply red_primArray_type; cbn; eauto.
 Qed.
 
-Lemma trans_cmp_global_instance {Σ : global_env} Re Rle gref napp u u' :
-  cmp_global_instance Σ Re Rle gref napp u u' ->
-  cmp_global_instance (trans_global_env Σ) Re Rle gref napp u u'.
+Lemma trans_cmp_global_instance {Σ : global_env} Rq Re Rle gref napp u u' :
+  cmp_global_instance Σ Rq Re Rle gref napp u u' ->
+  cmp_global_instance (trans_global_env Σ) Rq Re Rle gref napp u u'.
 Proof.
   unfold PCUICEquality.cmp_global_instance, PCUICEquality.global_variance.
   destruct gref; simpl; auto.
@@ -2257,12 +2257,12 @@ Proof.
   apply PCUICEquality.trans_eq_context_upto_names.
 Qed.
 
-Lemma eq_term_upto_univ_expand_lets {cf} {Σ : global_env} {cmp_universe cmp_sort pb Γ Δ t u napp} :
+Lemma eq_term_upto_univ_expand_lets {cf} {Σ : global_env} {cmp_qual cmp_universe cmp_sort pb Γ Δ t u napp} :
   subrelation (cmp_universe Conv) (cmp_universe pb) ->
   subrelation (cmp_sort Conv) (cmp_sort pb) ->
-  eq_context_upto Σ cmp_universe cmp_sort pb Γ Δ ->
-  eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp t u ->
-  eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp (expand_lets Γ t) (expand_lets Δ u).
+  eq_context_upto Σ cmp_qual cmp_universe cmp_sort pb Γ Δ ->
+  eq_term_upto_univ_napp Σ cmp_qual cmp_universe cmp_sort pb napp t u ->
+  eq_term_upto_univ_napp Σ cmp_qual cmp_universe cmp_sort pb napp (expand_lets Γ t) (expand_lets Δ u).
 Proof.
   intros subr subr' eqctx eqt.
   rewrite /expand_lets /expand_lets_k.
@@ -2273,13 +2273,14 @@ Proof.
   apply (PCUICConfluence.eq_context_extended_subst eqctx).
 Qed.
 
-Lemma trans_eq_term_upto_univ {cf} {Σ : global_env} {cmp_universe cmp_sort pb t u napp} :
-  SubstUnivPreserving (cmp_universe Conv) (cmp_universe Conv) ->
-  SubstUnivPreserving (cmp_universe Conv) (cmp_sort Conv) ->
-  eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp t u ->
-  eq_term_upto_univ_napp (trans_global_env Σ) cmp_universe cmp_sort pb napp (trans t) (trans u).
+Lemma trans_eq_term_upto_univ {cf} {Σ : global_env} {cmp_qual cmp_universe cmp_sort pb t u napp} :
+  SubstUnivPreserving (cmp_qual Conv) (cmp_universe Conv) (cmp_qual Conv) ->
+  SubstUnivPreserving (cmp_qual Conv) (cmp_universe Conv) (cmp_universe Conv) ->
+  SubstUnivPreserving (cmp_qual Conv) (cmp_universe Conv) (cmp_sort Conv) ->
+  eq_term_upto_univ_napp Σ cmp_qual cmp_universe cmp_sort pb napp t u ->
+  eq_term_upto_univ_napp (trans_global_env Σ) cmp_qual cmp_universe cmp_sort pb napp (trans t) (trans u).
 Proof.
-  intros substu substu' e.
+  intros substq substu substu' e.
   induction t using term_forall_list_ind in pb, napp, u, e |- *.
   all: invs e; cbn.
   all: try solve [ constructor ; auto ].
@@ -2292,7 +2293,7 @@ Proof.
   ].
   1,2,3,4,5,6: try solve [ constructor; unfold eq_mfixpoint in *; solve_all; eauto using subrelation_refl ].
   all: try solve [ constructor; now eapply trans_cmp_global_instance ].
-  - destruct X1 as [Hpars [Huinst [Hctx Hret]]].
+  - destruct X1 as [Hpars [[Hq Hu] [Hctx Hret]]].
     destruct X as [IHpars [IHctx IHret]].
     constructor; cbn; auto.
     all: unfold eq_predicate, eq_branches in *.
@@ -2307,6 +2308,7 @@ Proof.
         apply eq_term_upto_univ_expand_lets; eauto; tc.
         apply eq_context_upto_subst_context; eauto; tc.
         1: apply eq_context_upto_names_subst_instance; eauto; tc.
+        1: split; auto.
         1: now eapply trans_eq_context_upto_names.
         eapply All2_rev, All2_map. solve_all.
   - constructor; depelim X0; cbn in X; try now constructor.

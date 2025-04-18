@@ -523,11 +523,11 @@ Section Conversion.
     eapply R_aux_stateR. all: simpl. all: auto.
   Qed.
 
-  Definition abstract_env_compare_global_instance := compare_global_instance (abstract_env_lookup X) (abstract_env_compare_universe X).
+  Definition abstract_env_compare_global_instance := compare_global_instance (abstract_env_lookup X) abstract_env_compare_quality (abstract_env_compare_universe X).
 
-  Notation eqb_ctx := (eqb_ctx_upto (abstract_env_compare_universe X) (abstract_env_compare_sort X) abstract_env_compare_global_instance Conv).
-  Notation cmpb_term_napp := (eqb_term_upto_univ_napp (abstract_env_compare_universe X) (abstract_env_compare_sort X) abstract_env_compare_global_instance).
-  Notation cmpb_term pb := (eqb_term_upto_univ (abstract_env_compare_universe X) (abstract_env_compare_sort X) abstract_env_compare_global_instance pb).
+  Notation eqb_ctx := (eqb_ctx_upto abstract_env_compare_quality (abstract_env_compare_universe X) (abstract_env_compare_sort X) abstract_env_compare_global_instance Conv).
+  Notation cmpb_term_napp := (eqb_term_upto_univ_napp abstract_env_compare_quality (abstract_env_compare_universe X) (abstract_env_compare_sort X) abstract_env_compare_global_instance).
+  Notation cmpb_term pb := (eqb_term_upto_univ abstract_env_compare_quality (abstract_env_compare_universe X) (abstract_env_compare_sort X) abstract_env_compare_global_instance pb).
   Notation eqb_term := (cmpb_term Conv).
   Notation leqb_term := (cmpb_term Cumul).
 
@@ -1346,13 +1346,58 @@ Section Conversion.
     eapply typing_wf_local in X0; eauto.
   Qed.
 
+  Definition eqb_quality_instance :=
+    compare_quality_instance (abstract_env_compare_quality Conv).
+
+  Lemma eqb_quality_instance_spec :
+    forall u v Σ,
+      forallb (wf_qualityb Σ) (Instance.qualities u) ->
+      forallb (wf_qualityb Σ) (Instance.qualities v) ->
+      eqb_quality_instance u v ->
+      cmp_quality_instance eq_quality u v.
+  Proof using Type.
+    intros u v Σ Hu Hv.
+    eapply elimT.
+    eapply reflect_reflectT, reflect_cmp_quality_instance; tea.
+    intros.
+    apply iff_reflect.
+    eapply abstract_env_compare_quality_correct with (conv_pb := Conv); tas.
+  Qed.
+
+  Lemma compare_qualityb_complete Σ pb u u' :
+    wf_quality Σ u ->
+    wf_quality Σ u' ->
+    compare_quality pb u u' ->
+    abstract_env_compare_quality pb u u'.
+  Proof using Type.
+    intros all1 all2 conv.
+    eapply abstract_env_compare_quality_correct; eauto.
+  Qed.
+
+  Lemma eqb_quality_instance_complete Σ u u' :
+    wf_instance Σ u ->
+    wf_instance Σ u' ->
+    cmp_quality_instance eq_quality u u' ->
+    eqb_quality_instance u u'.
+  Proof using Type.
+    intros wfu wfu'.
+    eapply introT.
+    unfold wf_instance in *.
+    eapply reflect_reflectT, reflect_cmp_quality_instance with (qp := wf_qualityb Σ); tea.
+    1: intros ????; eapply iff_reflect, abstract_env_compare_quality_correct with (conv_pb := Conv); tea.
+    1,2: eapply Forall_forallb.
+    1: eapply wfu.
+    2: eapply wfu'.
+    all: now move => x /wf_qualityP H.
+  Qed.
+
   Definition eqb_universe_instance :=
     compare_universe_instance (abstract_env_compare_universe X Conv).
 
   Lemma eqb_universe_instance_spec :
     forall u v Σ (wfΣ : abstract_env_ext_rel X Σ),
-      forallb (wf_universeb Σ) (map Universe.make' u) ->
-      forallb (wf_universeb Σ) (map Universe.make' v) ->
+      forallb (wf_universeb Σ) (map Universe.make' (Instance.universes u)) ->
+      forallb (wf_universeb Σ) (map Universe.make' (Instance.universes v)) ->
       eqb_universe_instance u v ->
       cmp_universe_instance (eq_universe (global_ext_constraints Σ)) u v.
   Proof using Type.
@@ -1424,10 +1469,10 @@ Qed.
   Lemma compare_universe_instance_variance_complete Σ (wfΣ : abstract_env_ext_rel X Σ) pb v u u' :
     wf_instance Σ u ->
     wf_instance Σ u' ->
-    cmp_universe_instance_variance (compare_universe Σ) pb v u u' ->
-    compare_universe_instance_variance (abstract_env_compare_universe X) pb v u u'.
+    cmp_universe_instance_variance (compare_universe Σ) pb v (Instance.universes u) (Instance.universes u') ->
+    compare_universe_instance_variance (abstract_env_compare_universe X) pb v (Instance.universes u) (Instance.universes u').
   Proof using Type.
-    intros memu memu' r.
+    intros [_ memu] [_ memu'] r.
     induction r in memu, memu' |- *; cbnr.
     - depelim memu.
       depelim memu'.
@@ -1437,7 +1482,6 @@ Qed.
       + now apply IHr.
   Qed.
 
-
   Lemma consistent_instance_ext_wf Σ udecl u :
     consistent_instance_ext Σ udecl u ->
     wf_instance Σ u.
@@ -1445,13 +1489,12 @@ Qed.
     intros cons.
     unfold consistent_instance_ext, consistent_instance in *.
     destruct udecl.
-    - destruct u; cbn in *; [|congruence].
-      constructor.
-    - destruct cons as (mems&_&_).
-      apply forallb_Forall in mems.
-      eapply Forall_impl; eauto.
-      cbn.
-      intros ? ?%LevelSet.mem_spec; auto.
+    - destruct cons, u, l, l0; cbn in *; try congruence. red. split; constructor.
+    - destruct cons as (memq&_&memu&_).
+      apply forallb_Forall in memq, memu.
+      split; eapply Forall_impl; eauto.
+      * intros ? ?%QualitySet.mem_spec; auto.
+      * intros ? ?%LevelSet.mem_spec; auto.
   Qed.
 
   Lemma welltyped_zipc_tConst_inv Σ (wfΣ : abstract_env_ext_rel X Σ) Γ c u π :
@@ -1499,7 +1542,7 @@ Qed.
             (h1 : wtp Γ (tConst c u) π1)
             (c' : kername) (u' : Instance.t) (π2 : stack)
             (h2 : wtp Γ (tConst c' u') π2)
-            (ne : c <> c' \/ (c = c' /\ ~eqb_universe_instance u u'))
+            (ne : c <> c' \/ (c = c' /\ ~(eqb_quality_instance u u' /\ eqb_universe_instance u u')))
             (hx : conv_stack_ctx Γ π1 π2)
             (aux : Aux Term Γ (tConst c u) π1 (tConst c' u') π2 h2)
     : ConversionResult (conv_term leq Γ (tConst c u) π1 (tConst c' u') π2) :=
@@ -1657,7 +1700,9 @@ Qed.
     eapply declared_constant_inj in decl1; eauto; subst.
     apply consistent_instance_ext_wf in cons1.
     apply consistent_instance_ext_wf in cons2.
-    eapply eqb_universe_instance_complete in c1; auto.
+    destruct c1 as [cq cu].
+    eapply eqb_universe_instance_complete in cu; auto.
+    eapply eqb_quality_instance_complete in cq; eauto.
   Qed.
   (* Why Solve All Obligations is not working here ??? *)
   Next Obligation. solve_unfold_constants aux eq1 eq2 Σ wfΣ. Defined.
@@ -2671,18 +2716,29 @@ Qed.
     (wfΣ : abstract_env_ext_rel X Σ) pb ref n l l' :
       wf_instance Σ l ->
       wf_instance Σ l' ->
-      cmp_global_instance Σ (compare_universe Σ) pb ref n l l' <->
+      cmp_global_instance Σ compare_quality (compare_universe Σ) pb ref n l l' <->
       abstract_env_compare_global_instance pb ref n l l'.
   Proof.
     intros hl hl'. apply reflect_iff. eapply reflect_cmp_global_instance; eauto.
     all: try rewrite -> wf_universeb_instance_forall.
+    - intros ? ? Hq Hq'; apply iff_reflect. apply abstract_env_compare_quality_correct.
     - intros ? ? Hu Hu'; apply iff_reflect; apply (abstract_env_compare_universe_correct _ wfΣ).
       all: now apply wf_universe_iff.
     - intros ? ? Hu Hu'; apply iff_reflect; apply (abstract_env_compare_universe_correct _ wfΣ).
       all: now apply wf_universe_iff.
     - intros; now eapply abstract_env_lookup_correct'.
-    - revert hl. apply reflect_iff, wf_instanceP.
-    - revert hl'. apply reflect_iff, wf_instanceP.
+    - apply/forallbP.
+      1: intro; eapply wf_qualityP; eauto.
+      now destruct hl.
+    - apply/forallbP.
+      1: intro; eapply wf_qualityP; eauto.
+      now destruct hl'.
+    - apply/forallbP.
+      1: intro; eapply wf_levelP; eauto.
+      now destruct hl.
+    - apply/forallbP.
+      1: intro; eapply wf_levelP; eauto.
+      now destruct hl'.
   Qed.
 
   Lemma cmpb_term_correct Σ (wfΣ : abstract_env_ext_rel X Σ) pb napp t u :
@@ -2695,10 +2751,13 @@ Qed.
     eassert _ as H.
     2: split; [eapply elimT|eapply introT]; apply H.
     eapply reflect_eq_term_upto_univ; tea.
+    1: intros ????; apply iff_reflect, abstract_env_compare_quality_correct; tea; now apply wf_universe_iff.
     1,2: intros ????; apply iff_reflect, abstract_env_compare_universe_correct; tea; now apply wf_universe_iff.
     1,2: intros ????; apply iff_reflect, abstract_env_compare_sort_correct; tea; now apply wf_sort_iff.
-    1,2: intros ??????; apply iff_reflect, compare_global_instance_correct; tea.
-    all: rewrite -> wf_universeb_instance_forall in *; now eapply wf_instance_iff.
+    1,2: intros ????????; apply iff_reflect, compare_global_instance_correct; tea.
+    all: apply/wf_instanceP /andP; split.
+    1,3,5,7: assumption.
+    all: rewrite !wf_universeb_instance_forall in H1, H2; assumption.
   Qed.
 
   Lemma reduced_case_discriminee_whne Σ (wfΣ : abstract_env_ext_rel X Σ) Γ π ci p c brs h :
@@ -3040,8 +3099,10 @@ Qed.
   (hp : ∥ ws_cumul_pb_terms Σ (Γ,,, stack_context π) (pparams p) (pparams p') ∥) :
   ∥ ∑ mdecl idecl,
     [× declared_inductive Σ ci mdecl idecl,
-      forallb (wf_universeb Σ) (map Universe.make' (puinst p)),
-      forallb (wf_universeb Σ) (map Universe.make' (puinst p')),
+      forallb (wf_qualityb Σ) (Instance.qualities (puinst p)),
+      forallb (wf_qualityb Σ) (Instance.qualities (puinst p')),
+      forallb (wf_universeb Σ) (map Universe.make' (Instance.universes (puinst p))),
+      forallb (wf_universeb Σ) (map Universe.make' (Instance.universes (puinst p'))),
        #|pparams p| = ind_npars mdecl,
        #|pparams p'| = ind_npars mdecl,
        eq_context_upto_names p.(pcontext) p'.(pcontext),
@@ -3082,6 +3143,10 @@ Qed.
     exists mdecl, idecl.
     destruct hcase. destruct hcase'.
     split; tea.
+    - eapply Forall_forallb; try eapply consistent_instance_wf_quality; eauto.
+      now move => x /wf_qualityP H.
+    - eapply Forall_forallb; try eapply consistent_instance_wf_quality; eauto.
+      now move => x /wf_qualityP H.
     - eapply Forall_forallb; try eapply consistent_instance_wf_sort; eauto.
       intros; apply wf_universe_iff; eauto.
     - eapply Forall_forallb; try eapply consistent_instance_wf_sort; eauto.
@@ -3149,7 +3214,8 @@ Qed.
       | Error ce not_conv_params => no ce;
 
       | Success conv_params
-        with inspect (eqb_universe_instance p1.(puinst) p2.(puinst)) := {
+        with inspect (eqb_universe_instance p1.(puinst) p2.(puinst) &&
+             eqb_quality_instance p1.(puinst) p2.(puinst)) := {
 
         | exist false not_eq_insts => no (CasePredUnequalUniverseInstances
                                             (Γ,,, stack_context π1) ci1 p1 c1 brs1
@@ -3188,7 +3254,10 @@ Qed.
   Next Obligation.
     rename H into wfΣ.
     destruct (hΣ _ wfΣ).
-    eapply eq_sym, eqb_universe_instance_spec in eq_insts; eauto.
+    eapply eq_sym, andb_and in eq_insts.
+    destruct eq_insts as (eq_uinst & eq_qinst).
+    eapply eqb_quality_instance_spec in eq_qinst; eauto.
+    1: eapply eqb_universe_instance_spec in eq_uinst; eauto.
     - destruct (case_conv_preds_inv _ wfΣ h1 _ _ _ h2 hx (conv_params _ wfΣ)) as []; tea.
       specialize_Σ wfΣ.    destruct hx as [hx].
     destruct conv_params as [conv_params].
@@ -3196,27 +3265,39 @@ Qed.
     unfold app_context; rewrite <- !app_assoc.
     destruct X1 as [mdecl [idecl []]].
     etransitivity.
-    * inv_on_free_vars. eapply (inst_case_ws_cumul_ctx_pb d e e0 i1 i2); tea. fvs.
-    * eapply ws_cumul_ctx_pb_app_same. 2:eapply hx.
-      rewrite on_free_vars_ctx_app.
-      apply andb_true_iff. split; auto.
-      1:now eapply ws_cumul_ctx_pb_closed_left in hx.
-      eapply on_free_vars_ctx_inst_case_context; trea.
-      fvs.
-     - destruct (case_conv_preds_inv _ wfΣ h1 _ _ _ h2 hx (conv_params Σ wfΣ)) as []; tea.
-       destruct X1 as [mdecl [idecl []]]. eauto.
-     - destruct (case_conv_preds_inv _ wfΣ h1 _ _ _ h2 hx (conv_params Σ wfΣ)) as []; tea.
-       destruct X1 as [mdecl [idecl []]]. eauto.
+      * inv_on_free_vars. eapply (inst_case_ws_cumul_ctx_pb d e e0 i3 i4); tea.
+        1: fvs. unfold cmp_instance. split.
+        -- apply eq_qinst.
+        -- apply eq_uinst.
+      * eapply ws_cumul_ctx_pb_app_same. 2:eapply hx.
+        rewrite on_free_vars_ctx_app.
+        apply andb_true_iff. split; auto.
+        1:now eapply ws_cumul_ctx_pb_closed_left in hx.
+        eapply on_free_vars_ctx_inst_case_context; trea.
+        fvs.
+    - destruct (case_conv_preds_inv _ wfΣ h1 _ _ _ h2 hx (conv_params Σ wfΣ)) as []; tea.
+      destruct X1 as [mdecl [idecl []]]. eauto.
+    - destruct (case_conv_preds_inv _ wfΣ h1 _ _ _ h2 hx (conv_params Σ wfΣ)) as []; tea.
+      destruct X1 as [mdecl [idecl []]]. eauto.
+    - destruct (case_conv_preds_inv _ wfΣ h1 _ _ _ h2 hx (conv_params Σ wfΣ)) as []; tea.
+      destruct X1 as [mdecl [idecl []]]. eauto.
+    - destruct (case_conv_preds_inv _ wfΣ h1 _ _ _ h2 hx (conv_params Σ wfΣ)) as []; tea.
+      destruct X1 as [mdecl [idecl []]]. eauto.
   Qed.
   Next Obligation.
     unfold zipp in conv_ret; simpl in conv_ret.
     destruct (case_conv_preds_inv _ wfΣ h1 _ _ _ h2 hx (conv_params Σ wfΣ)) as []; tea.
-    eapply eq_sym, eqb_universe_instance_spec in eq_insts; eauto.
+    apply eq_sym, andb_and in eq_insts. destruct eq_insts as (eq_uinst & eq_qinst).
+    eapply eqb_quality_instance_spec in eq_qinst; eauto.
+    1: eapply eqb_universe_instance_spec in eq_uinst; eauto.
     - specialize_Σ wfΣ. destruct hx as [hx]. destruct conv_params as [conv_params].
     destruct conv_ret as [h].
     split. split; auto.
+    1:split; auto.
     2:rewrite app_context_assoc in h; auto.
     now destruct X0 as [mdecl [idecl []]].
+    - now destruct X0 as [mdecl [idecl []]].
+    - now destruct X0 as [mdecl [idecl []]].
     - now destruct X0 as [mdecl [idecl []]].
     - now destruct X0 as [mdecl [idecl []]].
   Qed.
@@ -3239,8 +3320,11 @@ Qed.
     apply consistent_instance_ext_wf in cons.
     apply consistent_instance_ext_wf in cons0.
     specialize_Σ wfΣ; destruct H as [[]].
-    apply eqb_universe_instance_complete in c; eauto.
-    congruence.
+    destruct c as [cq cu].
+    apply eqb_universe_instance_complete in cu; eauto.
+    eapply eqb_quality_instance_complete in cq; eauto.
+    apply eq_sym in not_eq_insts.
+    rewrite andb_false_iff in not_eq_insts. destruct not_eq_insts; congruence.
   Qed.
   Next Obligation.
     contradiction not_conv_params. intros Σ wfΣ.
@@ -3388,7 +3472,7 @@ Equations (noeqns) isconv_array_values_aux
     | prog_view_App _ _ _ _ := False_rect _ _;
 
     | prog_view_Const c u c' u' with eq_dec c c' := {
-      | left eq1 with inspect (eqb_universe_instance u u') := {
+      | left eq1 with inspect (eqb_universe_instance u u' && eqb_quality_instance u u') := {
         | @exist true eq2 with isconv_args_raw leq (tConst c u) π1 (tConst c' u') π2 aux := {
           | Success h := yes ;
           (* Unfold both constants at once *)
@@ -3629,13 +3713,21 @@ Equations (noeqns) isconv_array_values_aux
     constructor. eapply ws_cumul_eq_pb.
     constructor. all:fvs.
     - destruct h. eapply welltyped_zipc_zipp in h1; auto. fvs.
-    - constructor. eapply eqb_universe_instance_spec; eauto.
-      + eapply welltyped_zipc_tConst_inv in h1 as (?&?&?); eauto;
-        eapply Forall_forallb; try eapply consistent_instance_wf_sort; eauto.
-        intros; apply wf_universe_iff; eauto.
-      + eapply welltyped_zipc_tConst_inv in h2 as (?&?&?); eauto;
-        eapply Forall_forallb; try eapply consistent_instance_wf_sort; eauto.
-        intros; apply wf_universe_iff; eauto.
+    - constructor. apply eq_sym, andb_and in eq2. destruct eq2 as [equ eqq]. split.
+      * eapply eqb_quality_instance_spec; eauto.
+        -- eapply welltyped_zipc_tConst_inv in h1 as (?&?&?); eauto;
+             eapply Forall_forallb; try eapply consistent_instance_wf_quality; eauto.
+           now move => ? /wf_qualityP H.
+        -- eapply welltyped_zipc_tConst_inv in h2 as (?&?&?); eauto;
+             eapply Forall_forallb; try eapply consistent_instance_wf_quality; eauto.
+           now move => ? /wf_qualityP H.
+      * eapply eqb_universe_instance_spec; eauto.
+        -- eapply welltyped_zipc_tConst_inv in h1 as (?&?&?); eauto;
+             eapply Forall_forallb; try eapply consistent_instance_wf_sort; eauto.
+           intros; apply wf_universe_iff; eauto.
+        -- eapply welltyped_zipc_tConst_inv in h2 as (?&?&?); eauto;
+             eapply Forall_forallb; try eapply consistent_instance_wf_sort; eauto.
+           intros; apply wf_universe_iff; eauto.
   Qed.
   Next Obligation.
     pose (heΣ _ wfΣ). specialize_Σ wfΣ. sq.
@@ -3713,11 +3805,12 @@ Equations (noeqns) isconv_array_values_aux
   eapply welltyped_zipc_tConst_inv in h1 as (?&?&?); eauto.
   unfold declared_constant in *.
   erewrite abstract_env_lookup_correct in d; eauto. congruence.
-Qed.
+  Qed.
   Next Obligation.
     destruct (abstract_env_ext_exists X) as [[Σ wfΣ]];
-    right; split; [easy|].
-    now rewrite <- uneq_u.
+      right; split; [easy|].
+    intros []. apply eq_sym in uneq_u.
+    rewrite andb_false_iff in uneq_u. now destruct uneq_u.
   Qed.
 
   (* tLambda *)

@@ -98,7 +98,7 @@ Lemma inst_case_ws_cumul_ctx_pb {cf Σ} {wfΣ : wf Σ} {ind mdecl idecl Γ pars 
   on_free_vars_ctx (closedP #|pars'| xpredT) ctx' ->
   is_closed_context Γ ->
   ws_cumul_pb_terms Σ Γ pars pars' ->
-  cmp_universe_instance (eq_universe Σ) puinst puinst' ->
+  cmp_instance eq_quality (eq_universe Σ) puinst puinst' ->
   eq_context_upto_names ctx ctx' ->
   Σ ⊢ Γ,,, inst_case_context pars puinst ctx = Γ,,, inst_case_context pars' puinst' ctx'.
 Proof.
@@ -205,10 +205,10 @@ Section fixed.
     rewrite !decompose_app_mkApps; by easy.
   Qed.
 
-  Lemma eq_term_upto_univ_napp_nonind cmp_universe cmp_sort pb napp t t' :
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp t t' ->
+  Lemma eq_term_upto_univ_napp_nonind cmp_quality cmp_universe cmp_sort pb napp t t' :
+    eq_term_upto_univ_napp Σ cmp_quality cmp_universe cmp_sort pb napp t t' ->
     isIndConstructApp t = false ->
-    eq_term_upto_univ Σ cmp_universe cmp_sort pb t t'.
+    eq_term_upto_univ Σ cmp_quality cmp_universe cmp_sort pb t t'.
   Proof using Type.
     intros eq not_ind.
     generalize 0.
@@ -330,7 +330,7 @@ Section fixed.
     depelim eq.
     set (pl := {| pparams := motivepars |}) in *.
     set (pr := {| pparams := motivepars0 |}) in *.
-    specialize e as (?&?&?&?).
+    specialize e as (?&(?&?)&?&?).
     unshelve epose proof (decli_ := declared_inductive_to_gen decli); eauto.
     unshelve epose proof (decli'_ := declared_inductive_to_gen decli'); eauto.
     destruct (declared_inductive_inj decli_ decli'_) as [-> ->].
@@ -350,7 +350,8 @@ Section fixed.
     have eq_instctx : Σ ⊢ Γ,,, inst_case_predicate_context p = Γ,,, inst_case_predicate_context p'.
     { eapply (inst_case_ws_cumul_ctx_pb decli); tea.
       { apply (wf_predicate_length_pars wfp). }
-      { apply (wf_predicate_length_pars wfp'). } }
+      { apply (wf_predicate_length_pars wfp'). }
+      { now split. } }
     repeat split; eauto.
     - transitivity motiveret0.
       { eapply ws_cumul_pb_alt_closed. exists motiveret, motiveret0.
@@ -381,7 +382,7 @@ Section fixed.
     - rename a0 into brsa1.
       rename a2 into brsa2.
       rename e0 into brseq.
-      clear -wfΣ decli brsa1 brsa2 brseq clΓ wfp wfp' a a1 p0 p5 p4 p9 c eqpars.
+      clear -wfΣ decli brsa1 brsa2 brseq clΓ wfp wfp' a a1 p0 p5 p4 p9 H H0 eqpars.
       induction brseq in brs, brs', brsa1, brsa2, p4, p9 |- *;
         depelim brsa1; depelim brsa2; [constructor|].
       destruct p0, p1, r.
@@ -397,6 +398,7 @@ Section fixed.
         { rewrite -test_context_k_closed_on_free_vars_ctx //.
           now move/andP: fv'. }
         { rewrite -test_context_k_closed_on_free_vars_ctx; now move/andP: fv. }
+        { now split. }
         now rewrite e e0. }
       rewrite e e0; split => //.
       transitivity (bbody x); tea.

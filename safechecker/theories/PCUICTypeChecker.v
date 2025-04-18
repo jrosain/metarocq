@@ -49,7 +49,7 @@ Qed.
 
 Lemma subst_global_uctx_invariants {cf : checker_flags} {Σ : global_env_ext} {wfΣ : wf_ext Σ} {inst cstrs} {u : Instance.t} :
   global_uctx_invariants (global_ext_uctx (Σ,Polymorphic_ctx (inst, cstrs))) ->
-  Forall (fun l => LevelSet.mem l (global_ext_levels Σ)) u ->
+  Forall (fun l => LevelSet.mem l (global_ext_levels Σ)) (Instance.universes u) ->
   global_uctx_invariants ((global_ext_uctx Σ).1,subst_instance_cstrs u cstrs).
 Proof.
   intros [_ Hcs] Hu. split.
@@ -107,7 +107,7 @@ Proof.
           eapply In_Level_global_ext_poly in Hcs'.
           red. eapply LevelSet.union_spec. now right.
         -- apply LevelSetFact.mem_2.
-          pattern (nth n u Level.lzero).
+          pattern (nth n (Instance.universes u) Level.lzero).
           apply Forall_nth_def ; tea.
           now eapply LevelSetFact.mem_1, wf_ext_global_uctx_invariants.
       * destruct l'.
@@ -119,7 +119,7 @@ Proof.
           eapply In_Level_global_ext_poly in Hcs''.
           eapply LevelSet.union_spec. now right.
         -- apply LevelSetFact.mem_2.
-          pattern (nth n u Level.lzero).
+          pattern (nth n (Instance.universes u) Level.lzero).
           apply Forall_nth_def ; tea.
           now eapply LevelSetFact.mem_1, wf_ext_global_uctx_invariants.
 Qed.
@@ -315,7 +315,7 @@ Section Typecheck.
           (hu : forall Σ (wfΣ : abstract_env_ext_rel X Σ), welltyped Σ Γ u)
     : typing_result_comp (forall Σ (wfΣ : abstract_env_ext_rel X Σ), ∥ Σ ;;; Γ ⊢ t ≤[le] u ∥) :=
     convert le Γ t u ht hu
-      with inspect (eqb_term_upto_univ (abstract_env_compare_universe X) (abstract_env_compare_sort X) (abstract_env_compare_global_instance _ X) le t u) := {
+      with inspect (eqb_term_upto_univ abstract_env_compare_quality (abstract_env_compare_universe X) (abstract_env_compare_sort X) (abstract_env_compare_global_instance _ X) le t u) := {
         | @exist true He := ret _ ;
         | @exist false He with
           inspect (isconv_term _ X Γ le t ht u hu) := {
@@ -1026,6 +1026,35 @@ Section Typecheck.
     congruence.
   Qed.
 
+  Definition abstract_env_quality_mem_forallb {Σ} (wfΣ : abstract_env_ext_rel X Σ) u :
+    forallb (fun q => QualitySet.mem q (global_ext_qualities Σ)) u =
+      forallb (abstract_env_quality_mem X) u.
+  Proof using Type.
+    induction u; eauto; cbn.
+    set (b := QualitySet.Raw.mem _ _). set (b' := abstract_env_quality_mem _ _).
+    assert (Hbb' : b = b').
+    { unfold b'. apply eq_true_iff_eq. split; intro.
+      eapply (abstract_env_quality_mem_correct X wfΣ a); apply (QualitySet.Raw.mem_spec _ a);
+        eauto.
+      eapply (QualitySet.Raw.mem_spec _ a); eapply (abstract_env_quality_mem_correct X wfΣ a);
+        eauto.
+      Unshelve. 
+      apply QualitySet.Raw.union_ok.
+      - apply QualitySet.is_ok.
+      - apply QualitySet.Raw.create_ok; try constructor.
+        2: constructor.
+        1-3: constructor.
+        1,3,5: apply QualitySet.Raw.lt_leaf.
+        1: apply QualitySet.Raw.gt_leaf.
+        * apply QualitySet.Raw.gt_tree_node; auto.
+          all: apply QualitySet.Raw.gt_leaf.
+        * apply QualitySet.Raw.gt_tree_node; auto.
+          1: apply QualitySet.Raw.gt_leaf.
+          apply QualitySet.Raw.gt_tree_node; auto.
+          all: apply QualitySet.Raw.gt_leaf. }
+    destruct Hbb'. now rewrite IHu.
+  Qed.
+
   Definition abstract_env_level_mem_forallb {Σ} (wfΣ : abstract_env_ext_rel X Σ) u :
     forallb (level_mem Σ) u = forallb (abstract_env_level_mem X) u.
   Proof using Type.
@@ -1043,32 +1072,44 @@ Section Typecheck.
     u
     : typing_result_comp (forall Σ (wfΣ : abstract_env_ext_rel X Σ), consistent_instance_ext Σ uctx u) :=
   check_consistent_instance (Monomorphic_ctx) wfg u
-    with (Nat.eq_dec #|u| 0) := {
-      | left _ := ret _ ;
+    with (Nat.eq_dec #|Instance.universes u| 0) := {
+      | left _ with (Nat.eq_dec #|Instance.qualities u| 0) := {
+        | left _ := ret _ ;
+        | right _ := (raise (Msg "monomorphic instance should be of length 0")) }
       | right _ := (raise (Msg "monomorphic instance should be of length 0"))
     };
   check_consistent_instance (Polymorphic_ctx (inst, cstrs)) wfg u
     with inspect (AUContext.repr (inst, cstrs)) := {
-    | exist inst' _ with (Nat.eq_dec #|u| #|inst'.1|) := {
-      | right e1 := raise (Msg "instance does not have the right length") ;
-      | left e1 with inspect (forallb (abstract_env_level_mem X) u) := {
+    | exist inst' _ with (Nat.eq_dec #|Instance.universes u| #|inst'.1.(Universes.universes)|) := {
+      | right e1 := raise (Msg "universe instance does not have the right length") ;
+      | left e1 with (Nat.eq_dec #|Instance.qualities u| #|inst'.1.(Universes.qualities)|) := {
+        | right _ := raise (Msg "quality instance does not have the right length") ;
+        | left eq with inspect (forallb (abstract_env_level_mem X) (Instance.universes u) && forallb (abstract_env_quality_mem X) (Instance.qualities u)) := {
         | exist false e2 := raise (Msg "undeclared level in instance") ;
         | exist true e2 with inspect (abstract_env_check_constraints X (subst_instance_cstrs u cstrs)) := {
           | exist false e3 := raise (Msg "ctrs not satisfiable") ;
           | exist true e3 := ret _
-    }}}}.
+    }}}}}.
   Next Obligation.
     destruct (abstract_env_ext_exists X) as [[Σ wfΣ]]; specialize_Σ wfΣ; eauto.
+    destruct H as [Hu Hq]; congruence.
+  Qed.
+  Next Obligation.
+    destruct (abstract_env_ext_exists X) as [[Σ wfΣ]]; specialize_Σ wfΣ; eauto.
+    destruct H as [Hu Hq]; congruence.
   Qed.
   Next Obligation.
     pose proof (heΣ _ wfΣ) as [[_wfΣ s]]. specialize_Σ wfΣ.
-    assert (forallb (fun l : LevelSet.elt => LevelSet.mem l (global_ext_levels Σ)) u).
-    { symmetry in e2. rewrite abstract_env_level_mem_forallb; eauto. }
+    symmetry in e2. apply andb_and in e2. destruct e2 as [el2 eq2].
+    assert (forallb (fun l : LevelSet.elt => LevelSet.mem l (global_ext_levels Σ)) (Instance.universes u)).
+    { rewrite abstract_env_level_mem_forallb; eauto. }
+    assert (forallb (fun q => QualitySet.mem q (global_ext_qualities Σ)) (Instance.qualities u)).
+    { rewrite abstract_env_quality_mem_forallb; eauto. }
     repeat split; eauto.
-    - sq. unshelve eapply (abstract_env_check_constraints_correct X); eauto.
-      now apply nor_check_univs. pose proof (abstract_env_ext_wf _ wfΣ) as [HΣ].
-      eapply (subst_global_uctx_invariants (u := u)) in wfg; eauto. apply wfg.
-      solve_all.
+    sq. unshelve eapply (abstract_env_check_constraints_correct X); eauto.
+    now apply nor_check_univs. pose proof (abstract_env_ext_wf _ wfΣ) as [HΣ].
+    eapply (subst_global_uctx_invariants (u := u)) in wfg; eauto. apply wfg.
+    solve_all.
   Qed.
   Next Obligation.
     destruct (abstract_env_ext_exists X) as [[Σ wfΣ]]; specialize_Σ wfΣ;
@@ -1081,7 +1122,8 @@ Section Typecheck.
       now apply nor_check_univs.
       pose proof (abstract_env_ext_wf _ wfΣ) as [HΣ].
       eapply (subst_global_uctx_invariants (u := u)) in wfg; eauto. apply wfg.
-      assert (forallb (fun l : LevelSet.elt => LevelSet.mem l (global_ext_levels Σ)) u).
+      symmetry in e2. apply andb_and in e2. destruct e2 as [el2 eq2].
+      assert (forallb (fun l : LevelSet.elt => LevelSet.mem l (global_ext_levels Σ)) (Instance.universes u)).
       { rewrite abstract_env_level_mem_forallb; eauto. }
       solve_all.
   Qed.
@@ -1090,7 +1132,9 @@ Section Typecheck.
     pose proof (heΣ _ wfΣ) as [heΣ]. sq.
     clear -e2 H heΣ wfΣ.
     erewrite <- abstract_env_level_mem_forallb in e2; eauto.
-    now rewrite <- e2 in H.
+    erewrite <- abstract_env_quality_mem_forallb in e2; eauto.
+    symmetry in e2. apply andb_false_iff in e2. destruct e2;
+      now rewrite H0 in H.
   Qed.
   Next Obligation.
     now destruct (abstract_env_ext_exists X) as [[Σ wfΣ]]; specialize_Σ wfΣ.
@@ -1119,11 +1163,15 @@ Section Typecheck.
   check_is_allowed_elimination u wfu IntoAny := ret _.
   Next Obligation.
     destruct (abstract_env_ext_exists X) as [[Σ wfΣ]]; specialize_Σ wfΣ.
-    now rewrite H in e0.
+    destruct H as (_ & _ & _ & e0 & _). now rewrite e0 in e1.
   Qed.
   Next Obligation.
     destruct (abstract_env_ext_exists X) as [[Σ wfΣ]]; specialize_Σ wfΣ.
     now rewrite H in e0.
+  Qed.
+  Next Obligation.
+    destruct (abstract_env_ext_exists X) as [[Σ wfΣ]]; specialize_Σ wfΣ.
+    destruct u; inversion e0. auto.
   Qed.
   Next Obligation.
     symmetry in e; toProp e; destruct e as [-> | e]; [auto|right].
@@ -1400,6 +1448,7 @@ Section Typecheck.
     all:try apply eqb_eq in i0.
     all:try apply eqb_eq in i1 => //.
     all:destruct H as []; apply absurd; rewrite ?H ?H0 ?H1; eauto.
+    move/eqb_specT: H1 => ctra; now apply absurd in ctra.
   Qed.
 
   Section make_All.
@@ -2156,16 +2205,17 @@ Section Typecheck.
       - now eapply negbTE.
     - erewrite <- compare_global_instance_correct in i1; eauto.
       1: { apply/wf_instanceP.
-        rewrite -wf_universeb_instance_forall.
-        assert (tyu : isType Σ Γ (mkApps (tInd ci u) args)).
-        {
-          eapply isType_red.
-          2: eapply s.
-          now eapply validity, infering_typing.
-         }
-      eapply isType_wf_universes in tyu ; eauto.
-      rewrite wf_universes_mkApps in tyu.
-      now move: tyu => /andP []. }
+           assert (tyu : isType Σ Γ (mkApps (tInd ci u) args)).
+           { eapply isType_red.
+             2: eapply s.
+             now eapply validity, infering_typing. }
+           eapply isType_wf_universes in tyu ; eauto.
+           rewrite wf_universes_mkApps in tyu.
+           unfold wf_universes in tyu. unfold wf_instanceb.
+           move: tyu => /andP [hind hargs].
+           rewrite !andb_and in hind |- *; destruct hind. split.
+           - assumption.
+           - now rewrite -wf_universeb_instance_forall. }
       eapply consistent_instance_ext_wf; eauto.
     - rewrite /params /chop_args chop_firstn_skipn /= in eq_params.
       eapply All2_impl ; tea.
@@ -2369,7 +2419,6 @@ Section Typecheck.
       2: eassumption.
       erewrite <- All2_length ; tea.
     - apply/wf_instanceP.
-      rewrite -wf_universeb_instance_forall.
       assert (tyu : isType Σ Γ (mkApps (tInd ind' u) args)).
       {
         eapply isType_red.
@@ -2378,11 +2427,14 @@ Section Typecheck.
       }
       eapply isType_wf_universes in tyu ; eauto.
       rewrite wf_universes_mkApps in tyu.
-      now move: tyu => /andP [].
+      move: tyu => /andP [hind _]. cbn in hind.
+      move: hind => /andP [hu hq]. apply/andP; split.
+      * assumption.
+      * now rewrite -wf_universeb_instance_forall.
     - apply infering_typing, typing_wf_universes in ty ; auto.
       move: ty => /andP [].
       rewrite {1}/wf_universes /= wf_universeb_instance_forall =>
-        /andP [] /wf_instanceP; eauto.
+        /andP [Hl /andP [Hq _]] _. apply/wf_instanceP /andP. now split.
   Qed.
 
   Next Obligation.

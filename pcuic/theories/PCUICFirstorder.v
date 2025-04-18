@@ -724,7 +724,7 @@ Proof.
   intros Ha H. induction H in t', Ha |- using firstorder_value_inds.
   eapply eq_term_upto_univ_napp_mkApps_l_inv in Ha as (? & ? & [] & ->).
   invs e. repeat f_equal.
-  - now eapply cmp_universe_instance_eq.
+  - now eapply cmp_instance_eq.
   - revert x0 a. clear - H0. induction H0; intros; invs a; f_equal; eauto.
 Qed.
 

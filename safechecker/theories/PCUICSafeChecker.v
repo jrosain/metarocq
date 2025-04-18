@@ -135,7 +135,7 @@ Section OnUdecl.
   Qed.
 
   Lemma In_Var_global_ext_poly {n Σ inst cstrs} :
-    n < #|inst| ->
+    n < #|inst.(Universes.universes)| ->
     LevelSet.mem (Level.lvar n) (global_ext_levels (Σ, Polymorphic_ctx (inst, cstrs))).
   Proof using Type.
     intros Hn.
@@ -146,10 +146,23 @@ Section OnUdecl.
     eapply In_unfold_inj; try congruence.
   Qed.
 
+  Lemma In_Var_global_ext_poly' {n Σ inst cstrs} :
+    n < #|inst.(Universes.qualities)| ->
+    QualitySet.mem (Quality.var n) (global_ext_qualities (Σ, Polymorphic_ctx (inst, cstrs))).
+  Proof using Type.
+    intros Hn.
+    unfold global_ext_qualities; simpl.
+      apply QualitySet.mem_spec; rewrite QualitySet.union_spec. left.
+    rewrite /AUContext.qualities /= mapi_unfold.
+    apply QualitySetProp.of_list_1, InA_In_eq.
+    eapply In_unfold_inj; auto.
+    intros. now injection H => [->].
+  Qed.
+
   Lemma on_udecl_poly_bounded X inst cstrs :
     wf X ->
     on_udecl X (Polymorphic_ctx (inst, cstrs)) ->
-    closedu_cstrs #|inst| cstrs.
+    closedu_cstrs #|inst.(Universes.universes)| cstrs.
   Proof using Type.
     rewrite /on_udecl. intros wfX [_ [nlevs _]].
     red.
@@ -162,34 +175,34 @@ Section OnUdecl.
     apply LevelSetProp.Dec.F.union_1 in H0.
     destruct H. eapply LSet_in_poly_bounded in H.
     destruct H0. eapply LSet_in_poly_bounded in H0. simpl. now rewrite H H0.
-    eapply (LSet_in_global_bounded #|inst|) in H0 => //. simpl.
+    eapply (LSet_in_global_bounded #|inst.(Universes.universes)|) in H0 => //. simpl.
     now rewrite H H0.
-    eapply (LSet_in_global_bounded #|inst|) in H => //. simpl.
+    eapply (LSet_in_global_bounded #|inst.(Universes.universes)|) in H => //. simpl.
     destruct H0. eapply LSet_in_poly_bounded in H0. simpl. now rewrite H H0.
-    eapply (LSet_in_global_bounded #|inst|) in H0 => //. simpl.
+    eapply (LSet_in_global_bounded #|inst.(Universes.universes)|) in H0 => //. simpl.
     now rewrite H H0.
   Qed.
 
-  Lemma subst_instance_level_lift inst l :
-    closedu_level #|inst| l ->
-    subst_instance_level (lift_instance #|inst| (level_var_instance 0 inst)) l = lift_level #|inst| l.
+  Lemma subst_instance_level_lift inst l n :
+    closedu_level #|inst.(Universes.universes)| l ->
+    subst_instance_level (lift_instance n #|inst.(Universes.universes)| (var_instance 0 inst)) l = lift_level #|inst.(Universes.universes)| l.
   Proof using Type.
     destruct l => // /= /Nat.ltb_lt ltn.
     rewrite nth_nth_error.
     destruct nth_error eqn:eq. move:eq.
-    rewrite nth_error_map /level_var_instance [mapi_rec _ _ _]mapi_unfold (proj1 (nth_error_unfold _ _ _) ltn).
+    rewrite nth_error_map /var_instance [mapi_rec _ _ _]mapi_unfold (proj1 (nth_error_unfold _ _ _) ltn).
     simpl. now intros [=].
     eapply nth_error_None in eq; len in eq.
   Qed.
 
   Lemma subst_instance_level_var_instance inst l :
-    closedu_level #|inst| l ->
-    subst_instance_level (level_var_instance 0 inst) l = l.
+    closedu_level #|inst.(Universes.universes)| l ->
+    subst_instance_level (var_instance 0 inst) l = l.
   Proof using Type.
     destruct l => // /= /Nat.ltb_lt ltn.
-    rewrite /level_var_instance.
+    rewrite /var_instance.
     rewrite nth_nth_error.
-    now rewrite /level_var_instance [mapi_rec _ _ _]mapi_unfold (proj1 (nth_error_unfold _ _ _) ltn).
+    now rewrite /var_instance [mapi_rec _ _ _]mapi_unfold (proj1 (nth_error_unfold _ _ _) ltn).
   Qed.
 
   Lemma variance_universes_spec Σ ctx v univs u u' :
@@ -206,8 +219,11 @@ Section OnUdecl.
     subst univs. simpl.
     subst u u'. autorewrite with len.
     repeat (split; auto).
-    - rewrite forallb_map /level_var_instance.
+    - rewrite forallb_map /var_instance.
       rewrite [mapi_rec _ _ _]mapi_unfold forallb_unfold /= //.
+      intros x Hx. apply In_Var_global_ext_poly'. len.
+    - rewrite forallb_map /var_instance.
+      rewrite /= [mapi_rec _ _ _]mapi_unfold forallb_unfold /= //.
       intros x Hx. apply In_Var_global_ext_poly. len.
     - destruct wfext as [onX onu]. simpl in *.
       destruct onu as [_ [_ [sat _]]].
@@ -235,8 +251,11 @@ Section OnUdecl.
       specialize (wfctx _ inc'). simpl in wfctx.
       move/andP: wfctx => [cll clr].
       rewrite !subst_instance_level_lift //.
-    - rewrite /level_var_instance.
-      rewrite [mapi_rec _ _ _]mapi_unfold forallb_unfold /= //.
+    - rewrite /var_instance.
+      rewrite /= [mapi_rec _ _ _]mapi_unfold forallb_unfold /= //.
+      intros x Hx. apply In_Var_global_ext_poly'. len.
+    - rewrite /var_instance.
+      rewrite /= [mapi_rec _ _ _]mapi_unfold forallb_unfold /= //.
       intros x Hx. apply In_Var_global_ext_poly. len.
     - destruct wfext as [onX onu]. simpl in *.
       destruct onu as [_ [_ [sat _]]].
@@ -575,7 +594,7 @@ Section CheckEnv.
     typing_result (forall Σ, abstract_env_ext_rel X_ext Σ -> ∥ ws_cumul_ctx_pb_rel le Σ Γ Δ Δ' ∥) :=
     check_ws_cumul_ctx X_impl X_ext le Γ Δ Δ' wfΔ wfΔ'.
 
-  Notation eqb_term_conv X conv_pb := (eqb_term_upto_univ (abstract_env_compare_universe X) (abstract_env_compare_sort X) (abstract_env_compare_global_instance _ X) conv_pb).
+  Notation eqb_term_conv X conv_pb := (eqb_term_upto_univ abstract_env_compare_quality (abstract_env_compare_universe X) (abstract_env_compare_sort X) (abstract_env_compare_global_instance _ X) conv_pb).
 
   Program Definition check_eq_term pb X_ext t u
      (wft : forall Σ, abstract_env_ext_rel X_ext Σ -> wf_universes Σ t)
@@ -1487,7 +1506,7 @@ Section CheckEnv.
     | id, univs, Some v, wfunivs with inspect (variance_universes univs v) := {
       | exist (Some (univs', i, i')) eqvu =>
         check_leq <-
-          check_eq_true (eqb #|v| #|polymorphic_instance univs|)
+          check_eq_true (eqb #|v| #|Instance.universes (polymorphic_instance univs)|)
             (abstract_env_empty_ext abstract_env_empty, IllFormedDecl (string_of_kername id) (Msg "Variance annotation does not have the right length"));;
         Σ' <- make_abstract_env_ext X id univs' ;;
         ret _

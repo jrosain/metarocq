@@ -56,7 +56,7 @@ Proof. ltac:(Equations.Prop.Tactics.eqdec_proof). Qed.
 
 Definition string_of_predicate {term} (f : term -> string) (p : predicate term) :=
   "(" ^ "(" ^ String.concat "," (map f (pparams p)) ^ ")"
-  ^ "," ^ string_of_universe_instance (puinst p)
+  ^ "," ^ string_of_instance (puinst p)
   ^ ",(" ^ String.concat "," (map (string_of_name ∘ binder_name) (pcontext p)) ^ ")"
   ^ "," ^ f (preturn p) ^ ")".
 
@@ -593,13 +593,13 @@ Fixpoint noccur_between k n (t : term) : bool :=
     tCoFix mfix' idx
   end.
 
-(** Tests that the term is closed over [k] universe variables *)
+(** Tests that the term is closed over [k] universe variables and quality variables *)
 Fixpoint closedu (k : nat) (t : term) : bool :=
   match t with
   | tSort univ => closedu_sort k univ
-  | tInd _ u => closedu_instance k u
-  | tConstruct _ _ u => closedu_instance k u
-  | tConst _ u => closedu_instance k u
+  | tInd _ u => closed_instance_universes k u
+  | tConstruct _ _ u => closed_instance_universes k u
+  | tConst _ u => closed_instance_universes k u
   | tRel i => true
   | tEvar ev args => forallb (closedu k) args
   | tLambda _ T M | tProd _ T M => closedu k T && closedu k M
@@ -607,7 +607,7 @@ Fixpoint closedu (k : nat) (t : term) : bool :=
   | tCast c kind t => closedu k c && closedu k t
   | tLetIn na b t b' => closedu k b && closedu k t && closedu k b'
   | tCase ind p c brs =>
-    let p' := test_predicate (closedu_instance k) (closedu k) (closedu k) p in
+    let p' := test_predicate (closed_instance_universes k) (closedu k) (closedu k) p in
     let brs' := forallb (test_branch (closedu k)) brs in
     p' && closedu k c && brs'
   | tProj p c => closedu k c
@@ -617,6 +617,32 @@ Fixpoint closedu (k : nat) (t : term) : bool :=
     forallb (test_def (closedu k) (closedu k)) mfix
   | tArray u arr def ty =>
     closedu_level k u && forallb (closedu k) arr && closedu k def && closedu k ty
+  | _ => true
+  end.
+
+Fixpoint closedq (k : nat) (t : term) : bool :=
+  match t with
+  | tSort univ => true
+  | tInd _ u => closed_instance_qualities k u
+  | tConstruct _ _ u => closed_instance_qualities k u
+  | tConst _ u => closed_instance_qualities k u
+  | tRel i => true
+  | tEvar ev args => forallb (closedq k) args
+  | tLambda _ T M | tProd _ T M => closedq k T && closedq k M
+  | tApp u v => closedq k u && forallb (closedq k) v
+  | tCast c kind t => closedq k c && closedq k t
+  | tLetIn na b t b' => closedq k b && closedq k t && closedq k b'
+  | tCase ind p c brs =>
+    let p' := test_predicate (closed_instance_qualities k) (closedq k) (closedq k) p in
+    let brs' := forallb (test_branch (closedq k)) brs in
+    p' && closedq k c && brs'
+  | tProj p c => closedq k c
+  | tFix mfix idx =>
+    forallb (test_def (closedq k) (closedq k)) mfix
+  | tCoFix mfix idx =>
+    forallb (test_def (closedq k) (closedq k)) mfix
+  | tArray u arr def ty =>
+    forallb (closedq k) arr && closedq k def && closedq k ty
   | _ => true
   end.
 

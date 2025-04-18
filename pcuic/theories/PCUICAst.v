@@ -116,7 +116,13 @@ Section map_predicate_k.
   Definition test_predicate_ku (instp : nat -> Instance.t -> bool)
     (p : nat -> term -> bool) k (pred : predicate term) :=
     instp k pred.(puinst) && forallb (p k) pred.(pparams) &&
-    test_context (p #|pred.(puinst)|) pred.(pcontext) &&
+    test_context (p #|Instance.universes pred.(puinst)|) pred.(pcontext) &&
+    p k pred.(preturn).
+
+  Definition test_predicate_kq (instp : nat -> Instance.t -> bool)
+    (p : nat -> term -> bool) k (pred : predicate term) :=
+    instp k pred.(puinst) && forallb (p k) pred.(pparams) &&
+    test_context (p #|Instance.qualities pred.(puinst)|) pred.(pcontext) &&
     p k pred.(preturn).
 
 End map_predicate_k.
@@ -433,17 +439,17 @@ Instance subst_instance_constr : UnivSubst term :=
 Fixpoint closedu (k : nat) (t : term) : bool :=
   match t with
   | tSort s => closedu_sort k s
-  | tInd _ u => closedu_instance k u
-  | tConstruct _ _ u => closedu_instance k u
-  | tConst _ u => closedu_instance k u
+  | tInd _ u => closed_instance_universes k u
+  | tConstruct _ _ u => closed_instance_universes k u
+  | tConst _ u => closed_instance_universes k u
   | tRel i => true
   | tEvar ev args => forallb (closedu k) args
   | tLambda _ T M | tProd _ T M => closedu k T && closedu k M
   | tApp u v => closedu k u && closedu k v
   | tLetIn na b t b' => closedu k b && closedu k t && closedu k b'
   | tCase ind p c brs =>
-    let p' := test_predicate_ku closedu_instance closedu k p in
-    let brs' := forallb (test_branch (closedu #|p.(puinst)|) (closedu k)) brs in
+    let p' := test_predicate_ku closed_instance_universes closedu k p in
+    let brs' := forallb (test_branch (closedu #|Instance.universes p.(puinst)|) (closedu k)) brs in
     p' && closedu k c && brs'
   | tProj p c => closedu k c
   | tFix mfix idx =>
@@ -451,6 +457,30 @@ Fixpoint closedu (k : nat) (t : term) : bool :=
   | tCoFix mfix idx =>
     forallb (test_def (closedu k) (closedu k)) mfix
   | tPrim p => test_primu (closedu_level k) (closedu k) p
+  | _ => true
+  end.
+
+Fixpoint closedq (k : nat) (t : term) : bool :=
+  match t with
+  | tSort s => true
+  | tInd _ u => closed_instance_qualities k u
+  | tConstruct _ _ u => closed_instance_qualities k u
+  | tConst _ u => closed_instance_qualities k u
+  | tRel i => true
+  | tEvar ev args => forallb (closedq k) args
+  | tLambda _ T M | tProd _ T M => closedq k T && closedq k M
+  | tApp u v => closedq k u && closedq k v
+  | tLetIn na b t b' => closedq k b && closedq k t && closedq k b'
+  | tCase ind p c brs =>
+    let p' := test_predicate_kq closed_instance_qualities closedq k p in
+    let brs' := forallb (test_branch (closedq #|Instance.qualities p.(puinst)|) (closedq k)) brs in
+    p' && closedq k c && brs'
+  | tProj p c => closedq k c
+  | tFix mfix idx =>
+    forallb (test_def (closedq k) (closedq k)) mfix
+  | tCoFix mfix idx =>
+    forallb (test_def (closedq k) (closedq k)) mfix
+  | tPrim p => test_primq (closedq_quality k) (closedq k) p
   | _ => true
   end.
 
@@ -548,7 +578,7 @@ Local Ltac fcase c :=
 
 Definition string_of_predicate {term} (f : term -> string) (p : predicate term) :=
   "(" ^ "(" ^ String.concat "," (map f (pparams p)) ^ ")"
-  ^ "," ^ string_of_universe_instance (puinst p)
+  ^ "," ^ string_of_instance (puinst p)
   ^ ",(" ^ String.concat "," (map (string_of_name ∘ binder_name ∘ decl_name) (pcontext p)) ^ ")"
   ^ "," ^ f (preturn p) ^ ")".
 
@@ -1040,6 +1070,20 @@ Proof.
   destruct a; destruct hp; cbn in *. unfold mapu_array_model; cbn.
   rtoProp. destruct p0. f_equal; intuition eauto.
   eapply forallb_All in H2. eapply All_prod in a; tea.
+  eapply All_map_id, All_impl; tea. intuition eauto. apply hg; intuition auto.
+Qed.
+
+Lemma primProp_mapu_id' {P : term -> Type} {pu put pq pqt} p f g :
+  tPrimProp P p -> test_primu pu put p -> test_primq pq pqt p ->
+  (forall u, pu u -> f u = u) ->
+  (forall t, P t -> put t -> pqt t -> g t = t) ->
+  mapu_prim f g p = p.
+Proof.
+  intros hp hu hq hf hg.
+  destruct p as [? []]; cbn => //. f_equal. f_equal.
+  destruct a; destruct hp; cbn in *. unfold mapu_array_model; cbn.
+  rtoProp. destruct p0. f_equal; intuition eauto.
+  eapply forallb_All in H, H5. eapply All_prod in a; tea. eapply All_prod in a. 2: exact H5.
   eapply All_map_id, All_impl; tea. intuition eauto. apply hg; intuition auto.
 Qed.
 

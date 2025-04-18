@@ -183,33 +183,37 @@ Proof.
     rename p5 into Hp; rename p6 into Hreturn; rename p7 into Hcontext; rename p8 into Hc; rename p9 into Hbrs.
     eapply cumul_Case; fold inst.
     * unfold cumul_predicate in *; destruct_head'_prod.
-      repeat split; eauto.
+      split; [|split]; eauto.
       + eapply All2_map. repeat toAll.
-        eapply All2_impl. 1: tea. cbn; intros. destruct_head'_prod; eauto.
-      + unfold preturn. cbn.
+        eapply All2_impl_nth_error. 1: tea. cbn; intros. destruct X as [X _].
+        apply All2_undep in X. eapply All2_nth_error in X; eauto.
+        apply X; auto.
+        -- eapply All_nth_error in Hp; eauto.
+        -- eapply All_nth_error in Hp'; eauto.
+      + split; auto. unfold preturn. cbn.
         unshelve erewrite (All2_length _ : #|pcontext _| = #|pcontext _|); shelve_unifiable; tea.
         exactly_once (idtac; multimatch goal with H : _ |- _ => eapply H end); eauto.
         ++ unshelve erewrite <- (All2_length _ : #|pcontext _| = #|pcontext _|); shelve_unifiable; tea.
            rewrite <- inst_case_predicate_context_length.
-            rewrite inst_case_predicate_context_inst; eauto.
-            eapply closed_subst_ext. 2: symmetry; apply up_Upn.
-            eapply closed_subst_app; eauto. rewrite inst_inst_case_context; eauto.
-            rewrite on_free_vars_ctx_inst_case_context_nil; eauto.
-            +++ rewrite forallb_map. eapply forallb_impl. 2:tea. cbn; intros.
-                eapply inst_is_open_term; eauto.
-            +++ rewrite length_map. rewrite inst_context_on_free_vars ; eauto.
+           rewrite inst_case_predicate_context_inst; eauto.
+           eapply closed_subst_ext. 2: symmetry; apply up_Upn.
+           eapply closed_subst_app; eauto. rewrite inst_inst_case_context; eauto.
+           rewrite on_free_vars_ctx_inst_case_context_nil; eauto.
+           +++ rewrite forallb_map. eapply forallb_impl. 2:tea. cbn; intros.
+               eapply inst_is_open_term; eauto.
+           +++ rewrite length_map. rewrite inst_context_on_free_vars ; eauto.
         ++ unfold PCUICCases.inst_case_predicate_context.
-            apply on_free_vars_ctx_inst_case_context; eauto.
+           apply on_free_vars_ctx_inst_case_context; eauto.
         ++ unfold PCUICCases.inst_case_predicate_context.
-            unfold is_open_term. rewrite length_app.
-            rewrite <- shiftnP_add.
-            rewrite inst_case_predicate_context_length.
-            eassumption.
+           unfold is_open_term. rewrite length_app.
+           rewrite <- shiftnP_add.
+           rewrite inst_case_predicate_context_length.
+           eassumption.
         ++ unfold PCUICCases.inst_case_predicate_context.
-            unfold is_open_term. rewrite length_app.
-            rewrite <- shiftnP_add.
-            rewrite inst_case_predicate_context_length.
-            unshelve erewrite (All2_length _ : #|pcontext _| = #|pcontext _|); shelve_unifiable; tea.
+           unfold is_open_term. rewrite length_app.
+           rewrite <- shiftnP_add.
+           rewrite inst_case_predicate_context_length.
+           unshelve erewrite (All2_length _ : #|pcontext _| = #|pcontext _|); shelve_unifiable; tea.
     * eauto.
     * rename Hbody into Hbrsbrs'. unfold cumul_branches, cumul_branch in *.
       repeat toAll.

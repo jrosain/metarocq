@@ -17,6 +17,7 @@ Lemma compare_term_config_impl {cf1 cf2} Σ φ pb t t'
     -> @compare_term cf1 Σ φ pb t t' -> @compare_term cf2 Σ φ pb t t'.
 Proof.
   intro H. apply eq_term_upto_univ_impl; auto.
+  1: intros ??; tauto.
   1,2: intros ??; now eapply cmp_universe_config_impl.
   1,2: intros ??; now eapply cmp_sort_config_impl.
 Qed.
@@ -78,10 +79,12 @@ Proof.
        end.
   - eapply cumul_Evar. solve_all.
   - eapply cumul_Case.
-    * cbv [cumul_predicate] in *; destruct_head'_prod. repeat split; tas.
-      eapply cmp_universe_instance_impl';
-        [ hnf; intros * ?; eapply (@cmp_universe_config_impl cf1 cf2) | ];
-        eassumption.
+    * cbv [cumul_predicate] in *; destruct_head'_prod. split; [|split]; tas.
+      -- destruct X. now apply All2_undep in a1.
+      -- eapply cmp_instance_impl'; eauto;
+        [ intros ?? ; tauto | hnf; intros * ?; eapply (@cmp_universe_config_impl cf1 cf2)];
+           eassumption.
+      -- now destruct X, p0.
     * assumption.
     * unfold cumul_branches, cumul_branch in *. solve_all.
   - eapply cumul_Fix. unfold cumul_mfixpoint in *. solve_all.
@@ -92,12 +95,12 @@ Proof.
     * solve_all.
   - eapply cumul_Ind; eauto. 2:solve_all.
     eapply @cmp_global_instance_impl; [ .. | eassumption ].
-    3: auto with arith. all: intros ??; now apply (@cmp_universe_config_impl cf1 cf2).
+    4: auto with arith. all: intros ??; try tauto; now apply (@cmp_universe_config_impl cf1 cf2).
   - eapply cumul_Construct; eauto. 2:solve_all.
     eapply @cmp_global_instance_impl; [ .. | eassumption ].
-    3: auto with arith. all: intros ??; now apply (@cmp_universe_config_impl cf1 cf2).
+    4: auto with arith. all: intros ??; try tauto; now apply (@cmp_universe_config_impl cf1 cf2).
   - eapply cumul_Sort. eapply (@cmp_sort_config_impl cf1 cf2); eassumption.
-  - eapply cumul_Const. eapply cmp_universe_instance_impl'; eauto; tc.
+  - eapply cumul_Const. eapply cmp_instance_impl'; eauto; tc.
     hnf; intros *; eapply (@cmp_universe_config_impl cf1 cf2); eassumption.
 Defined.
 
@@ -154,3 +157,4 @@ Qed.
 #[global] Hint Resolve weakening_config_conv_ctx : config.
 #[global] Hint Resolve weakening_config_cumul_ctx : config.
 *)
+

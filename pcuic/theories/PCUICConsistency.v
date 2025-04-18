@@ -41,10 +41,10 @@ Theorem pcuic_consistent {cf:checker_flags} {nor : normalizing_flags} Σ
   {normalization_in: NormalizationIn Σ} t False_pcuic :
   declared_inductive Σ False_pcuic False_mib False_oib ->
   wf_ext Σ -> axiom_free Σ ->
-  Σ ;;; [] |- t : tInd False_pcuic []  -> False.
+  Σ ;;; [] |- t : tInd False_pcuic Instance.empty -> False.
 Proof.
   intros Hdecl wfΣ axΣ typ_false.
-  destruct (pcuic_canonicity Σ t False_pcuic [] []) as [t' [[typ_false' eqtt'] ctor]]; eauto.
+  destruct (pcuic_canonicity Σ t False_pcuic Instance.empty []) as [t' [[typ_false' eqtt'] ctor]]; eauto.
   destruct Hdecl as [Hdecl Hidecl].
   destruct False_pcuic as [kn n]. destruct n; cbn in *; [| now rewrite nth_error_nil in Hidecl].
   rewrite /construct_cofix_discr /head in ctor.
