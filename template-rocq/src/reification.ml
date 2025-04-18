@@ -21,12 +21,13 @@ sig
 
   type quoted_global_reference
 
+  type quoted_quality
   type quoted_sort_family
   type quoted_constraint_type
   type quoted_univ_constraint
   type quoted_univ_constraints
   type quoted_univ_level
-  type quoted_univ_instance
+  type quoted_instance
   type quoted_univ_context
   type quoted_univ_contextset
   type quoted_abstract_univ_context

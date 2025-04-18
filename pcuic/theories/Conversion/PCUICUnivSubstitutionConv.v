@@ -27,10 +27,10 @@ Import NonEmptySetFacts.
 
 Lemma subst_instance_level_val u l v v'
       (H1 : forall s, valuation_mono v s = valuation_mono v' s)
-      (H2 : forall n, val v (nth n u Level.lzero) = valuation_poly v' n)
+      (H2 : forall n, val v (nth n (Instance.universes u) Level.lzero) = valuation_poly v' n)
   : val v (subst_instance_level u l) = val v' l.
 Proof.
-  destruct l; cbn; try congruence. apply H2.
+  destruct l; cbn; try congruence.
 Qed.
 
 Lemma eq_valuation v v'
@@ -57,7 +57,7 @@ Qed. *)
 
 Lemma subst_instance_level_expr_val u expr v v'
       (H1 : forall s, valuation_mono v s = valuation_mono v' s)
-      (H2 : forall n, val v (nth n u Level.lzero) = valuation_poly v' n)
+      (H2 : forall n, val v (nth n (Instance.universes u) Level.lzero) = valuation_poly v' n)
   : val v (subst_instance_level_expr u expr) = val v' expr.
 Proof.
   destruct expr as [[] b]; cbnr.
@@ -68,7 +68,7 @@ Qed.
 
 Lemma subst_instance_universe_val u exprs v v'
       (H1 : forall s, valuation_mono v s = valuation_mono v' s)
-      (H2 : forall n, val v (nth n u Level.lzero) = valuation_poly v' n)
+      (H2 : forall n, val v (nth n (Instance.universes u) Level.lzero) = valuation_poly v' n)
   : val v (subst_instance_universe u exprs) = val v' exprs.
 Proof.
   symmetry.
@@ -86,7 +86,7 @@ Qed.
 
 Lemma subst_instance_sort_val u s v v'
       (H1 : forall s, valuation_mono v s = valuation_mono v' s)
-      (H2 : forall n, val v (nth n u Level.lzero) = valuation_poly v' n)
+      (H2 : forall n, val v (nth n (Instance.universes u) Level.lzero) = valuation_poly v' n)
   : Sort.to_csort v (subst_instance_sort u s) = Sort.to_csort v' s.
 Proof.
   destruct s as [ | | exprs]; cbnr.
@@ -95,7 +95,7 @@ Qed.
 
 Definition subst_instance_valuation (u : Instance.t) (v : valuation) :=
   {| valuation_mono := valuation_mono v ;
-     valuation_poly := fun i => val v (nth i u Level.lzero) |}.
+     valuation_poly := fun i => val v (nth i (Instance.universes u) Level.lzero) |}.
 
 
 Lemma subst_instance_level_val' u l v
@@ -130,30 +130,33 @@ Proof.
 Qed.
 
 
-Class SubstUnivPreserving eq_universe {A} `{UnivSubst A} (eqA : A -> A -> Prop) := Build_SubstUnivPreserving :
-  forall u u1 u2, cmp_universe_instance eq_universe u1 u2 ->
+Class SubstUnivPreserving eq_quality eq_universe {A} `{UnivSubst A} (eqA : A -> A -> Prop) := Build_SubstUnivPreserving :
+  forall u u1 u2, cmp_instance eq_quality eq_universe u1 u2 ->
     eqA (subst_instance u1 u) (subst_instance u2 u).
 
-Lemma subst_equal_inst_inst Re Re' :
-  SubstUnivPreserving Re Re' ->
-  forall u u1 u2, cmp_universe_instance Re u1 u2 ->
-             cmp_universe_instance Re' (subst_instance u1 u)
-                                    (subst_instance u2 u).
+Lemma subst_equal_inst_inst Rq Rq' Re Re' :
+  SubstUnivPreserving Rq Re Rq' ->
+  SubstUnivPreserving Rq Re Re' ->
+  forall u u1 u2, cmp_instance Rq Re u1 u2 ->
+             cmp_instance Rq' Re' (subst_instance u1 u) (subst_instance u2 u).
 Proof.
-  intros hRe u. induction u; cbnr; try now constructor.
-  intros u1 u2; unfold cmp_universe_instance; cbn; constructor.
-  - pose proof (hRe (Universe.make' a) u1 u2 H) as HH.
+  intros hRq hRe u. induction u; cbnr; try now constructor.
+  intros u1 u2; unfold cmp_instance; cbn; constructor.
+  - apply Forall2_map, Forall2_same.
+    intros q; now apply hRq.
+  - apply Forall2_map, Forall2_same.
+    intros l. pose proof (hRe (Universe.make' l) u1 u2 H) as HH.
     now rewrite /subst_instance !subst_instance_universe_make in HH.
-  - exact (IHu u1 u2 H).
 Qed.
 
-Lemma subst_equal_inst_global_inst Σ cmp_universe pb gr napp :
-  SubstUnivPreserving (cmp_universe Conv) (cmp_universe Conv) ->
-  forall u u1 u2, cmp_universe_instance (cmp_universe Conv) u1 u2 ->
-             cmp_global_instance Σ cmp_universe pb gr napp (subst_instance u1 u)
+Lemma subst_equal_inst_global_inst Σ cmp_qual cmp_universe pb gr napp :
+  SubstUnivPreserving (cmp_qual Conv) (cmp_universe Conv) (cmp_qual Conv) ->
+  SubstUnivPreserving (cmp_qual Conv) (cmp_universe Conv) (cmp_universe Conv) ->
+  forall u u1 u2, cmp_instance (cmp_qual Conv) (cmp_universe Conv) u1 u2 ->
+             cmp_global_instance Σ cmp_qual cmp_universe pb gr napp (subst_instance u1 u)
                                     (subst_instance u2 u).
 Proof.
-  intros subst_conv u u1 u2 Ru1u2.
+  intros subst_conv subst_conv' u u1 u2 Ru1u2.
   unfold cmp_global_instance, cmp_global_instance_gen, cmp_opt_variance.
   destruct global_variance_gen as [| |v].
   - now eapply subst_equal_inst_inst.
@@ -161,16 +164,17 @@ Proof.
   - left. now eapply subst_equal_inst_inst.
 Qed.
 
-Lemma eq_term_upto_univ_subst_instance Σ cmp_universe cmp_sort pb napp :
-  SubstUnivPreserving (cmp_universe Conv) (cmp_universe Conv) ->
-  SubstUnivPreserving (cmp_universe Conv) (cmp_sort Conv) ->
-  SubstUnivPreserving (cmp_universe Conv) (cmp_sort pb) ->
+Lemma eq_term_upto_univ_subst_instance Σ cmp_qual cmp_universe cmp_sort pb napp :
+  SubstUnivPreserving (cmp_qual Conv) (cmp_universe Conv) (cmp_qual Conv) ->
+  SubstUnivPreserving (cmp_qual Conv) (cmp_universe Conv) (cmp_universe Conv) ->
+  SubstUnivPreserving (cmp_qual Conv) (cmp_universe Conv) (cmp_sort Conv) ->
+  SubstUnivPreserving (cmp_qual Conv) (cmp_universe Conv) (cmp_sort pb) ->
   forall t u1 u2,
-    cmp_universe_instance (cmp_universe Conv) u1 u2 ->
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp (subst_instance u1 t)
+    cmp_instance (cmp_qual Conv) (cmp_universe Conv) u1 u2 ->
+    eq_term_upto_univ_napp Σ cmp_qual cmp_universe cmp_sort pb napp (subst_instance u1 t)
                             (subst_instance u2 t).
 Proof.
-  intros hsubst_conv hsubst_sort_conv hsubst_sort_pb t.
+  intros hsubst_qual_conv hsubst_conv hsubst_sort_conv hsubst_sort_pb t.
   induction t in napp, pb, hsubst_sort_pb |- * using term_forall_list_ind; intros u1 u2 hu.
   all: cbn; try constructor; eauto using subst_equal_inst_inst, subst_equal_inst_global_inst.
   all: solve_all; unfold eq_predicate, eq_branches, eq_branch, eq_mfixpoint in *.
@@ -188,14 +192,14 @@ Qed.
 
 #[global]
 Instance eq_universe_SubstUnivPreserving {cf:checker_flags} φ :
-  SubstUnivPreserving (eq_universe φ) (eq_universe φ).
+  SubstUnivPreserving eq_quality (eq_universe φ) (eq_universe φ).
 Proof.
   intros exprs u1 u2 hu.
   unfold_univ_rel.
   assert (He : forall e, val v (subst_instance_level_expr u1 e)
                     = val v (subst_instance_level_expr u2 e)). {
     destruct e as [[] b]; cbnr.
-    case_eq (nth_error u1 n).
+    case_eq (nth_error (Instance.universes u1) n).
     - intros l1 X. eapply Forall2_nth_error_Some_l in hu; tea.
       destruct hu as [l2 [-> H2]].
       specialize (H2 v Hv).

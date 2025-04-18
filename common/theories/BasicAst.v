@@ -56,6 +56,56 @@ Module QVar.
     intros x y e z t e'. hnf in * |- ; subst. reflexivity.
   Qed.
 
+  Definition ltb_ {V V_ltb} (v1 v2 : repr_ V) : bool :=
+    match v1, v2 with
+    | Var i, Var j => V_ltb i j
+    end.
+  Arguments ltb_ {V} V_ltb.
+
+  Definition ltb := ltb_ Nat.ltb.
+
+  Lemma reflect_lt_qvar {V : Set} (x y : t) : reflectProp (lt x y) (ltb x y).
+  Proof.
+    destruct (ltb x y) eqn:e; constructor; destruct x, y; rewrite /ltb /ltb_ in e.
+    - constructor. now apply Nat.ltb_lt.
+    - intro f. inversion f. subst. apply Nat.ltb_lt in H1. congruence.
+  Qed.
+  
+  Inductive le_ {V V_le} : repr_ V -> repr_ V -> Prop :=
+  | leVarVar i j : V_le i j -> le_ (Var i) (Var j).
+  Derive Signature for le_.
+  Arguments le_ {V} V_le.
+
+  Definition le := le_ Nat.le.
+
+  #[global] Instance le_preorder : PreOrder le.
+  Proof.
+    constructor.
+    - intros i. destruct i. constructor. apply le_n.
+    - intros v1 v2 v3 X1 X2; inversion X1; inversion X2; constructor.
+      subst. etransitivity; tea. inversion H3. now subst.
+  Qed.
+
+  Definition le_compat : Proper (eq ==> eq ==> iff) le.
+  Proof.
+    intros x y e z t e'. subst; reflexivity.
+  Qed.
+
+  Definition leqb_ {V V_leqb} (v1 v2 : repr_ V) : bool :=
+    match v1, v2 with
+    | Var i, Var j => V_leqb i j
+    end.
+  Arguments leqb_ {V} V_leqb.
+
+  Definition leqb := leqb_ Nat.leb.
+
+  Lemma reflect_le_qvar {V : Set} (x y : t) : reflectProp (le x y) (leqb x y).
+  Proof.
+    destruct (leqb x y) eqn:e; constructor; destruct x, y; rewrite /leqb /leqb_ in e.
+    - constructor. now apply Nat.leb_le.
+    - intro f. inversion f. subst. apply Nat.leb_le in H1. congruence.
+  Qed.
+
   Definition compare (v1 v2 : t) : comparison
     := match v1, v2 with
        | Var i, Var j => Nat.compare i j

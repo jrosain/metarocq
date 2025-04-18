@@ -258,24 +258,36 @@ Module Lookup (T : Term) (E : EnvironmentSig T).
 
   Definition consistent_instance `{checker_flags} (lvs : LevelSet.t) (φ : ConstraintSet.t) uctx (u : Instance.t) :=
     match uctx with
-    | Monomorphic_ctx => List.length u = 0
+    | Monomorphic_ctx => #|Instance.universes u| = 0 /\ #|Instance.qualities u| = 0
     | Polymorphic_ctx c =>
       (* levels of the instance already declared *)
-      forallb (fun l => LevelSet.mem l lvs) u /\
-      List.length u = List.length c.1 /\
-      valid_constraints φ (subst_instance_cstrs u c.2)
+      forallb (fun l => LevelSet.mem l lvs) (Instance.universes u) = true /\
+        #|Instance.universes u| = #|AUContext.universes c| /\
+        #|Instance.qualities u| = #|AUContext.qualities c| /\
+        valid_constraints φ (subst_instance_cstrs u c.2)
     end.
 
   Definition consistent_instance_ext `{checker_flags} Σ :=
     consistent_instance (global_ext_levels Σ) (global_ext_constraints Σ).
 
-  Lemma consistent_instance_length {cf : checker_flags} {Σ : global_env_ext} {univs u} :
+  Lemma consistent_instance_univs_length {cf : checker_flags} {Σ : global_env_ext} {univs u} :
     consistent_instance_ext Σ univs u ->
-    #|u| = #|abstract_instance univs|.
+    #|Instance.universes u| = #|Instance.universes (abstract_instance univs)|.
   Proof.
     unfold consistent_instance_ext, consistent_instance.
-    destruct univs; simpl; auto.
+    destruct univs; simpl. tauto.
     intros [_ [H _]].
+    destruct cst; simpl in *.
+    now rewrite H; cbn; autorewrite with len.
+  Qed.
+
+  Lemma consistent_instance_quals_length {cf : checker_flags} {Σ : global_env_ext} {univs u} :
+    consistent_instance_ext Σ univs u ->
+    #|Instance.qualities u| = #|Instance.qualities (abstract_instance univs)|.
+  Proof.
+    unfold consistent_instance_ext, consistent_instance.
+    destruct univs; simpl. tauto.
+    intros (_ & _ & H & _).
     destruct cst; simpl in *.
     now rewrite H; cbn; autorewrite with len.
   Qed.
@@ -1428,20 +1440,23 @@ Module GlobalMaps (T: Term) (E: EnvironmentSig T) (TU : TermUtils T E) (ET: EnvT
       ConstraintSet.fold (fun elt acc => ConstraintSet.add (lift_constraint n elt) acc)
         cstrs ConstraintSet.empty.
 
-    Definition level_var_instance n (inst : list name) :=
-      mapi_rec (fun i _ => Level.lvar i) inst n.
+    Definition level_var_instance n (inst : bound_names) :=
+      mapi_rec (fun i _ => Level.lvar i) inst.(Universes.universes) n.
 
-    Fixpoint variance_cstrs (v : list Variance.t) (u u' : Instance.t) :=
+    Fixpoint variance_cstrs_ (v : list Variance.t) (u u' : list Level.t) :=
       match v, u, u' with
       | _, [], [] => ConstraintSet.empty
       | v :: vs, u :: us, u' :: us' =>
         match v with
-        | Variance.Irrelevant => variance_cstrs vs us us'
-        | Variance.Covariant => ConstraintSet.add (u, ConstraintType.Le 0, u') (variance_cstrs vs us us')
-        | Variance.Invariant => ConstraintSet.add (u, ConstraintType.Eq, u') (variance_cstrs vs us us')
+        | Variance.Irrelevant => variance_cstrs_ vs us us'
+        | Variance.Covariant => ConstraintSet.add (u, ConstraintType.Le 0, u') (variance_cstrs_ vs us us')
+        | Variance.Invariant => ConstraintSet.add (u, ConstraintType.Eq, u') (variance_cstrs_ vs us us')
         end
       | _, _, _ => (* Impossible due to on_variance invariant *) ConstraintSet.empty
       end.
+
+    Definition variance_cstrs (v : list Variance.t) (u u' : list Level.t) :=
+      variance_cstrs_ v u u'.
 
     (** This constructs a duplication of the polymorphic universe context of the inductive,
       where the two instances are additionally related according to the variance information.
@@ -1453,11 +1468,12 @@ Module GlobalMaps (T: Term) (E: EnvironmentSig T) (TU : TermUtils T E) (ET: EnvT
       | Polymorphic_ctx auctx =>
         let (inst, cstrs) := auctx in
         let u' := level_var_instance 0 inst in
-        let u := lift_instance #|inst| u' in
-        let cstrs := ConstraintSet.union cstrs (lift_constraints #|inst| cstrs) in
+        let n := #|inst.(Universes.universes)| in
+        let u := lift_instance n u' in
+        let cstrs := ConstraintSet.union cstrs (lift_constraints n cstrs) in
         let cstrv := variance_cstrs v u u' in
-        let auctx' := (inst ++ inst, ConstraintSet.union cstrs cstrv) in
-        Some (Polymorphic_ctx auctx', u, u')
+        let auctx' := (append_bound_names inst inst, ConstraintSet.union cstrs cstrv) in
+        Some (Polymorphic_ctx auctx', Instance.make [] u, Instance.make [] u')
       end.
 
     (** A constructor type respects the given variance [v] if each constructor
@@ -1699,7 +1715,7 @@ Module GlobalMaps (T: Term) (E: EnvironmentSig T) (TU : TermUtils T E) (ET: EnvT
             [/\ (variance_universes univs v = Some (univs', i, i')),
               consistent_instance_ext (Σ, univs') univs i,
               consistent_instance_ext (Σ, univs') univs i' &
-              List.length v = #|UContext.instance (AUContext.repr auctx)|]
+              List.length v = #|UContext.univs_instance (AUContext.repr auctx)|]
         end
       end.
 

@@ -167,18 +167,18 @@ Qed.
 
 Lemma eq_term_eq_term_napp {cf:checker_flags} Σ ϕ napp t t' :
   eq_term Σ ϕ t t' ->
-  eq_term_upto_univ_napp Σ (compare_universe ϕ) (compare_sort ϕ) Conv napp t t'.
+  eq_term_upto_univ_napp Σ compare_quality (compare_universe ϕ) (compare_sort ϕ) Conv napp t t'.
 Proof.
-  intros. eapply eq_term_upto_univ_impl. 6:eauto.
-  5:auto with arith. all:typeclasses eauto.
+  intros. eapply eq_term_upto_univ_impl. 7:eauto.
+  6:auto with arith. all:typeclasses eauto.
 Qed.
 
 Lemma leq_term_leq_term_napp {cf:checker_flags} Σ ϕ napp t t' :
   leq_term Σ ϕ t t' ->
-  eq_term_upto_univ_napp Σ (compare_universe ϕ) (compare_sort ϕ) Cumul napp t t'.
+  eq_term_upto_univ_napp Σ compare_quality (compare_universe ϕ) (compare_sort ϕ) Cumul napp t t'.
 Proof.
-  intros. eapply eq_term_upto_univ_impl. 6:eauto.
-  5:auto with arith. all:typeclasses eauto.
+  intros. eapply eq_term_upto_univ_impl. 7:eauto.
+  6:auto with arith. all:typeclasses eauto.
 Qed.
 
 Lemma eq_term_mkApps `{checker_flags} Σ φ f l f' l' :

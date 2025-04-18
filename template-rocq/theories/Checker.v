@@ -130,11 +130,11 @@ Section Lookups.
     | _ => raise (UndeclaredInductive (mkInd ind i))
     end.
 
-  Definition lookup_ind_type ind i (u : list Level.t) :=
+  Definition lookup_ind_type ind i (u : Instance.t) :=
     res <- lookup_ind_decl ind i ;;
     ret (subst_instance u (snd res).(ind_type)).
 
-  Definition lookup_ind_type_cstrs ind i (u : list Level.t) :=
+  Definition lookup_ind_type_cstrs ind i (u : Instance.t) :=
     res <- lookup_ind_decl ind i ;;
     let '(mib, body) := res in
     let uctx := mib.(ind_universes) in
@@ -654,7 +654,7 @@ Section Typecheck.
     end.
 
   Definition reduce_to_ind Γ (t : term) :
-    typing_result (inductive * list Level.t * list term) :=
+    typing_result (inductive * Instance.t * list term) :=
     match decompose_app t with
     | (tInd i u, l) => ret (i, u, l)
     | _ => t' <- hnf_stack Γ t ;;

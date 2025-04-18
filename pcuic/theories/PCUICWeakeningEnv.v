@@ -166,7 +166,8 @@ Proof.
     destruct X as (H0 & H1 & H2); repeat split; tas.
     - eapply forallb_Forall in H0; eapply forallb_Forall, Forall_impl; tea.
       intros x ?; now eapply weakening_env_global_ext_levels'.
-    - eapply valid_subset; tea;
+    - exact H2.p1.
+    - eapply valid_subset; tea. 2: exact H2.p2.
       now eapply weakening_env_global_ext_constraints.
 Qed.
 #[global] Hint Resolve weakening_env_consistent_instance : extends.

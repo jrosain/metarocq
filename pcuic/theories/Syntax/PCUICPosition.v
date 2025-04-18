@@ -180,9 +180,9 @@ Definition dlet_ty na b B t (p : pos B) : pos (tLetIn na b B t) :=
 Definition dlet_in na b B t (p : pos t) : pos (tLetIn na b B t) :=
   exist (let_in :: proj1_sig p) (proj2_sig p).
 
-Lemma eq_context_upto_context_choice_term Σ cmp_universe cmp_sort pb Γ Γ' c :
-  eq_context_upto Σ cmp_universe cmp_sort pb Γ Γ' ->
-  rel_option (eq_term_upto_univ Σ cmp_universe cmp_sort (match c.2 with
+Lemma eq_context_upto_context_choice_term Σ cmp_quality cmp_universe cmp_sort pb Γ Γ' c :
+  eq_context_upto Σ cmp_quality cmp_universe cmp_sort pb Γ Γ' ->
+  rel_option (eq_term_upto_univ Σ cmp_quality cmp_universe cmp_sort (match c.2 with
                                       | choose_decl_body => Conv
                                       | choose_decl_type => pb
                                       end) )
@@ -203,12 +203,12 @@ Proof.
 Qed.
 
 Lemma eq_term_upto_valid_pos :
-  forall {Σ u v p cmp_universe cmp_sort pb napp},
+  forall {Σ u v p cmp_quality cmp_universe cmp_sort pb napp},
     validpos u p ->
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp u v ->
+    eq_term_upto_univ_napp Σ cmp_quality cmp_universe cmp_sort pb napp u v ->
     validpos v p.
 Proof.
-  intros Σ u v p cmp_universe cmp_sort pb napp vp e.
+  intros Σ u v p cmp_quality cmp_universe cmp_sort pb napp vp e.
   induction p as [| c p ih ] in u, v, pb, napp, vp, e |- *.
   - reflexivity.
   - destruct c, u. all: try discriminate.
