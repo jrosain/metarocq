@@ -20,7 +20,7 @@ Module QVar.
   Definition t := repr.
 
   Definition var (n : nat) : t := Var n.
-  
+
   Definition eqb {V : Set} `{ReflectEq V} (v1 v2 : repr_ V) : bool :=
     match v1, v2 with
     | Var i, Var j => eqb i j
@@ -143,6 +143,31 @@ Module QVar.
   Proof. destruct v1, v2. unfold eq_. apply eq_dec_V. Defined.
 
   Definition eq_dec (x y : t) := eq_dec_ Nat.eq_dec.
+
+  Definition sup_ {V} V_sup (x y : repr_ V) : repr_ V :=
+    match x, y with
+    | Var n, Var m => Var (V_sup n m)
+    end.
+
+  Definition sup : t -> t -> t := sup_ Nat.max.
+
+  Lemma sup_comm_ {V : Set} V_sup :
+    (forall n m : V, V_sup n m = V_sup m n) ->
+    forall (x y : repr_ V), sup_ V_sup x y = sup_ V_sup y x.
+  Proof.
+    intros Vcomm ??. destruct x, y; cbn.
+    f_equal. apply Vcomm.
+  Qed.
+
+  Lemma sup_comm (x y : t) : sup x y = sup y x.
+  Proof.
+    apply sup_comm_, Nat.max_comm.
+  Qed.
+
+  Lemma sup_idem (x : t) : sup x x = x.
+  Proof.
+    destruct x; cbn. now rewrite Nat.max_id.
+  Qed.
 End QVar.
 
 Definition leq_qvar_dec v v' : {QVar.le v v'} + {~QVar.le v v'}.
