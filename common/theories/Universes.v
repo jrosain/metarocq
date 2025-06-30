@@ -1000,19 +1000,22 @@ Proof.
 Qed.
 
 Module Quality.
-  Inductive t :=
-    qProp | qSProp | qType | qVar (_ : QVar.t).
-  Derive NoConfusion EqDec for t.
+  Inductive t_ {var} :=
+    qProp | qSProp | qType | qVar (_ : var).
+  Derive NoConfusion for t_.
+  Arguments t_ : clear implicits.
+
+  Definition t := t_ QVar.t.
 
   Definition var (n : nat) := qVar (QVar.var n).
-  
-  Definition is_var (q : t) :=
+
+  Definition is_var {var} (q : t_ var) :=
     match q with
     | qVar _ => true
     | _ => false
     end.
-  
-  Definition eqb (q1 q2 : t) : bool :=
+
+  Definition eqb {var} `{ReflectEq var} (q1 q2 : t_ var) : bool :=
     match q1, q2 with
     | qProp, qProp
     | qSProp, qSProp
@@ -1021,33 +1024,41 @@ Module Quality.
     | _, _ => false
     end.
 
-  #[global, program] Instance reflect_eq_quality : ReflectEq t :=
+  #[global, program] Instance reflect_eq_quality {var} `{ReflectEq var} : ReflectEq (t_ var) :=
     { eqb := eqb }.
   Next Obligation.
     destruct x, y; cbn; try constructor; auto; try congruence.
-    destruct (eqb_spec t0 t1); constructor. now f_equal.
+    destruct (eqb_spec v v0); constructor. now f_equal.
     congruence.
   Qed.
 
-  Definition eq (q1 q2 : t) : Prop :=
+  Definition eq_ {var} eq_var (q1 q2 : t_ var) : Prop :=
     match q1, q2 with
     | qSProp, qSProp | qProp, qProp | qType, qType => True
-    | qVar q1, qVar q2 => QVar.eq q1 q2
+    | qVar q1, qVar q2 => eq_var q1 q2
     | (qSProp | qProp | qType | qVar _), _ => False
     end.
 
-  #[global] Instance quality_eq_equiv : Equivalence eq.
+  #[global] Instance quality_eq_equiv_ {var} eq_qvar `{Equivalence var eq_qvar}
+    : Equivalence (@eq_ var eq_qvar).
   Proof.
     split.
-    - intros []; unfold eq; auto. apply QVar.eq_equiv.
-    - intros [] []; unfold eq; auto. apply QVar.eq_equiv.
-    - intros [] [] []; unfold eq; auto. apply QVar.eq_equiv.
+    - intros []; unfold eq_; auto. reflexivity.
+    - intros [] []; unfold eq_; auto. intros; now symmetry.
+    - intros [] [] []; unfold eq_; auto. intros; etransitivity; eauto.
+  Qed.
+
+  Definition eq (q1 q2 : t) : Prop := eq_ QVar.eq q1 q2.
+
+  #[global] Instance quality_eq_equiv : Equivalence eq.
+  Proof.
+    apply quality_eq_equiv_, QVar.eq_equiv.
   Qed.
 
   Module OT <: OrderedType.
     Definition t := t.
-    #[local] Definition eq (q q' : t) : Prop := q = q'.
-    #[local] Definition eq_equiv : Equivalence eq := _.
+    #[local] Definition eq (q q' : t) : Prop := (eq q q').
+    #[local] Definition eq_equiv : Equivalence eq := quality_eq_equiv.
 
     Definition lt (q1 q2 : t) : Prop :=
       match q1, q2 with
@@ -1074,8 +1085,9 @@ Module Quality.
       intros [] [] e [] [] e'; unfold lt; unfold eq in *.
       all: try tauto.
       all: try inversion e.
-      all: try inversion e'.
-      reflexivity.
+      cbn in e, e'.
+      destruct t0, t1, t2, t3; cbn in *.
+      now apply QVar.lt_compat.
     Qed.
 
     Definition compare (x y : t) : comparison
@@ -1102,11 +1114,15 @@ Module Quality.
             | _ => idtac
             end.
       all: repeat constructor; try apply f_equal; try assumption.
+      now rewrite H.
     Qed.
     Definition eq_dec (x y : t) : {eq x y} + {~ (eq x y)}.
-    Proof. unfold eq; decide equality. destruct t0, t1. apply QVar.eq_dec_qvar. Defined.
+    Proof.
+      destruct x, y; try now cbn.
+      destruct t0, t1. cbn. decide equality.
+    Defined.
   End OT.
-  Module OTOrig <: OrderedTypeOrig := Backport_OT OT.                       
+  Module OTOrig <: OrderedTypeOrig := Backport_OT OT.
 End Quality.
 
 Module QualitySet := MSetAVL.Make Quality.OT.
@@ -1129,15 +1145,21 @@ Section QualitySetMoreFacts.
     QualitySet.In x (QualitySet_pair y z) -> x = y \/ x = z.
   Proof.
     intro H. apply QualitySetFact.add_iff in H.
-    destruct H; [intuition|].
-    apply QualitySetFact.singleton_1 in H; intuition.
+    destruct H.
+    - right. destruct x, z; try now cbn.
+      destruct t0, t. now cbn in H.
+    - apply QualitySetFact.singleton_1 in H.
+      left. destruct x, y; try now cbn.
+      now destruct t0, t.
   Qed.
 
   Lemma QualitySet_triple_In x y z t :
     QualitySet.In x (QualitySet_triple y z t) -> x = y \/ x = z \/ x = t.
   Proof.
     intro H. apply QualitySetFact.add_iff in H.
-    destruct H; [intuition|]. apply QualitySet_pair_In in H; destruct H; intuition.
+    destruct H.
+    - do 2 right. destruct x, t; try now cbn. now destruct t0, t.
+    - apply QualitySet_pair_In in H; destruct H; intuition.
   Qed.
 
   Definition QualitySet_mem_union (qs qs' : QualitySet.t) x :
@@ -1152,11 +1174,12 @@ Section QualitySetMoreFacts.
   Proof.
     split.
     - induction qs; simpl => //. intros [<-|H].
-      * eapply QualitySet.add_spec; left; auto. 
+      * eapply QualitySet.add_spec; left. reflexivity.
       * eapply QualitySet.add_spec; right; auto.
     - induction qs; simpl => //.
       * rewrite QualitySetFact.empty_iff //.
       * rewrite QualitySet.add_spec. intuition auto.
+        left. destruct x, a; try now cbn. now destruct t0, t.
   Qed.
 
   Lemma QualitySet_union_empty qs : QualitySet.Equal (QualitySet.union QualitySet.empty qs) qs.
@@ -1182,7 +1205,7 @@ Module Instance.
 
   (** A universe instance represents a vector of argument concrete_sort
       to a polymorphic definition (constant, inductive or constructor). *)
-  Definition t : Set := list Quality.t × list Level.t.
+  Definition t := list Quality.t × list Level.t.
 
   Definition empty : t := ([], []).
   Definition is_empty (i : t) : bool :=
@@ -1702,42 +1725,54 @@ Section Univ.
 End Univ.
 
 Module Sort.
-  Inductive t_ {univ} :=
-    sProp | sSProp | sType (_ : univ).
+  Inductive t_ {var univ} :=
+    sProp | sSProp | sType (_ : univ) | sQVar (_ : var) (_ : univ).
   Derive NoConfusion for t_.
   Arguments t_ : clear implicits.
 
-  Definition t := t_ Universe.t.
+  Definition t := t_ QVar.t Universe.t.
 
-  Definition eqb {univ} `{ReflectEq univ} (u1 u2 : t_ univ) : bool :=
+  Definition eqb {var univ} `{ReflectEq var} `{ReflectEq univ} (u1 u2 : t_ var univ) : bool :=
     match u1, u2 with
     | sSProp, sSProp => true
     | sProp, sProp => true
     | sType e1, sType e2 => eqb e1 e2
+    | sQVar q1 e1, sQVar q2 e2 => eqb q1 q2 && eqb e1 e2
     | _, _ => false
     end.
 
-  #[global, program] Instance reflect_eq_sort {univ} `{ReflectEq univ} : ReflectEq (t_ univ) :=
+  #[global, program] Instance reflect_eq_sort
+    {var univ} `{ReflectEq var} `{ReflectEq univ} : ReflectEq (t_ var univ) :=
     { eqb := eqb }.
   Next Obligation.
     destruct x, y; cbn; try constructor; auto; try congruence.
-    destruct (eqb_spec u u0); constructor. now f_equal.
-    congruence.
+    - destruct (eqb_spec u u0); constructor. now f_equal.
+      congruence.
+    - destruct (eqb_spec u u0), (eqb_spec v v0); constructor.
+      2-4: intros e; injection e => e0 e1.
+      * now rewrite H1 H2.
+      * now apply H2.
+      * now apply H1.
+      * now apply H1.
   Qed.
 
-  #[global] Instance eq_dec_sort {univ} `{EqDec univ} : EqDec (t_ univ) := ltac:(intros s s'; decide equality).
+  #[global] Instance eq_dec_sort {var univ} `{EqDec var} `{EqDec univ} : EqDec (t_ var univ) :=
+    ltac:(intros s s'; do 3 decide equality).
 
-  Definition map {u u'} (f : u -> u') s :=
+  Definition map_univ {var u u'} (f : u -> u') (s : t_ var u) : t_ var u' :=
     match s with
+    | sQVar q u => sQVar q (f u)
     | sType u => sType (f u)
     | sProp => sProp
     | sSProp => sSProp
     end.
 
-  Definition on_sort {univ} {T} (P: univ -> T) (def: T) (s : t_ univ) :=
+  Definition on_sort {var univ} {T} (Pv : var -> T) (Pu: univ -> T) (def: T) (mult : T -> T -> T)
+    (s : t_ var univ) :=
     match s with
     | sProp | sSProp => def
-    | sType l => P l
+    | sType l => Pu l
+    | sQVar qv l => mult (Pv qv) (Pu l)
     end.
 
   (** Test if the universe is a lub of levels or contains +n's. *)
@@ -1745,6 +1780,7 @@ Module Sort.
     match s with
     | sSProp | sProp => true
     | sType l => Universe.is_levels l
+    | sQVar _ l => Universe.is_levels l
     end.
 
   (** Test if the universe is a level or an algebraic universe. *)
@@ -1752,37 +1788,44 @@ Module Sort.
     match s with
     | sSProp | sProp => true
     | sType l => Universe.is_level l
+    | sQVar _ l => Universe.is_level l
     end.
 
-  Definition is_sprop {univ} (s : t_ univ) : bool :=
+  Definition is_sprop {var univ} (s : t_ var univ) : bool :=
     match s with
       | sSProp => true
       | _ => false
     end.
 
-  Definition is_prop {univ} (s : t_ univ) : bool :=
+  Definition is_prop {var univ} (s : t_ var univ) : bool :=
     match s with
       | sProp => true
       | _ => false
     end.
 
-  Definition is_propositional {univ} (s : t_ univ) : bool :=
+  Definition is_propositional {var univ} (s : t_ var univ) : bool :=
     match s with
       | sProp | sSProp => true
       | _ => false
     end.
 
-  Lemma is_prop_propositional {univ} (s : t_ univ) :
+  Lemma is_prop_propositional {var univ} (s : t_ var univ) :
     is_prop s -> is_propositional s.
   Proof. now destruct s. Qed.
-  Lemma is_sprop_propositional {univ} (s : t_ univ) :
+  Lemma is_sprop_propositional {var univ} (s : t_ var univ) :
     is_sprop s -> is_propositional s.
   Proof. now destruct s. Qed.
 
-  Definition is_type_sort {univ} (s : t_ univ) : bool :=
+  Definition is_type_sort {var univ} (s : t_ var univ) : bool :=
     match s with
       | sType _ => true
       | _ => false
+    end.
+
+  Definition is_qvar {var univ} (s : t_ var univ) : bool :=
+    match s with
+    | sQVar _ _ => true
+    | _ => false
     end.
 
   Definition type0 : t := sType (Universe.make LevelExpr.set).
@@ -1797,54 +1840,63 @@ Module Sort.
 
   (** The universe strictly above FOR TYPING (not cumulativity) *)
 
-  Definition super_ {univ} type1 univ_succ (s : t_ univ) : t_ univ :=
+  Definition super_ {var univ} type1 univ_succ (s : t_ var univ) : t_ var univ :=
     match s with
     | sSProp | sProp => sType type1
-    | sType l => sType (univ_succ l)
+    | sType l | sQVar _ l => sType (univ_succ l)
     end.
   Definition super : t -> t := super_ (Universe.make LevelExpr.type1) Universe.succ.
-  Definition csuper := super_ 1 S.
+  Definition csuper := @super_ nat nat 1 S.
 
-  Definition sup_ {univ} univ_sup (s s' : t_ univ) : t_ univ :=
+  Definition sup_ {var univ} var_sup univ_sup (s s' : t_ var univ) : t_ var univ :=
     match s, s' with
-    | sSProp, s' => s'
-    | sProp, sSProp => sProp
-    | sProp, s' => s'
-    | sType u1, sType u2 => sType (univ_sup u1 u2)
-    | sType _ as s, _ => s
+    | s, sSProp | sSProp, s => s
+    | s, sProp | sProp, s => s
+    | sType u1, (sQVar _ u2 | sType u2) => sType (univ_sup u1 u2)
+    | sQVar _ u1, sType u2 => sType (univ_sup u1 u2)
+    | sQVar q1 u1, sQVar q2 u2 => sQVar (var_sup q1 q2) (univ_sup u1 u2)
     end.
-  Definition sup : t -> t -> t := sup_ Universe.sup.
-  Definition csup := sup_ Nat.max.
+  Definition sup : t -> t -> t := sup_ QVar.sup Universe.sup.
+  Definition csup := sup_ QVar.sup Nat.max.
 
   (** Type of a product *)
-  Definition sort_of_product_ {univ} univ_sup (domsort rangsort : t_ univ) : t_ univ :=
+  Definition sort_of_product_ {var univ} var_sup univ_sup (domsort rangsort : t_ var univ)
+    : t_ var univ :=
     match rangsort with
-    | sSProp | sProp => rangsort
     (* Prop and SProp impredicativity *)
-    | _ => Sort.sup_ univ_sup domsort rangsort
+    | sSProp | sProp => rangsort
+    | sType _ => sup_ var_sup univ_sup domsort rangsort
+    | sQVar q u2 =>
+        match domsort with
+        | sSProp | sProp => rangsort
+        | sType u1 | sQVar _ u1 => sQVar q (univ_sup u1 u2)
+        end
     end.
-  Definition sort_of_product : t -> t -> t := sort_of_product_ Universe.sup.
-  Definition csort_of_product := sort_of_product_ Nat.max.
+  Definition sort_of_product : t -> t -> t := sort_of_product_ QVar.sup Universe.sup.
+  Definition csort_of_product := sort_of_product_ QVar.sup Nat.max.
 
   Definition get_is_level (s : t) : option Level.t :=
     match s with
     | sSProp => None
     | sProp => None
     | sType l => Universe.get_is_level l
+    | sQVar _ l => Universe.get_is_level l
     end.
 
-  Definition to_quality {univ} (s : t_ univ) :=
+  Definition to_quality {var univ} (s : t_ var univ) :=
     match s with
     | sSProp => Quality.qSProp
     | sProp => Quality.qProp
     | sType _ => Quality.qType
+    | sQVar q _ => Quality.qVar q
     end.
 
-  Definition to_csort v s :=
+  Definition to_csort v (s : t) :=
     match s with
     | sSProp => sSProp
     | sProp => sProp
     | sType u => sType (val v u)
+    | sQVar q u => sQVar q (val v u)
     end.
 
   Lemma to_quality_to_csort s v :
@@ -1853,7 +1905,7 @@ Module Sort.
     destruct s; cbnr.
   Qed.
 
-  Lemma sType_super_ {univ type1 univ_succ} (s : t_ univ) :
+  Lemma sType_super_ {var univ type1 univ_succ} (s : t_ var univ) :
     to_quality (super_ type1 univ_succ s) = Quality.qType.
   Proof. now destruct s. Qed.
 
@@ -1861,16 +1913,21 @@ Module Sort.
     to_quality (super s) = Quality.qType.
   Proof. apply sType_super_. Qed.
 
-  Inductive lt_ {univ univ_lt} : t_ univ -> t_ univ -> Prop :=
+  Inductive lt_ {var univ var_lt univ_lt} : t_ var univ -> t_ var univ -> Prop :=
   | ltPropSProp : lt_ sProp sSProp
   | ltPropType s : lt_ sProp (sType s)
+  | ltSPropQVar q s : lt_ sSProp (sQVar q s)
+  | ltPropQVar q s : lt_ sProp (sQVar q s)
   | ltSPropType s : lt_ sSProp (sType s)
-  | ltTypeType s1 s2 : univ_lt s1 s2 -> lt_ (sType s1) (sType s2).
+  | ltTypeType s1 s2 : univ_lt s1 s2 -> lt_ (sType s1) (sType s2)
+  | ltQVarType q s1 s2 : lt_ (sQVar q s1) (sType s2)
+  | ltQVarQVar1 q1 q2 s1 s2 : var_lt q1 q2 -> lt_ (sQVar q1 s1) (sQVar q2 s2)
+  | ltQVarQVar2 q1 q2 s1 s2 : q1 = q2 -> univ_lt s1 s2 -> lt_ (sQVar q1 s1) (sQVar q2 s2).
   Derive Signature for lt_.
-  Arguments lt_ {univ} univ_lt.
+  Arguments lt_ {var} {univ} var_lt univ_lt.
 
-  Definition lt := lt_ Universe.lt.
-  Definition clt := lt_ Nat.lt.
+  Definition lt := lt_ QVar.lt Universe.lt.
+  Definition clt := lt_ QVar.lt Nat.lt.
 
   Module OT <: OrderedType.
     Definition t := t.
@@ -1880,12 +1937,17 @@ Module Sort.
     #[local] Instance lt_strorder : StrictOrder lt.
     Proof.
       constructor.
-      - intros [| |] X; inversion X.
+      - intros [| | |] X; inversion X.
         now eapply irreflexivity in H1.
-      - intros [| |] [| |] [| |] X1 X2;
-          inversion X1; inversion X2; constructor.
-        subst.
-        etransitivity; tea.
+        now eapply irreflexivity in H0.
+        now eapply irreflexivity in H4.
+      - intros [| | |] [| | |] [| | |] X1 X2;
+          inversion X1; inversion X2; subst; try (constructor; fail).
+        * constructor; etransitivity; eauto.
+        * apply ltQVarQVar1. etransitivity; eauto.
+        * apply ltQVarQVar1. assumption.
+        * apply ltQVarQVar1. assumption.
+        * apply ltQVarQVar2. reflexivity. etransitivity; eauto.
     Qed.
 
     Definition lt_compat : Proper (eq ==> eq ==> iff) lt.
@@ -1900,7 +1962,14 @@ Module Sort.
           | sSProp, sSProp => Eq
           | sSProp, _ => Lt
           | _, sSProp => Gt
+          | sType x, sQVar _ _ => Gt
           | sType x, sType y => LevelExprSet.compare x y
+          | sQVar _ x, sType y => Lt
+          | sQVar q1 x, sQVar q2 y =>
+              match QVar.compare q1 q2 with
+              | Eq => LevelExprSet.compare x y
+              | c => c
+              end
           end.
     Lemma compare_spec x y : CompareSpec (eq x y) (lt x y) (lt y x) (compare x y).
     Proof.
@@ -1909,6 +1978,8 @@ Module Sort.
       all: lazymatch goal with
             | [ |- context[LevelExprSet.compare ?x ?y] ]
               => destruct (LevelExprSet.compare_spec x y)
+            | [ |- context[QVar.compare ?x ?y] ]
+              => destruct (QVar.compare_spec x y)
             | _ => idtac
             end.
       all: lazymatch goal with
@@ -1918,14 +1989,23 @@ Module Sort.
             | _ => idtac
             end.
       all: repeat constructor; try apply f_equal; try assumption.
-      f_equal; apply Eqdep_dec.UIP_dec; decide equality.
+      - f_equal; apply Eqdep_dec.UIP_dec; decide equality.
+      - destruct (QVar.compare_spec t0 t2).
+        all: repeat constructor; try f_equal; try assumption.
+        f_equal; apply Eqdep_dec.UIP_dec; decide equality.
+      - destruct (QVar.compare_spec t0 t2).
+        1: constructor; apply ltQVarQVar2; try assumption.
+        all: repeat constructor; try f_equal; try assumption.
+      - destruct (QVar.compare_spec t0 t2).
+        1: constructor; apply ltQVarQVar2; try assumption.
+        all: repeat constructor; try f_equal; try assumption.
+        now symmetry.
     Qed.
     Definition eq_dec (x y : t) : {x = y} + {x <> y}.
-    Proof. repeat decide equality. apply Universe.eq_dec_univ0. Defined.
+    Proof. repeat decide equality; apply Universe.eq_dec_univ0. Defined.
   End OT.
   Module OTOrig <: OrderedTypeOrig := Backport_OT OT.
 End Sort.
-
 
 Module SortMap := FMapAVL.Make Sort.OTOrig.
 Module SortMapFact := FMapFacts.WProperties SortMap.
@@ -1935,16 +2015,16 @@ Module SortMapDecide := FMapAVL.Decide Sort.OTOrig SortMap.
 Notation sProp := Sort.sProp.
 Notation sSProp := Sort.sSProp.
 Notation sType := Sort.sType.
+Notation sQVar := Sort.sQVar.
 Notation sort := Sort.t.
 
 Notation "⟦ u ⟧_ v" := (Sort.to_csort v u) (at level 0, format "⟦ u ⟧_ v", v name) : univ_scope.
 
-
 Lemma val_sort_sup v s1 s2 :
   Sort.to_csort v (Sort.sup s1 s2) = Sort.csup (Sort.to_csort v s1) (Sort.to_csort v s2).
 Proof.
-  destruct s1 as [ | | u1]; destruct s2 as [ | | u2]; cbnr.
-  f_equal. apply val_sup.
+  destruct s1 as [ | | u1 | q1 u1]; destruct s2 as [ | | u2 | q2 u2]; cbnr;
+    f_equal; apply val_sup.
 Qed.
 
 Lemma is_prop_val s :
@@ -1959,7 +2039,6 @@ Proof.
   destruct s => //.
 Qed.
 
-
 Lemma val_is_prop s v :
   Sort.to_csort v s = sProp <-> Sort.is_prop s.
 Proof.
@@ -1973,11 +2052,11 @@ Proof.
 Qed.
 
 Lemma is_prop_and_is_sprop_val_false s :
-  Sort.is_prop s = false -> Sort.is_sprop s = false ->
+  Sort.is_prop s = false -> Sort.is_sprop s = false -> Sort.is_qvar s = false ->
   forall v, ∑ n, Sort.to_csort v s = sType n.
 Proof.
   intros Hp Hsp v.
-  destruct s => //. simpl. eexists; eauto.
+  destruct s => //; simpl; eexists; eauto.
 Qed.
 
 Lemma val_is_prop_false s v n :
@@ -1987,10 +2066,12 @@ Proof.
 Qed.
 
 Lemma get_is_level_correct s l :
-  Sort.get_is_level s = Some l -> s = sType (Universe.make' l).
+  Sort.get_is_level s = Some l ->
+   (∑ q, s = sQVar q (Universe.make' l)) + { s = sType (Universe.make' l) }.
 Proof.
   intro H; destruct s => //=.
-  f_equal; now apply universe_get_is_level_correct.
+  - right. f_equal. now apply universe_get_is_level_correct.
+  - left. exists t. f_equal. now apply universe_get_is_level_correct.
 Qed.
 
 Lemma eqb_true_iff (s s' : sort) :
@@ -2002,15 +2083,15 @@ Qed.
 Lemma sup_comm x1 x2 :
   Sort.sup x1 x2 = Sort.sup x2 x1.
 Proof.
-  destruct x1,x2;auto.
-  cbn;apply f_equal;apply sup0_comm.
+  destruct x1,x2;auto; cbn; f_equal; try (apply sup0_comm).
+  apply QVar.sup_comm.
 Qed.
 
-Lemma is_not_prop_and_is_not_sprop {univ} (s : Sort.t_ univ) :
-  Sort.is_prop s = false -> Sort.is_sprop s = false ->
+Lemma is_not_prop_and_is_not_sprop {var univ} (s : Sort.t_ var univ) :
+  Sort.is_prop s = false -> Sort.is_sprop s = false -> Sort.is_qvar s = false ->
   ∑ s', s = sType s'.
 Proof.
-  intros Hp Hsp.
+  intros Hp Hsp Hqv.
   destruct s => //. now eexists.
 Qed.
 
@@ -2059,7 +2140,7 @@ Lemma is_prop_sort_prod x2 x3 :
 Proof.
   unfold Sort.sort_of_product.
   destruct x3;cbn;auto.
-  intros;simpl in *;destruct x2;auto.
+  all: intros;simpl in *;destruct x2;auto.
 Qed.
 
 Lemma is_sprop_sort_prod x2 x3 :
@@ -2068,14 +2149,12 @@ Lemma is_sprop_sort_prod x2 x3 :
 Proof.
   unfold Sort.sort_of_product.
   destruct x3;cbn;auto.
-  intros;simpl in *;destruct x2;auto.
+  all: intros;simpl in *;destruct x2;auto.
 Qed.
 
 Section QualityCompare.
   Context {cf}.
 
-  (* JJJ This is about _conversion_ (for cumulativity)!!
-     The management of [QVar]s is unclear for now. *)
   Definition leq_quality q q' : Prop :=
     match q, q' with
     | Quality.qProp, Quality.qProp
@@ -2125,44 +2204,50 @@ End QualityCompare.
 
 Section SortCompare.
   Context {cf}.
-  Definition leq_sort_n_ {univ} (leq_universe_n : Z -> univ -> univ -> Prop) n s s' : Prop :=
+  Definition leq_sort_n_ {var univ} (eq_var : var -> var -> Prop) (leq_universe_n : Z -> univ -> univ -> Prop)
+    n s s' : Prop :=
     match s, s' with
     | sProp,   sProp
     | sSProp,  sSProp => (n = 0)%Z
     | sType u, sType u' => leq_universe_n n u u'
     | sProp,   sType u => prop_sub_type
-    | _, _ => False
+    | sQVar q1 u1, sQVar q2 u2 => eq_var q1 q2 /\ leq_universe_n n u1 u2
+    | (sSProp | sProp | sType _ | sQVar _ _), _ => False
     end.
 
-  Definition leq_sort_n n φ := leq_sort_n_ (fun n => leq_universe_n n φ) n.
+  Definition leq_sort_n n φ := leq_sort_n_ QVar.eq (fun n => leq_universe_n n φ) n.
   Definition lt_sort := leq_sort_n 1.
   Definition leq_sort := leq_sort_n 0.
 
-  Definition leqb_sort_n_ {univ} (leqb_universe_n : bool -> univ -> univ -> bool) b s s' : bool :=
+  Definition leqb_sort_n_ {var univ} (eqb_var : var -> var -> bool)
+    (leqb_universe_n : bool -> univ -> univ -> bool) b s s' : bool :=
     match s, s' with
     | sProp,   sProp
     | sSProp,  sSProp => negb b
     | sType u, sType u' => leqb_universe_n b u u'
     | sProp,   sType u => prop_sub_type
-    | _, _ => false
+    | sQVar q1 u1, sQVar q2 u2 => eqb_var q1 q2 && leqb_universe_n b u1 u2
+    | (sSProp | sProp | sType _ | sQVar _ _), _ => false
     end.
 
-  Definition eq_sort_ {univ} (eq_universe : univ -> univ -> Prop) s s' : Prop :=
+  Definition eq_sort_ {var univ} (eq_var : var -> var -> Prop) (eq_universe : univ -> univ -> Prop) s s' : Prop :=
     match s, s' with
     | sProp,   sProp
     | sSProp,  sSProp => True
     | sType u, sType u' => eq_universe u u'
-    | _, _ => False
+    | sQVar q1 u1, sQVar q2 u2 => eq_var q1 q2 /\ eq_universe u1 u2
+    | (sSProp | sProp | sType _ | sQVar _ _), _ => False
     end.
 
-  Definition eq_sort φ := eq_sort_ (eq_universe φ).
+  Definition eq_sort φ := eq_sort_ QVar.eq (eq_universe φ).
 
-  Definition eqb_sort_ {univ} (eqb_universe : univ -> univ -> bool) s s' : bool :=
+  Definition eqb_sort_ {var univ} (eqb_var : var -> var -> bool) (eqb_universe : univ -> univ -> bool) s s' : bool :=
     match s, s' with
     | sProp,   sProp
     | sSProp,  sSProp => true
     | sType u, sType u' => eqb_universe u u'
-    | _, _ => false
+    | sQVar q1 u1, sQVar q2 u2 => eqb_var q1 q2 && eqb_universe u1 u2
+    | (sSProp | sProp | sType _ | sQVar _ _), _ => false
     end.
 
   Definition compare_sort φ (pb : conv_pb) :=
@@ -2177,19 +2262,24 @@ Section SortCompare.
 
   Lemma compare_sort_type φ pb u u' :
     compare_sort φ pb (sType u) (sType u') = compare_universe φ pb u u'.
-  Proof. now destruct pb. Qed.
+  Proof using Type. now destruct pb. Qed.
+
+  Lemma compare_sort_qvar φ pb q q' u u' :
+    compare_sort φ pb (sQVar q u) (sQVar q' u') =
+      (QVar.eq q q' /\ compare_universe φ pb u u').
+  Proof using Type. now destruct pb. Qed.
 
   Section GeneralLemmas.
-    Context {univ} {leq_universe_n : Z -> univ -> univ -> Prop} {eq_universe : univ -> univ -> Prop}.
+    Context {var univ} {eq_var : var -> var -> Prop} {leq_universe_n : Z -> univ -> univ -> Prop}
+      {eq_universe : univ -> univ -> Prop}.
 
-    Let leq_sort_n := leq_sort_n_ leq_universe_n.
-    Let lt_sort := leq_sort_n_ leq_universe_n 1.
-    Let leq_sort := leq_sort_n_ leq_universe_n 0.
-    Let eq_sort := eq_sort_ eq_universe.
+    Let leq_sort_n := leq_sort_n_ eq_var leq_universe_n.
+    Let lt_sort := leq_sort_n 1.
+    Let leq_sort := leq_sort_n 0.
+    Let eq_sort := eq_sort_ eq_var eq_universe.
     Notation "x <_ n  y" := (leq_sort_n n x y) (at level 10, n name).
     Notation "x < y" := (lt_sort x y).
     Notation "x <= y" := (leq_sort x y).
-
 
     Lemma sort_le_prop_inv s : s <= sProp -> s = sProp.
     Proof using Type. destruct s => //. Qed.
@@ -2208,61 +2298,91 @@ Section SortCompare.
     Lemma sort_sprop_le_inv s : sSProp <= s -> s = sSProp.
     Proof using Type. destruct s => //. Qed.
 
-    Global Instance leq_sort_refl `{Reflexive univ (leq_universe_n 0)} : Reflexive leq_sort.
-    Proof using Type. intros []; cbnr. Qed.
+    Ltac cbnsr := cbn; try split; try reflexivity.
 
-    Global Instance eq_sort_refl `{Reflexive univ eq_universe} : Reflexive eq_sort.
-    Proof using Type. intros []; cbnr. Qed.
+    Global Instance leq_sort_refl `{Reflexive var eq_var} `{Reflexive univ (leq_universe_n 0)}
+      : Reflexive leq_sort.
+    Proof using Type. intros []; cbnsr. Qed.
 
-    Global Instance eq_sort_sym `{Symmetric univ eq_universe} : Symmetric eq_sort.
-    Proof using Type. intros [] [] => //=. apply H. Qed.
+    Global Instance eq_sort_refl `{Reflexive var eq_var} `{Reflexive univ eq_universe}
+      : Reflexive eq_sort.
+    Proof using Type. intros []; cbnsr. Qed.
 
-    Global Instance leq_sort_n_trans n `{Transitive univ (leq_universe_n n)} : Transitive (leq_sort_n n).
+    Global Instance eq_sort_sym `{Symmetric var eq_var} `{Symmetric univ eq_universe}
+      : Symmetric eq_sort.
     Proof using Type.
-      intros [] [] [] => //=. apply H.
+      intros [] [] => //=.
+      - apply H0.
+      - intros [eqv equ]. split; [now apply H|now apply H0].
     Qed.
 
-    Global Instance leq_sort_trans `{Transitive univ (leq_universe_n 0)} : Transitive leq_sort.
-    Proof using Type. apply (leq_sort_n_trans 0). Qed.
-
-    Global Instance lt_sort_trans `{Transitive univ (leq_universe_n 1)} : Transitive lt_sort.
-    Proof using Type. apply (leq_sort_n_trans 1). Qed.
-
-    Global Instance eq_sort_trans `{Transitive univ eq_universe} : Transitive eq_sort.
-    Proof using Type.
-      intros [] [] [] => //=. apply H.
+    Global Instance leq_sort_n_trans n `{Hv : Transitive var eq_var}
+      `{Hu : Transitive univ (leq_universe_n n)} : Transitive (leq_sort_n n).
+    Proof using cf.
+      intros [] [] [] => //=.
+      - apply Hu.
+      - intros [] []. split; etransitivity; eauto.
     Qed.
 
-    Global Instance leq_sort_preorder `{PreOrder univ (leq_universe_n 0)} : PreOrder leq_sort :=
-      Build_PreOrder _ _ _.
+    Global Instance leq_sort_trans `{Transitive var eq_var}
+      `{Transitive univ (leq_universe_n 0)} : Transitive leq_sort.
+    Proof using leq_sort_n. apply (leq_sort_n_trans 0). Qed.
+
+    Global Instance lt_sort_trans `{Transitive var eq_var}
+      `{Transitive univ (leq_universe_n 1)} : Transitive lt_sort.
+    Proof using leq_sort_n. apply (leq_sort_n_trans 1). Qed.
+
+    Global Instance eq_sort_trans `{Transitive var eq_var} `{Hu : Transitive univ eq_universe}
+      : Transitive eq_sort.
+    Proof using Type.
+      intros [] [] [] => //=.
+      - apply Hu.
+      - intros [] []. split; etransitivity; eauto.
+    Qed.
+
+    Global Instance leq_sort_preorder `{Equivalence var eq_var}
+      `{PreOrder univ (leq_universe_n 0)} : PreOrder leq_sort := Build_PreOrder _ _ _.
 
     (* Can't be a global instance since it can lead to infinite search *)
     Lemma lt_sort_irrefl : Irreflexive (leq_universe_n 1) -> Irreflexive lt_sort.
     Proof using Type.
-      intros H []; unfold complement; cbnr. 1,2: lia. apply H.
+      intros Hu []; unfold complement; cbnr.
+      1,2: lia. apply Hu.
+      intros [_ e].
+      revert e. apply Hu.
     Qed.
 
-    Global Instance lt_sort_str_order `{StrictOrder univ (leq_universe_n 1)} : StrictOrder lt_sort :=
+    Global Instance lt_sort_str_order `{Equivalence var eq_var}
+      `{StrictOrder univ (leq_universe_n 1)}
+      : StrictOrder lt_sort :=
       Build_StrictOrder _ (lt_sort_irrefl _) _.
 
     Global Instance eq_leq_sort `{subrelation univ eq_universe (leq_universe_n 0)}: subrelation eq_sort leq_sort.
     Proof using Type.
-      intros [] [] => //=. apply H.
+      intros [] [] => //=.
+      - apply H.
+      - intros [ev eu]; auto.
     Qed.
 
-    Global Instance eq_sort_equivalence `{Equivalence univ eq_universe} : Equivalence eq_sort := Build_Equivalence _ _ _ _.
+    Global Instance eq_sort_equivalence `{Equivalence var eq_var} `{Equivalence univ eq_universe}
+      : Equivalence eq_sort := Build_Equivalence _ _ _ _.
 
-    Global Instance leq_sort_antisym `{Antisymmetric _ eq_universe (leq_universe_n 0)} : Antisymmetric _ eq_sort leq_sort.
+    Global Instance leq_sort_antisym `{Equivalence var eq_var}
+      `{Hu : Antisymmetric _ eq_universe (leq_universe_n 0)} : Antisymmetric _ eq_sort leq_sort.
     Proof using Type.
-      intros [] [] => //=. apply H.
+      intros [] [] => //=.
+      - apply Hu.
+      - intros (hev & hlu) (hev' & hlu').
+        split; [assumption|]. now apply Hu.
     Qed.
 
-    Global Instance leq_sort_partial_order `{PartialOrder _ eq_universe (leq_universe_n 0)}: PartialOrder eq_sort leq_sort.
-    Proof.
+    Global Instance leq_sort_partial_order `{Equivalence var eq_var}
+      `{HPOu : PartialOrder _ eq_universe (leq_universe_n 0)}: PartialOrder eq_sort leq_sort.
+    Proof using Type.
       assert (subrelation eq_universe (leq_universe_n 0)).
-      { intros u u' Hu. specialize (H u u'); cbn in H. apply H in Hu. apply Hu. }
+      { intros u u' Hu. specialize (HPOu u u'); cbn in H. now apply HPOu. }
       assert (subrelation eq_universe (flip (leq_universe_n 0))).
-      { intros u u' Hu. specialize (H u u'); cbn in H. apply H in Hu. apply Hu. }
+      { intros u u' Hu. specialize (HPOu u u'); cbn in H. apply HPOu in Hu. apply Hu. }
       intros s s'. split.
       - intro Heq. split.
         + now eapply eq_leq_sort.
@@ -2274,11 +2394,11 @@ Section SortCompare.
 
 
   (** Universes with linear hierarchy *)
-  Definition concrete_sort := Sort.t_ nat.
+  Definition concrete_sort := Sort.t_ QVar.t nat.
 
   (** u + n <= u' *)
   Definition leq_csort_n : Z -> concrete_sort -> concrete_sort -> Prop :=
-    leq_sort_n_ (fun n u u' => (Z.of_nat u <= Z.of_nat u' - n)%Z).
+    leq_sort_n_ QVar.eq (fun n u u' => (Z.of_nat u <= Z.of_nat u' - n)%Z).
 
   Definition leq_csort := leq_csort_n 0.
   Definition lt_csort := leq_csort_n 1.
@@ -2287,23 +2407,34 @@ Section SortCompare.
   Notation "x < y" := (lt_csort x y) : univ_scope.
   Notation "x <= y" := (leq_csort x y) : univ_scope.
 
-  Definition is_propositional_or_set s := match s with sSProp | sProp | sType 0 => true | _ => false end.
+  Definition is_propositional_or_set (s : concrete_sort) :=
+    match s with
+    | sSProp | sProp | sType 0 => true
+    | sType _ | sQVar _ _ => false (* XXX: sQVar _ 0? *)
+    end.
 
   Lemma csort_sup_comm s s' : Sort.csup s s' = Sort.csup s' s.
-  Proof using Type. destruct s, s' => //=. f_equal; lia. Qed.
+  Proof using Type.
+    destruct s, s' => //=.
+    all: f_equal; try lia.
+    destruct t, t0; cbn. f_equal; lia.
+  Qed.
 
   Lemma csort_sup_not_uproplevel s s' :
-    ~ Sort.is_propositional s -> ∑ n, Sort.csup s s' = sType n.
+    ~ Sort.is_propositional s -> ∑ n, (Sort.csup s s' = sType n) + ∑ q, Sort.csup s s' = sQVar q n.
   Proof using Type.
     destruct s => //=.
-    destruct s'; now eexists.
+    - destruct s'; now eexists.
+    - destruct s'; now eexists.
   Qed.
 
   Lemma csort_sup_mon s s' v v' : (s <= s')%u -> (sType v <= sType v')%u ->
     (Sort.csup s (sType v) <= Sort.csup s' (sType v'))%u.
   Proof using Type.
-    destruct s, s' => //=; intros Hle Hle';
-    lia.
+    destruct s, s' => //=; intros Hle Hle'.
+    - lia.
+    - lia.
+    - destruct Hle; lia.
   Qed.
 
   Lemma leq_csort_of_product_mon u u' v v' :
@@ -2315,18 +2446,20 @@ Section SortCompare.
     destruct v, v'; cbn in Hle2 |- *; auto.
     - destruct u'; cbn; assumption.
     - apply csort_sup_mon; assumption.
+    - destruct u, u'; cbn in *; auto.
+      all: destruct Hle2; split; auto; lia.
   Qed.
 
-  Lemma impredicative_csort_product {univ} {univ_sup} {l u} :
+  Lemma impredicative_csort_product {var univ} {var_sup univ_sup} {l u} :
     Sort.is_propositional u ->
-    Sort.sort_of_product_ (univ := univ) univ_sup l u = u.
+    Sort.sort_of_product_ (var := var) (univ := univ) var_sup univ_sup l u = u.
   Proof using Type. now destruct u. Qed.
 
   Lemma leq_sort_sup_l φ u1 s2 :
     let s1 := sType u1 in
     leq_sort φ s1 (Sort.sup s1 s2).
   Proof using Type.
-    destruct s2 as [| | u2]; cbnr.
+    destruct s2 as [| | u2 | q2 u2]; cbnr;
     apply leq_universe_sup_l.
   Qed.
 
@@ -2334,22 +2467,23 @@ Section SortCompare.
     let s2 := sType u2 in
     leq_sort φ s2 (Sort.sup s1 s2).
   Proof using Type.
-    destruct s1 as [| | u1]; cbnr.
+    destruct s1 as [| | u1 | q1 u1]; cbnr;
     apply leq_universe_sup_r.
   Qed.
 
   Lemma leq_sort_product φ (s1 s2 : Sort.t)
     : leq_sort φ s2 (Sort.sort_of_product s1 s2).
   Proof using Type.
-    destruct s2 as [| | u2] => //.
-    apply leq_sort_sup_r.
+    destruct s2 as [| | u2 | q2 u2] => //.
+    - apply leq_sort_sup_r.
+    - destruct s1 as [| | u1 | q1 u1] => //=; split; try reflexivity.
+      all: apply leq_universe_sup_r.
   Qed.
   (* Rk: [leq_universe φ s1 (sort_of_product s1 s2)] does not hold due to
       impredicativity. *)
 
-
   Global Instance lt_sort_irrefl' {c: check_univs} φ (H: consistent φ) : Irreflexive (lt_sort φ).
-  Proof.
+  Proof using Type.
     unshelve eapply lt_sort_irrefl.
     now unshelve eapply lt_universe_irrefl.
   Qed.
@@ -2394,9 +2528,8 @@ Section SortCompare.
   Proof using Type.
     intros Hctrs.
     destruct pb, t, u; cbnr; trivial.
-    all: intros H; unfold_univ_rel;
-    apply H.
-    all: eapply satisfies_subset; eauto.
+    1,3: intros H; unfold_univ_rel; apply H; eapply satisfies_subset; eauto.
+    all: intros [e H]; split; auto; unfold_univ_rel; apply H; eapply satisfies_subset; eauto.
   Qed.
 
   Lemma eq_sort_subset ctrs ctrs' t u
@@ -2410,12 +2543,11 @@ Section SortCompare.
   Proof using Type. apply cmp_sort_subset with (pb := Cumul). Qed.
 End SortCompare.
 
-
-
 Definition relevance_of_quality (s : Quality.t) :=
   match s with
   | Quality.qSProp => Irrelevant
-  | _ => Relevant
+  | Quality.qVar q => RelevanceVar q
+  | Quality.qProp | Quality.qType => Relevant
   end.
 
 #[global] Opaque relevance_of_quality.
@@ -2427,10 +2559,7 @@ Notation isSortRel s rel := (relevance_of_sort s = rel).
 Notation isSortRelOpt s relopt :=
   (option_default (fun rel => isSortRel s rel) relopt True).
 
-
-
 (** Elimination restriction *)
-
 
 (** This inductive classifies which eliminations are allowed for inductive types
   in various sorts. *)
@@ -2440,7 +2569,6 @@ Inductive allowed_eliminations : Set :=
   | IntoSetPropSProp
   | IntoAny.
 Derive NoConfusion EqDec for allowed_eliminations.
-
 
 Definition is_allowed_elimination_cuniv (allowed : allowed_eliminations) : concrete_sort -> bool :=
   match allowed with
@@ -2488,7 +2616,7 @@ Qed.
 Lemma is_allowed_elimination_monotone `{cf : checker_flags} Σ s1 s2 a :
   leq_sort Σ s1 s2 -> is_allowed_elimination Σ a s2 -> is_allowed_elimination Σ a s1.
 Proof.
-  destruct a, s2 as [| |u2], s1 as [| |u1] => //=. 1: now left.
+  destruct a, s2 as [| |u2|q2 u2], s1 as [| |u1|q1 u1] => //=. 1: now left.
   intros Hle [H|]; right => //.
   unfold_univ_rel.
   cbn in H.
@@ -2531,8 +2659,12 @@ Section UnivCF2.
     unfold compare_sort, leq_sort, eq_sort, eq_sort_, leq_sort_n, leq_sort_n_, is_true.
     destruct pb, t, u => //=.
     - apply eq_universe_config_impl.
+    - intros Himpl [e univs]; split; auto.
+      now apply eq_universe_config_impl.
     - unfold config.impl. do 2 destruct check_univs, prop_sub_type; cbn => //=.
     - apply leq_universe_config_impl.
+    - intros Himpl [e univs]; split; auto.
+      now apply leq_universe_config_impl.
   Qed.
 
   Lemma eq_sort_config_impl ctrs t u
@@ -2584,25 +2716,30 @@ Ltac cong := intuition congruence.
 Lemma leq_relevance_eq {cf φ} {s s'} :
   leq_sort φ s s' -> relevance_of_sort s = relevance_of_sort s'.
 Proof.
-  now destruct s, s'.
+  destruct s, s'; auto; intros [].
+  cbn. f_equal. destruct t, t1. cbn in *. now rewrite H.
 Qed.
 
 Lemma leq_relevance_opt {cf φ} {s s' rel} :
   leq_sort φ s s' -> isSortRelOpt s rel -> isSortRelOpt s' rel.
 Proof.
-  now destruct s, s'.
+  destruct s, s'; auto; intros [].
+  cbn. intro Hrel. red in Hrel |- *. destruct rel; auto.
+  rewrite -Hrel; f_equal. destruct t1, t. cbn in *. now rewrite H.
 Qed.
 
 Lemma leq_relevance {cf φ} {s s' rel} :
   leq_sort φ s s' -> isSortRel s rel -> isSortRel s' rel.
 Proof.
-  now destruct s, s'.
+  destruct s, s'; auto; intros [].
+  cbn. intro Hrel. destruct rel; rewrite -Hrel; f_equal; destruct t, t1; cbn in *; now rewrite H.
 Qed.
 
 Lemma geq_relevance {cf φ} {s s' rel} :
   leq_sort φ s' s -> isSortRel s rel -> isSortRel s' rel.
 Proof.
-  now destruct s, s'.
+  destruct s, s'; auto; intros [].
+  cbn. intro Hrel. destruct rel; rewrite -Hrel; f_equal; destruct t, t1; cbn in *; now rewrite H.
 Qed.
 
 Lemma relevance_super s : relevance_of_sort (Sort.super s) = rel_of_Type.
@@ -2615,10 +2752,14 @@ Lemma leq_sort_product_mon {cf} ϕ s1 s1' s2 s2' :
   leq_sort ϕ s2 s2' ->
   leq_sort ϕ (Sort.sort_of_product s1 s2) (Sort.sort_of_product s1' s2').
 Proof.
-  destruct s2 as [| | u2], s2' as [| | u2']; cbnr; try absurd;
-  destruct s1 as [| | u1], s1' as [| | u1']; cbnr; try absurd; trivial.
+  destruct s2 as [| | u2 | q2 u2], s2' as [| | u2' | q2' u2']; cbnr; try absurd;
+  destruct s1 as [| | u1 | q1 u1], s1' as [| | u1' | q1' u1']; cbnr; try absurd; trivial.
   - intros _ H2; etransitivity; [apply H2 | apply leq_universe_sup_r].
   - apply leq_universe_sup_mon.
+  - intros [] Hle. apply leq_universe_sup_mon; auto.
+  - intros Hprop [e Hle]; split; auto. etransitivity; eauto. apply leq_universe_sup_r.
+  - intros Hle []; split; auto. now apply leq_universe_sup_mon.
+  - intros [] []; split; auto. now apply leq_universe_sup_mon.
 Qed.
 
 Lemma impredicative_product {cf} {ϕ l u} :
@@ -2639,16 +2780,17 @@ Section UniverseLemmas.
 
   Lemma sup_idem s : Sort.sup s s = s.
   Proof using Type.
-    destruct s; cbn; auto.
-    apply f_equal.
-    apply univ_sup_idem.
+    destruct s; cbn; auto; f_equal.
+    1,3: apply univ_sup_idem.
+    apply QVar.sup_idem.
   Qed.
 
   Lemma sort_of_product_idem s
     : Sort.sort_of_product s s = s.
   Proof using Type.
     unfold Sort.sort_of_product; destruct s; try reflexivity.
-    apply sup_idem.
+    - apply sup_idem.
+    - cbn. now rewrite univ_sup_idem.
   Qed.
 
   Lemma univ_sup_assoc s1 s2 s3 :
@@ -2668,8 +2810,12 @@ Section UniverseLemmas.
   Instance proper_sort_sup_eq_sort φ :
     Proper (eq_sort φ ==> eq_sort φ ==> eq_sort φ) Sort.sup.
   Proof using Type.
-    intros [| | u1] [| |u1'] H1 [| |u2] [| |u2'] H2; cbn in *; try absurd; auto.
-    now apply proper_univ_sup_eq_univ.
+    intros [| | u1 | q1 u1] [| | u1' | q1' u1'] H1 [| | u2 | q2 u2] [| | u2' | q2' u2'] H2;
+      cbn in *; try absurd; auto.
+    1-3: now apply proper_univ_sup_eq_univ.
+    destruct H1, H2. split.
+    - destruct q1, q2, q1', q2'. cbn in *. lia.
+    - now apply proper_univ_sup_eq_univ.
   Qed.
 
   Lemma sort_of_product_twice u s :
@@ -2677,10 +2823,10 @@ Section UniverseLemmas.
     = Sort.sort_of_product u s.
   Proof using Type.
     destruct u,s; cbnr.
-    now rewrite univ_sup_assoc univ_sup_idem.
+    1, 3: now rewrite univ_sup_assoc univ_sup_idem.
+    all: f_equal; rewrite univ_sup_assoc univ_sup_idem //.
   Qed.
 End UniverseLemmas.
-
 
 Section no_prop_leq_type.
   Context {cf: checker_flags}.
@@ -2723,9 +2869,11 @@ Section no_prop_leq_type.
     leq_sort ϕ s s' ->
     leq_sort ϕ (Sort.super s) (Sort.super s').
   Proof using Type.
-    destruct s as [| | u1], s' as [| | u1']; cbnr; try absurd;
+    destruct s as [| | u1 | q1 u1], s' as [| | u1' | q1' u1']; cbnr; try absurd;
     intros H; unfold_univ_rel;
-    rewrite !val_map_succ; lia.
+      rewrite !val_map_succ.
+    1,2: lia.
+    destruct H. specialize (H0 v Hv). lia.
   Qed.
 
   Lemma leq_sort_prop_no_prop_sub_type s1 s2 :
@@ -2734,9 +2882,9 @@ Section no_prop_leq_type.
     Sort.is_prop s1 -> Sort.is_prop s2.
   Proof using Type.
     intros ps.
-    destruct s1; cbn; [ | absurd | absurd].
+    destruct s1; cbn; [ | absurd | absurd | absurd].
     rewrite ps.
-    destruct s2; cbn; [ auto | absurd | absurd].
+    destruct s2; cbn; [ auto | absurd | absurd | absurd].
   Qed.
 
   Hint Resolve leq_sort_prop_no_prop_sub_type : univ_lemmas.
@@ -2750,8 +2898,6 @@ Section no_prop_leq_type.
     destruct s1, s2; cbn; try absurd; intros H; split; trivial.
     now rewrite ps in H.
   Qed.
-
-
 End no_prop_leq_type.
 
 
@@ -2779,13 +2925,15 @@ Notation "x @[ u ]" := (subst_instance u x) (at level 3,
           | Level.lvar n => List.nth n (Instance.universes i) Level.lzero
           end.
 
+Definition subst_instance_qvar (i : Instance.t) (qv : QVar.t) : Quality.t :=
+  match qv with
+  | QVar.Var n => List.nth n (Instance.qualities i) Quality.qType
+  end.
+
 #[global] Instance subst_instance_quality : UnivSubst Quality.t :=
   fun i q => match q with
           | Quality.qSProp | Quality.qProp | Quality.qType => q
-          | Quality.qVar v =>
-              match v with
-              | QVar.Var n => List.nth n (Instance.qualities i) Quality.qType
-              end
+          | Quality.qVar v => subst_instance_qvar i v
           end.
 
 #[global] Instance subst_instance_cstr : UnivSubst UnivConstraint.t :=
@@ -2813,13 +2961,27 @@ Notation "x @[ u ]" := (subst_instance u x) (at level 3,
   fun u e => match e with
           | sProp | sSProp => e
           | sType u' => sType (subst_instance u u')
+          | sQVar q u' =>
+              match subst_instance_qvar u q with
+              | Quality.qSProp => sSProp
+              | Quality.qProp => sProp
+              | Quality.qType => sType (subst_instance u u')
+              | Quality.qVar q' => sQVar q' (subst_instance u u')
+              end
           end.
 
-Lemma subst_instance_to_quality s u :
-  Sort.to_quality s@[u] = Sort.to_quality s.
-Proof.
-  destruct s => //.
-Qed.
+#[global] Instance subst_instance_relevance : UnivSubst relevance :=
+  fun u r => match r with
+          | Relevant | Irrelevant => r
+          | RelevanceVar q => relevance_of_quality (subst_instance_qvar u q)
+          end.
+
+#[global] Instance subst_instance_binder_annot {A : Type}
+  : UnivSubst (binder_annot A) :=
+  fun u b => {| binder_name := b.(binder_name);
+            binder_relevance := subst_instance_relevance u b.(binder_relevance) |}.
+
+#[global] Instance subst_instance_aname : UnivSubst aname := subst_instance_binder_annot.
 
 #[global] Instance subst_instance_instance : UnivSubst Instance.t :=
   fun i i' =>
@@ -2827,24 +2989,6 @@ Qed.
     Instance.make
       (List.map (subst_instance_quality i) (Instance.qualities i'))
       (List.map (subst_instance_level i) (Instance.universes i')).
-
-Theorem relevance_subst_eq u s : relevance_of_sort (subst_instance_sort u s) = relevance_of_sort s.
-Proof.
-  now destruct s.
-Qed.
-
-Theorem relevance_subst_opt u rel s :
-  isSortRelOpt s rel -> isSortRelOpt (subst_instance_sort u s) rel.
-Proof.
-  now destruct s.
-Qed.
-
-Theorem relevance_subst u rel s :
-  isSortRel s rel -> isSortRel (subst_instance_sort u s) rel.
-Proof.
-  now destruct s.
-Qed.
-
 
 (** Tests that the term is closed over [k] universe variables *)
 Section Closedu.
@@ -2865,7 +3009,7 @@ Section Closedu.
   Definition closedu_sort (u : Sort.t) :=
     match u with
     | sSProp | sProp => true
-    | sType l => closedu_universe l
+    | sType l | sQVar _ l => closedu_universe l
     end.
 
 End Closedu.
@@ -2879,6 +3023,19 @@ Section Closedq.
     | Quality.qSProp | Quality.qProp | Quality.qType => true
     | Quality.qVar (QVar.Var n) => (n <? k)%nat
     end.
+
+  Definition closedq_sort (s : Sort.t) := closedq_quality (Sort.to_quality s).
+
+  Definition closedq_rel (r : relevance) :=
+    match r with
+    | Relevant | Irrelevant => true
+    | RelevanceVar (QVar.Var n) => (n <? k)%nat
+    end.
+
+  Definition closedq_binder_annot {A : Type} (b : binder_annot A) :=
+    closedq_rel b.(binder_relevance).
+
+  Definition closedq_aname (n : aname) := closedq_binder_annot n.
 End Closedq.
 
 Definition closed_instance_qualities (k : nat) (i : Instance.t) :=
@@ -2913,11 +3070,12 @@ Section UniverseClosedSubst.
   Qed.
 
   Lemma closedu_subst_instance_univ u s
-    : closedu_sort 0 s -> subst_instance_sort u s = s.
+    : closedu_sort 0 s -> closedq_sort 0 s -> subst_instance_sort u s = s.
   Proof.
     intro H.
-    destruct s as [| | t]; cbnr.
-    apply f_equal. apply eq_univ'.
+    destruct s as [| | t | q t]; cbnr.
+    2: destruct q; intros f; exfalso; now apply ssrbool.notF.
+    intros _. apply f_equal. apply eq_univ'.
     destruct t as [ts H1].
     unfold closedu_universe in *;cbn in *.
     intro e; split; intro He.
@@ -2980,14 +3138,14 @@ Section SubstUnivInstanceClosed.
     : closedu_sort #|Instance.universes u| s -> closedu_sort 0 (subst_instance_sort u s).
   Proof using Hcl.
     intro H.
-    destruct s as [| |t]; cbnr.
-    destruct t as [l Hl].
-    apply LevelExprSet.for_all_spec; proper.
-    intros e He. eapply map_spec in He.
-    destruct He as [e' [He' X]]; subst.
-    apply subst_instance_level_expr_closedu.
-    apply LevelExprSet.for_all_spec in H; proper.
-    now apply H.
+    destruct s as [| |t|q t]; cbnr.
+    2: destruct (subst_instance_qvar u q); cbnr.
+    all: destruct t as [l Hl]; apply LevelExprSet.for_all_spec; proper;
+      intros e He; eapply map_spec in He;
+      destruct He as [e' [He' X]]; subst;
+      apply subst_instance_level_expr_closedu;
+      apply LevelExprSet.for_all_spec in H; proper;
+      now apply H.
   Qed.
 End SubstUnivInstanceClosed.
 
@@ -3004,6 +3162,45 @@ Section SubstQualityInstanceClosed.
       erewrite e in e'. rewrite e e' //. destruct #|Instance.qualities u|; auto.
       now apply leb_complete in H'.
   Qed.
+
+  Lemma subst_instance_sort_closedq q
+    : closedq_sort #|Instance.qualities u| q -> closedq_sort 0 (subst_instance_sort u q).
+  Proof using Hcl.
+    intro H. destruct q as [| | u1 | q1 u1 ]; cbnr.
+    destruct (subst_instance_qvar u q1) eqn:esubst; auto.
+    apply forallb_All in Hcl. unfold subst_instance_qvar in esubst. destruct q1.
+    unshelve eapply All_nth_error in Hcl; eauto.
+    rewrite nth_nth_error in esubst.
+    destruct (nth_error (Instance.qualities u) n); cbn; auto.
+    now rewrite esubst. inversion esubst.
+  Qed.
+
+  Lemma subst_instance_rel_closedq r
+    : closedq_rel #|Instance.qualities u| r -> closedq_rel 0 (subst_instance u r).
+  Proof using Hcl.
+    destruct r; cbnr. intro H. destruct t.
+    destruct (subst_instance_qvar u (QVar.Var n)) eqn:e; auto.
+    apply forallb_All in Hcl. unshelve eapply All_nth_error in Hcl; eauto.
+    - exact (Quality.qVar t).
+    - destruct t; inversion Hcl.
+    - rewrite /subst_instance_qvar nth_nth_error in e.
+      destruct (nth_error (Instance.qualities u) n); cbn.
+      + now rewrite e.
+      + inversion e.
+  Qed.
+
+  Lemma subst_instance_binder_annot_closedq {A : Type} (b : binder_annot A)
+    : closedq_binder_annot #|Instance.qualities u| b -> closedq_binder_annot 0 (subst_instance u b).
+  Proof using Hcl.
+    destruct b; cbn. intro H.
+    unfold subst_instance. cbv [subst_instance_binder_annot closedq_binder_annot];
+      cbv [closedq_binder_annot] in H; cbn in *.
+    now apply subst_instance_rel_closedq.
+  Qed.
+
+  Lemma subst_instance_aname_closedq (n : aname)
+    : closedq_aname #|Instance.qualities u| n -> closedq_aname 0 (subst_instance u n).
+  Proof using Hcl. apply subst_instance_binder_annot_closedq. Qed.
 End SubstQualityInstanceClosed.
 
 Lemma subst_instance_closedu t u (Hcl : closed_instance_universes 0 u) :
@@ -3035,10 +3232,41 @@ Proof.
   - apply subst_instance_closedu; auto.
 Qed.
 
+Theorem relevance_subst u rel s :
+  isSortRel s rel -> isSortRel (subst_instance_sort u s) (subst_instance_relevance u rel).
+Proof.
+  destruct s; intros <-; auto.
+  cbn. destruct (subst_instance_qvar u t) eqn:e.
+  all: cbv [relevance_of_quality subst_instance_relevance]; now rewrite e.
+Qed.
+
 #[global]
 Hint Resolve subst_instance_level_closedu subst_instance_level_expr_closedu
 subst_instance_univ_closedu subst_instance_closedu subst_instance_closedq
-  subst_instance_closed : substu.
+subst_instance_sort_closedq subst_instance_rel_closedq subst_instance_binder_annot_closedq
+subst_instance_aname_closedq subst_instance_closed : substu.
+
+Lemma closedq_relevance_subst_instance u r
+  : closedq_rel 0 r -> subst_instance_relevance u r = r.
+Proof.
+  destruct r; auto.
+  destruct t; cbn; auto.
+Qed.
+
+Lemma closedq_binder_annot_subts_instance {A : Type} u (b : binder_annot A)
+  : closedq_binder_annot 0 b -> subst_instance_binder_annot u b = b.
+Proof.
+  destruct b => Hq. unfold subst_instance, subst_instance_binder_annot. cbn.
+  rewrite closedq_relevance_subst_instance; auto.
+Qed.
+
+Lemma closedq_aname_subst_instance u (n : aname)
+  : closedq_aname 0 n -> subst_instance_aname u n = n.
+Proof. apply closedq_binder_annot_subts_instance. Qed.
+
+#[global]
+Hint Resolve closedq_relevance_subst_instance closedq_binder_annot_subts_instance
+closedq_aname_subst_instance : substu.
 
 Definition string_of_level (l : Level.t) : string :=
   match l with
@@ -3055,6 +3283,8 @@ Definition string_of_sort (u : Sort.t) :=
   | sSProp => "SProp"
   | sProp => "Prop"
   | sType l => "Type(" ^ string_of_list string_of_level_expr (LevelExprSet.elements l) ^ ")"
+  | sQVar q l => "QSort(" ^ string_of_qvar q ^ "," ^
+                  string_of_list string_of_level_expr (LevelExprSet.elements l) ^ ")"
   end.
 
 Definition string_of_instance u :=
@@ -3115,3 +3345,4 @@ Definition print_constraint_set t :=
   print_list (fun '(l1, d, l2) => string_of_level l1 ^ " " ^
                          print_constraint_type d ^ " " ^ string_of_level l2)
              " /\ " (ConstraintSet.elements t).
+

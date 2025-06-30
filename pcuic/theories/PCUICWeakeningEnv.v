@@ -204,13 +204,20 @@ Proof.
   - right. eapply global_levels_sub; tea.
 Qed.
 
+Lemma extends_wf_qvar {Σ : global_env_ext} Σ' q :
+  extends Σ Σ' -> wf_qvar Σ q -> wf_qvar (Σ', Σ.2) q.
+Proof.
+  destruct Σ as [Σ univ]; cbn.
+  intros [sub _] Hwf. assumption.
+Qed.
+
 Lemma extends_wf_sort {Σ : global_env_ext} Σ' s : extends Σ Σ' ->
   wf_sort Σ s -> wf_sort (Σ', Σ.2) s.
 Proof.
   destruct s => //=.
-  apply extends_wf_universe.
+  - apply extends_wf_universe.
+  - intros Hext [Hwfv Hwfu]. split; [now apply extends_wf_qvar|now apply extends_wf_universe].
 Qed.
-
 
 Definition on_udecl_prop (Σ : global_env) (udecl : universes_decl)
   := let levels := levels_of_udecl udecl in

@@ -795,15 +795,18 @@ Proof.
   cbv [eq_universe]; destruct ?; auto using eq0_universe_dec.
 Defined.
 
-Definition eq_sort__dec {univ eq_universe}
-           (eq_universe_dec : forall u u', {@eq_universe u u'} + {~@eq_universe u u'})
-           s s'
-  : {@eq_sort_ univ eq_universe s s'} + {~@eq_sort_ univ eq_universe s s'}.
+Definition eq_sort__dec {var univ eq_var eq_universe}
+  (eq_var_dec : forall qv qv', {eq_var qv qv'} + {~eq_var qv qv'})
+  (eq_universe_dec : forall u u', {@eq_universe u u'} + {~@eq_universe u u'})
+  s s' : {@eq_sort_ var univ eq_var eq_universe s s'} +
+           {~@eq_sort_ var univ eq_var eq_universe s s'}.
 Proof.
-  cbv [eq_sort_]; repeat destruct ?; auto. all: destruct pst; auto.
+  cbv [eq_sort_]; repeat destruct ?; auto.
+  destruct (eq_var_dec v v0); destruct (eq_universe_dec u u0); auto.
+  all: right; intros []; contradiction.
 Defined.
 
-Definition eq_sort_dec {cf ϕ} s s' : {@eq_sort cf ϕ s s'} + {~@eq_sort cf ϕ s s'} := eq_sort__dec eq_universe_dec _ _.
+Definition eq_sort_dec {cf ϕ} s s' : {@eq_sort cf ϕ s s'} + {~@eq_sort cf ϕ s s'} := eq_sort__dec QVar.eq_dec eq_universe_dec _ _.
 
 Definition valid_constraints_dec cf ϕ cstrs : {@valid_constraints cf ϕ cstrs} + {~@valid_constraints cf ϕ cstrs}.
 Proof.

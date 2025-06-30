@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool OrderedTypeAlt MSetAVL MSetFacts MSetProperties MSetDecide Morphisms.
 From MetaRocq.Utils Require Import utils wGraph.
-From MetaRocq.Common Require Import config Universes.
+From MetaRocq.Common Require Import config BasicAst Universes.
 From Equations.Prop Require Import DepElim.
 From Equations Require Import Equations.
 Import ConstraintType.
@@ -1252,11 +1252,11 @@ Section CheckLeqProcedure.
 
   Definition eqb_univ_instance_gen (u1 u2 : Instance.t) : bool :=
     forallb2 (fun l1 l2 => check_eqb_universe_gen
-        (Universe.make' l1) (Universe.make' l2)) 
+        (Universe.make' l1) (Universe.make' l2))
       (Instance.universes u1) (Instance.universes u2).
 
   Definition leqb_sort_gen (s1 s2 : Sort.t) :=
-    leqb_sort_n_ (fun _ => check_leqb_universe_gen) false s1 s2.
+    leqb_sort_n_ QVar.eqb (fun _ => check_leqb_universe_gen) false s1 s2.
 
   Definition check_leqb_sort_gen (s1 s2 : Sort.t) :=
     (s1 == s2)
@@ -1299,7 +1299,7 @@ Section CheckLeq.
     := LevelExprSet.For_all gc_expr_declared u.
 
   Definition gc_levels_declared_sort (s : Sort.t)
-    := Sort.on_sort gc_levels_declared True s.
+    := Sort.on_sort (fun _ => False) gc_levels_declared True or s.
 
   Lemma val_level_of_variable_level v (l : VariableLevel.t)
     : val v (l : Level.t) = val v l.
@@ -2085,13 +2085,21 @@ Section CheckLeq.
   Definition check_eqb_sort_refl := check_eqb_sort_refl_gen _ leqb_level_n_spec.
 
   Definition gc_leq_sort φ :=
-    leq_sort_n_ (fun n u u' => if check_univs then gc_leq0_universe_n n φ u u' else True) 0.
+    leq_sort_n_ QVar.leqb (fun n u u' => if check_univs then gc_leq0_universe_n n φ u u' else True) 0.
 
-  Definition gc_eq_sort φ :=
-    eq_sort_ (fun u u' => if check_univs then gc_eq0_universe φ u u' else True).
+  Definition gc_eq_sort φ : sort -> sort -> Prop :=
+    eq_sort_ QVar.eqb (fun u u' => if check_univs then gc_eq0_universe φ u u' else True).
 
   Let levels_declared_sort (s : Sort.t) :=
-    Sort.on_sort gc_levels_declared True s.
+    Sort.on_sort (fun _ => False) gc_levels_declared True or s.
+
+  Lemma levels_declared_sort_var q u (H : levels_declared_sort (sQVar q u)) :
+    gc_levels_declared u.
+  Proof using Type.
+    red in H |- *. cbn in H. destruct H; auto.
+  Qed.
+
+  Ltac eeauto := eauto using levels_declared_sort_var.
 
   Lemma check_eqb_sort_spec_gen leqb_level_n_gen
       (leqb_correct : leqb_level_n_spec_gen leqb_level_n_gen)
@@ -2121,6 +2129,30 @@ Section CheckLeq.
       + apply NonEmptySetFacts.univ_expr_eqb_true_iff in H as ->.
         toProp; toProp; left; now apply NonEmptySetFacts.univ_expr_eqb_true_iff.
       + toProp; toProp; right; assumption.
+    - toProp. destruct H.
+      + apply eqb_eq in H. injection H => _ e2. rewrite e2. destruct t2. cbn. apply eqb_refl.
+      + toProp. destruct H; repeat toProp.
+        now destruct H.
+    - toProp. destruct check_univs eqn:ecu; auto. red. intros v Hsat. destruct H.
+      + apply eqb_eq in H. injection H => e _. now rewrite e.
+      + toProp. destruct H; repeat toProp. destruct H.
+        eapply check_leqb_universe_spec_gen in H1; eeauto.
+        destruct H0. eapply check_leqb_universe_spec_gen in H2; eeauto.
+        unfold gc_leq_universe, gc_leq_universe_n in H1, H2.
+        rewrite ecu in H1, H2. unfold gc_leq0_universe_n in H1, H2.
+        specialize (H1 v Hsat). specialize (H2 v Hsat). lia.
+    - toProp. destruct check_univs eqn:ecu.
+      + right. toProp; toProp; auto.
+        -- eapply check_leqb_universe_spec_gen; eeauto. do 2 red. rewrite ecu.
+           red in H1 |- *. intros. rewrite H1; auto. lia.
+        -- have e : t0 = t2 by apply/eqb_eq. now rewrite e.
+        -- eapply check_leqb_universe_spec_gen; eeauto.
+           do 2 red. destruct check_univs; auto.
+           intros v Hsat. specialize (H1 v Hsat). rewrite H1. lia.
+      + right. toProp; toProp; auto.
+        -- eapply check_leqb_universe_spec_gen; eeauto. do 2 red. now rewrite ecu.
+        -- have e : t0 = t2 by apply/eqb_eq. now rewrite e.
+        -- eapply check_leqb_universe_spec_gen; eeauto. do 2 red. now rewrite ecu.
   Defined.
 
   Definition check_eqb_sort_spec := check_eqb_sort_spec_gen _ leqb_level_n_spec.
@@ -2481,13 +2513,14 @@ Section CheckLeq2.
     check_constraints_complete_gen _ (leqb_level_n_spec _ _ Huctx' HC' HG').
 
   Let levels_declared_sort (s : Sort.t)
-    := Sort.on_sort levels_declared True s.
+    := Sort.on_sort (fun _ => False) levels_declared True or s.
 
   Lemma levels_univ_gc_declared_declared (s : Sort.t)
     : levels_declared_sort s -> gc_levels_declared_sort uctx' s.
   Proof using HG levels_declared.
     destruct s; cbnr.
     apply levels_gc_declared_declared.
+    intros []; auto. right. now apply levels_gc_declared_declared.
   Qed.
 
   Lemma check_leqb_sort_spec_gen' leqb_level_n_gen
@@ -2500,7 +2533,10 @@ Section CheckLeq2.
     - apply eqb_true_iff in H as ->.
       reflexivity.
     - destruct s1, s2; cbn in *; trivial; try discriminate H.
-      now eapply check_leqb_universe_spec_gen'.
+      + now eapply check_leqb_universe_spec_gen'.
+      + destruct Hu1, Hu2; auto. toProp. destruct H. split.
+        -- have e : t0 = t2 by apply/eqb_eq. now rewrite e.
+        -- eapply check_leqb_universe_spec_gen' in H2; eauto.
   Qed.
 
   Definition check_leqb_sort_spec' :=
@@ -2513,11 +2549,17 @@ Section CheckLeq2.
     leq_sort uctx.2 s1 s2 ->
     check_leqb_sort_gen leqb_level_n_gen s1 s2.
   Proof using HG' Huctx'.
-    move : s1 s2 => [| | u1] [| | u2] //. cbn.
-    intros decl1 decl2 Hle.
-    unfold check_leqb_sort_gen.
-    toProp; right.
-    apply check_leqb_universe_complete_gen => //.
+    move : s1 s2 => [| | u1 | q1 u1] [| | u2 | q2 u2] //. cbn.
+    all: intros decl1 decl2 Hle.
+    all: unfold check_leqb_sort_gen; toProp; right.
+    - apply check_leqb_universe_complete_gen => //.
+    - cbn. toProp.
+      + cbn in Hle. destruct Hle.
+        destruct q1, q2. cbn in H |- *.
+        rewrite H. apply eqb_refl.
+      + destruct decl1, decl2; auto.
+        apply check_leqb_universe_complete_gen => //.        
+        now destruct Hle.
   Qed.
 
   Definition check_leqb_sort_complete :=
@@ -2529,7 +2571,7 @@ Section CheckLeq2.
       levels_declared_sort s2 ->
       check_eqb_sort_gen leqb_level_n_gen s1 s2 -> eq_sort uctx.2 s1 s2.
   Proof using HG' Huctx'.
-    move : s1 s2 => [| | u1] [| | u2] //; intros Hu1 Hu2.
+    move : s1 s2 => [| | u1 | q1 u1] [| | u2 | q2 u2] //; intros Hu1 Hu2.
     { move/andP => [H HH] //. }
     move/orP => [H | H].
     - apply eqb_true_iff in H as ->.
@@ -2541,10 +2583,37 @@ Section CheckLeq2.
       now rewrite He.
       apply NonEmptySetFacts.univ_expr_eqb_true_iff in HH as ->.
       toProp; left; toProp; right; now apply NonEmptySetFacts.univ_expr_eqb_true_iff.
+    - intros. unfold check_eqb_sort_gen in H. toProp. destruct H.
+      + now have -> : sQVar q1 u1 = sQVar q2 u2 by apply/eqb_eq.
+      + toProp. destruct H as [H1 H2]. cbn in H1, H2. repeat toProp.
+        destruct H1 as [Hq Hle1]. destruct H2 as [_ Hle2].
+        split.
+        -- now have -> : q1 = q2 by apply/eqb_eq.
+        -- apply leq_universe_antisym; eapply check_leqb_universe_spec_gen'; eauto.
+           all: destruct Hu1, Hu2; auto.
   Qed.
 
   Definition check_eqb_sort_spec' :=
     check_eqb_sort_spec_gen' _ (leqb_level_n_spec _ _ Huctx' HC' HG').
+
+  Lemma check_eqb_universe_gen_subrel leqb_level_n_gen u1 u2 :
+    check_eqb_universe_gen leqb_level_n_gen u1 u2 ->
+    check_leqb_universe_gen leqb_level_n_gen u1 u2.
+  Proof using Type.
+    unfold check_eqb_universe_gen, check_leqb_universe_gen. intro H; repeat toProp. destruct H.
+    - now left.
+    - right. toProp. apply H.
+  Qed.
+
+  Lemma check_eqb_universe_gen_subrel' leqb_level_n_gen u1 u2 :
+    check_eqb_universe_gen leqb_level_n_gen u1 u2 ->
+    check_leqb_universe_gen leqb_level_n_gen u2 u1.
+  Proof using Type.
+    unfold check_eqb_universe_gen, check_leqb_universe_gen. intro H; repeat toProp. destruct H.
+    - left. repeat toProp. destruct H; auto. right.
+      have -> : u1 = u2 by apply/eqb_eq. apply eqb_refl.
+    - right. toProp. apply H.
+  Qed.
 
   Lemma check_eqb_sort_complete_gen leqb_level_n_gen
     (leqb_correct : leqb_level_n_spec_gen uctx' leqb_level_n_gen) u1 u2 :
@@ -2553,15 +2622,26 @@ Section CheckLeq2.
     eq_sort uctx.2 u1 u2 ->
     check_eqb_sort_gen leqb_level_n_gen u1 u2.
   Proof using HG' Huctx'.
-    move : u1 u2 => [| | u1] [| | u2] //. cbn.
-    intros decl1 decl2 Hle.
-    eapply check_eqb_universe_complete_gen in Hle => //; eauto.
-    unfold check_eqb_sort_gen, leqb_sort_gen, check_leqb_universe_gen; cbn.
-    unfold check_eqb_universe_gen in Hle.
-    move/orP: Hle => [/orP [-> | e] | /andP [H1 H2]] //=.
-    now rewrite orb_true_r.
-    apply eqb_eq in e as ->; rewrite eqb_refl //.
-    toProp; right; toProp; toProp; right; assumption.
+    move : u1 u2 => [| | u1 | q1 u1] [| | u2 | q2 u2] //; cbn.
+    - intros decl1 decl2 Hle.
+      eapply check_eqb_universe_complete_gen in Hle => //; eauto.
+      unfold check_eqb_sort_gen, leqb_sort_gen, check_leqb_universe_gen; cbn.
+      unfold check_eqb_universe_gen in Hle.
+      move/orP: Hle => [/orP [-> | e] | /andP [H1 H2]] //=.
+      now rewrite orb_true_r.
+      apply eqb_eq in e as ->; rewrite eqb_refl //.
+      toProp; right; toProp; toProp; right; assumption.
+    - intros decl1 decl2 (e & He).
+      have -> : q1 = q2 by (destruct q1, q2; now cbn in e).
+      unfold check_eqb_sort_gen; toProp. right; toProp; cbn; toProp.
+      + apply QVar.eqb_refl.
+      + eapply check_eqb_universe_complete_gen in He; eauto.
+        now apply check_eqb_universe_gen_subrel.
+        all: destruct decl1, decl2; auto.
+      + apply QVar.eqb_refl.
+      + eapply check_eqb_universe_complete_gen in He; eauto.
+        now apply check_eqb_universe_gen_subrel'.
+        all: destruct decl1, decl2; auto.
   Qed.
 
   Definition check_eqb_sort_complete :=

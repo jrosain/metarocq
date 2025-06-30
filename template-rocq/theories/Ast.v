@@ -574,12 +574,14 @@ Fixpoint noccur_between k n (t : term) : bool :=
   | tConst c u' => tConst c (subst_instance_instance u u')
   | tInd i u' => tInd i (subst_instance_instance u u')
   | tConstruct ind k u' => tConstruct ind k (subst_instance_instance u u')
-  | tLambda na T M => tLambda na (subst_instance_constr u T) (subst_instance_constr u M)
+  | tLambda na T M =>
+      tLambda (subst_instance_aname u na) (subst_instance_constr u T) (subst_instance_constr u M)
   | tApp f v => tApp (subst_instance_constr u f) (List.map (subst_instance_constr u) v)
-  | tProd na A B => tProd na (subst_instance_constr u A) (subst_instance_constr u B)
+  | tProd na A B =>
+      tProd (subst_instance_aname u na) (subst_instance_constr u A) (subst_instance_constr u B)
   | tCast c kind ty => tCast (subst_instance_constr u c) kind (subst_instance_constr u ty)
-  | tLetIn na b ty b' => tLetIn na (subst_instance_constr u b) (subst_instance_constr u ty)
-                                (subst_instance_constr u b')
+  | tLetIn na b ty b' => tLetIn (subst_instance_aname u na) (subst_instance_constr u b)
+                          (subst_instance_constr u ty) (subst_instance_constr u b')
   | tCase ind p c brs =>
     let p' := map_predicate (subst_instance_instance u) (subst_instance_constr u) (subst_instance_constr u) p in
     let brs' := List.map (map_branch (subst_instance_constr u)) brs in
@@ -622,16 +624,16 @@ Fixpoint closedu (k : nat) (t : term) : bool :=
 
 Fixpoint closedq (k : nat) (t : term) : bool :=
   match t with
-  | tSort univ => true
+  | tSort univ => closedq_sort k univ
   | tInd _ u => closed_instance_qualities k u
   | tConstruct _ _ u => closed_instance_qualities k u
   | tConst _ u => closed_instance_qualities k u
   | tRel i => true
   | tEvar ev args => forallb (closedq k) args
-  | tLambda _ T M | tProd _ T M => closedq k T && closedq k M
+  | tLambda na T M | tProd na T M => closedq_aname k na && closedq k T && closedq k M
   | tApp u v => closedq k u && forallb (closedq k) v
   | tCast c kind t => closedq k c && closedq k t
-  | tLetIn na b t b' => closedq k b && closedq k t && closedq k b'
+  | tLetIn na b t b' => closedq_aname k na && closedq k b && closedq k t && closedq k b'
   | tCase ind p c brs =>
     let p' := test_predicate (closed_instance_qualities k) (closedq k) (closedq k) p in
     let brs' := forallb (test_branch (closedq k)) brs in

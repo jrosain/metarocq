@@ -43,6 +43,8 @@ Proof.
   induction c in k |- * using term_forall_list_ind; simpl; auto;
     autorewrite with map;
     try solve [f_equal; eauto; solve_all; eauto].
+  all: rewrite /subst_instance_def /map_def; f_equal; solve_all; eauto.
+  all: cbv[map_def_gen]; cbn; solve_all.
 Qed.
 
 Lemma subst_instance_mkApps u f a :

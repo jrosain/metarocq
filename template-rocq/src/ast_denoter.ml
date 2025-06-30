@@ -243,6 +243,9 @@ struct
     | Universes0.Sort.Coq_sType u ->
       let evm, u = unquote_universe evm u in
       evm, Sorts.sort_of_univ u
+    | Universes0.Sort.Coq_sQVar (q, u) ->
+      let evm, u = unquote_universe evm u in
+      evm, Sorts.qsort (unquote_qvar q) u
 
   let unquote_universe_level evm l = evm, unquote_level l
 

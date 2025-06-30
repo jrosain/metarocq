@@ -408,7 +408,7 @@ Lemma map_vass_map_def g l n k :
          (mapi (fun i (d : def term) => vass (dname d) (lift0 i (dtype d))) l).
 Proof.
   rewrite mapi_mapi mapi_map. apply mapi_ext.
-  intros. unfold map_decl, vass; simpl; f_equal.
+  intros. unfold map_decl, vass; simpl; cbv[map_decl_gen]; f_equal.
   rewrite -> permute_lift. f_equal; lia. lia.
 Qed.
 
@@ -417,7 +417,7 @@ Definition fix_context_gen k mfix :=
 
 Lemma lift_decl0 k d : map_decl (lift 0 k) d = d.
 Proof.
-  destruct d; destruct decl_body; unfold map_decl; simpl;
+  destruct d; destruct decl_body; unfold map_decl; simpl; cbv[map_decl_gen]; cbn;
   f_equal; now rewrite ?lift0_id.
 Qed.
 
@@ -564,7 +564,7 @@ Hint Rewrite subst_context_snoc : subst.
 Lemma subst_decl0 k d : map_decl (subst [] k) d = d.
 Proof.
   destruct d; destruct decl_body;
-    unfold subst_decl, map_decl; simpl in *;
+    unfold subst_decl, map_decl; simpl in *; cbv[map_decl_gen];
     f_equal; simpl; rewrite subst_empty; intuition trivial.
 Qed.
 
@@ -727,7 +727,7 @@ Proof.
   rewrite !subst_context_alt !mapi_compose.
   apply mapi_ext => i x.
   destruct x as [na [b|] ty] => //.
-  - rewrite /subst_decl /map_decl /=; f_equal.
+  - rewrite /subst_decl /map_decl /=; cbv[map_decl_gen]; cbn; f_equal.
     + rewrite !mapi_length. f_equal. rewrite {2}Nat.add_0_r.
       rewrite subst_app_simpl.
       rewrite distr_subst_rec. rewrite Nat.add_0_r; f_equal; try lia.
@@ -737,7 +737,7 @@ Proof.
       rewrite {2}Nat.add_0_r.
       rewrite distr_subst_rec. rewrite Nat.add_0_r; f_equal; try lia.
       rewrite length_map. f_equal; lia.
-  - rewrite /subst_decl /map_decl /=; f_equal.
+  - rewrite /subst_decl /map_decl /=; cbv[map_decl_gen]; cbn; f_equal.
     rewrite !mapi_length. rewrite {2}Nat.add_0_r.
     rewrite subst_app_simpl.
     rewrite distr_subst_rec. rewrite Nat.add_0_r; f_equal; try lia.
@@ -753,7 +753,7 @@ Hint Rewrite context_assumptions_subst : pcuic.
 Lemma subst_app_context s s' Γ : subst_context (s ++ s') 0 Γ = subst_context s 0 (subst_context s' #|s| Γ).
 Proof.
   induction Γ; simpl; auto.
-  rewrite !subst_context_snoc /= /subst_decl /map_decl /=. simpl.
+  rewrite !subst_context_snoc /= /subst_decl /map_decl /=; cbv[map_decl_gen]; simpl.
   rewrite IHΓ. f_equal. f_equal.
   - destruct a as [na [b|] ty]; simpl; auto.
     f_equal. rewrite subst_context_length Nat.add_0_r.

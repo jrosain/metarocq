@@ -260,20 +260,20 @@ Module Lookup (T : Term) (E : EnvironmentSig T).
     QualitySet.In Quality.qProp (global_ext_qualities Σ).
   Proof.
     apply QualitySet.union_spec; right.
-    do 2 rewrite QualitySetFact.add_iff; auto.
+    do 2 rewrite QualitySetFact.add_iff; cbn; auto.
   Qed.
 
   Lemma global_ext_qtype_InSet Σ :
     QualitySet.In Quality.qType (global_ext_qualities Σ).
   Proof.
     apply QualitySet.union_spec; right.
-    rewrite QualitySetFact.add_iff; auto.
+    rewrite QualitySetFact.add_iff; cbn; auto.
   Qed.
 
   Ltac global_ext_qconst_InSet :=
     try apply global_ext_qsprop_InSet; try apply global_ext_qprop_InSet;
       try apply global_ext_qtype_InSet.
-  
+
   Lemma global_ext_levels_InSet Σ :
     LevelSet.In Level.lzero (global_ext_levels Σ).
   Proof.
@@ -324,8 +324,11 @@ Module Lookup (T : Term) (E : EnvironmentSig T).
   Definition wf_universe Σ (u : Universe.t) : Prop :=
     forall l, LevelExprSet.In l u -> LevelSet.In (LevelExpr.get_level l) (global_ext_levels Σ).
 
+  Definition wf_qvar Σ (qv : QVar.t) : Prop :=
+    QualitySet.In (Quality.qVar qv) (global_ext_qualities Σ).
+
   Definition wf_sort Σ (s : sort) : Prop :=
-    Sort.on_sort (wf_universe Σ) True s.
+    Sort.on_sort (wf_qvar Σ) (wf_universe Σ) True and s.
 
   Definition wf_universe_dec Σ u : {wf_universe Σ u} + {~wf_universe Σ u}.
   Proof.
@@ -339,10 +342,21 @@ Module Lookup (T : Term) (E : EnvironmentSig T).
     { intro H; apply IHt; intros; apply H; now constructor. }
   Defined.
 
+  Definition wf_qvar_dec Σ qv : {wf_qvar Σ qv} + {~wf_qvar Σ qv}.
+  Proof.
+    cbv [wf_qvar QualitySet.this].
+    apply QualitySetProp.In_dec.
+  Defined.
+
   Definition wf_sort_dec Σ s : {@wf_sort Σ s} + {~@wf_sort Σ s}.
   Proof.
     destruct s; try (left; exact I).
-    apply wf_universe_dec.
+    - apply wf_universe_dec.
+    - cbv [wf_sort Sort.on_sort].
+      destruct (wf_universe_dec Σ t0);
+        destruct (wf_qvar_dec Σ t).
+      2-4: right; intros []; contradiction.
+      left; now split.
   Defined.
 
   Lemma declared_ind_declared_constructors `{cf : checker_flags} {Σ ind mib oib} :

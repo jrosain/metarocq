@@ -20,11 +20,16 @@ Module QVar.
   Definition t := repr.
 
   Definition var (n : nat) : t := Var n.
-  
+
   Definition eqb {V : Set} `{ReflectEq V} (v1 v2 : repr_ V) : bool :=
     match v1, v2 with
     | Var i, Var j => eqb i j
     end.
+
+  Lemma eqb_refl {V : Set} `{ReflectEq V} (v : repr_ V) : eqb v v = true.
+  Proof.
+    destruct v. cbn. apply eqb_refl.
+  Qed.
 
   #[global, program] Instance reflect_eq_qvar {V : Set} `{ReflectEq V} : ReflectEq (repr_ V) :=
     { eqb := eqb }.
@@ -70,7 +75,7 @@ Module QVar.
     - constructor. now apply Nat.ltb_lt.
     - intro f. inversion f. subst. apply Nat.ltb_lt in H1. congruence.
   Qed.
-  
+
   Inductive le_ {V V_le} : repr_ V -> repr_ V -> Prop :=
   | leVarVar i j : V_le i j -> le_ (Var i) (Var j).
   Derive Signature for le_.
@@ -142,7 +147,32 @@ Module QVar.
     (v1 v2 : repr_ V) : {eq_ eq_V v1 v2} + {~ (eq_ eq_V v1 v2)}.
   Proof. destruct v1, v2. unfold eq_. apply eq_dec_V. Defined.
 
-  Definition eq_dec (x y : t) := eq_dec_ Nat.eq_dec.
+  Definition eq_dec := eq_dec_ Nat.eq_dec.
+
+  Definition sup_ {V} V_sup (x y : repr_ V) : repr_ V :=
+    match x, y with
+    | Var n, Var m => Var (V_sup n m)
+    end.
+
+  Definition sup : t -> t -> t := sup_ Nat.max.
+
+  Lemma sup_comm_ {V : Set} V_sup :
+    (forall n m : V, V_sup n m = V_sup m n) ->
+    forall (x y : repr_ V), sup_ V_sup x y = sup_ V_sup y x.
+  Proof.
+    intros Vcomm ??. destruct x, y; cbn.
+    f_equal. apply Vcomm.
+  Qed.
+
+  Lemma sup_comm (x y : t) : sup x y = sup y x.
+  Proof.
+    apply sup_comm_, Nat.max_comm.
+  Qed.
+
+  Lemma sup_idem (x : t) : sup x x = x.
+  Proof.
+    destruct x; cbn. now rewrite Nat.max_id.
+  Qed.
 End QVar.
 
 Definition leq_qvar_dec v v' : {QVar.le v v'} + {~QVar.le v v'}.
@@ -175,6 +205,9 @@ Proof. ltac:(Equations.Prop.Tactics.eqdec_proof). Qed.
 
 Definition map_binder_annot {A B} (f : A -> B) (b : binder_annot A) : binder_annot B :=
   {| binder_name := f b.(binder_name); binder_relevance := b.(binder_relevance) |}.
+
+Definition cmp_binder_annot {A B} cmp_rel (b : binder_annot A) (b' : binder_annot B) : Prop :=
+  cmp_rel b.(binder_relevance) b'.(binder_relevance).
 
 Definition eq_binder_annot {A B} (b : binder_annot A) (b' : binder_annot B) : Prop :=
   b.(binder_relevance) = b'.(binder_relevance).
@@ -274,9 +307,13 @@ Definition print_def {A} (f : A -> string) (g : A -> string) (def : def A) :=
   string_of_name (binder_name (dname def)) ^ " { struct " ^ string_of_nat (rarg def) ^ " }" ^
                  " : " ^ f (dtype def) ^ " := " ^ nl ^ g (dbody def).
 
+Definition map_def_gen {A B} (anamef : aname -> aname) (tyf bodyf : A -> B) (d : def A) :=
+  {| dname := anamef d.(dname);
+    dtype := tyf d.(dtype);
+    dbody := bodyf d.(dbody);
+    rarg := d.(rarg) |}.
 
-Definition map_def {A B} (tyf bodyf : A -> B) (d : def A) :=
-  {| dname := d.(dname); dtype := tyf d.(dtype); dbody := bodyf d.(dbody); rarg := d.(rarg) |}.
+Notation map_def := (map_def_gen (fun x => x)).
 
 Lemma map_dtype {A B} (f : A -> B) (g : A -> B) (d : def A) :
   f (dtype d) = dtype (map_def f g d).
@@ -407,10 +444,13 @@ Notation j_vdef na b ty := (TermTypRel b ty na.(binder_relevance)).
 Notation j_decl d := (TermoptTypRel (decl_body d) (decl_type d) (decl_name d).(binder_relevance)).
 Notation j_decl_s d s := (Judge (decl_body d) (decl_type d) s (Some (decl_name d).(binder_relevance))).
 
-Definition map_decl {term term'} (f : term -> term') (d : context_decl term) : context_decl term' :=
-  {| decl_name := d.(decl_name);
-     decl_body := option_map f d.(decl_body);
-     decl_type := f d.(decl_type) |}.
+Definition map_decl_gen {term term'} (fname : aname -> aname) (f : term -> term')
+  (d : context_decl term) : context_decl term' :=
+  {| decl_name := fname d.(decl_name);
+    decl_body := option_map f d.(decl_body);
+    decl_type := f d.(decl_type) |}.
+
+Definition map_decl {term term'} := (@map_decl_gen term term' (fun x => x)).
 
 Lemma compose_map_decl {term term' term''} (g : term -> term') (f : term' -> term'') x :
   map_decl f (map_decl g x) = map_decl (f ∘ g) x.
@@ -420,7 +460,7 @@ Qed.
 
 Lemma map_decl_ext {term term'} (f g : term -> term') x : (forall x, f x = g x) -> map_decl f x = map_decl g x.
 Proof.
-  intros H; destruct x as [? [?|] ?]; rewrite /map_decl /=; f_equal; auto.
+  intros H; destruct x as [? [?|] ?]; rewrite /map_decl /=; cbv[map_decl_gen]; cbn; f_equal; auto.
   now rewrite (H t).
 Qed.
 
@@ -431,7 +471,7 @@ Qed.
 
 #[global] Instance map_decl_pointwise {term term'} : Proper (`=1` ==> `=1`) (@map_decl term term').
 Proof. intros f g Hfg x. rewrite /map_decl.
-  destruct x => /=. f_equal.
+  destruct x => /=. cbv[map_decl_gen]. cbn. f_equal.
   - now rewrite Hfg.
   - apply Hfg.
 Qed.

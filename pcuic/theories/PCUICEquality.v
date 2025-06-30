@@ -432,6 +432,16 @@ Definition eq_mfixpoint (eq_term : term -> term -> Type) mfix mfix' :=
   ) mfix mfix'.
 
 
+Definition cmp_rel cmp_qual r r' :=
+  match r, r' with
+  | Relevant, Relevant | Irrelevant, Irrelevant => True
+  | RelevanceVar q, RelevanceVar q' => cmp_qual (Quality.qVar q) (Quality.qVar q')
+  | (Relevant | Irrelevant | RelevanceVar _), _ => False
+  end.
+
+Definition cmp_binder_annot {A} cmp_qual (b b' : binder_annot A) : Prop :=
+  cmp_rel cmp_qual b.(binder_relevance) b'.(binder_relevance).
+
 (** ** Syntactic ws_cumul_pb up-to universes
   We don't look at printing annotations *)
 
@@ -479,19 +489,19 @@ Inductive eq_term_upto_univ_napp Σ
     Σ ⊢ tConstruct i k u <==[ pb , napp ] tConstruct i k u'
 
 | eq_Lambda : forall na na' ty ty' t t',
-    eq_binder_annot na na' ->
+    cmp_binder_annot (cmp_quality Conv) na na' ->
     Σ ⊢ ty <==[ Conv , 0 ] ty' ->
     Σ ⊢ t <==[ Conv , 0 ] t' ->
     Σ ⊢ tLambda na ty t <==[ pb , napp ] tLambda na' ty' t'
 
 | eq_Prod : forall na na' a a' b b',
-    eq_binder_annot na na' ->
+    cmp_binder_annot (cmp_quality Conv) na na' ->
     Σ ⊢ a <==[ Conv , 0 ] a' ->
     Σ ⊢ b <==[ pb , 0 ] b' ->
     Σ ⊢ tProd na a b <==[ pb , napp ] tProd na' a' b'
 
 | eq_LetIn : forall na na' t t' ty ty' u u',
-    eq_binder_annot na na' ->
+    cmp_binder_annot (cmp_quality Conv) na na' ->
     Σ ⊢ t <==[ Conv , 0 ] t' ->
     Σ ⊢ ty <==[ Conv , 0 ] ty' ->
     Σ ⊢ u <==[ Conv , 0 ] u' ->
@@ -809,6 +819,19 @@ Proof.
   apply All2_same. intuition auto; try reflexivity.
 Qed.
 
+#[global]
+Polymorphic Instance cmp_rel_refl cmp_quality :
+  RelationClasses.Reflexive cmp_quality -> Reflexive (cmp_rel cmp_quality).
+Proof.
+  intros refl_quality r. destruct r; cbnr.
+Qed.
+
+#[global]
+Polymorphic Instance cmp_binder_annot_refl {A} cmp_quality :
+  RelationClasses.Reflexive cmp_quality -> Reflexive (@cmp_binder_annot A cmp_quality).
+Proof.
+  intros refl_quality b. destruct b. cbv[cmp_binder_annot]. now apply cmp_rel_refl.
+Qed.
 
 #[global]
 Polymorphic Instance eq_term_upto_univ_refl Σ cmp_quality cmp_universe cmp_sort pb napp :
@@ -824,6 +847,7 @@ Proof.
   all: simpl.
   all: try constructor. all: eauto.
   all: try reflexivity.
+  all: try now apply cmp_binder_annot_refl.
   all: try solve [eapply All_All2 ; eauto].
   - unfold eq_predicate. solve_all.
     2,3: reflexivity.
@@ -866,6 +890,22 @@ Proof.
 Qed.
 
 #[global]
+Polymorphic Instance cmp_rel_sym cmp_quality :
+  RelationClasses.Symmetric cmp_quality -> Symmetric (cmp_rel cmp_quality).
+Proof.
+  intros sym_quality r r'. destruct r, r'; cbnr.
+  all: try tauto.
+  apply sym_quality.
+Qed.
+
+#[global]
+Polymorphic Instance cmp_binder_annot_sym {A} cmp_quality :
+  RelationClasses.Symmetric cmp_quality -> Symmetric (@cmp_binder_annot A cmp_quality).
+Proof.
+  intros sym_quality b1 b2. destruct b1, b2. cbv[cmp_binder_annot]. now apply cmp_rel_sym.
+Qed.
+
+#[global]
 Polymorphic Instance eq_term_upto_univ_sym Σ cmp_quality cmp_universe cmp_sort pb napp :
   RelationClasses.Symmetric (cmp_quality Conv) ->
   RelationClasses.Symmetric (cmp_universe Conv) ->
@@ -881,7 +921,8 @@ Proof.
   all: try solve [
     econstructor ; eauto ;
     try eapply Forall2_symP ; eauto ; easy
-  ].
+         ].
+  2-4: econstructor; eauto; apply cmp_binder_annot_sym; eauto.
   - econstructor.
     apply All2_sym. solve_all.
   - solve_all. destruct e as (r & ? & eq & ?).
@@ -946,6 +987,22 @@ Proof.
 Qed.
 
 #[global]
+Polymorphic Instance cmp_rel_trans cmp_quality :
+  RelationClasses.Transitive cmp_quality -> Transitive (cmp_rel cmp_quality).
+Proof.
+  intros trans_quality r1 r2 r3. destruct r1, r2, r3; auto.
+  all: try (intros; now cbn).
+Qed.
+
+#[global]
+Polymorphic Instance cmp_binder_annot_trans {A} cmp_quality :
+  RelationClasses.Transitive cmp_quality -> Transitive (@cmp_binder_annot A cmp_quality).
+Proof.
+  intros trans_quality b1 b2 b3. destruct b1, b2, b3. cbv[cmp_binder_annot].
+  now apply cmp_rel_trans.
+Qed.
+
+#[global]
 Polymorphic Instance eq_term_upto_univ_trans Σ cmp_quality cmp_universe cmp_sort pb napp :
   RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb) ->
   RelationClasses.Transitive (cmp_quality Conv) ->
@@ -964,7 +1021,8 @@ Proof.
   all: try solve [
     dependent destruction e2 ; econstructor ; eauto ;
     try now etransitivity
-  ].
+         ].
+  2-4: dependent destruction e2; econstructor; eauto; eapply cmp_binder_annot_trans; eauto.
   - dependent destruction e2.
     econstructor.
     eapply All2_All_mix_left in X as h; eauto.
@@ -1214,6 +1272,22 @@ Proof.
 Qed.
 
 #[global]
+Polymorphic Instance cmp_rel_subrel cmp_quality cmp_quality' :
+  RelationClasses.subrelation cmp_quality cmp_quality' ->
+  subrelation (cmp_rel cmp_quality) (cmp_rel cmp_quality').
+Proof.
+  intros subrel_quality r1 r2. destruct r1, r2; auto. cbn. apply subrel_quality.
+Qed.
+
+#[global]
+Polymorphic Instance cmp_binder_annot_subrel {A} cmp_quality cmp_quality' :
+  RelationClasses.subrelation cmp_quality cmp_quality' ->
+  subrelation (@cmp_binder_annot A cmp_quality) (@cmp_binder_annot A cmp_quality').
+Proof.
+  intros subrel_quality b1 b2. destruct b1, b2. cbv[cmp_binder_annot]. now apply cmp_rel_subrel.
+Qed.
+
+#[global]
 Instance eq_term_upto_univ_impl Σ cmp_quality cmp_quality' cmp_universe cmp_universe' cmp_sort cmp_sort' pb pb' napp napp' :
   RelationClasses.subrelation (cmp_quality Conv) (cmp_quality' Conv) ->
   RelationClasses.subrelation (cmp_universe Conv) (cmp_universe' Conv) ->
@@ -1230,6 +1304,9 @@ Proof.
   - inversion 1; subst; constructor.
     eapply All2_impl'; tea.
     eapply All_impl; eauto.
+  - inversion 1; subst; constructor; eauto. eapply cmp_binder_annot_subrel in H3; eauto.
+  - inversion 1; subst; constructor; eauto. eapply cmp_binder_annot_subrel in H3; eauto.
+  - inversion 1; subst; constructor; eauto. eapply cmp_binder_annot_subrel in H4; eauto.
   - inversion 1; subst; constructor.
     eapply IHt1. 4:eauto. all:auto with arith. eauto.
   - inversion 1; subst; constructor.
@@ -1266,6 +1343,9 @@ Proof.
   - inversion 1; subst; constructor.
     eapply All2_impl'; tea.
     eapply All_impl; eauto.
+  - inversion 1; subst; constructor; eauto. eapply cmp_binder_annot_subrel in H3; eauto.
+  - inversion 1; subst; constructor; eauto. eapply cmp_binder_annot_subrel in H3; eauto.
+  - inversion 1; subst; constructor; eauto. eapply cmp_binder_annot_subrel in H4; eauto.
   - inversion 1; subst; constructor.
     eapply cmp_global_instance_empty_impl. 2:eauto. all:eauto.
   - inversion 1; subst; constructor.
@@ -1821,16 +1901,19 @@ Proof.
 Qed.
 
 Lemma eq_term_upto_univ_it_mkLambda_or_LetIn Σ cmp_quality cmp_universe cmp_sort pb :
+  RelationClasses.Reflexive (cmp_quality Conv) ->
   RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb) ->
   RelationClasses.subrelation (cmp_sort Conv) (cmp_sort pb) ->
   Proper (eq_context_upto Σ cmp_quality cmp_universe cmp_sort Conv ==> eq_term_upto_univ Σ cmp_quality cmp_universe cmp_sort Conv ==> eq_term_upto_univ Σ cmp_quality cmp_universe cmp_sort pb) it_mkLambda_or_LetIn.
 Proof.
-  intros ?? Γ Δ eq u v h.
+  intros ??? Γ Δ eq u v h.
   induction eq in u, v, h |- *.
   - cbn.
     eapply eq_term_upto_univ_leq; trea.
   - simpl. cbn. apply IHeq => //.
-    destruct p; cbn; constructor ; tas; try reflexivity.
+    destruct p; cbn; constructor ; tas.
+    all: destruct na, na'; cbv in eqna; rewrite eqna; cbv [cmp_binder_annot];
+      eapply cmp_rel_refl; eauto.
 Qed.
 
 Lemma eq_term_upto_univ_it_mkLambda_or_LetIn_r Σ cmp_quality cmp_universe cmp_sort Γ :
@@ -1845,8 +1928,10 @@ Proof.
   - assumption.
   - simpl. cbn. apply ih. constructor ; try apply eq_term_upto_univ_refl.
     all: auto.
+    apply cmp_binder_annot_refl; auto.
   - simpl. cbn. apply ih. constructor ; try apply eq_term_upto_univ_refl.
     all: auto.
+    apply cmp_binder_annot_refl; auto.
 Qed.
 
 Lemma eq_term_it_mkLambda_or_LetIn {cf:checker_flags} Σ φ Γ :
@@ -1868,8 +1953,10 @@ Proof.
   - assumption.
   - simpl. cbn. apply ih. constructor ; try apply eq_term_upto_univ_refl.
     all: auto.
+    apply cmp_binder_annot_refl; auto.
   - simpl. cbn. apply ih. constructor ; try apply eq_term_upto_univ_refl.
     all: auto.
+    apply cmp_binder_annot_refl; auto.
 Qed.
 
 Lemma eq_term_it_mkProd_or_LetIn {cf:checker_flags} Σ φ Γ:
@@ -2030,6 +2117,21 @@ Proof.
   - eapply cmp_universe_instance_variance_flip; eauto.
 Qed.
 
+Lemma flip_cmp_rel cmp_quality cmp_quality' :
+  RelationClasses.subrelation cmp_quality (flip cmp_quality') ->
+  subrelation (cmp_rel cmp_quality) (flip (cmp_rel cmp_quality')).
+Proof.
+  intros subrel_quality r1 r2. destruct r1, r2; auto.
+  cbn; apply subrel_quality.
+Qed.
+
+Lemma flip_cmp_binder_annot {A} cmp_quality cmp_quality' :
+  RelationClasses.subrelation cmp_quality (flip cmp_quality') ->
+  subrelation (@cmp_binder_annot A cmp_quality) (flip (@cmp_binder_annot A cmp_quality')).
+Proof.
+  intros subrel_quality b1 b2. destruct b1, b2. cbv[cmp_binder_annot]. now apply flip_cmp_rel.
+Qed.
+
 Lemma eq_term_upto_univ_napp_flip Σ cmp_quality cmp_quality' cmp_universe cmp_universe' cmp_sort cmp_sort' pb pb' napp u v :
   RelationClasses.subrelation (cmp_quality Conv) (flip (cmp_quality' Conv)) ->
   RelationClasses.subrelation (cmp_universe Conv) (flip (cmp_universe' Conv)) ->
@@ -2047,6 +2149,9 @@ Proof.
     eapply All2_sym, All2_impl'; tea.
     eapply All_impl; eauto.
   - inversion 1; subst; constructor. now eapply sort_sub_pb.
+  - inversion 1; subst; constructor; eauto. eapply flip_cmp_binder_annot in H3; eauto.
+  - inversion 1; subst; constructor; eauto. eapply flip_cmp_binder_annot in H3; eauto.
+  - inversion 1; subst; constructor; eauto. eapply flip_cmp_binder_annot in H4; eauto.
   - inversion 1; subst; constructor.
     eapply cmp_global_instance_flip. 3:eauto. all:eauto.
   - inversion 1; subst; constructor.
@@ -2130,23 +2235,23 @@ Proof.
   split; intro; eapply Forall2_impl; tea; apply Hfg.
 Qed.
 
-Lemma eq_annots_subst_instance_ctx (Γ : list aname) u (Δ : context) :
-  eq_annots Γ Δ@[u] <-> eq_annots Γ Δ.
-Proof.
-  etransitivity. eapply Forall2_map_right.
-  eapply Forall2_ext; auto.
-  intros x y; reflexivity.
-Qed.
+(* Lemma eq_annots_subst_instance_ctx (Γ : list aname) u (Δ : context) : *)
+(*   eq_annots Γ Δ@[u] <-> eq_annots Γ Δ. *)
+(* Proof. *)
+(*   etransitivity. eapply Forall2_map_right. *)
+(*   eapply Forall2_ext; auto. *)
+(*   intros x y; reflexivity. *)
+(* Qed. *)
 
-Lemma eq_annots_inst_case_context (Γ : list aname) pars puinst (ctx : context) :
-  eq_annots Γ ctx <->
-  eq_annots Γ (PCUICCases.inst_case_context pars puinst ctx).
-Proof.
-  etransitivity. symmetry; eapply (eq_annots_subst_instance_ctx _ puinst).
-  etransitivity.
-  symmetry; eapply (eq_annots_subst_context _ (List.rev pars) 0).
-  reflexivity.
-Qed.
+(* Lemma eq_annots_inst_case_context (Γ : list aname) pars puinst (ctx : context) : *)
+(*   eq_annots Γ ctx <-> *)
+(*   eq_annots Γ (PCUICCases.inst_case_context pars puinst ctx). *)
+(* Proof. *)
+(*   etransitivity. symmetry; eapply (eq_annots_subst_instance_ctx _ puinst). *)
+(*   etransitivity. *)
+(*   symmetry; eapply (eq_annots_subst_context _ (List.rev pars) 0). *)
+(*   reflexivity. *)
+(* Qed. *)
 
 Lemma eq_context_gen_map2_set_binder_name cmp_term cmp_term' pb pb' pctx pctx' Γ Δ :
   eq_context_gen cmp_term pb pctx pctx' ->

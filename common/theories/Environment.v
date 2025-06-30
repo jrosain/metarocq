@@ -204,11 +204,17 @@ Module Environment (T : Term).
   Definition subst_telescope s k (Γ : context) : context :=
     mapi (fun k' decl => map_decl (subst s (k' + k)) decl) Γ.
 
-  Global Instance subst_instance_decl : UnivSubst context_decl
-    := map_decl ∘ subst_instance.
+  #[global] Instance subst_instance_opt {A : Type} `{UnivSubst A} : UnivSubst (option A)
+    := fun u t => match t with
+               | Some t => Some (subst_instance u t)
+               | None => None
+               end.
+
+  #[global] Instance subst_instance_decl : UnivSubst context_decl
+    := fun u => map_decl_gen (subst_instance u) (subst_instance u).
 
   Global Instance subst_instance_context : UnivSubst context
-    := map_context ∘ subst_instance.
+    := fun u => map (subst_instance u).
 
   Lemma subst_instance_length u (ctx : context)
     : #|subst_instance u ctx| = #|ctx|.
@@ -1199,7 +1205,10 @@ Module Environment (T : Term).
   Lemma context_assumptions_subst_instance u Γ :
     context_assumptions (subst_instance u Γ) =
     context_assumptions Γ.
-  Proof. apply context_assumptions_map. Qed.
+  Proof.
+    induction Γ; auto; cbn.
+    destruct (decl_body a); cbn; auto.
+  Qed.
 
   Lemma context_assumptions_subst_context s k Γ :
     context_assumptions (subst_context s k Γ) =
