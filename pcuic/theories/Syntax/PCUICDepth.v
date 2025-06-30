@@ -187,17 +187,17 @@ Proof.
   - specialize (IHt k). lia.
   - rewrite /mfixpoint_depth_gen. generalize #|m|.
     induction X in k |- *; simpl; auto; try lia.
-    destruct p. intros n'.
+    destruct p, p. intros n'.
     rewrite {1 3}/def_depth_gen /=.
-    specialize (l0 k).
-    specialize (l1 (n' + k)). simpl in l1.
+    specialize (l0 (n' + k)).
+    specialize (l1 k). simpl in l1.
     specialize (IHX k n'). lia.
   - rewrite /mfixpoint_depth_gen. generalize #|m|.
     induction X in k |- *; simpl; auto; try lia.
-    destruct p. intros n'.
+    destruct p, p. intros n'.
     rewrite {1 3}/def_depth_gen /=.
-    specialize (l0 k).
-    specialize (l1 (n' + k)). simpl in l1.
+    specialize (l0 (n' + k)).
+    specialize (l1 k). simpl in l1.
     specialize (IHX k n'). lia.
   - destruct p as [? []]; cbn in X; cbn; eauto; try lia.
     destruct X as [? []]. specialize (l k); specialize (l0 k).
@@ -428,11 +428,13 @@ Proof.
         intros. apply auxbr. simpl. lia.
   - eapply X12; try (apply aux; red; simpl; lia).
     apply auxΓ => //. simpl. specialize (H mfix). lia.
-    red. apply All_pair. split; apply auxl; simpl; auto.
+    red. apply All_pair. split. apply All_pair. split. apply All_True.
+    all: apply auxl; simpl; auto.
 
   - eapply X13; try (apply aux; red; simpl; lia).
     apply auxΓ => //. simpl. specialize (H mfix). lia.
-    red. apply All_pair. split; apply auxl; simpl; auto.
+    red. apply All_pair. split. apply All_pair. split. apply All_True.
+    all: apply auxl; simpl; auto.
 
   - eapply X14.
     destruct prim as [? []]; cbn => //.
@@ -553,11 +555,13 @@ Proof.
         intros. apply auxbr. simpl. lia.
   - eapply X12; try (apply aux; red; simpl; lia).
     apply auxΓ => //. simpl. specialize (H mfix). lia.
-    red. apply All_pair. split; apply auxl; simpl; auto.
+    red. apply All_pair. split. apply All_pair. split. apply All_True.
+    all: apply auxl; simpl; auto.
 
   - eapply X13; try (apply aux; red; simpl; lia).
     apply auxΓ => //. simpl. specialize (H mfix). lia.
-    red. apply All_pair. split; apply auxl; simpl; auto.
+    red. apply All_pair. split. apply All_pair. split. apply All_True.
+    all: apply auxl; simpl; auto.
 
   - eapply X14; cbn. destruct prim as [? []]; cbn => //.
     do 2 (split; [eapply aux; cbn; lia|]).

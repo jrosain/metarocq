@@ -80,11 +80,11 @@ Proof.
   * revert mfix.
     fix auxm 1.
     destruct mfix; constructor; [|apply auxm].
-    split; apply auxt.
+    repeat split; apply auxt.
   * revert mfix.
     fix auxm 1.
     destruct mfix; constructor; [|apply auxm].
-    split; apply auxt.
+    repeat split; apply auxt.
 
   * destruct prim. destruct p; cbn; intuition auto.
     destruct a. cbn.
@@ -336,7 +336,7 @@ Proof.
       hnf in *; cbn in *. lia.
   - eapply X12; [apply auxt; hnf; cbn; lia.. | ]. rename mfix into l.
     revert l auxt. unfold MR; cbn. fix auxt' 1.
-    destruct l; constructor. split.
+    destruct l; constructor. repeat split.
     apply auxt. hnf; cbn. unfold def_size. lia.
     apply auxt. hnf; cbn. unfold def_size. lia.
     apply auxt'. intros. apply auxt.
@@ -344,7 +344,7 @@ Proof.
 
   - eapply X13; [apply auxt; hnf; cbn; lia.. | ]. rename mfix into l.
     revert l auxt. unfold MR; cbn. fix auxt' 1.
-    destruct l; constructor. split.
+    destruct l; constructor. repeat split.
     apply auxt. hnf; cbn. unfold def_size. lia.
     apply auxt. hnf; cbn. unfold def_size. lia.
     apply auxt'. intros. apply auxt.
@@ -569,11 +569,15 @@ Proof.
         intros. apply auxbr. simpl. lia.
   - eapply X12; try (apply aux; red; simpl; lia).
     apply auxΓ => //. simpl. specialize (H mfix). lia.
-    red. apply All_pair. split; apply auxl; simpl; auto.
+    red. apply All_pair. split. apply All_pair; split.
+    apply All_True.
+    all: apply auxl; simpl; auto.
 
   - eapply X13; try (apply aux; red; simpl; lia).
     apply auxΓ => //. simpl. specialize (H mfix). lia.
-    red. apply All_pair. split; apply auxl; simpl; auto.
+    red. apply All_pair. split. apply All_pair. split.
+    apply All_True.
+    all: apply auxl; simpl; auto.
 
   - eapply X14.
     destruct prim. destruct p; cbn; intuition auto; destruct a; cbn in *.
@@ -658,10 +662,12 @@ Proof.
       apply IHhh1. intros. apply aux. lia.
 
   * eapply X12; try (apply aux; red; simpl; lia).
-    red. apply All_pair. split; apply auxl; simpl; auto.
+    red. apply All_pair. split. apply All_pair. split. apply All_True.
+    all: apply auxl; simpl; auto.
 
   * eapply X13; try (apply aux; red; simpl; lia).
-    red. apply All_pair. split; apply auxl; simpl; auto.
+    red. apply All_pair. split. apply All_pair. split. apply All_True.
+    all: apply auxl; simpl; auto.
 
   * eapply X14.
     destruct hh, p; cbn; intuition auto.

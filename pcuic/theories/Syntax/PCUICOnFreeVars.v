@@ -372,9 +372,9 @@ Proof.
     solve_all.
     f_equal; solve_all.
     len. now rewrite !shiftnP_strengthenP.
-  - unfold test_def in *. simpl; intros ? [].
+  - unfold test_def in *. simpl; intros ? [[]].
     len; rewrite shiftnP_strengthenP. f_equal; eauto.
-  - unfold test_def in *. simpl; intros ? [].
+  - unfold test_def in *. simpl; intros ? [[]].
     len; rewrite shiftnP_strengthenP. f_equal; eauto.
   - solve_all.
 Qed.
@@ -1459,7 +1459,7 @@ Proof.
     fix auxm 1.
     destruct mfix; [constructor|].
     move=> n /= /andP[] /andP[] clb clty clmfix; constructor.
-    * split => //; apply auxt => //.
+    * repeat split => //; apply auxt => //.
     * now apply auxm.
 
   - red. len; solve_all;
@@ -1473,7 +1473,7 @@ Proof.
     fix auxm 1.
     destruct mfix; [constructor|].
     move=> n /= /andP[] /andP[] clb clty clmfix; constructor.
-    * split => //; apply auxt => //.
+    * repeat split => //; apply auxt => //.
     * now apply auxm.
 
   - destruct prim as [? []]; cbn => //. cbn in clt.

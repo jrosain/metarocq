@@ -232,7 +232,7 @@ Proof.
   - destruct (eqb_spec n idx); t'.
     case: (reflect_prop_list (l := m) (l' := mfix)); t'.
     red in X.
-    { eapply All_impl; tea; cbv beta. intros []; cbn; intros [] []; cbn.
+    { eapply All_impl; tea; cbv beta. intros []; cbn; intros [[]] []; cbn.
       destruct (r dtype0); t'.
       destruct (r0 dbody0); t'.
       destruct (eqb_spec rarg rarg0); t'.
@@ -240,7 +240,7 @@ Proof.
   - destruct (eqb_spec n idx); t'.
     case: (reflect_prop_list (l := m) (l' := mfix)); t'.
     red in X.
-    { eapply All_impl; tea; cbv beta. intros []; cbn; intros [] []; cbn.
+    { eapply All_impl; tea; cbv beta. intros []; cbn; intros [[]] []; cbn.
       destruct (r dtype0); t'.
       destruct (r0 dbody0); t'.
       destruct (eqb_spec rarg rarg0); t'.

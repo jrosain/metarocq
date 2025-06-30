@@ -1704,18 +1704,14 @@ Proof.
   - f_equal.
     red in X.
     eapply All_map_eq. eapply (All_impl X).
-    intros x [IH IH'].
-    apply map_def_eq_spec.
+    intros x [IH IH']. cbv[subst_instance_def map_def_gen]. f_equal; cbn.
     * apply IH.
-    * specialize (IH' (#|m| + k)).
-      sigma.
-      now rewrite - !up_Upn up_up !up_Upn.
+    * specialize (IH' (#|m| + k)). sigma. now rewrite - !up_Upn up_up !up_Upn.
   - f_equal.
     autorewrite with len.
     red in X.
     eapply All_map_eq. eapply (All_impl X).
-    intros x [IH IH'].
-    apply map_def_eq_spec.
+    intros x [IH IH']. cbv[subst_instance_def map_def_gen]. f_equal; cbn.
     * apply IH.
     * specialize (IH' (#|m| + k)). sigma.
       now rewrite - !up_Upn up_up !up_Upn.
@@ -1812,7 +1808,7 @@ Proof.
   rewrite subst_context_alt !lift_context_alt.
   rewrite mapi_compose.
   apply mapi_ext; len.
-  intros n' [? [?|] ?]; unfold lift_decl, subst_decl, map_decl; simpl.
+  intros n' [? [?|] ?]; unfold lift_decl, subst_decl, map_decl; cbv [map_decl_gen]; simpl.
   * intros. now rewrite !Nat.add_succ_r !subst_reli_lift_id //.
   * f_equal. now rewrite !Nat.add_succ_r !subst_reli_lift_id //.
 Qed.
@@ -1873,8 +1869,8 @@ Definition expand_lets_k_ctx_decl Γ k Δ d :
 Proof.
   rewrite /expand_lets_k_ctx lift_context_app subst_context_app /=; simpl.
   unfold app_context. simpl.
-  rewrite /subst_context /fold_context_k /=.
-  f_equal. rewrite compose_map_decl. f_equal.
+  rewrite /subst_context /fold_context_k /fold_context_gen_k /=.
+  f_equal. rewrite compose_map_decl_gen. f_equal.
 Qed.
 
 Lemma expand_lets_nil t : expand_lets [] t = t.
@@ -2091,12 +2087,12 @@ Proof.
   rewrite !subst_context_alt !mapi_compose.
   apply mapi_ext => i x.
   destruct x as [na [b|] ty] => //.
-  - rewrite /subst_decl /map_decl /=; f_equal.
+  - rewrite /subst_decl /map_decl /=; cbv[map_decl_gen]; cbn; f_equal.
     + rewrite !mapi_length. f_equal.
       now rewrite subst_app_decomp.
     + rewrite mapi_length.
       now rewrite subst_app_decomp.
-  - rewrite /subst_decl /map_decl /=; f_equal.
+  - rewrite /subst_decl /map_decl /=; cbv[map_decl_gen]; cbn; f_equal.
     rewrite !mapi_length. now rewrite subst_app_decomp.
 Qed.
 

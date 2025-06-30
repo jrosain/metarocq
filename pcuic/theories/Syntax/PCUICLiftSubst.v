@@ -408,7 +408,7 @@ Lemma map_vass_map_def g l n k :
          (mapi (fun i (d : def term) => vass (dname d) (lift0 i (dtype d))) l).
 Proof.
   rewrite mapi_mapi mapi_map. apply mapi_ext.
-  intros. unfold map_decl, vass; simpl; f_equal.
+  intros. unfold map_decl, vass; simpl; cbv[map_decl_gen]; f_equal.
   rewrite -> permute_lift. f_equal; lia. lia.
 Qed.
 
@@ -417,17 +417,20 @@ Definition fix_context_gen k mfix :=
 
 Lemma lift_decl0 k d : map_decl (lift 0 k) d = d.
 Proof.
-  destruct d; destruct decl_body; unfold map_decl; simpl;
+  destruct d; destruct decl_body; unfold map_decl; simpl; cbv[map_decl_gen]; cbn;
   f_equal; now rewrite ?lift0_id.
 Qed.
 
+Lemma lift_decl0_gen k d : map_decl_gen id(lift 0 k) d = d.
+Proof. apply lift_decl0. Qed.
+
 Lemma lift0_context k Γ : lift_context 0 k Γ = Γ.
 Proof.
-  unfold lift_context, fold_context_k.
+  unfold lift_context, fold_context_k, fold_context_gen_k.
   rewrite rev_mapi. rewrite List.rev_involutive.
   unfold mapi. generalize 0 at 2. generalize #|List.rev Γ|.
   induction Γ; intros; simpl; trivial.
-  rewrite lift_decl0; f_equal; auto.
+  rewrite lift_decl0_gen; f_equal; auto.
 Qed.
 
 Lemma lift_context_length n k Γ : #|lift_context n k Γ| = #|Γ|.
@@ -457,7 +460,7 @@ Qed.
 Lemma lift_context_app n k Γ Δ :
   lift_context n k (Γ ,,, Δ) = lift_context n k Γ ,,, lift_context n (#|Γ| + k) Δ.
 Proof.
-  unfold lift_context, fold_context_k, app_context.
+  unfold lift_context, fold_context_k, fold_context_gen_k, app_context.
   rewrite List.rev_app_distr.
   rewrite mapi_app. rewrite <- List.rev_app_distr. f_equal. f_equal.
   apply mapi_ext. intros. f_equal. rewrite List.length_rev. f_equal. lia.
@@ -564,17 +567,20 @@ Hint Rewrite subst_context_snoc : subst.
 Lemma subst_decl0 k d : map_decl (subst [] k) d = d.
 Proof.
   destruct d; destruct decl_body;
-    unfold subst_decl, map_decl; simpl in *;
+    unfold subst_decl, map_decl; simpl in *; cbv[map_decl_gen];
     f_equal; simpl; rewrite subst_empty; intuition trivial.
 Qed.
 
+Lemma subst_decl0_gen k d : map_decl_gen id (subst [] k) d = d.
+Proof. apply subst_decl0. Qed.
+
 Lemma subst0_context k Γ : subst_context [] k Γ = Γ.
 Proof.
-  unfold subst_context, fold_context_k.
+  unfold subst_context, fold_context_k, fold_context_gen_k.
   rewrite rev_mapi. rewrite List.rev_involutive.
   unfold mapi. generalize 0. generalize #|List.rev Γ|.
   induction Γ; intros; simpl; trivial.
-  erewrite subst_decl0; f_equal; eauto.
+  erewrite subst_decl0_gen; f_equal; eauto.
 Qed.
 
 Lemma subst_context_snoc0 s Γ d : subst_context s 0 (Γ ,, d) = subst_context s 0 Γ ,, subst_decl s #|Γ| d.
@@ -587,7 +593,7 @@ Hint Rewrite subst_context_snoc : subst.
 Lemma subst_context_app s k Γ Δ :
   subst_context s k (Γ ,,, Δ) = subst_context s k Γ ,,, subst_context s (#|Γ| + k) Δ.
 Proof.
-  unfold subst_context, fold_context_k, app_context.
+  unfold subst_context, fold_context_k, fold_context_gen_k, app_context.
   rewrite List.rev_app_distr.
   rewrite mapi_app. rewrite <- List.rev_app_distr. f_equal. f_equal.
   apply mapi_ext. intros. f_equal. rewrite List.length_rev. f_equal. lia.
@@ -727,7 +733,7 @@ Proof.
   rewrite !subst_context_alt !mapi_compose.
   apply mapi_ext => i x.
   destruct x as [na [b|] ty] => //.
-  - rewrite /subst_decl /map_decl /=; f_equal.
+  - rewrite /subst_decl /map_decl /=; cbv[map_decl_gen]; cbn; f_equal.
     + rewrite !mapi_length. f_equal. rewrite {2}Nat.add_0_r.
       rewrite subst_app_simpl.
       rewrite distr_subst_rec. rewrite Nat.add_0_r; f_equal; try lia.
@@ -737,7 +743,7 @@ Proof.
       rewrite {2}Nat.add_0_r.
       rewrite distr_subst_rec. rewrite Nat.add_0_r; f_equal; try lia.
       rewrite length_map. f_equal; lia.
-  - rewrite /subst_decl /map_decl /=; f_equal.
+  - rewrite /subst_decl /map_decl /=; cbv[map_decl_gen]; cbn; f_equal.
     rewrite !mapi_length. rewrite {2}Nat.add_0_r.
     rewrite subst_app_simpl.
     rewrite distr_subst_rec. rewrite Nat.add_0_r; f_equal; try lia.
@@ -753,7 +759,7 @@ Hint Rewrite context_assumptions_subst : pcuic.
 Lemma subst_app_context s s' Γ : subst_context (s ++ s') 0 Γ = subst_context s 0 (subst_context s' #|s| Γ).
 Proof.
   induction Γ; simpl; auto.
-  rewrite !subst_context_snoc /= /subst_decl /map_decl /=. simpl.
+  rewrite !subst_context_snoc /= /subst_decl /map_decl /=; cbv[map_decl_gen]; simpl.
   rewrite IHΓ. f_equal. f_equal.
   - destruct a as [na [b|] ty]; simpl; auto.
     f_equal. rewrite subst_context_length Nat.add_0_r.
@@ -888,6 +894,3 @@ Qed.
 
 Lemma expand_lets_k_nil k t : expand_lets_k [] k t = t.
 Proof. by rewrite /expand_lets_k /= subst_empty lift0_id. Qed.
-
-
-

@@ -49,7 +49,7 @@ Proof.
       |- _ P ?arg =>
       revert arg; fix aux_arg 1; intro arg;
         destruct arg; constructor; [|apply aux_arg];
-          try split; apply auxt
+          try repeat split; apply auxt
     end].
   destruct type_info; split; cbn; [|now auto].
   revert pparams; fix aux_pparams 1.

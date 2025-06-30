@@ -93,6 +93,7 @@ Ltac solve_all_one :=
     apply map_def_id_spec ||
     apply map_branch_eq_spec ||
     apply map_branch_id_spec ||
+    apply mfix_gen_id_spec ||
     (eapply All_forallb_eq_forallb; [eassumption|]) ||
     (eapply mapi_context_eqP_test_id_spec; [eassumption|eassumption|]) ||
     (eapply mapi_context_eqP_spec; [eassumption|]) ||

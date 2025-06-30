@@ -407,6 +407,10 @@ Fixpoint noccur_between k n (t : term) : bool :=
   implement universe polymorphism. *)
 
 #[global]
+Instance subst_instance_def {A} `(UnivSubst A) : UnivSubst (def A)
+  := fun u => map_def_gen (subst_instance u) (subst_instance u) (subst_instance u).
+
+#[global]
 Instance subst_instance_constr : UnivSubst term :=
   fix subst_instance_constr u c {struct c} : term :=
   match c with
@@ -416,21 +420,23 @@ Instance subst_instance_constr : UnivSubst term :=
   | tConst c u' => tConst c (subst_instance_instance u u')
   | tInd i u' => tInd i (subst_instance_instance u u')
   | tConstruct ind k u' => tConstruct ind k (subst_instance_instance u u')
-  | tLambda na T M => tLambda na (subst_instance_constr u T) (subst_instance_constr u M)
+  | tLambda na T M =>
+      tLambda (subst_instance_aname u na) (subst_instance_constr u T) (subst_instance_constr u M)
   | tApp f v => tApp (subst_instance_constr u f) (subst_instance_constr u v)
-  | tProd na A B => tProd na (subst_instance_constr u A) (subst_instance_constr u B)
-  | tLetIn na b ty b' => tLetIn na (subst_instance_constr u b) (subst_instance_constr u ty)
-                                (subst_instance_constr u b')
+  | tProd na A B =>
+      tProd (subst_instance_aname u na) (subst_instance_constr u A) (subst_instance_constr u B)
+  | tLetIn na b ty b' => tLetIn (subst_instance_aname u na) (subst_instance_constr u b)
+                          (subst_instance_constr u ty) (subst_instance_constr u b')
   | tCase ind p c brs =>
     let p' := map_predicate (subst_instance_instance u) (subst_instance_constr u) (subst_instance_constr u) id p in
     let brs' := List.map (map_branch (subst_instance_constr u) id) brs in
     tCase ind p' (subst_instance_constr u c) brs'
   | tProj p c => tProj p (subst_instance_constr u c)
   | tFix mfix idx =>
-    let mfix' := List.map (map_def (subst_instance_constr u) (subst_instance_constr u)) mfix in
+    let mfix' := List.map (subst_instance_def subst_instance_constr u) mfix in
     tFix mfix' idx
   | tCoFix mfix idx =>
-    let mfix' := List.map (map_def (subst_instance_constr u) (subst_instance_constr u)) mfix in
+    let mfix' := List.map (subst_instance_def subst_instance_constr u) mfix in
     tCoFix mfix' idx
   | tPrim p => tPrim (mapu_prim (subst_instance_level u) (subst_instance_constr u) p)
   end.
@@ -462,24 +468,24 @@ Fixpoint closedu (k : nat) (t : term) : bool :=
 
 Fixpoint closedq (k : nat) (t : term) : bool :=
   match t with
-  | tSort s => true
+  | tSort s => closedq_sort k s
   | tInd _ u => closed_instance_qualities k u
   | tConstruct _ _ u => closed_instance_qualities k u
   | tConst _ u => closed_instance_qualities k u
   | tRel i => true
   | tEvar ev args => forallb (closedq k) args
-  | tLambda _ T M | tProd _ T M => closedq k T && closedq k M
+  | tLambda na T M | tProd na T M => closedq_aname k na && closedq k T && closedq k M
   | tApp u v => closedq k u && closedq k v
-  | tLetIn na b t b' => closedq k b && closedq k t && closedq k b'
+  | tLetIn na b t b' => closedq_aname k na && closedq k b && closedq k t && closedq k b'
   | tCase ind p c brs =>
     let p' := test_predicate_kq closed_instance_qualities closedq k p in
     let brs' := forallb (test_branch (closedq #|Instance.qualities p.(puinst)|) (closedq k)) brs in
     p' && closedq k c && brs'
   | tProj p c => closedq k c
   | tFix mfix idx =>
-    forallb (test_def (closedq k) (closedq k)) mfix
+    forallb (test_def_gen (closedq_aname k) (closedq k) (closedq k)) mfix
   | tCoFix mfix idx =>
-    forallb (test_def (closedq k) (closedq k)) mfix
+    forallb (test_def_gen (closedq_aname k) (closedq k) (closedq k)) mfix
   | tPrim p => test_primq (closedq_quality k) (closedq k) p
   | _ => true
   end.
@@ -672,7 +678,7 @@ Lemma map_decl_id_spec P f d :
 Proof.
   intros Hc Hf.
   destruct Hc.
-  unfold map_decl; destruct d; cbn in *. f_equal; eauto.
+  unfold map_decl; destruct d; cbn in *. cbv[map_decl_gen]; f_equal; eauto.
   destruct decl_body; simpl; eauto. f_equal.
   eauto.
 Qed.
@@ -686,7 +692,7 @@ Proof.
   intros [].
   unfold map_decl; destruct d; cbn in *.
   unfold test_decl; simpl.
-  intros [pty pbody]%andb_and. intros Hx.
+  intros [pty pbody]%andb_and. intros Hx. cbv[map_decl_gen].
   f_equal; eauto.
   destruct decl_body; simpl; eauto. f_equal.
   eauto.
@@ -882,7 +888,7 @@ Lemma map_decl_eq_spec {A B} {P : A -> Type} {d} {f g : A -> B} :
   map_decl f d = map_decl g d.
 Proof.
   destruct d; cbn; intros [Pty Pbod] Hfg.
-  unfold map_decl; cbn in *; f_equal.
+  unfold map_decl; cbn in *; cbv[map_decl_gen]; f_equal.
   * destruct decl_body; cbn in *; eauto. f_equal.
     eauto.
   * eauto.
@@ -1161,7 +1167,7 @@ Lemma map_decl_eqP_spec {A B} {P : A -> Type} {p : A -> bool}
   map_decl f d = map_decl g d.
 Proof.
   destruct d; cbn; intros [Pty Pbod] [pty pbody]%andb_and Hfg.
-  unfold map_decl; cbn in *; f_equal.
+  unfold map_decl; cbn in *; cbv[map_decl_gen]; f_equal.
   * destruct decl_body; cbn in *; eauto. f_equal.
     eauto.
   * eauto.
@@ -1188,7 +1194,7 @@ Proof.
   intros Ha Hfg. induction Ha; simpl; auto.
   rewrite IHHa; f_equal.
   destruct p as [Hty Hbody].
-  unfold map_decl; destruct x ; cbn in *; f_equal.
+  unfold map_decl; destruct x ; cbn in *; cbv[map_decl_gen]; f_equal.
   * destruct decl_body; cbn in *; auto.
     f_equal. eauto.
   * eauto.
@@ -1202,7 +1208,7 @@ Proof.
   intros Ha Hfg. induction Ha; simpl; auto.
   rewrite IHHa; f_equal.
   destruct p as [Hty Hbody].
-  unfold map_decl; destruct x ; cbn in *; f_equal.
+  unfold map_decl; destruct x ; cbn in *;  cbv[map_decl_gen]; f_equal.
   * destruct decl_body; cbn in *; auto.
     f_equal. eauto.
   * eauto.
@@ -1220,7 +1226,7 @@ Proof.
   intros [hl [hty hbod]%andb_and]%andb_and.
   rewrite IHHa; auto; f_equal.
   destruct p0 as [Hty Hbody].
-  unfold map_decl; destruct x ; cbn in *; f_equal; eauto.
+  unfold map_decl; destruct x ; cbn in *; cbv[map_decl_gen]; f_equal; eauto.
   destruct decl_body; cbn in *; auto.
   f_equal. unfold shiftf. eapply Hfg; auto.
 Qed.
@@ -1348,6 +1354,24 @@ Proof.
   - apply H1.
   - eapply H0; eauto. apply Hbr.
     now move/andb_and: hb => [].
+Qed.
+
+Lemma def_gen_id_spec (f : aname -> aname) (g h : term -> term) (t : def term) :
+  (f t.(dname) = t.(dname)) ->
+  (g t.(dtype) = t.(dtype)) ->
+  (h t.(dbody) = t.(dbody)) ->
+  map_def_gen f g h t = t.
+Proof.
+  intros hname htype hbody.
+  destruct t; cbv; now f_equal.
+Qed.
+
+Lemma mfix_gen_id_spec (f : aname -> aname) (g h : term -> term) (mfix : mfixpoint term) :
+  tFixProp_gen (fun x => f x = x) (fun x => g x = x) (fun x => h x = x) mfix ->
+  map (map_def_gen f g h) mfix = mfix.
+Proof.
+  intros. induction X; auto; cbn; f_equal; auto.
+  apply def_gen_id_spec; now repeat destruct p.
 Qed.
 
 Lemma test_context_map (p : term -> bool) f (ctx : context) :

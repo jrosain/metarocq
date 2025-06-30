@@ -132,15 +132,22 @@ Module PrintTermTree.
     print_list (print_def (print_term Γ true) (print_term (fresh_names Σ Γ ctx') true))
                (nl ^ " with ") defs.
   Definition print_sort (s : sort) :=
+    let print_univ l := MRString.string_of_list string_of_level_expr (LevelExprSet.elements l) in
+    let print_var qv :=
+          match qv with
+          | QVar.Var n => MRString.string_of_nat n
+          end in
     match s with
     | sProp => "Prop"
     | sSProp => "SProp"
     | sType l =>
       if with_universes then
-        ("Type(" ++
-           MRString.string_of_list string_of_level_expr (LevelExprSet.elements l) ++
-          ")")%bs
-       else "Type"
+        ("Type(" ++ print_univ l ++ ")")%bs
+      else "Type"
+    | sQVar qv l =>
+        if with_universes then
+          ("QSort(" ++ print_var qv ++ "," ++ print_univ l ++ ")")%bs
+        else "QSort"
     end.
 
   (* TODO: SPROP: we ignore relevance on printing, maybe add print config? *)

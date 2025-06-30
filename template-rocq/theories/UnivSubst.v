@@ -39,7 +39,7 @@ Lemma subst_instance_it_mkProd_or_LetIn u ctx t :
 Proof.
   induction ctx in u, t |- *; simpl; try congruence.
   rewrite IHctx. unfold mkProd_or_LetIn; cbn. f_equal.
-  destruct (decl_body a); eauto.
+  destruct (decl_body a); auto.
 Qed.
 
 Lemma subst_instance_length u ctx
@@ -82,9 +82,9 @@ Proof.
   unfold subst_instance; cbn.
   induction t in |- * using term_forall_list_ind; simpl; auto; intros Hu Hq;
     rewrite -> ?map_map_compose, ?compose_on_snd, ?compose_map_def, ?length_map,
-               ?map_predicate_map_predicate, ?map_branch_map_branch;
+    ?map_predicate_map_predicate, ?map_branch_map_branch;
     try f_equal; eauto with substu; unfold test_def, test_predicate in *;
-      try solve [f_equal; eauto; repeat (rtoProp; solve_all; eauto with substu)].
+    try solve [f_equal; eauto; repeat (rtoProp; solve_all; eauto with substu)].
 Qed.
 
 Lemma subst_instance_closedu (u : Instance.t) (Hcl : closed_instance_universes 0 u) t :
@@ -106,5 +106,5 @@ Proof.
                ?map_predicate_map_predicate;
     try f_equal; auto with substu;
       unfold test_def, test_predicate in *; simpl;
-      try solve [f_equal; eauto; repeat (rtoProp; solve_all); intuition auto with substu].
+    try solve [f_equal; eauto; repeat (rtoProp; solve_all); intuition auto with substu].
 Qed.

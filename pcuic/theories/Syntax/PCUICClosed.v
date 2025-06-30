@@ -11,7 +11,7 @@ From Equations Require Import Equations.
 
 Lemma lift_decl_closed n k d : closed_decl k d -> lift_decl n k d = d.
 Proof.
-  case: d => na [body|] ty; rewrite /test_decl /lift_decl /map_decl /=; unf_term.
+  case: d => na [body|] ty; rewrite /test_decl /lift_decl /map_decl /map_decl_gen /=; unf_term.
   - move/andP => [cb cty]. now rewrite !lift_closed //.
   - move=> cty; now rewrite !lift_closed //.
 Qed.
@@ -29,12 +29,12 @@ Lemma alli_fold_context_k (p : nat -> context_decl -> bool) ctx f :
   fold_context_k f ctx = ctx.
 Proof.
   intros Hf.
-  rewrite /fold_context_k /mapi.
+  rewrite /fold_context_k /fold_context_gen_k /mapi.
   generalize 0.
   induction ctx using rev_ind; simpl; intros n; auto.
   rewrite List.rev_app_distr /=.
   move/andP=> [] Hc Hd.
-  rewrite Hf //; len. f_equal.
+  rewrite -map_decl_def Hf //; len. f_equal.
   now apply IHctx.
 Qed.
 
@@ -74,7 +74,7 @@ Lemma map_decl_closed_ext (f : term -> term) g k (d : context_decl) : closed_dec
   map_decl f d = map_decl g d.
 Proof.
   destruct d as [? [?|] ?] => /= cl Hfg;
-  unfold map_decl; simpl; f_equal.
+  unfold map_decl, map_decl_gen; simpl; f_equal.
   rewrite Hfg => //. unfold closed_decl in cl.
   simpl in cl. now move/andP: cl => [].
   move/andP: cl => [cl cl']. now rewrite Hfg.
@@ -214,12 +214,12 @@ Proof.
       now rewrite Nat.add_assoc (Nat.add_comm k) in e.
     * specialize (b (#|bcontext x| + k')).
       now rewrite Nat.add_assoc (Nat.add_comm k) in b.
-  - rewrite a //.
+  - rewrite b0 //.
     specialize (b (#|m| + k')).
     rewrite Nat.add_assoc in b.
     rewrite (Nat.add_comm k #|m|) in b.
     rewrite b //.
-  - rewrite a //.
+  - rewrite b0 //.
     specialize (b (#|m| + k')).
     rewrite Nat.add_assoc in b.
     rewrite (Nat.add_comm k #|m|) in b.
@@ -264,11 +264,11 @@ Proof.
     * specialize (b0 (#|bcontext x| + k')).
       rewrite Nat.add_assoc (Nat.add_comm k) in b0.
       simpl in H2. len in H2. rewrite !Nat.add_assoc in H2. eauto.
-  - move/andP: b => [hty hbod]. rewrite a0 //.
+  - move/andP: b => [hty hbod]. rewrite b1 //.
     specialize (b0 (#|m| + k')).
     rewrite Nat.add_assoc (Nat.add_comm k #|m|) in b0.
     rewrite b0 //. now autorewrite with len in hbod.
-  - move/andP: b => [hty hbod]. rewrite a0 //.
+  - move/andP: b => [hty hbod]. rewrite b1 //.
     specialize (b0 (#|m| + k')).
     rewrite Nat.add_assoc (Nat.add_comm k #|m|) in b0.
     rewrite b0 //. now autorewrite with len in hbod.
@@ -646,21 +646,20 @@ Proof.
     rewrite !subst_context_alt !mapi_compose.
     apply mapi_ext=> n' x.
     destruct x as [na' [b'|] ty']; simpl.
-    * rewrite !mapi_length /subst_decl /= /map_decl /=; f_equal.
+    * rewrite !mapi_length /subst_decl /= /map_decl /map_decl_gen /=; f_equal.
       + rewrite Nat.add_0_r distr_subst_rec. simpl. lia_f_equal.
       + rewrite Nat.add_0_r distr_subst_rec; simpl. lia_f_equal.
-    * rewrite !mapi_length /subst_decl /= /map_decl /=; f_equal.
+    * rewrite !mapi_length /subst_decl /= /map_decl /map_decl_gen /=; f_equal.
       rewrite Nat.add_0_r distr_subst_rec /=. lia_f_equal.
   - rewrite -IHΓ.
-    rewrite subst_context_snoc /= // /subst_decl /map_decl /=.
+    rewrite subst_context_snoc /= // /subst_decl /map_decl /map_decl_gen /=.
     f_equal.
     rewrite subst_context_app. simpl.
     rewrite /app_context. f_equal.
     + lia_f_equal.
-    + rewrite /subst_context // /fold_context_k /= /map_decl /=.
+    + rewrite /subst_context // /fold_context_k /fold_context_gen_k /= /map_decl /map_decl_gen /=.
       lia_f_equal.
 Qed.
-
 
 Lemma smash_context_app_def Γ na b ty :
   smash_context [] (Γ ++ [{| decl_name := na; decl_body := Some b; decl_type := ty |}]) =
@@ -682,7 +681,7 @@ Lemma lift_context_add k k' n Γ : lift_context (k + k') n Γ = lift_context k n
 Proof.
   induction Γ => //.
   rewrite !lift_context_snoc IHΓ; f_equal.
-  destruct a as [na [b|] ty]; rewrite /lift_decl /map_decl /=; simpl; f_equal;
+  destruct a as [na [b|] ty]; rewrite /lift_decl /map_decl /map_decl_gen /=; simpl; f_equal;
   len; rewrite simpl_lift //; try lia.
 Qed.
 
@@ -850,4 +849,3 @@ Lemma closed_ctx_app Γ Δ :
 Proof.
   rewrite PCUICClosed.test_context_k_app=> /andP [//].
 Qed.
-

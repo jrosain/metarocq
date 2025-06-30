@@ -43,6 +43,8 @@ Proof.
   induction c in k |- * using term_forall_list_ind; simpl; auto;
     autorewrite with map;
     try solve [f_equal; eauto; solve_all; eauto].
+  all: rewrite /subst_instance_def /map_def; f_equal; solve_all; eauto.
+  all: cbv[map_def_gen]; cbn; solve_all.
 Qed.
 
 Lemma subst_instance_mkApps u f a :
@@ -81,11 +83,15 @@ Proof.
     autorewrite with map;
     try solve [f_equal; eauto; solve_all; eauto].
 
-  elim (Nat.leb k n); auto.
-  rewrite nth_error_map.
-  destruct (nth_error s (n - k)). simpl.
-  now rewrite [subst_instance_constr _ _]subst_instance_lift.
-  reflexivity.
+  - elim (Nat.leb k n); auto.
+    rewrite nth_error_map.
+    destruct (nth_error s (n - k)). simpl.
+    now rewrite [subst_instance_constr _ _]subst_instance_lift.
+    reflexivity.
+  - cbv [subst_instance_def]. f_equal. solve_all.
+    cbv [map_def_gen]; cbn. now f_equal.
+  - cbv [subst_instance_def]. f_equal. solve_all.
+    cbv [map_def_gen]; cbn. now f_equal.
 Qed.
 
 Lemma map_subst_instance_to_extended_list_k u ctx k :
@@ -96,13 +102,40 @@ Proof.
   solve_all. now destruct H as [n [-> _]].
 Qed.
 
+Lemma closed_subst_def_name u (d : def term) :
+  test_def_gen (closedq_aname 0) (closedq 0) (closedq 0) d ->
+  subst_instance u d.(dname) = d.(dname).
+Proof.
+  unfold test_def_gen; intros; rtoProp; now apply closedq_aname_subst_instance.
+Qed.
+
+Lemma closed_subst_def_type u (d : def term) :
+  test_def_gen (closedq_aname 0) (closedq 0) (closedq 0) d ->
+  (closedq 0 d.(dtype) -> subst_instance_constr u d.(dtype) = d.(dtype)) ->
+  subst_instance u d.(dtype) = d.(dtype).
+Proof.
+  unfold test_def_gen; intros; rtoProp. auto.
+Qed.
+
+Lemma closed_subst_def_body u (d : def term) :
+  test_def_gen (closedq_aname 0) (closedq 0) (closedq 0) d ->
+  (closedq 0 d.(dbody) -> subst_instance_constr u d.(dbody) = d.(dbody)) ->
+  subst_instance u d.(dbody) = d.(dbody).
+Proof.
+  unfold test_def_gen; intros; rtoProp. auto.
+Qed.
+
+#[global]
+Hint Resolve closed_subst_def_name closed_subst_def_type closed_subst_def_body : substu.
+
 Lemma closed_subst_instance u t
   : closedu 0 t -> closedq 0 t -> subst_instance u t = t.
 Proof.
   unfold subst_instance; cbn.
   induction t in |- * using term_forall_list_ind; simpl; auto; intros Hu Hq;
     autorewrite with map;
-    try f_equal; eauto with substu; unfold test_predicate_ku, test_predicate_kq, test_branch, test_def in *;
+    try f_equal; eauto with substu;
+    unfold test_predicate_ku, test_predicate_kq, test_branch, test_def in *;
     try solve [f_equal; eauto; repeat (rtoProp; solve_all); eauto with substu].
 Qed.
 
