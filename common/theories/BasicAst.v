@@ -11,7 +11,38 @@ Inductive name : Set :=
 | nNamed (_ : ident).
 Derive NoConfusion EqDec for name.
 
-Inductive relevance : Set := Relevant | Irrelevant.
+Module Type SVAR.
+  Parameter t : Set.
+  Parameter eqb : t -> t -> bool.
+  Parameter reflect_eq : ReflectEq t.
+  Parameter eq_dec : EqDec t.
+  Parameter lt : t -> t -> Prop.
+  Parameter lt_strorder : StrictOrder lt.
+  Parameter lt_compat : Proper (eq ==> eq ==> iff) lt.
+  Parameter compare : t -> t -> comparison.
+  Parameter compare_spec :
+    forall x y : t, CompareSpec (x = y) (lt x y) (lt y x) (compare x y).
+  Parameter to_string : t -> string.
+  Parameter unrepr : t -> nat.
+End SVAR.
+
+Module SVar : SVAR.
+  Definition t := nat.
+
+  Definition eqb := Nat.eqb.
+  Instance reflect_eq : ReflectEq t := ltac:(tc).
+  Instance eq_dec : EqDec t := ltac:(tc).
+  Definition lt := Nat.lt.
+  Instance lt_strorder : StrictOrder lt := ltac:(tc).
+  Instance lt_compat : Proper (eq ==> eq ==> iff) lt := ltac:(tc).
+  Definition compare := Nat.compare.
+  Definition compare_spec := Nat.compare_spec.
+  Definition to_string := string_of_nat.
+  Definition unrepr (x : t) := x.
+End SVar.
+Existing Instances SVar.reflect_eq SVar.eq_dec SVar.lt_strorder SVar.lt_compat.
+
+Inductive relevance : Set := Relevant | Irrelevant | RelevanceVar (x : SVar.t).
 Derive NoConfusion EqDec for relevance.
 
 (** Binders annotated with relevance *)
@@ -52,6 +83,7 @@ Definition string_of_relevance (r : relevance) :=
   match r with
   | Relevant => "Relevant"
   | Irrelevant => "Irrelevant"
+  | RelevanceVar x => "RelevanceVar(" ^ SVar.to_string x ^ ")"
   end.
 
 (** The kind of a cast *)

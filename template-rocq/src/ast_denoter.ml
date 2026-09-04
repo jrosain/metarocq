@@ -17,6 +17,7 @@ struct
   type quoted_bool = bool
   type quoted_name = name
   type quoted_aname = name binder_annot
+  type quoted_qvar = BasicAst.SVar.t
   type quoted_relevance = relevance
   type quoted_sort = Universes0.Sort.t
   type quoted_cast_kind = cast_kind
@@ -135,10 +136,16 @@ struct
     let s = unquote_string qi in
     Id.of_string s
 
+  let unquote_int (q: quoted_int) : int = Caml_nat.caml_int_of_nat q
+
+  let unquote_qvar (x : quoted_qvar) : Sorts.QVar.t =
+    Sorts.QVar.make_var (unquote_int (BasicAst.SVar.unrepr x))
+
   let unquote_relevance (r : relevance) : Sorts.relevance =
     match r with
     | BasicAst.Relevant -> Sorts.Relevant
     | BasicAst.Irrelevant -> Sorts.Irrelevant
+    | BasicAst.RelevanceVar x -> Sorts.RelevanceVar (unquote_qvar x)
 
   let unquote_name (q: quoted_name) : Name.t =
     match q with
@@ -148,8 +155,6 @@ struct
   let unquote_aname (q: quoted_aname) : Name.t Constr.binder_annot =
     {Context.binder_name = unquote_name q.binder_name;
      Context.binder_relevance = unquote_relevance q.binder_relevance}
-
-  let unquote_int (q: quoted_int) : int = Caml_nat.caml_int_of_nat q
 
   let unquote_evar env evm n l =
     let id = Evar.unsafe_of_int (unquote_int n) in

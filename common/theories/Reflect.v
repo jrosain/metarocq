@@ -88,6 +88,7 @@ Definition eq_relevance r r' :=
   match r, r' with
   | Relevant, Relevant => true
   | Irrelevant, Irrelevant => true
+  | RelevanceVar x, RelevanceVar y => x == y
   | _, _ => false
   end.
 
@@ -95,11 +96,9 @@ Definition eq_relevance r r' :=
   eqb := eq_relevance
 }.
 Next Obligation.
-  intros x y. destruct x, y.
-  - cbn. constructor. reflexivity.
-  - cbn. constructor. discriminate.
-  - cbn. constructor. discriminate.
-  - simpl. now constructor.
+  intros x y. destruct x, y; cbn.
+  1-8: constructor; easy.
+  destruct (QVar.reflect_eq.(eqb_spec) x x0); constructor; easy.
 Qed.
 
 Definition eq_aname (na nb : binder_annot name) :=
