@@ -2,7 +2,7 @@
 (* For primitive integers and floats  *)
 From Stdlib Require Numbers.Cyclic.Int63.Uint63 Floats.PrimFloat Floats.FloatAxioms.
 From MetaRocq.Utils Require Import utils.
-From MetaRocq.Common Require Import BasicAst Universes Kernames.
+From MetaRocq.Common Require Import BasicAst Universes Levels Kernames.
 From Stdlib Require Import ssreflect.
 From Equations Require Import Equations.
 
@@ -404,7 +404,7 @@ Definition eqb_sorts_decl x y :=
   | _, _ => false
   end.
 
-#[global,program] Instance reflect_universes_decl : ReflectEq universes_decl :=
+#[global,program] Instance reflect_universes_decl : ReflectEq ulvls_decl :=
  {| eqb := eqb_sorts_decl |}.
  Next Obligation.
    unfold eqb_sorts_decl.

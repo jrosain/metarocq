@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool ssrfun Morphisms Setoid.
 From MetaRocq.Utils Require Import utils.
-From MetaRocq.Common Require Import BasicAst Primitive Universes.
+From MetaRocq.Common Require Import BasicAst Primitive Universes Sorts Levels.
 From Equations.Prop Require Import Classes EqDecInstances.
 
 Ltac Tauto.intuition_solver ::= auto with *.
@@ -11,7 +11,7 @@ Module Type Term.
   Parameter Inline term : Type.
 
   Parameter Inline tRel : nat -> term.
-  Parameter Inline tSort : Sort.t -> term.
+  Parameter Inline tUniv : Universe.t -> term.
   Parameter Inline tProd : aname -> term -> term -> term.
   Parameter Inline tLambda : aname -> term -> term -> term.
   Parameter Inline tLetIn : aname -> term -> term -> term -> term.
@@ -137,7 +137,7 @@ Module Environment (T : Term).
   Import T.
   #[global] Existing Instance subst_instance_constr.
 
-  Definition judgment := judgment_ Sort.t term.
+  Definition judgment := judgment_ Universe.t term.
 
   (** ** Declarations *)
   Notation context_decl := (context_decl term).
@@ -372,9 +372,9 @@ Module Environment (T : Term).
         `ind_params |- ind_indices`. *)
     ind_indices : context;
     (** Sort of the inductive. *)
-    ind_sort : Sort.t;
+    ind_univ : Universe.t;
     (** Full type of the inductive. This should be equal to
-        `forall ind_params ind_indices, tSort ind_sort` *)
+        `forall ind_params ind_indices, tUniv ind_univ` *)
     ind_type : term;
     (** Allowed eliminations for the inductive. *)
     ind_kelim : allowed_eliminations;
@@ -408,9 +408,9 @@ Module Environment (T : Term).
     ind_bodies : list one_inductive_body ;
     (** Whether the mutual inductive is universe monomorphic or universe polymorphic,
         and information about the local universes if polymorphic. *)
-    ind_universes : universes_decl;
+    ind_ulvls : ulvls_decl;
     (** Variance information. `None` when non-cumulative. *)
-    ind_variance : option (list Universes.Variance.t) }.
+    ind_variance : option (list Levels.Variance.t) }.
 
   (** Data associated to a constant (definition, lemma or axiom). *)
   Record constant_body := {
@@ -420,14 +420,14 @@ Module Environment (T : Term).
     cst_body : option term;
     (** Whether the constant is universe monomorphic or polymorphic, and if polymorphic
         information about its local universes. *)
-    cst_universes : universes_decl;
+    cst_ulvls : ulvls_decl;
     (** Proof relevance of this constant. *)
     cst_relevance : relevance }.
 
   Definition map_constant_body f decl :=
     {| cst_type := f decl.(cst_type);
        cst_body := option_map f decl.(cst_body);
-       cst_universes := decl.(cst_universes);
+       cst_ulvls := decl.(cst_ulvls);
        cst_relevance := decl.(cst_relevance) |}.
 
   Lemma map_cst_type f decl :
@@ -447,28 +447,28 @@ Module Environment (T : Term).
   Definition global_declarations := list (kername * global_decl).
 
   Record global_env := mk_global_env
-    { universes : ContextSet.t;
+    { ulvls : ContextSet.t;
       declarations : global_declarations;
       retroknowledge : Retroknowledge.t }.
 
-  Coercion universes : global_env >-> ContextSet.t.
+  Coercion ulvls : global_env >-> ContextSet.t.
 
   Definition empty_global_env :=
-    {| universes := ContextSet.empty;
+    {| ulvls := ContextSet.empty;
        declarations := [];
        retroknowledge := Retroknowledge.empty |}.
 
   Definition add_global_decl Σ decl :=
-    {| universes := Σ.(universes);
+    {| ulvls := Σ.(ulvls);
        declarations := decl :: Σ.(declarations);
        retroknowledge := Σ.(retroknowledge) |}.
 
-  Lemma eta_global_env Σ : Σ = {| universes := Σ.(universes); declarations := Σ.(declarations);
+  Lemma eta_global_env Σ : Σ = {| ulvls := Σ.(ulvls); declarations := Σ.(declarations);
     retroknowledge := Σ.(retroknowledge) |}.
   Proof. now destruct Σ. Qed.
 
   Definition set_declarations Σ decls :=
-    {| universes := Σ.(universes);
+    {| ulvls := Σ.(ulvls);
        declarations := decls;
        retroknowledge := Σ.(retroknowledge) |}.
 
@@ -536,22 +536,22 @@ Module Environment (T : Term).
     := (strictly_extends_decls_part_globals Σ.(declarations) Σ'.(declarations))
          (only parsing).
   Definition extends (Σ Σ' : global_env) :=
-    [× Σ.(universes) ⊂_cs Σ'.(universes),
+    [× Σ.(ulvls) ⊂_cs Σ'.(ulvls),
       extends_decls_part Σ Σ' &
       Retroknowledge.extends Σ.(retroknowledge) Σ'.(retroknowledge)].
 
   Definition extends_decls (Σ Σ' : global_env) :=
-    [× Σ.(universes) = Σ'.(universes),
+    [× Σ.(ulvls) = Σ'.(ulvls),
       extends_decls_part Σ Σ' &
       Σ.(retroknowledge) = Σ'.(retroknowledge)].
 
   Definition extends_strictly_on_decls (Σ Σ' : global_env) :=
-    [× Σ.(universes) ⊂_cs Σ'.(universes),
+    [× Σ.(ulvls) ⊂_cs Σ'.(ulvls),
       strictly_extends_decls_part Σ Σ' &
       Retroknowledge.extends Σ.(retroknowledge) Σ'.(retroknowledge)].
 
   Definition strictly_extends_decls (Σ Σ' : global_env) :=
-    [× Σ.(universes) = Σ'.(universes),
+    [× Σ.(ulvls) = Σ'.(ulvls),
       strictly_extends_decls_part Σ Σ' &
       Σ.(retroknowledge) = Σ'.(retroknowledge)].
 
@@ -788,7 +788,7 @@ Module Environment (T : Term).
        List.filter (fun '(kn, _) => negb (KernameSet.mem kn known_kns)) Σ' ++ Σ.
 
   Definition merge_global_envs (Σ Σ' : global_env) : global_env
-    := {| universes := ContextSet.union Σ.(universes) Σ'.(universes)
+    := {| ulvls := ContextSet.union Σ.(ulvls) Σ'.(ulvls)
        ; declarations := merge_globals Σ.(declarations) Σ'.(declarations)
        ; retroknowledge := Retroknowledge.merge Σ.(retroknowledge) Σ'.(retroknowledge) |}.
 
@@ -905,18 +905,18 @@ Module Environment (T : Term).
   Definition primitive_invariants (p : prim_tag) (cdecl : constant_body) :=
     match p with
     | primInt | primFloat | primString =>
-     [/\ cdecl.(cst_type) = tSort Sort.type0, cdecl.(cst_body) = None &
-          cdecl.(cst_universes) = Monomorphic_ctx]
+     [/\ cdecl.(cst_type) = tUniv Universe.type0, cdecl.(cst_body) = None &
+          cdecl.(cst_ulvls) = Monomorphic_ctx]
     | primArray =>
-      let s := sType (Universe.make' (Level.lvar 0)) in
-      [/\ cdecl.(cst_type) = tImpl (tSort s) (tSort s), cdecl.(cst_body) = None &
-        cdecl.(cst_universes) = Polymorphic_ctx array_uctx]
+      let s := Universe.mk sType (UnivLvl.make' (Level.lvar 0)) in
+      [/\ cdecl.(cst_type) = tImpl (tUniv s) (tUniv s), cdecl.(cst_body) = None &
+        cdecl.(cst_ulvls) = Polymorphic_ctx array_uctx]
     end.
 
   (** A context of global declarations + global universe constraints,
       i.e. a global environment *)
 
-  Definition global_env_ext : Type := global_env * universes_decl.
+  Definition global_env_ext : Type := global_env * ulvls_decl.
 
   (** Use a coercion for this common projection of the global context. *)
   Definition fst_ctx : global_env_ext -> global_env := fst.
@@ -1306,7 +1306,7 @@ End EnvironmentDecideReflectInstances.
 Module Type TermUtils (T: Term) (E: EnvironmentSig T).
   Import T E.
 
-  Parameter Inline destArity : context -> term -> option (context × Sort.t).
+  Parameter Inline destArity : context -> term -> option (context × Universe.t).
   Parameter Inline inds : kername -> Instance.t -> list one_inductive_body -> list term.
 
 End TermUtils.

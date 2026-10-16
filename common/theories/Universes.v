@@ -15,9 +15,8 @@ Module Universe.
   	  Universes are quotiented at conversion so that every impredicative sorts (e.g., [sSProp] or [sProp])
 	  at level i and j are convertible. *)
   Record t_ {sort} {ulvl} :=
-    mk
-	{ s : sort
-  	; l : ulvl }.
+    mk { s : sort
+  	   ; l : ulvl }.
   Arguments t_ : clear implicits.
   Arguments mk {_ _} _ _.
 
@@ -196,7 +195,7 @@ Module Universe.
 	    by apply irreflexivity in contra.
 	  - intros [s1 l1] [s2 l2] [s3 l3] [hslt | [he hlt]] [hslt' | [he' hlt']]; cbn in *.
 	    + left. etransitivity; eauto.
-		+ left. by rewrite -he'. 
+		+ left. by rewrite -he'.
 		+ left. by rewrite he.
 		+ right; split; cbn.
 		  * congruence.
@@ -207,7 +206,7 @@ Module Universe.
     Proof.
       intros x y e z t e'. hnf in * |- ; subst. reflexivity.
     Qed.
-	
+
     Definition compare (u v : t) : comparison :=
 	  match Sort.compare u.(s) v.(s) with
 	  | Eq => LevelExprSet.compare u.(l) v.(l)
@@ -392,11 +391,11 @@ Section UnivCompare.
     | _, _ => false
     end.
 
-  Definition eq_univ_ {univ} (eq_universe : univ -> univ -> Prop) u u' : Prop :=
+  Definition eq_univ_ {univ} (eq_ulvl : univ -> univ -> Prop) u u' : Prop :=
     match usort u, usort u' with
     | sProp,   sProp
     | sSProp,  sSProp => True
-    | sType, sType => eq_universe (ulvl u) (ulvl u')
+    | sType, sType => eq_ulvl (ulvl u) (ulvl u')
     | _, _ => False
     end.
 
@@ -871,56 +870,49 @@ Qed.
 Section UniverseLemmas.
   Context {cf: checker_flags}.
 
-  Lemma univ_sup_idem s : Universe.sup s s = s.
-  Proof using Type.
-    apply eq_univ'; cbn.
-    intro; rewrite !LevelExprSet.union_spec. intuition.
-  Qed.
-
-  Lemma sup_idem s : Universe.sup s s = s.
+  (* we need to use quotiented equality as Universe.sup uses quotienting *)
+  Lemma univ_sup_idem Φ s : eq_univ Φ (Universe.sup s s) s.
   Proof using Type.
     destruct s as [[| |] l]; cbn; auto.
-    apply f_equal.
-    apply univ_sup_idem.
+    rewrite ulvl_sup_idem; reflexivity.
   Qed.
 
-  Lemma sort_of_product_idem s
-    : Universe.sort_of_product s s = s.
+  Lemma univ_of_product_idem Φ s
+    : eq_univ Φ (Universe.univ_of_product s s) s.
   Proof using Type.
-    unfold Universe.sort_of_product; destruct s; try reflexivity.
-    apply sup_idem.
+    unfold Universe.univ_of_product; destruct s as [[| |] l]; try reflexivity.
+    cbn; rewrite ulvl_sup_idem. reflexivity.
   Qed.
 
-  Lemma univ_sup_assoc s1 s2 s3 :
-    Universe.sup s1 (Universe.sup s2 s3) = Universe.sup (Universe.sup s1 s2) s3.
+  Lemma univ_sup_assoc Φ s1 s2 s3 :
+    eq_univ Φ (Universe.sup s1 (Universe.sup s2 s3)) (Universe.sup (Universe.sup s1 s2) s3).
   Proof using Type.
-    apply eq_univ'; cbn. symmetry; apply LevelExprSetProp.union_assoc.
+    destruct s1 as [[| |] l1], s2 as [[| |] l2], s3 as [[| |] l3]; cbn; try reflexivity.
+    rewrite ulvl_sup_assoc; reflexivity.
   Qed.
 
-  Instance proper_univ_sup_eq_univ φ :
-    Proper (eq_univ φ ==> eq_univ φ ==> eq_univ φ) Universe.sup.
+  Instance proper_ulvl_sup_eq_univ φ :
+    Proper (eq_ulvl φ ==> eq_ulvl φ ==> eq_ulvl φ) UnivLvl.sup.
   Proof using Type.
     intros u1 u1' H1 u2 u2' H2.
     unfold_ulvl_rel.
     rewrite !val_sup. lia.
   Qed.
 
-  Instance proper_sort_sup_eq_sort φ :
-    Proper (eq_sort φ ==> eq_sort φ ==> eq_sort φ) Universe.sup.
+  Instance proper_univ_sup_eq_sort φ :
+    Proper (eq_univ φ ==> eq_univ φ ==> eq_univ φ) Universe.sup.
   Proof using Type.
-    intros [| | u1] [| |u1'] H1 [| |u2] [| |u2'] H2; cbn in *; try absurd; auto.
-    now apply proper_univ_sup_eq_univ.
+    intros [[| |] u1] [[| |] u1'] H1 [[| |] u2] [[| |] u2'] H2; cbn in *; try absurd; auto.
+    now apply proper_ulvl_sup_eq_univ.
   Qed.
 
-  Lemma sort_of_product_twice u s :
-    Universe.sort_of_product u (Universe.sort_of_product u s)
-    = Universe.sort_of_product u s.
+  Lemma sort_of_product_twice Φ u s :
+    eq_univ Φ (Universe.univ_of_product u (Universe.univ_of_product u s)) (Universe.univ_of_product u s).
   Proof using Type.
-    destruct u,s; cbnr.
-    now rewrite univ_sup_assoc univ_sup_idem.
+    destruct u as [[| |] u], s as [[| |] s]; cbnr.
+    rewrite ulvl_sup_assoc ulvl_sup_idem; reflexivity.
   Qed.
 End UniverseLemmas.
-
 
 Section no_prop_leq_type.
   Context {cf: checker_flags}.
@@ -933,10 +925,10 @@ Section no_prop_leq_type.
   Qed.
 
   Lemma spec_map_succ l x :
-    LevelExprSet.In x (Universe.succ l) <->
+    LevelExprSet.In x (UnivLvl.succ l) <->
     exists x', LevelExprSet.In x' l /\ x = LevelExpr.succ x'.
   Proof using Type.
-    rewrite map_spec. reflexivity.
+    rewrite NonEmptySetFacts.map_spec. reflexivity.
   Qed.
 
   Lemma val_succ v l : val v (LevelExpr.succ l) = val v l + 1.
@@ -944,10 +936,10 @@ Section no_prop_leq_type.
     destruct l as []; simpl. cbn. lia.
   Qed.
 
-  Lemma val_map_succ v l : val v (Universe.succ l) = val v l + 1.
+  Lemma val_map_succ v l : val v (UnivLvl.succ l) = val v l + 1.
   Proof using Type.
     pose proof (spec_map_succ l).
-    set (n := Universe.succ l) in *.
+    set (n := UnivLvl.succ l) in *.
     destruct (val_In_max l v) as [max [inmax eqv]]. rewrite <-eqv.
     rewrite val_caract. split.
     intros.
@@ -959,46 +951,44 @@ Section no_prop_leq_type.
     now rewrite val_succ.
   Qed.
 
-  Lemma leq_sort_super s s' :
-    leq_sort ϕ s s' ->
-    leq_sort ϕ (Universe.super s) (Universe.super s').
+  Lemma leq_univ_super s s' :
+    leq_univ ϕ s s' ->
+    leq_univ ϕ (Universe.super s) (Universe.super s').
   Proof using Type.
-    destruct s as [| | u1], s' as [| | u1']; cbnr; try absurd;
+    destruct s as [[| |] u1], s' as [[| |] u1']; cbnr; try absurd;
     intros H; unfold_univ_rel;
     rewrite !val_map_succ; lia.
   Qed.
 
-  Lemma leq_sort_prop_no_prop_sub_type s1 s2 :
+  Lemma leq_univ_prop_no_prop_sub_type s1 s2 :
     prop_sub_type = false ->
-    leq_sort ϕ s1 s2 ->
+    leq_univ ϕ s1 s2 ->
     Universe.is_prop s1 -> Universe.is_prop s2.
   Proof using Type.
     intros ps.
-    destruct s1; cbn; [ | absurd | absurd].
+    destruct s1 as [[| |] u1]; cbn; [ | absurd | absurd].
     rewrite ps.
-    destruct s2; cbn; [ auto | absurd | absurd].
+    destruct s2 as [[| |] u2]; cbn; [ auto | absurd | absurd].
   Qed.
 
-  Hint Resolve leq_sort_prop_no_prop_sub_type : univ_lemmas.
+  Hint Resolve leq_univ_prop_no_prop_sub_type : univ_lemmas.
 
   Lemma leq_prop_is_propositonal {s1 s2} :
     prop_sub_type = false ->
-    leq_sort ϕ s1 s2 ->
+    leq_univ ϕ s1 s2 ->
     Universe.is_propositional s1 <-> Universe.is_propositional s2.
   Proof using Type.
     intros ps.
-    destruct s1, s2; cbn; try absurd; intros H; split; trivial.
+    destruct s1 as [[| |] u1], s2 as [[| |] u2]; cbn; try absurd; intros H; split; trivial.
     now rewrite ps in H.
   Qed.
-
-
 End no_prop_leq_type.
 
 
 (* This level is a hack used in plugings to generate fresh levels *)
 Definition fresh_level : Level.t := Level.level     "__metarocq_fresh_level__".
 (* This universe is a hack used in plugins to generate fresh universes *)
-Definition fresh_universe : Universe.t := Universe.make' fresh_level.
+Definition fresh_universe : UnivLvl.t := UnivLvl.make' fresh_level.
 
 (** * Universe substitution
 
@@ -1037,14 +1027,11 @@ Notation "x @[ u ]" := (subst_instance u x) (at level 3,
             end
           end.
 
-#[global] Instance subst_instance_universe : UnivSubst Universe.t :=
-  fun u => map (subst_instance_level_expr u).
+#[global] Instance subst_instance_univ_lvl : UnivSubst UnivLvl.t :=
+  fun u => NonEmptySetFacts.map (subst_instance_level_expr u).
 
-#[global] Instance subst_instance_sort : UnivSubst Universe.t :=
-  fun u e => match e with
-          | sProp | sSProp => e
-          | sType u' => sType (subst_instance u u')
-          end.
+#[global] Instance subst_instance_univ : UnivSubst Universe.t :=
+  fun u e => Universe.mk (usort e) (subst_instance u (ulvl e)).
 
 Lemma subst_instance_to_family s u :
   Universe.to_family s@[u] = Universe.to_family s.
@@ -1056,23 +1043,22 @@ Qed.
   fun u u' => List.map (subst_instance_level u) u'.
 
 
-Theorem relevance_subst_eq u s : relevance_of_sort (subst_instance_sort u s) = relevance_of_sort s.
+Theorem relevance_subst_eq u s : relevance_of_univ (subst_instance_univ u s) = relevance_of_univ s.
 Proof.
   now destruct s.
 Qed.
 
 Theorem relevance_subst_opt u rel s :
-  isSortRelOpt s rel -> isSortRelOpt (subst_instance_sort u s) rel.
+  isUnivRelOpt s rel -> isUnivRelOpt (subst_instance_univ u s) rel.
 Proof.
   now destruct s.
 Qed.
 
 Theorem relevance_subst u rel s :
-  isSortRel s rel -> isSortRel (subst_instance_sort u s) rel.
+  isUnivRel s rel -> isUnivRel (subst_instance_univ u s) rel.
 Proof.
   now destruct s.
 Qed.
-
 
 (** Tests that the term is closed over [k] universe variables *)
 Section Closedu.
@@ -1087,14 +1073,11 @@ Section Closedu.
   Definition closedu_level_expr (s : LevelExpr.t) :=
     closedu_level (LevelExpr.get_level s).
 
-  Definition closedu_universe (u : Universe.t) :=
+  Definition closedu_univ_lvl (u : UnivLvl.t) :=
     LevelExprSet.for_all closedu_level_expr u.
 
-  Definition closedu_sort (u : Universe.t) :=
-    match u with
-    | sSProp | sProp => true
-    | sType l => closedu_universe l
-    end.
+  Definition closedu_universe (u : Universe.t) :=
+    closedu_univ_lvl (ulvl u).
 
   Definition closedu_instance (u : Instance.t) :=
     forallb closedu_level u.
@@ -1115,23 +1098,30 @@ Section UniverseClosedSubst.
     destruct e as [t b]. destruct t;cbnr. discriminate.
   Qed.
 
-  Lemma closedu_subst_instance_univ u s
-    : closedu_sort 0 s -> subst_instance_sort u s = s.
+  Lemma closedu_subst_instance_univ_lvl i u :
+    closedu_univ_lvl 0 u -> subst_instance_univ_lvl i u = u.
   Proof.
-    intro H.
-    destruct s as [| | t]; cbnr.
-    apply f_equal. apply eq_univ'.
-    destruct t as [ts H1].
+    intro hclosed.
+    apply NonEmptySetFacts.eq_univ'.
+    destruct u as [ts H1].
     unfold closedu_universe in *;cbn in *.
     intro e; split; intro He.
-    - apply map_spec in He. destruct He as [e' [He' X]].
+    - apply NonEmptySetFacts.map_spec in He. destruct He as [e' [He' X]].
       rewrite closedu_subst_instance_level_expr in X.
-      apply LevelExprSet.for_all_spec in H; proper.
-      exact (H _ He').
+      apply LevelExprSet.for_all_spec in hclosed; proper.
+      exact (hclosed _ He').
       now subst.
-    - apply map_spec. exists e; split; tas.
+    - apply NonEmptySetFacts.map_spec. exists e; split; tas.
       symmetry; apply closedu_subst_instance_level_expr.
-      apply LevelExprSet.for_all_spec in H; proper. now apply H.
+      apply LevelExprSet.for_all_spec in hclosed; proper. now apply hclosed.
+  Qed.
+
+  Lemma closedu_subst_instance_univ u s
+    : closedu_universe 0 s -> subst_instance_univ u s = s.
+  Proof.
+    intro hclosed.
+    have e : (ulvl s)@[u] = ulvl s by apply closedu_subst_instance_univ_lvl.
+    unfold subst_instance_univ; destruct s as [[| |] l]; apply f_equal; cbn; auto.
   Qed.
 
   Lemma closedu_subst_instance u t
@@ -1174,18 +1164,24 @@ Section SubstInstanceClosed.
     discriminate.
   Qed.
 
-  Lemma subst_instance_univ_closedu s
-    : closedu_sort #|u| s -> closedu_sort 0 (subst_instance_sort u s).
-  Proof using Hcl.
-    intro H.
-    destruct s as [| |t]; cbnr.
-    destruct t as [l Hl].
+  Lemma subst_instance_ulvl_closedu l
+    : closedu_univ_lvl #|u| l -> closedu_univ_lvl 0 (subst_instance_univ_lvl u l).
+  Proof.
+    intros hclosed.
     apply LevelExprSet.for_all_spec; proper.
-    intros e He. eapply map_spec in He.
+    intros e He. eapply NonEmptySetFacts.map_spec in He.
     destruct He as [e' [He' X]]; subst.
     apply subst_instance_level_expr_closedu.
-    apply LevelExprSet.for_all_spec in H; proper.
-    now apply H.
+    apply LevelExprSet.for_all_spec in hclosed; proper.
+    now apply hclosed.
+  Qed.
+
+  Lemma subst_instance_univ_closedu s
+    : closedu_universe #|u| s -> closedu_universe 0 (subst_instance_univ u s).
+  Proof using Hcl.
+    intro H.
+    destruct s as [[| |] t]; cbnr;
+      apply subst_instance_ulvl_closedu; auto.
   Qed.
 
   Lemma subst_instance_closedu t :
@@ -1213,23 +1209,23 @@ Definition string_of_level_expr (e : LevelExpr.t) : string :=
   let '(l, n) := e in string_of_level l ^ (if n is 0 then "" else "+" ^ string_of_nat n).
 
 Definition string_of_sort (u : Universe.t) :=
-  match u with
+  match usort u with
   | sSProp => "SProp"
   | sProp => "Prop"
-  | sType l => "Type(" ^ string_of_list string_of_level_expr (LevelExprSet.elements l) ^ ")"
+  | sType => "Type(" ^ string_of_list string_of_level_expr (LevelExprSet.elements (ulvl u)) ^ ")"
   end.
 
 Definition string_of_universe_instance u :=
   string_of_list string_of_level u.
 
-Inductive universes_entry :=
+Inductive ulvls_entry :=
 | Monomorphic_entry (ctx : ContextSet.t)
 | Polymorphic_entry (ctx : UContext.t).
-Derive NoConfusion for universes_entry.
+Derive NoConfusion for ulvls_entry.
 
-Definition universes_entry_of_decl (u : universes_decl) : universes_entry :=
+Definition ulvls_entry_of_decl (u : ulvls_decl) : ulvls_entry :=
   match u with
-  | Polymorphic_ctx ctx => Polymorphic_entry (Universes.AUContext.repr ctx)
+  | Polymorphic_ctx ctx => Polymorphic_entry (AUContext.repr ctx)
   | Monomorphic_ctx => Monomorphic_entry ContextSet.empty
   end.
 
