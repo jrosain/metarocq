@@ -666,6 +666,35 @@ Module UnivLvl.
 
   Definition type0 : t := make LevelExpr.set.
   Definition type1 : t := make LevelExpr.type1.
+
+  Lemma equal_exprsets (u v : t) : LevelExprSet.Equal u v <-> u = v.
+  Proof.
+    split; intro H. now apply eq_univ, LevelExprSet.eq_leibniz.
+    now subst.
+  Qed.
+
+  Lemma elim :
+    forall [P : t -> Type],
+      (forall le, P (singleton le)) ->
+      (forall le u, P u -> ~ LevelExprSet.In le u -> P (add le u)) ->
+    forall u , P u.
+  Proof.
+    intros ? hs ha [].
+    revert t_set0 t_ne0.
+    apply: LevelExprSetProp.set_induction.
+    - move => s /LevelExprSetFact.is_empty_1 he ne; exfalso => //. congruence.
+    - intros s s' IH x nin hadd hne.
+      destruct (LevelExprSet.is_empty s) eqn:hem in |- .
+      + assert (singleton x = {| t_set := s'; t_ne := hne |}) as <- => //.
+        unfold singleton; apply equal_exprsets; cbn.
+        intro a; specialize (hadd a); rewrite hadd.
+        rewrite LevelExprSet.singleton_spec; intuition.
+        exfalso. apply LevelExprSetFact.is_empty_2 in hem; eapply hem; eauto.
+      + specialize (IH hem). specialize (ha x _ IH).
+        have e : LevelExprSet.Equal (add x {| t_set := s; t_ne := hem |}) ({| t_set := s'; t_ne := hne |}).
+        2: by apply equal_exprsets in e; now rewrite -e.
+        intros x'; specialize (hadd x'). rewrite LevelExprSet.add_spec; cbn; intuition.
+  Qed.
 End UnivLvl.
 
 Ltac u :=
@@ -821,12 +850,25 @@ Proof.
   * destruct n; discriminate.
 Qed.
 
-
 Lemma sup0_comm x1 x2 :
   UnivLvl.sup x1 x2 = UnivLvl.sup x2 x1.
 Proof.
   apply eq_univ'; simpl. unfold LevelExprSet.Equal.
   intros H. rewrite !LevelExprSet.union_spec. intuition.
+Qed.
+
+Lemma ulvl_sup_idem l : UnivLvl.sup l l = l.
+Proof.
+  apply UnivLvl.equal_exprsets; intro le.
+  rewrite LevelExprSet.union_spec; intuition.
+Qed.
+
+Lemma ulvl_sup_assoc l1 l2 l3 :
+  UnivLvl.sup l1 (UnivLvl.sup l2 l3) =
+    UnivLvl.sup (UnivLvl.sup l1 l2) l3.
+Proof.
+  apply UnivLvl.equal_exprsets; intros le.
+  rewrite !LevelExprSet.union_spec; firstorder.
 Qed.
 
 (*
