@@ -1,7 +1,7 @@
 (* Distributed under the terms of the MIT license. *)
 From Stdlib Require Import ssreflect ssrbool ssrfun Morphisms Setoid.
 From MetaRocq.Utils Require Import utils.
-From MetaRocq.Common Require Import BasicAst Primitive Universes Environment Reflect.
+From MetaRocq.Common Require Import BasicAst Primitive Universes Levels Environment Reflect.
 From Equations.Prop Require Import Classes EqDecInstances.
 
 Ltac Tauto.intuition_solver ::= auto with *.
@@ -47,22 +47,22 @@ Module EnvironmentReflect (T : Term) (Import E : EnvironmentSig T) (Import TDec 
   Qed.
 
   Definition extendsb (Σ Σ' : global_env) : bool
-    := Σ.(universes) ⊂?_cs Σ'.(universes)
+    := Σ.(ulvls) ⊂?_cs Σ'.(ulvls)
        && extendsb_decls_part Σ Σ'
        && Retroknowledge.extendsb Σ.(retroknowledge) Σ'.(retroknowledge).
 
   Definition extends_declsb (Σ Σ' : global_env) : bool
-    := (Σ.(universes) == Σ'.(universes))
+    := (Σ.(ulvls) == Σ'.(ulvls))
        && extendsb_decls_part Σ Σ'
        && (Σ.(retroknowledge) == Σ'.(retroknowledge)).
 
   Definition extends_strictly_on_declsb (Σ Σ' : global_env) : bool
-    := (Σ.(universes) ⊂?_cs Σ'.(universes))
+    := (Σ.(ulvls) ⊂?_cs Σ'.(ulvls))
        && strictly_extendsb_decls_part Σ Σ'
        && Retroknowledge.extendsb Σ.(retroknowledge) Σ'.(retroknowledge).
 
   Definition strictly_extends_declsb (Σ Σ' : global_env) : bool
-    := (Σ.(universes) == Σ'.(universes))
+    := (Σ.(ulvls) == Σ'.(ulvls))
        && strictly_extendsb_decls_part Σ Σ'
        && (Σ.(retroknowledge) == Σ'.(retroknowledge)).
 

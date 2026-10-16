@@ -1,7 +1,7 @@
 From Stdlib Require Import PArith NArith ZArith Lia.
 From MetaRocq.Utils Require Import MRList MROption MRUtils.
 From MetaRocq.Common Require Import uGraph.
-From MetaRocq.Common Require Import Universes.
+From MetaRocq.Common Require Import Universes Levels.
 Import wGraph.
 
 Definition levels_of_cs (cstr : ConstraintSet.t) : LevelSet.t
@@ -77,7 +77,7 @@ Proof.
   split; apply global_uctx_invariants_union_or; constructor; apply levels_of_cs2_spec.
 Qed.
 
-Definition levels_of_universe (u : Universe.t) : VSet.t
+Definition levels_of_ulvl (u : UnivLvl.t) : VSet.t
   := LevelExprSet.fold
        (fun gc acc => match LevelExpr.get_noprop gc with
                       | Some l => VSet.add l acc
@@ -85,10 +85,10 @@ Definition levels_of_universe (u : Universe.t) : VSet.t
                       end)
        u
        VSet.empty.
-Lemma levels_of_universe_spec u cstr (lvls := levels_of_universe u)
+Lemma levels_of_ulvl_spec u cstr (lvls := levels_of_ulvl u)
   : gc_levels_declared (lvls, cstr) u.
 Proof.
-  subst lvls; cbv [levels_of_universe gc_levels_declared gc_expr_declared on_Some_or_None LevelExpr.get_noprop]; cbn [fst snd].
+  subst lvls; cbv [levels_of_ulvl gc_levels_declared gc_expr_declared on_Some_or_None LevelExpr.get_noprop]; cbn [fst snd].
   cbv [LevelExprSet.For_all]; cbn [fst snd].
   repeat first [ apply conj
                | progress intros
@@ -751,14 +751,14 @@ Proof.
   destruct b; [ left; apply H; reflexivity | right; intro H'; apply H in H'; auto ].
 Defined.
 
-Definition leq0_universe_n_dec n ϕ u u' : {@leq0_universe_n (uGraph.Z_of_bool n) ϕ u u'} + {~@leq0_universe_n (uGraph.Z_of_bool n) ϕ u u'}.
+Definition leq0_ulvl_n_dec n ϕ u u' : {@leq0_ulvl_n (uGraph.Z_of_bool n) ϕ u u'} + {~@leq0_ulvl_n (uGraph.Z_of_bool n) ϕ u u'}.
 Proof.
-  pose proof (@uGraph.gc_leq0_universe_n_iff config.default_checker_flags (uGraph.Z_of_bool n) ϕ u u') as H.
+  pose proof (@uGraph.gc_leq0_ulvl_n_iff config.default_checker_flags (uGraph.Z_of_bool n) ϕ u u') as H.
   pose proof (@uGraph.gc_consistent_iff config.default_checker_flags ϕ).
   cbv [on_Some on_Some_or_None] in *.
   destruct gc_of_constraints eqn:?.
   all: try solve [ left; cbv [consistent] in *; hnf; intros; exfalso; intuition eauto ].
-  pose proof (fun G cstr => @uGraph.leqb_universe_n_spec G (LevelSet.union (levels_of_cs ϕ) (LevelSet.union (levels_of_universe u) (levels_of_universe u')), cstr)).
+  pose proof (fun G cstr => @uGraph.leqb_ulvl_n_spec G (LevelSet.union (levels_of_cs ϕ) (LevelSet.union (levels_of_ulvl u) (levels_of_ulvl u')), cstr)).
   pose proof (fun x y => @gc_of_constraints_of_uctx config.default_checker_flags (x, y)) as H'.
   pose proof (@is_consistent_spec config.default_checker_flags (levels_of_cs ϕ, ϕ)).
   specialize_under_binders_by eapply gc_levels_declared_union_or.
@@ -770,40 +770,40 @@ Proof.
   specialize_under_binders_by eapply levels_of_cs_spec.
   specialize_under_binders_by reflexivity.
   destruct is_consistent;
-    [ | left; now cbv [leq0_universe_n consistent] in *; intros; exfalso; intuition eauto ].
+    [ | left; now cbv [leq0_ulvl_n consistent] in *; intros; exfalso; intuition eauto ].
   specialize_by intuition eauto.
   let H := match goal with H : forall (b : bool), _ |- _ => H end in
   specialize (H n u u').
-  specialize_under_binders_by (constructor; eapply gc_levels_declared_union_or; constructor; eapply levels_of_universe_spec).
+  specialize_under_binders_by (constructor; eapply gc_levels_declared_union_or; constructor; eapply levels_of_ulvl_spec).
   match goal with H : is_true ?b <-> ?x, H' : ?y <-> ?x |- {?y} + {_} => destruct b eqn:?; [ left | right ] end.
   all: intuition.
 Defined.
 
-Definition leq_universe_n_dec cf n ϕ u u' : {@leq_universe_n cf (uGraph.Z_of_bool n) ϕ u u'} + {~@leq_universe_n cf (uGraph.Z_of_bool n) ϕ u u'}.
+Definition leq_ulvl_n_dec cf n ϕ u u' : {@leq_ulvl_n cf (uGraph.Z_of_bool n) ϕ u u'} + {~@leq_ulvl_n cf (uGraph.Z_of_bool n) ϕ u u'}.
 Proof.
-  cbv [leq_universe_n]; destruct (@leq0_universe_n_dec n ϕ u u'); destruct ?; auto.
+  cbv [leq_ulvl_n]; destruct (@leq0_ulvl_n_dec n ϕ u u'); destruct ?; auto.
 Defined.
 
-Definition eq0_universe_dec ϕ u u' : {@eq0_universe ϕ u u'} + {~@eq0_universe ϕ u u'}.
+Definition eq0_ulvl_dec ϕ u u' : {@eq0_ulvl ϕ u u'} + {~@eq0_ulvl ϕ u u'}.
 Proof.
-  pose proof (@eq0_leq0_universe ϕ u u') as H.
-  destruct (@leq0_universe_n_dec false ϕ u u'), (@leq0_universe_n_dec false ϕ u' u); constructor; destruct H; split_and; now auto.
+  pose proof (@eq0_leq0_ulvl ϕ u u') as H.
+  destruct (@leq0_ulvl_n_dec false ϕ u u'), (@leq0_ulvl_n_dec false ϕ u' u); constructor; destruct H; split_and; now auto.
 Defined.
 
-Definition eq_universe_dec {cf ϕ} u u' : {@eq_universe cf ϕ u u'} + {~@eq_universe cf ϕ u u'}.
+Definition eq_ulvl_dec {cf ϕ} u u' : {@eq_ulvl cf ϕ u u'} + {~@eq_ulvl cf ϕ u u'}.
 Proof.
-  cbv [eq_universe]; destruct ?; auto using eq0_universe_dec.
+  cbv [eq_ulvl]; destruct ?; auto using eq0_ulvl_dec.
 Defined.
 
-Definition eq_sort__dec {univ eq_universe}
-           (eq_universe_dec : forall u u', {@eq_universe u u'} + {~@eq_universe u u'})
+Definition eq_univ__dec {univ eq_ulvl}
+           (eq_ulvl_dec : forall u u', {@eq_ulvl u u'} + {~@eq_ulvl u u'})
            s s'
-  : {@eq_sort_ univ eq_universe s s'} + {~@eq_sort_ univ eq_universe s s'}.
+  : {@eq_univ_ univ eq_ulvl s s'} + {~@eq_univ_ univ eq_ulvl s s'}.
 Proof.
-  cbv [eq_sort_]; repeat destruct ?; auto. all: destruct pst; auto.
+  cbv [eq_univ_]; repeat destruct ?; auto. all: destruct pst; auto.
 Defined.
 
-Definition eq_sort_dec {cf ϕ} s s' : {@eq_sort cf ϕ s s'} + {~@eq_sort cf ϕ s s'} := eq_sort__dec eq_universe_dec _ _.
+Definition eq_univ_dec {cf ϕ} s s' : {@eq_univ cf ϕ s s'} + {~@eq_univ cf ϕ s s'} := eq_univ__dec eq_ulvl_dec _ _.
 
 Definition valid_constraints_dec cf ϕ cstrs : {@valid_constraints cf ϕ cstrs} + {~@valid_constraints cf ϕ cstrs}.
 Proof.
@@ -830,12 +830,12 @@ Definition valid_constraints0_dec ϕ ctrs : {@valid_constraints0 ϕ ctrs} + {~@v
 
 Definition is_lSet_dec cf ϕ s : {@is_lSet cf ϕ s} + {~@is_lSet cf ϕ s}.
 Proof.
-  apply eq_sort_dec.
+  apply eq_univ_dec.
 Defined.
 
 Definition is_allowed_elimination_dec cf ϕ allowed u : {@is_allowed_elimination cf ϕ allowed u} + {~@is_allowed_elimination cf ϕ allowed u}.
 Proof.
   cbv [is_allowed_elimination is_true]; destruct ?; auto;
     try solve [ repeat decide equality ].
-  destruct (@is_lSet_dec cf ϕ u), Sort.is_propositional; intuition auto.
+  destruct (@is_lSet_dec cf ϕ u), Universe.is_propositional; intuition auto.
 Defined.
