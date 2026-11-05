@@ -12,7 +12,7 @@ Implicit Types (cf : checker_flags).
 
 Definition cumul_predicate (cumul : context -> term -> term -> Type) cumul_universe Γ p p' :=
   All2 (cumul Γ) p.(pparams) p'.(pparams) ×
-  cmp_universe_instance cumul_universe p.(puinst) p'.(puinst) ×
+  cmp_ulvl_instance cumul_universe p.(puinst) p'.(puinst) ×
   eq_context_upto_names p.(pcontext) p'.(pcontext) ×
   cumul (Γ ,,, inst_case_predicate_context p) p.(preturn) p'.(preturn).
 
@@ -23,14 +23,14 @@ Definition cumul_predicate_dep {cumul cumul_universe Γ p p'}
   :=
   let '(Hparams, (Huinst, (Heq, Hcumul))) := H in
   All2_dep (cumul' Γ) Hparams ×
-  cmp_universe_instance_dep cumul_universe cumul_universe' Huinst ×
+  cmp_ulvl_instance_dep cumul_universe cumul_universe' Huinst ×
   cumul' _ _ _ Hcumul.
 
 Lemma cumul_predicate_undep {cumul cumul_universe Γ p p' H cumul' cumul_universe'} :
   @cumul_predicate cumul' cumul_universe' Γ p p' <~>
-  @cumul_predicate_dep cumul cumul_universe Γ p p' H (fun Γ p p' _ => cumul' Γ p p') (fun x y _ => on_rel cumul_universe' Universe.make' x y).
+  @cumul_predicate_dep cumul cumul_universe Γ p p' H (fun Γ p p' _ => cumul' Γ p p') (fun x y _ => on_rel cumul_universe' UnivLvl.make' x y).
 Proof.
-  cbv [cumul_predicate cumul_predicate_dep cmp_universe_instance cmp_universe_instance_dep] in *.
+  cbv [cumul_predicate cumul_predicate_dep cmp_ulvl_instance cmp_ulvl_instance_dep] in *.
   split; intro; repeat destruct ?; subst; rdest; try assumption.
   all: repeat first [ assumption | toAll ].
 Qed.
@@ -53,10 +53,10 @@ Reserved Notation " Σ ;;; Γ ⊢ t ≤s[ pb ] u" (at level 50, Γ, t, u at next
   format "Σ  ;;;  Γ  ⊢  t  ≤s[ pb ]  u").
 
 Definition cumul_Ind_univ {cf} (Σ : global_env_ext) pb i napp :=
-  cmp_global_instance Σ (compare_universe Σ) pb (IndRef i) napp.
+  cmp_global_instance Σ (compare_ulvl Σ) pb (IndRef i) napp.
 
 Definition cumul_Construct_univ {cf} (Σ : global_env_ext) pb  i k napp :=
-  cmp_global_instance Σ (compare_universe Σ) pb (ConstructRef i k) napp.
+  cmp_global_instance Σ (compare_ulvl Σ) pb (ConstructRef i k) napp.
 
 (** * Definition of cumulativity and conversion relations *)
 Local Unset Elimination Schemes.
@@ -93,12 +93,12 @@ Inductive cumulSpec0 {cf : checker_flags} (Σ : global_env_ext) Γ (pb : conv_pb
     All2 (fun t u => Σ ;;; Γ ⊢ t ≤s[Conv] u) args args' ->
     Σ ;;; Γ ⊢ mkApps (tConstruct i k u) args ≤s[pb] mkApps (tConstruct i k u') args'
 
-| cumul_Sort : forall s s',
-    compare_sort Σ pb s s' ->
-    Σ ;;; Γ ⊢ tSort s ≤s[pb] tSort s'
+| cumul_Univ : forall s s',
+    compare_univ Σ pb s s' ->
+    Σ ;;; Γ ⊢ tUniv s ≤s[pb] tUniv s'
 
 | cumul_Const : forall c u u',
-    cmp_universe_instance (compare_universe Σ Conv) u u' ->
+    cmp_ulvl_instance (compare_ulvl Σ Conv) u u' ->
     Σ ;;; Γ ⊢ tConst c u ≤s[pb] tConst c u'
 
 (* congruence rules *)
@@ -132,7 +132,7 @@ Inductive cumulSpec0 {cf : checker_flags} (Σ : global_env_ext) Γ (pb : conv_pb
     Σ ;;; Γ ⊢ tLetIn na t ty u ≤s[pb] tLetIn na' t' ty' u'
 
 | cumul_Case indn : forall p p' c c' brs brs',
-    cumul_predicate (fun Γ t u => Σ ;;; Γ ⊢ t ≤s[Conv] u) (compare_universe Σ Conv) Γ p p' ->
+    cumul_predicate (fun Γ t u => Σ ;;; Γ ⊢ t ≤s[Conv] u) (compare_ulvl Σ Conv) Γ p p' ->
     Σ ;;; Γ ⊢ c ≤s[Conv] c' ->
     cumul_branches (fun Γ t u => Σ ;;; Γ ⊢ t ≤s[Conv] u) Γ p brs brs' ->
     Σ ;;; Γ ⊢ tCase indn p c brs ≤s[pb] tCase indn p' c' brs'
@@ -150,7 +150,7 @@ Inductive cumulSpec0 {cf : checker_flags} (Σ : global_env_ext) Γ (pb : conv_pb
     Σ ;;; Γ ⊢ tCoFix mfix idx ≤s[pb] tCoFix mfix' idx
 
 | cumul_Prim p p' :
-  onPrims (fun x y => Σ ;;; Γ ⊢ x ≤s[Conv] y) (compare_universe Σ Conv) p p' ->
+  onPrims (fun x y => Σ ;;; Γ ⊢ x ≤s[Conv] y) (compare_ulvl Σ Conv) p p' ->
   Σ ;;; Γ ⊢ tPrim p ≤s[pb] tPrim p'
 
 (** Reductions *)
@@ -379,8 +379,8 @@ Lemma cumulSpec0_rect :
 
     (forall (Γ : context) (pb : conv_pb) (indn : case_info) (p p' : predicate term)
             (c c' : term) (brs brs' : list (branch term))
-            (Hp : cumul_predicate (fun Γ => cumulSpec0 Σ Γ Conv) (compare_universe Σ Conv) Γ p p')
-            (_ : cumul_predicate_dep Hp (fun Γ => P cf Σ Γ Conv) (fun l l' _ => on_rel (fun _ _ => True) Universe.make' l l'))
+            (Hp : cumul_predicate (fun Γ => cumulSpec0 Σ Γ Conv) (compare_ulvl Σ Conv) Γ p p')
+            (_ : cumul_predicate_dep Hp (fun Γ => P cf Σ Γ Conv) (fun l l' _ => on_rel (fun _ _ => True) UnivLvl.make' l l'))
             (Hc : cumulSpec0 Σ Γ Conv c c') (_ : P cf Σ Γ Conv c c' Hc)
             (Hbody : cumul_branches (fun Γ => cumulSpec0 Σ Γ Conv) Γ p brs brs')
             (_ : All2_dep
@@ -426,8 +426,8 @@ Lemma cumulSpec0_rect :
         P cf Σ Γ pb (tCoFix mfix idx) (tCoFix mfix' idx)
           (cumul_CoFix _ _ _ _ _ _ H)) ->
 
-    (forall Γ pb p p' (e : onPrims (cumulSpec0 Σ Γ Conv) (eq_universe Σ) p p'),
-      onPrims_dep (cumulSpec0 Σ Γ Conv) (eq_universe Σ) (P cf Σ Γ Conv) (fun _ _ _ => True) p p' e ->
+    (forall Γ pb p p' (e : onPrims (cumulSpec0 Σ Γ Conv) (eq_ulvl Σ) p p'),
+      onPrims_dep (cumulSpec0 Σ Γ Conv) (eq_ulvl Σ) (P cf Σ Γ Conv) (fun _ _ _ => True) p p' e ->
       P cf Σ Γ pb (tPrim p) (tPrim p') (cumul_Prim _ _ _ _ _ e)) ->
 
     (* cumulativity rules *)
@@ -448,13 +448,13 @@ Lemma cumulSpec0_rect :
         P cf Σ Γ pb (mkApps (tConstruct i k u) args) (mkApps (tConstruct i k u') args')
           (cumul_Construct _ _ _ _ _ _ _ _ _ Hu Hargs)) ->
 
-    (forall (Γ : context) (pb : conv_pb) (s s' : sort)
-            (Hs : compare_sort Σ pb s s'),
-        P cf Σ Γ pb (tSort s) (tSort s')
-          (cumul_Sort _ _ _ _ _ Hs)) ->
+    (forall (Γ : context) (pb : conv_pb) (s s' : Universe.t)
+            (Hs : compare_univ Σ pb s s'),
+        P cf Σ Γ pb (tUniv s) (tUniv s')
+          (cumul_Univ _ _ _ _ _ Hs)) ->
 
     (forall (Γ : context) (pb : conv_pb) (c : kername) (u u' : list Level.t)
-            (Hu : cmp_universe_instance (compare_universe Σ Conv) u u'),
+            (Hu : cmp_ulvl_instance (compare_ulvl Σ Conv) u u'),
         P cf Σ Γ pb (tConst c u) (tConst c u')
           (cumul_Const _ _ _ _ _ _ Hu)) ->
 
@@ -653,8 +653,8 @@ Lemma convSpec0_ind_all :
 
       (forall (Γ : context) (indn : case_info) (p p' : predicate term)
               (c c' : term) (brs brs' : list (branch term))
-              (Hp : cumul_predicate (fun Γ => cumulSpec0 Σ Γ Conv) (compare_universe Σ Conv) Γ p p')
-              (_ : cumul_predicate_dep Hp (fun Γ => P cf Σ Γ Conv) (fun l l' _ => on_rel (fun _ _ => True) Universe.make' l l'))
+              (Hp : cumul_predicate (fun Γ => cumulSpec0 Σ Γ Conv) (compare_ulvl Σ Conv) Γ p p')
+              (_ : cumul_predicate_dep Hp (fun Γ => P cf Σ Γ Conv) (fun l l' _ => on_rel (fun _ _ => True) UnivLvl.make' l l'))
               (Hc : cumulSpec0 Σ Γ Conv c c') (_ : P cf Σ Γ Conv c c' Hc)
               (Hbody : cumul_branches (fun Γ => cumulSpec0 Σ Γ Conv) Γ p brs brs')
               (_ : All2_dep
@@ -688,8 +688,8 @@ Lemma convSpec0_ind_all :
            P cf Σ Γ Conv (tCoFix mfix idx) (tCoFix mfix' idx)
              (cumul_CoFix _ _ _ _ _ _ H)) ->
 
-      (forall Γ p p' (e : onPrims (cumulSpec0 Σ Γ Conv) (eq_universe Σ) p p'),
-        onPrims_dep (cumulSpec0 Σ Γ Conv) (eq_universe Σ) (P cf Σ Γ Conv) (fun _ _ _ => True) p p' e ->
+      (forall Γ p p' (e : onPrims (cumulSpec0 Σ Γ Conv) (eq_ulvl Σ) p p'),
+        onPrims_dep (cumulSpec0 Σ Γ Conv) (eq_ulvl Σ) (P cf Σ Γ Conv) (fun _ _ _ => True) p p' e ->
         P cf Σ Γ Conv (tPrim p) (tPrim p') (cumul_Prim _ _ _ _ _ e)) ->
 
       (* cumulativity rules *)
@@ -710,13 +710,13 @@ Lemma convSpec0_ind_all :
         P cf Σ Γ Conv (mkApps (tConstruct i k u) args) (mkApps (tConstruct i k u') args')
           (cumul_Construct _ _ _ _ _ _ _ _ _ Hu Hargs)) ->
 
-      (forall (Γ : context) (s s' : sort)
-              (Hs : compare_sort Σ Conv s s'),
-          P cf Σ Γ Conv (tSort s) (tSort s')
-            (cumul_Sort _ _ _ _ _ Hs)) ->
+      (forall (Γ : context) (s s' : Universe.t)
+              (Hs : compare_univ Σ Conv s s'),
+          P cf Σ Γ Conv (tUniv s) (tUniv s')
+            (cumul_Univ _ _ _ _ _ Hs)) ->
 
       (forall (Γ : context) (c : kername) (u u' : list Level.t)
-              (Hu : cmp_universe_instance (compare_universe Σ Conv) u u'),
+              (Hu : cmp_ulvl_instance (compare_ulvl Σ Conv) u u'),
           P cf Σ Γ Conv (tConst c u) (tConst c u')
             (cumul_Const _ _ _ _ _ _ Hu)) ->
 
