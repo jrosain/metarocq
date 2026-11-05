@@ -102,51 +102,50 @@ Register MetaRocq.Common.Universes.IntoPropSProp as metarocq.ast.IntoPropSProp.
 Register MetaRocq.Common.Universes.IntoSetPropSProp as metarocq.ast.IntoSetPropSProp.
 Register MetaRocq.Common.Universes.IntoAny as metarocq.ast.IntoAny.
 (* We convert from simple constraints to ones in Z *)
-Register MetaRocq.Common.Universes.ConstraintType.Lt as metarocq.ast.constraints.Lt.
-Register MetaRocq.Common.Universes.ConstraintType.Le0 as metarocq.ast.constraints.Le0.
-Register MetaRocq.Common.Universes.ConstraintType.Le as metarocq.ast.constraints.Le.
-Register MetaRocq.Common.Universes.ConstraintType.Eq as metarocq.ast.constraints.Eq.
-Register MetaRocq.Common.Universes.Universe.t as metarocq.ast.universe.t.
-Register MetaRocq.Common.Universes.Universe.make' as metarocq.ast.universe.make_of_level.
-Register MetaRocq.Common.Universes.Universe.from_kernel_repr as metarocq.ast.universe.from_kernel_repr.
-Register MetaRocq.Common.Universes.LevelSetProp.of_list as metarocq.ast.universe.of_list.
-Register MetaRocq.Common.Universes.Level.t as metarocq.ast.level.t.
-Register MetaRocq.Common.Universes.Level.level as metarocq.ast.level.Level.
-Register MetaRocq.Common.Universes.PropLevel.t as metarocq.ast.level.prop_level_type.
-Register MetaRocq.Common.Universes.PropLevel.lProp as metarocq.ast.level.lprop.
-Register MetaRocq.Common.Universes.PropLevel.lSProp as metarocq.ast.level.lsprop.
-Register MetaRocq.Common.Universes.Level.lzero as metarocq.ast.level.lzero.
-Register MetaRocq.Common.Universes.Level.lvar as metarocq.ast.level.Var.
+Register MetaRocq.Common.Levels.ConstraintType.Lt as metarocq.ast.constraints.Lt.
+Register MetaRocq.Common.Levels.ConstraintType.Le0 as metarocq.ast.constraints.Le0.
+Register MetaRocq.Common.Levels.ConstraintType.Le as metarocq.ast.constraints.Le.
+Register MetaRocq.Common.Levels.ConstraintType.Eq as metarocq.ast.constraints.Eq.
+Register MetaRocq.Common.Levels.UnivLvl.t as metarocq.ast.universe.t.
+Register MetaRocq.Common.Levels.UnivLvl.make' as metarocq.ast.universe.make_of_level.
+Register MetaRocq.Common.Levels.UnivLvl.from_kernel_repr as metarocq.ast.universe.from_kernel_repr.
+Register MetaRocq.Common.Levels.LevelSetProp.of_list as metarocq.ast.universe.of_list.
+Register MetaRocq.Common.Levels.Level.t as metarocq.ast.level.t.
+Register MetaRocq.Common.Levels.Level.level as metarocq.ast.level.Level.
+Register MetaRocq.Common.Levels.PropLevel.t as metarocq.ast.level.prop_level_type.
+Register MetaRocq.Common.Levels.PropLevel.lProp as metarocq.ast.level.lprop.
+Register MetaRocq.Common.Levels.PropLevel.lSProp as metarocq.ast.level.lsprop.
+Register MetaRocq.Common.Levels.Level.lzero as metarocq.ast.level.lzero.
+Register MetaRocq.Common.Levels.Level.lvar as metarocq.ast.level.Var.
 
-Register MetaRocq.Common.Universes.LevelExprSet.Mkt as metarocq.ast.levelexprset.mkt.
-Register MetaRocq.Common.Universes.Build_nonEmptyLevelExprSet as metarocq.ast.universe.build0.
-Register MetaRocq.Common.Universes.Sort.sSProp as metarocq.ast.sort.sprop.
-Register MetaRocq.Common.Universes.Sort.sProp as metarocq.ast.sort.prop.
-Register MetaRocq.Common.Universes.Sort.sType as metarocq.ast.sort.type.
+Register MetaRocq.Common.Levels.LevelExprSet.Mkt as metarocq.ast.levelexprset.mkt.
+Register MetaRocq.Common.Levels.Build_nonEmptyLevelExprSet as metarocq.ast.universe.build0.
+Register MetaRocq.Common.Universes.uSProp as metarocq.ast.sort.sprop.
+Register MetaRocq.Common.Universes.uProp as metarocq.ast.sort.prop.
+Register MetaRocq.Common.Universes.uType as metarocq.ast.sort.type.
 
+Register MetaRocq.Common.Levels.Variance.t as metarocq.ast.variance.t.
+Register MetaRocq.Common.Levels.Variance.Irrelevant as metarocq.ast.variance.Irrelevant.
+Register MetaRocq.Common.Levels.Variance.Covariant as metarocq.ast.variance.Covariant.
+Register MetaRocq.Common.Levels.Variance.Invariant as metarocq.ast.variance.Invariant.
 
-Register MetaRocq.Common.Universes.Variance.t as metarocq.ast.variance.t.
-Register MetaRocq.Common.Universes.Variance.Irrelevant as metarocq.ast.variance.Irrelevant.
-Register MetaRocq.Common.Universes.Variance.Covariant as metarocq.ast.variance.Covariant.
-Register MetaRocq.Common.Universes.Variance.Invariant as metarocq.ast.variance.Invariant.
+Register MetaRocq.Common.Levels.ulvls_decl as metarocq.ast.ulvls_decl.
+Register MetaRocq.Common.Levels.Monomorphic_ctx as metarocq.ast.Monomorphic_ctx.
+Register MetaRocq.Common.Levels.Polymorphic_ctx as metarocq.ast.Polymorphic_ctx.
 
-Register MetaRocq.Common.Universes.universes_decl as metarocq.ast.universes_decl.
-Register MetaRocq.Common.Universes.Monomorphic_ctx as metarocq.ast.Monomorphic_ctx.
-Register MetaRocq.Common.Universes.Polymorphic_ctx as metarocq.ast.Polymorphic_ctx.
+Register MetaRocq.Common.Levels.ConstraintSet.t_ as metarocq.ast.ConstraintSet.t_.
+Register MetaRocq.Common.Levels.ConstraintSet.empty as metarocq.ast.ConstraintSet.empty.
+Register MetaRocq.Common.Levels.ConstraintSet.add as metarocq.ast.ConstraintSet.add.
+Register MetaRocq.Common.Levels.ConstraintSet.elements as metarocq.ast.ConstraintSet.elements.
 
-Register MetaRocq.Common.Universes.ConstraintSet.t_ as metarocq.ast.ConstraintSet.t_.
-Register MetaRocq.Common.Universes.ConstraintSet.empty as metarocq.ast.ConstraintSet.empty.
-Register MetaRocq.Common.Universes.ConstraintSet.add as metarocq.ast.ConstraintSet.add.
-Register MetaRocq.Common.Universes.ConstraintSet.elements as metarocq.ast.ConstraintSet.elements.
+Register MetaRocq.Common.Levels.UContext.t as metarocq.ast.UContext.t.
+Register MetaRocq.Common.Levels.UContext.make as metarocq.ast.UContext.make.
+Register MetaRocq.Common.Levels.AUContext.t as metarocq.ast.AUContext.t.
+Register MetaRocq.Common.Levels.AUContext.make as metarocq.ast.AUContext.make.
 
-Register MetaRocq.Common.Universes.UContext.t as metarocq.ast.UContext.t.
-Register MetaRocq.Common.Universes.UContext.make as metarocq.ast.UContext.make.
-Register MetaRocq.Common.Universes.AUContext.t as metarocq.ast.AUContext.t.
-Register MetaRocq.Common.Universes.AUContext.make as metarocq.ast.AUContext.make.
-
-Register MetaRocq.Common.Universes.LevelSet.t_ as metarocq.ast.LevelSet.t.
-Register MetaRocq.Common.Universes.LevelSet.elements as metarocq.ast.LevelSet.elements.
-Register MetaRocq.Common.Universes.UnivConstraint.make as metarocq.ast.make_univ_constraint.
+Register MetaRocq.Common.Levels.LevelSet.t_ as metarocq.ast.LevelSet.t.
+Register MetaRocq.Common.Levels.LevelSet.elements as metarocq.ast.LevelSet.elements.
+Register MetaRocq.Common.Levels.UnivConstraint.make as metarocq.ast.make_univ_constraint.
 
 Register MetaRocq.Common.uGraph.init_graph as metarocq.ast.graph.init.
 (* FIXME wrong! *)
@@ -163,7 +162,7 @@ Register MetaRocq.Template.Ast.term as metarocq.ast.term.
 Register MetaRocq.Template.Ast.tRel as metarocq.ast.tRel.
 Register MetaRocq.Template.Ast.tVar as metarocq.ast.tVar.
 Register MetaRocq.Template.Ast.tEvar as metarocq.ast.tEvar.
-Register MetaRocq.Template.Ast.tSort as metarocq.ast.tSort.
+Register MetaRocq.Template.Ast.tUniv as metarocq.ast.tUniv.
 Register MetaRocq.Template.Ast.tCast as metarocq.ast.tCast.
 Register MetaRocq.Template.Ast.tProd as metarocq.ast.tProd.
 Register MetaRocq.Template.Ast.tLambda as metarocq.ast.tLambda.
