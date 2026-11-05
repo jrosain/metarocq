@@ -20,19 +20,19 @@ Proof.
   induction Δ; simpl; auto.
   destruct a as [na [b|] ty];
   intros wfΓ wfctx; constructor; intuition auto.
-  now eapply lift_sorting_forget_univ.
+  now eapply lift_univing_forget_univ.
 Qed.
 
 Lemma sorts_local_ctx_All_local_env {cf} P Σ Γ Δ s :
   All_local_env (lift_typing P Σ) Γ ->
-  sorts_local_ctx (lift_typing P) Σ Γ Δ s ->
+  univs_local_ctx (lift_typing P) Σ Γ Δ s ->
   All_local_env (lift_typing P Σ) (Γ ,,, Δ).
 Proof.
   induction Δ in s |- *; simpl; eauto.
   destruct a as [na [b|] ty];
   intros wfΓ wfctx; constructor; intuition eauto.
   destruct s => //. destruct wfctx; eauto.
-  destruct s => //. destruct wfctx. now eapply lift_sorting_forget_univ.
+  destruct s => //. destruct wfctx. now eapply lift_univing_forget_univ.
 Qed.
 
 Lemma type_local_ctx_Pclosed Σ Γ Δ s :
@@ -52,7 +52,7 @@ Proof.
 Qed.
 
 Lemma sorts_local_ctx_Pclosed Σ Γ Δ s :
-  sorts_local_ctx (fun _ => lift_wfb_term1 (fun Γ t => closedn #|Γ| t)) Σ Γ Δ s ->
+  univs_local_ctx (fun _ => lift_wfb_term1 (fun Γ t => closedn #|Γ| t)) Σ Γ Δ s ->
   Alli (fun i d => closed_decl (#|Γ| + i) d) 0 (List.rev Δ).
 Proof.
   induction Δ in s |- *; simpl; auto; try constructor.
