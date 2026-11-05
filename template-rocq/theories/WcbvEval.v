@@ -83,7 +83,7 @@ Definition atom t :=
   | tFix _ _
   | tCoFix _ _
   | tLambda _ _ _
-  | tSort _
+  | tUniv _
   | tProd _ _ _
   | tInt _
   | tFloat _ => true
@@ -92,7 +92,7 @@ Definition atom t :=
 
 Definition isArityHead t :=
   match t with
-  | tSort _
+  | tUniv _
   | tProd _ _ _ => true
   | _ => false
   end.
