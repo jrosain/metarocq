@@ -21,7 +21,7 @@ Fixpoint string_of_term (t : term) :=
   | tRel n => "Rel(" ^ string_of_nat n ^ ")"
   | tVar n => "Var(" ^ n ^ ")"
   | tEvar ev args => "Evar(" ^ string_of_nat ev ^ "," ^ string_of_list string_of_term args ^ ")"
-  | tSort s => "Sort(" ^ string_of_sort s ^ ")"
+  | tUniv s => "Sort(" ^ string_of_univ s ^ ")"
   | tProd na b t => "Prod(" ^ string_of_aname na ^ "," ^
                             string_of_term b ^ "," ^ string_of_term t ^ ")"
   | tLambda na b t => "Lambda(" ^ string_of_aname na ^ "," ^ string_of_term b
@@ -257,7 +257,7 @@ Proof.
             mind_entry_finite := Finite; (* inductive *)
             mind_entry_params := _;
             mind_entry_inds := _;
-            mind_entry_universes := decl.(ind_universes);
+            mind_entry_universes := decl.(ind_ulvls);
             mind_entry_private := None |}.
   - refine (match List.hd_error decl.(ind_bodies) with
             | Some i0 => _
@@ -866,7 +866,7 @@ Qed.
 Definition application_atom t :=
   match t with
   | tVar _
-  | tSort _
+  | tUniv _
   | tInd _ _
   | tConstruct _ _ _
   | tLambda _ _ _ => true
@@ -1022,19 +1022,19 @@ Hint Rewrite @map_InP_length : len.
 
 (** Views *)
 
-Definition isSort T :=
+Definition isUniv T :=
   match T with
-  | tSort u => true
+  | tUniv u => true
   | _ => false
   end.
 
-Inductive view_sort : term -> Type :=
-| view_sort_sort s : view_sort (tSort s)
-| view_sort_other t : ~ isSort t -> view_sort t.
+Inductive view_univ : term -> Type :=
+| view_univ_univ s : view_univ (tUniv s)
+| view_univ_other t : ~ isUniv t -> view_univ t.
 
-Equations view_sortc (t : term) : view_sort t :=
-  view_sortc (tSort s) := view_sort_sort s;
-  view_sortc t := view_sort_other t _.
+Equations view_univc (t : term) : view_univ t :=
+  view_univc (tUniv s) := view_univ_univ s;
+  view_univc t := view_univ_other t _.
 
 Definition isProd t :=
   match t with
@@ -1064,18 +1064,18 @@ Equations view_indc (t : term) : view_ind t :=
   view_indc (tInd ind u) => view_ind_tInd ind u;
   view_indc t => view_ind_other t _.
 
-Inductive view_prod_sort : term -> Type :=
-| view_prod_sort_prod na A B : view_prod_sort (tProd na A B)
-| view_prod_sort_sort u : view_prod_sort (tSort u)
-| view_prod_sort_other t :
+Inductive view_prod_univ : term -> Type :=
+| view_prod_univ_prod na A B : view_prod_univ (tProd na A B)
+| view_prod_univ_univ u : view_prod_univ (tUniv u)
+| view_prod_univ_other t :
     ~isProd t ->
-    ~isSort t ->
-    view_prod_sort t.
+    ~isUniv t ->
+    view_prod_univ t.
 
-Equations view_prod_sortc (t : term) : view_prod_sort t := {
-  | tProd na A B => view_prod_sort_prod na A B;
-  | tSort u => view_prod_sort_sort u;
-  | t => view_prod_sort_other t _ _
+Equations view_prod_univc (t : term) : view_prod_univ t := {
+  | tProd na A B => view_prod_univ_prod na A B;
+  | tUniv u => view_prod_univ_univ u;
+  | t => view_prod_univ_other t _ _
   }.
 
 
