@@ -35,8 +35,8 @@ Lemma extends_wf_local_gen `{cf : checker_flags} R Σ Γ (wfΓ : wf_local Σ Γ)
 Proof.
   intros X0 Σ' H0.
   induction X0 in H0 |- *; try econstructor; simpl in *; intuition auto.
-  - apply lift_sorting_it_impl with tu => //. intro; eauto.
-  - apply lift_sorting_it_impl with tu => /=. all: intro; eauto.
+  - apply lift_univing_it_impl with tu => //. intro; eauto.
+  - apply lift_univing_it_impl with tu => /=. all: intro; eauto.
 Qed.
 
 Definition extends_wf_local `{cf : checker_flags} := extends_wf_local_gen extends.
@@ -112,7 +112,7 @@ Proof.
   - apply All_local_env_impl with (1 := X0) => Γ' j Hj.
     now apply Hj.
   - econstructor; eauto 2 with extends.
-    now apply extends_wf_sort.
+    now apply extends_wf_univ.
   - econstructor; eauto 2 with extends. all: econstructor; eauto 2 with extends.
     * revert X5. clear -Σ' wf0 wfΣ' extΣ.
       induction 1; constructor; try destruct t0; eauto with extends.
@@ -131,7 +131,7 @@ Proof.
     + eapply (All_impl X3); intros d X. now apply X.
   - econstructor; eauto with extends.
     destruct X1; constructor; eauto with extends.
-    * now eapply extends_wf_universe.
+    * now eapply extends_wf_ulvl.
     * solve_all.
   - econstructor. 1: eauto.
     + eapply forall_Σ'1; eauto.
@@ -150,11 +150,11 @@ Proof.
   apply on_global_decl_impl_full; eauto.
   - reflexivity.
   - intros ?????. eapply weakening_env_cumulSpec0; eauto.
-  - intro. eapply (extends_wf_sort (Σ:=(Σ,φ)) Σ'); auto.
+  - intro. eapply (extends_wf_univ (Σ:=(Σ,φ)) Σ'); auto.
   - unfold check_constructors_smaller. intros ???.
     eapply Forall_impl; tea; cbn. intros.
     eapply Forall_impl; tea; simpl; intros.
-    eapply leq_sort_subset; tea.
+    eapply leq_univ_subset; tea.
     apply weakening_env_global_ext_constraints; tea; eauto.
   - rewrite /on_variance. intros u l. destruct u => //.
     destruct l => //.
@@ -195,13 +195,13 @@ Lemma weakening_env_gen_lookup_on_global_env `{checker_flags} R P Σ Σ' c decl 
   weaken_env_prop_gen cumulSpec0 (lift_typing typing) R P ->
   wf Σ' -> wf Σ -> R Σ Σ' -> on_global_env cumulSpec0 P Σ ->
   lookup_env Σ c = Some decl ->
-  on_global_decl cumulSpec0 P (Σ', universes_decl_of_decl decl) c decl.
+  on_global_decl cumulSpec0 P (Σ', ulvls_decl_of_decl decl) c decl.
 Proof.
   intros HRext1 HRext2 HTR HP wfΣ' wfΣ Hext HΣ.
   destruct HΣ as [onu onΣ].
   destruct Σ as [univs Σ retro]; cbn in *.
   induction onΣ; simpl. 1: congruence.
-  assert (HH: R {| universes := univs; declarations := Σ; retroknowledge := retro |} Σ'). {
+  assert (HH: R {| ulvls := univs; declarations := Σ; retroknowledge := retro |} Σ'). {
     etransitivity; [ eapply HRext2 | exact Hext ].
     split; cbv [snoc]; cbn; auto.
     eexists [_]; cbn; reflexivity.
@@ -218,25 +218,25 @@ Lemma weakening_env_lookup_on_global_env `{checker_flags} P Σ Σ' c decl :
   weaken_env_prop cumulSpec0 (lift_typing typing) P ->
   wf Σ' -> wf Σ -> extends Σ Σ' -> on_global_env cumulSpec0 P Σ ->
   lookup_env Σ c = Some decl ->
-  on_global_decl cumulSpec0 P (Σ', universes_decl_of_decl decl) c decl.
+  on_global_decl cumulSpec0 P (Σ', ulvls_decl_of_decl decl) c decl.
 Proof. eapply weakening_env_gen_lookup_on_global_env; tc. Qed.
 Lemma weakening_env_decls_lookup_on_global_env `{checker_flags} P Σ Σ' c decl :
   weaken_env_decls_prop cumulSpec0 (lift_typing typing) P ->
   wf Σ' -> wf Σ -> extends_decls Σ Σ' -> on_global_env cumulSpec0 P Σ ->
   lookup_env Σ c = Some decl ->
-  on_global_decl cumulSpec0 P (Σ', universes_decl_of_decl decl) c decl.
+  on_global_decl cumulSpec0 P (Σ', ulvls_decl_of_decl decl) c decl.
 Proof. eapply weakening_env_gen_lookup_on_global_env; tc. Qed.
 Lemma weakening_env_strictly_decls_lookup_on_global_env `{checker_flags} P Σ Σ' c decl :
   weaken_env_strictly_decls_prop cumulSpec0 (lift_typing typing) P ->
   wf Σ' -> wf Σ -> strictly_extends_decls Σ Σ' -> on_global_env cumulSpec0 P Σ ->
   lookup_env Σ c = Some decl ->
-  on_global_decl cumulSpec0 P (Σ', universes_decl_of_decl decl) c decl.
+  on_global_decl cumulSpec0 P (Σ', ulvls_decl_of_decl decl) c decl.
 Proof. eapply weakening_env_gen_lookup_on_global_env; tc. Qed.
 Lemma weakening_env_strictly_on_decls_lookup_on_global_env `{checker_flags} P Σ Σ' c decl :
   weaken_env_strictly_on_decls_prop cumulSpec0 (lift_typing typing) P ->
   wf Σ' -> wf Σ -> extends_strictly_on_decls Σ Σ' -> on_global_env cumulSpec0 P Σ ->
   lookup_env Σ c = Some decl ->
-  on_global_decl cumulSpec0 P (Σ', universes_decl_of_decl decl) c decl.
+  on_global_decl cumulSpec0 P (Σ', ulvls_decl_of_decl decl) c decl.
 Proof. eapply weakening_env_gen_lookup_on_global_env; tc. Qed.
 
 (* we can fill weaken_env_strictly_decls_prop with any other weaken_env_*_prop, so we only include this version *)
@@ -244,7 +244,7 @@ Lemma weaken_lookup_on_global_env `{checker_flags} P Σ c decl :
   weaken_env_strictly_decls_prop cumulSpec0 (lift_typing typing) P ->
   wf Σ -> on_global_env cumulSpec0 P Σ ->
   lookup_env Σ c = Some decl ->
-  on_global_decl cumulSpec0 P (Σ, universes_decl_of_decl decl) c decl.
+  on_global_decl cumulSpec0 P (Σ, ulvls_decl_of_decl decl) c decl.
 Proof.
   intros. eapply weakening_env_strictly_decls_lookup_on_global_env; tea; tc; reflexivity.
 Qed.
@@ -253,7 +253,7 @@ Lemma declared_constant_inv `{checker_flags} Σ P cst decl :
   weaken_env_strictly_decls_prop cumulSpec0 (lift_typing typing) P ->
   wf Σ -> on_global_env cumulSpec0 P Σ ->
   declared_constant Σ cst decl ->
-  on_constant_decl P (Σ, cst_universes decl) decl.
+  on_constant_decl P (Σ, cst_ulvls decl) decl.
 Proof.
   intros.
   unshelve eapply declared_constant_to_gen in H0; tea.
@@ -264,7 +264,7 @@ Lemma declared_minductive_inv `{checker_flags} {Σ P ind mdecl} :
   weaken_env_strictly_decls_prop cumulSpec0 (lift_typing typing) P ->
   wf Σ -> on_global_env cumulSpec0 P Σ ->
   declared_minductive Σ ind mdecl ->
-  on_inductive cumulSpec0 P (Σ, ind_universes mdecl) ind mdecl.
+  on_inductive cumulSpec0 P (Σ, ind_ulvls mdecl) ind mdecl.
 Proof.
   intros.
   unshelve eapply declared_minductive_to_gen in H0; tea.
@@ -275,7 +275,7 @@ Lemma declared_inductive_inv `{checker_flags} {Σ P ind mdecl idecl} :
   weaken_env_strictly_decls_prop cumulSpec0 (lift_typing typing) P ->
   wf Σ -> on_global_env cumulSpec0 P Σ ->
   declared_inductive Σ ind mdecl idecl ->
-  on_ind_body cumulSpec0 P (Σ, ind_universes mdecl) (inductive_mind ind) mdecl (inductive_ind ind) idecl.
+  on_ind_body cumulSpec0 P (Σ, ind_ulvls mdecl) (inductive_mind ind) mdecl (inductive_ind ind) idecl.
 Proof.
   intros.
   destruct H0 as [Hmdecl Hidecl].
@@ -289,7 +289,7 @@ Lemma weaken_decls_lookup_on_global_env `{checker_flags} P Σ c decl :
   weaken_env_decls_prop cumulSpec0 (lift_typing typing) P ->
   wf Σ -> on_global_env cumulSpec0 P Σ ->
   lookup_env Σ c = Some decl ->
-  on_global_decl cumulSpec0 P (Σ, universes_decl_of_decl decl) c decl.
+  on_global_decl cumulSpec0 P (Σ, ulvls_decl_of_decl decl) c decl.
 Proof.
   intros. eapply weakening_env_decls_lookup_on_global_env; eauto.
   split => //.
@@ -304,7 +304,7 @@ Lemma declared_constructor_inv `{checker_flags} {Σ P mdecl idecl ref cdecl}
   ∑ cs,
   let onib := declared_inductive_inv HP wfΣ HΣ (let (x, _) := Hdecl in x) in
   nth_error onib.(ind_cunivs) ref.2 = Some cs
-  × on_constructor cumulSpec0 P (Σ, ind_universes mdecl) mdecl
+  × on_constructor cumulSpec0 P (Σ, ind_ulvls mdecl) mdecl
                    (inductive_ind ref.1) idecl idecl.(ind_indices) cdecl cs.
 Proof.
   intros.
@@ -318,7 +318,7 @@ Lemma declared_minductive_inv_decls `{checker_flags} {Σ P ind mdecl} :
   weaken_env_decls_prop cumulSpec0 (lift_typing typing) P ->
   wf Σ -> on_global_env cumulSpec0 P Σ ->
   declared_minductive Σ ind mdecl ->
-  on_inductive cumulSpec0 P (Σ, ind_universes mdecl) ind mdecl.
+  on_inductive cumulSpec0 P (Σ, ind_ulvls mdecl) ind mdecl.
 Proof.
   intros.
   unshelve eapply declared_minductive_to_gen in H0; tea.
@@ -329,7 +329,7 @@ Lemma declared_inductive_inv_decls `{checker_flags} {Σ P ind mdecl idecl} :
   weaken_env_decls_prop cumulSpec0 (lift_typing typing) P ->
   wf Σ -> on_global_env cumulSpec0 P Σ ->
   declared_inductive Σ ind mdecl idecl ->
-  on_ind_body cumulSpec0 P (Σ, ind_universes mdecl) (inductive_mind ind) mdecl (inductive_ind ind) idecl.
+  on_ind_body cumulSpec0 P (Σ, ind_ulvls mdecl) (inductive_mind ind) mdecl (inductive_ind ind) idecl.
 Proof.
   intros.
   destruct H0 as [Hmdecl Hidecl].
@@ -347,7 +347,7 @@ Lemma declared_constructor_inv_decls `{checker_flags} {Σ P mdecl idecl ref cdec
   ∑ cs,
   let onib := declared_inductive_inv_decls HP wfΣ HΣ (let (x, _) := Hdecl in x) in
   nth_error onib.(ind_cunivs) ref.2 = Some cs
-  × on_constructor cumulSpec0 P (Σ, ind_universes mdecl) mdecl
+  × on_constructor cumulSpec0 P (Σ, ind_ulvls mdecl) mdecl
                    (inductive_ind ref.1) idecl idecl.(ind_indices) cdecl cs.
 Proof.
   intros.
@@ -367,7 +367,7 @@ Lemma declared_projection_inv `{checker_flags} {Σ P mdecl idecl cdecl ref pdecl
     let oib := declared_inductive_inv HP wfΣ HΣ (let (x, _) := Hdecl in
       let (x, _) := x in x) in
     (match oib.(ind_cunivs) with
-     | [cs] => sorts_local_ctx P (Σ, ind_universes mdecl) (arities_context (ind_bodies mdecl) ,,, ind_params mdecl) (cstr_args c) cs
+     | [cs] => univs_local_ctx P (Σ, ind_ulvls mdecl) (arities_context (ind_bodies mdecl) ,,, ind_params mdecl) (cstr_args c) cs
      | _ => False
     end) *
     on_projections mdecl (inductive_mind ref.(proj_ind)) (inductive_ind ref.(proj_ind)) idecl (idecl.(ind_indices)) c *
@@ -410,7 +410,7 @@ Qed.
 
 Lemma on_declared_constant `{checker_flags} {Σ cst decl} :
   wf Σ -> declared_constant Σ cst decl ->
-  on_constant_decl (lift_typing typing) (Σ, cst_universes decl) decl.
+  on_constant_decl (lift_typing typing) (Σ, cst_ulvls decl) decl.
 Proof.
   intros.
   eapply declared_constant_inv; tea.
@@ -432,7 +432,7 @@ Hint Resolve weaken_wf_local | 100 : pcuic.
 Lemma on_declared_minductive `{checker_flags} {Σ ref decl} :
   wf Σ ->
   declared_minductive Σ ref decl ->
-  on_inductive cumulSpec0 (lift_typing typing) (Σ, ind_universes decl) ref decl.
+  on_inductive cumulSpec0 (lift_typing typing) (Σ, ind_ulvls decl) ref decl.
 Proof.
   intros wfΣ Hdecl.
   apply (declared_minductive_inv weaken_env_prop_typing wfΣ wfΣ Hdecl).
@@ -440,8 +440,8 @@ Qed.
 
 Lemma on_declared_inductive `{checker_flags} {Σ ref mdecl idecl} {wfΣ : wf Σ} :
   declared_inductive Σ ref mdecl idecl ->
-  on_inductive cumulSpec0 (lift_typing typing) (Σ, ind_universes mdecl) (inductive_mind ref) mdecl *
-  on_ind_body cumulSpec0 (lift_typing typing) (Σ, ind_universes mdecl) (inductive_mind ref) mdecl (inductive_ind ref) idecl.
+  on_inductive cumulSpec0 (lift_typing typing) (Σ, ind_ulvls mdecl) (inductive_mind ref) mdecl *
+  on_ind_body cumulSpec0 (lift_typing typing) (Σ, ind_ulvls mdecl) (inductive_mind ref) mdecl (inductive_ind ref) idecl.
 Proof.
   intros Hdecl.
   split.
@@ -452,14 +452,14 @@ Defined.
 Lemma on_declared_constructor `{checker_flags} {Σ ref mdecl idecl cdecl}
   {wfΣ : wf Σ}
   (Hdecl : declared_constructor Σ ref mdecl idecl cdecl) :
-  on_inductive cumulSpec0 (lift_typing typing) (Σ, ind_universes mdecl)
+  on_inductive cumulSpec0 (lift_typing typing) (Σ, ind_ulvls mdecl)
                (inductive_mind (fst ref)) mdecl *
-  on_ind_body cumulSpec0 (lift_typing typing) (Σ, ind_universes mdecl)
+  on_ind_body cumulSpec0 (lift_typing typing) (Σ, ind_ulvls mdecl)
               (inductive_mind (fst ref)) mdecl (inductive_ind (fst ref)) idecl *
   ∑ ind_ctor_sort,
     let onib := declared_inductive_inv weaken_env_prop_typing wfΣ wfΣ (let (x, _) := Hdecl in x) in
      nth_error (ind_cunivs onib) ref.2 = Some ind_ctor_sort
-    ×  on_constructor cumulSpec0 (lift_typing typing) (Σ, ind_universes mdecl)
+    ×  on_constructor cumulSpec0 (lift_typing typing) (Σ, ind_ulvls mdecl)
                  mdecl (inductive_ind (fst ref))
                  idecl idecl.(ind_indices) cdecl ind_ctor_sort.
 Proof.
@@ -470,11 +470,11 @@ Defined.
 
 Lemma on_declared_projection `{checker_flags} {Σ ref mdecl idecl cdecl pdecl} {wfΣ : wf Σ}
   (Hdecl : declared_projection Σ ref mdecl idecl cdecl pdecl) :
-  on_inductive cumulSpec0 (lift_typing typing) (Σ, ind_universes mdecl) (inductive_mind ref.(proj_ind)) mdecl *
+  on_inductive cumulSpec0 (lift_typing typing) (Σ, ind_ulvls mdecl) (inductive_mind ref.(proj_ind)) mdecl *
   (idecl.(ind_ctors) = [cdecl]) *
   let oib := declared_inductive_inv weaken_env_prop_typing wfΣ wfΣ (let (x, _) := Hdecl in let (x, _) := x in x) in
   (match oib.(ind_cunivs) with
-  | [cs] => sorts_local_ctx (lift_typing typing) (Σ, ind_universes mdecl)
+  | [cs] => univs_local_ctx (lift_typing typing) (Σ, ind_ulvls mdecl)
       (arities_context (ind_bodies mdecl) ,,, ind_params mdecl) (cstr_args cdecl) cs
     | _ => False
   end) *

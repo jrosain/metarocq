@@ -41,7 +41,7 @@ Ltac pcuic := intuition eauto 5 with pcuic ||
   (try solve [repeat red; cbn in *; intuition auto; eauto 5 with pcuic || (try lia || congruence)]).
 
 #[global]
-Hint Resolve eq_leq_sort' : pcuic.
+Hint Resolve eq_leq_univ' : pcuic.
 
 Derive Signature for assumption_context.
 Derive Signature for clos_refl_trans_1n.
@@ -262,7 +262,7 @@ Qed.
 #[global] Hint Resolve closed_red_open_right : fvs.
 
 Ltac fvs := eauto 10 with fvs.
-#[global] Hint Resolve eq_leq_sort : core.
+#[global] Hint Resolve eq_leq_univ : core.
 
 Section ConvCongruences.
   Context {cf:checker_flags} {Σ : global_env_ext} {wfΣ : wf Σ}.
@@ -313,9 +313,9 @@ Section ConvCongruences.
   Qed.
 
 
-  Lemma ws_cumul_pb_Sort_inv {Γ s s'} pb :
-    Σ ;;; Γ ⊢ tSort s ≤[pb] tSort s' ->
-    compare_sort Σ pb s s'.
+  Lemma ws_cumul_pb_Univ_inv {Γ s s'} pb :
+    Σ ;;; Γ ⊢ tUniv s ≤[pb] tUniv s' ->
+    compare_univ Σ pb s s'.
   Proof using Type.
     intros H; depind H.
     - now inversion c.
@@ -323,8 +323,8 @@ Section ConvCongruences.
     - depelim r. solve_discr.
   Qed.
 
-  Lemma ws_cumul_pb_Sort_Prod_inv {Γ s na dom codom} pb :
-    Σ ;;; Γ ⊢ tSort s ≤[pb] tProd na dom codom ->
+  Lemma ws_cumul_pb_Univ_Prod_inv {Γ s na dom codom} pb :
+    Σ ;;; Γ ⊢ tUniv s ≤[pb] tProd na dom codom ->
     False.
   Proof using Type.
     intros H. depind H.
@@ -335,8 +335,8 @@ Section ConvCongruences.
       + eapply IHws_cumul_pb. reflexivity.
   Qed.
 
-  Lemma ws_cumul_pb_Prod_Sort_inv {Γ s na dom codom} pb :
-    Σ ;;; Γ ⊢ tProd na dom codom ≤[pb] tSort s -> False.
+  Lemma ws_cumul_pb_Prod_Univ_inv {Γ s na dom codom} pb :
+    Σ ;;; Γ ⊢ tProd na dom codom ≤[pb] tUniv s -> False.
   Proof using Type.
     intros H; depind H; auto.
     - now inversion c.
@@ -347,9 +347,9 @@ Section ConvCongruences.
     - depelim r. solve_discr.
   Qed.
 
-  Lemma ws_cumul_pb_Sort_l_inv {Γ s T} pb :
-    Σ ;;; Γ ⊢ tSort s ≤[pb] T ->
-    ∑ s', Σ ;;; Γ ⊢ T ⇝ tSort s' × compare_sort Σ pb s s'.
+  Lemma ws_cumul_pb_Univ_l_inv {Γ s T} pb :
+    Σ ;;; Γ ⊢ tUniv s ≤[pb] T ->
+    ∑ s', Σ ;;; Γ ⊢ T ⇝ tUniv s' × compare_univ Σ pb s s'.
   Proof using Type.
     intros H. depind H.
     - inversion c; eauto using into_closed_red.
@@ -359,9 +359,9 @@ Section ConvCongruences.
       eapply red_step with v; eauto with fvs.
   Qed.
 
-  Lemma ws_cumul_pb_Sort_r_inv {Γ s T} pb :
-    Σ ;;; Γ ⊢ T ≤[pb] tSort s ->
-    ∑ s', Σ ;;; Γ ⊢ T ⇝ tSort s' × compare_sort Σ pb s' s.
+  Lemma ws_cumul_pb_Univ_r_inv {Γ s T} pb :
+    Σ ;;; Γ ⊢ T ≤[pb] tUniv s ->
+    ∑ s', Σ ;;; Γ ⊢ T ⇝ tUniv s' × compare_univ Σ pb s' s.
   Proof using Type.
     intros H. depind H.
     - inversion c; eauto using into_closed_red.
@@ -993,13 +993,13 @@ Section Inversions.
   Definition Is_conv_to_Arity Σ Γ T :=
     exists T', ∥ Σ ;;; Γ ⊢ T ⇝ T' ∥ /\ isArity T'.
 
-  Lemma arity_red_to_prod_or_sort :
+  Lemma arity_red_to_prod_or_univ :
     forall Γ T,
       is_closed_context Γ ->
       is_open_term Γ T ->
       isArity T ->
       (exists na A B, ∥ Σ ;;; Γ ⊢ T ⇝ (tProd na A B) ∥) \/
-      (exists u, ∥ Σ ;;; Γ ⊢ T ⇝ (tSort u) ∥).
+      (exists u, ∥ Σ ;;; Γ ⊢ T ⇝ (tUniv u) ∥).
   Proof using wfΣ.
     intros Γ T.
     induction T in Γ |- *. all: cbn [isArity]; try contradiction; try congruence.
@@ -1038,7 +1038,7 @@ Section Inversions.
     forall Γ T,
       Is_conv_to_Arity Σ Γ T ->
       (exists na A B, ∥ Σ ;;; Γ ⊢ T ⇝ (tProd na A B) ∥) \/
-      (exists u, ∥ Σ ;;; Γ ⊢ T ⇝ (tSort u) ∥).
+      (exists u, ∥ Σ ;;; Γ ⊢ T ⇝ (tUniv u) ∥).
   Proof using wfΣ.
     intros Γ T [T' [r a]].
     induction T'.
@@ -1046,7 +1046,7 @@ Section Inversions.
     - right. eexists. eassumption.
     - left. eexists _, _, _. eassumption.
     - destruct r as [r1].
-      eapply arity_red_to_prod_or_sort in a as [[na' [A [B [r2]]]] | [u [r2]]].
+      eapply arity_red_to_prod_or_univ in a as [[na' [A [B [r2]]]] | [u [r2]]].
       + left. eexists _,_,_. constructor.
         etransitivity; tea.
       + right. eexists. constructor.
@@ -1055,10 +1055,10 @@ Section Inversions.
       + now eapply closed_red_open_right in r1.
   Qed.
 
-  Lemma invert_red_sort Γ u v :
-    Σ ;;; Γ ⊢ (tSort u) ⇝ v -> v = tSort u.
+  Lemma invert_red_univ Γ u v :
+    Σ ;;; Γ ⊢ (tUniv u) ⇝ v -> v = tUniv u.
   Proof using wfΣ.
-    intros [clΓ clu H]. generalize_eq x (tSort u).
+    intros [clΓ clu H]. generalize_eq x (tUniv u).
     induction H; simplify *.
     - depind r. solve_discr.
     - reflexivity.
@@ -1066,15 +1066,15 @@ Section Inversions.
   Qed.
 
   Lemma eq_term_upto_univ_conv_arity_l :
-    forall cmp_universe cmp_sort pb Γ u v,
+    forall cmp_ulvl cmp_univ pb Γ u v,
       isArity u ->
       is_closed_context Γ ->
       is_open_term Γ u ->
       is_open_term Γ v ->
-      eq_term_upto_univ Σ cmp_universe cmp_sort pb u v ->
+      eq_term_upto_univ Σ cmp_ulvl cmp_univ pb u v ->
       Is_conv_to_Arity Σ Γ v.
   Proof using Type.
-    intros cmp_universe cmp_sort pb Γ u v a clΓ clu clv e.
+    intros cmp_ulvl cmp_univ pb Γ u v a clΓ clu clv e.
     induction u in Γ, clΓ, clv, clu, a, v, pb, e |- *. all: try (cbn [isArity] in *; congruence).
     all: dependent destruction e.
     - eexists. split.
@@ -1101,15 +1101,15 @@ Section Inversions.
   Qed.
 
   Lemma eq_term_upto_univ_conv_arity_r :
-    forall cmp_universe cmp_sort pb Γ u v,
+    forall cmp_ulvl cmp_univ pb Γ u v,
     isArity u ->
     is_closed_context Γ ->
     is_open_term Γ u ->
     is_open_term Γ v ->
-    eq_term_upto_univ Σ cmp_universe cmp_sort pb v u ->
+    eq_term_upto_univ Σ cmp_ulvl cmp_univ pb v u ->
     Is_conv_to_Arity Σ Γ v.
   Proof using Type.
-    intros cmp_universe cmp_sort pb Γ u v a clΓ clu clv e.
+    intros cmp_ulvl cmp_univ pb Γ u v a clΓ clu clv e.
     induction u in Γ, clΓ, clv, clu, a, v, pb, e |- *. all: try (cbn [isArity] in *; congruence).
     all: dependent destruction e.
     - eexists. split.
@@ -1406,7 +1406,7 @@ Section Inversions.
     ∑ u' args',
       [× Σ ;;; Γ ⊢ T ⇝ mkApps (tConst cst u') args',
          All2 (fun args args' => Σ ;;; Γ ⊢ args ≤[Conv] args') args args' &
-         PCUICEquality.cmp_universe_instance (eq_universe Σ) u u'].
+         PCUICEquality.cmp_ulvl_instance (eq_ulvl Σ) u u'].
   Proof using wfΣ.
     intros hdecl hb H.
     eapply ws_cumul_pb_red in H as (v & v' & [tv tv' eqp]).
@@ -1428,7 +1428,7 @@ Section Inversions.
     ∑ u' args',
       [× Σ ;;; Γ ⊢ T ⇝ mkApps (tConst cst u') args',
          All2 (fun args args' => Σ ;;; Γ ⊢ args ≤[Conv] args') args' args &
-         PCUICEquality.cmp_universe_instance (eq_universe Σ) u' u].
+         PCUICEquality.cmp_ulvl_instance (eq_ulvl Σ) u' u].
   Proof using wfΣ.
     intros hdecl hb H.
     eapply ws_cumul_pb_red in H as (v & v' & [tv tv' eqp]).
@@ -1486,7 +1486,7 @@ Section Inversions.
 
   Lemma invert_cumul_Prim {Γ pb p p'} :
     Σ ;;; Γ ⊢ tPrim p ≤[pb] tPrim p' ->
-    onPrims (ws_cumul_pb Conv Σ Γ) (eq_universe Σ) p p'.
+    onPrims (ws_cumul_pb Conv Σ Γ) (eq_ulvl Σ) p p'.
   Proof using wfΣ.
     intros hd.
     generalize (ws_cumul_pb_is_open_term hd); move/and3P => [] cl cl' cl''.
@@ -1605,7 +1605,7 @@ Proof.
 Qed.
 
 Lemma tProd_it_mkProd_or_LetIn na A B ctx s :
-  tProd na A B = it_mkProd_or_LetIn ctx (tSort s) ->
+  tProd na A B = it_mkProd_or_LetIn ctx (tUniv s) ->
   { ctx' & ctx = (ctx' ++ [vass na A]) /\
            destArity [] B = Some (ctx', s) }.
 Proof.
@@ -1621,7 +1621,7 @@ Qed.
 
 Definition ws_cumul_pb_predicate {cf} Σ Γ p p' :=
   [× ws_cumul_pb_terms Σ Γ p.(pparams) p'.(pparams),
-     cmp_universe_instance (eq_universe Σ) (puinst p) (puinst p'),
+     cmp_ulvl_instance (eq_ulvl Σ) (puinst p) (puinst p'),
      eq_context_upto_names (pcontext p) (pcontext p') &
      Σ ;;; Γ ,,, inst_case_predicate_context p ⊢ preturn p = preturn p'].
 
@@ -1723,20 +1723,20 @@ Section Inversions.
     - transitivity x0; auto. symmetry. now eapply red_terms_ws_cumul_pb_terms.
   Qed.
 
-  Lemma invert_cumul_sort_ind {Γ s ind u args} :
-    Σ;;; Γ ⊢ tSort s ≤ mkApps (tInd ind u) args -> False.
+  Lemma invert_cumul_univ_ind {Γ s ind u args} :
+    Σ;;; Γ ⊢ tUniv s ≤ mkApps (tInd ind u) args -> False.
   Proof using wfΣ.
     intros cum.
-    apply PCUICConversion.ws_cumul_pb_Sort_l_inv in cum as (?&?&?).
+    apply PCUICConversion.ws_cumul_pb_Univ_l_inv in cum as (?&?&?).
     apply invert_red_mkApps_tInd in c as (?&[]); auto.
     solve_discr.
   Qed.
 
-  Lemma invert_cumul_ind_sort {Γ s ind u args} :
-    Σ;;; Γ ⊢ mkApps (tInd ind u) args ≤ tSort s -> False.
+  Lemma invert_cumul_ind_univ {Γ s ind u args} :
+    Σ;;; Γ ⊢ mkApps (tInd ind u) args ≤ tUniv s -> False.
   Proof using wfΣ.
     intros cum.
-    apply PCUICConversion.ws_cumul_pb_Sort_r_inv in cum as (?&?&?).
+    apply PCUICConversion.ws_cumul_pb_Univ_r_inv in cum as (?&?&?).
     apply invert_red_mkApps_tInd in c as (?&[]); auto.
     solve_discr.
   Qed.
@@ -1930,7 +1930,7 @@ Section ConvRedConv.
   Qed.
 
   #[global]
-  Instance all_eq_term_refl : Reflexive (All2 (eq_term_upto_univ Σ.1 (compare_universe Σ) (compare_sort Σ) Conv)).
+  Instance all_eq_term_refl : Reflexive (All2 (eq_term_upto_univ Σ.1 (compare_ulvl Σ) (compare_univ Σ) Conv)).
   Proof using Type.
     intros x. apply All2_same. intros. reflexivity.
   Qed.
@@ -2084,7 +2084,7 @@ Section ConvRedConv.
 
   Instance eqbrs_refl : Reflexive (All2 (fun x y : branch term =>
       eq_context_upto_names (bcontext x) (bcontext y) *
-      eq_term_upto_univ Σ.1 (compare_universe Σ) (compare_sort Σ) Conv (bbody x) (bbody y))).
+      eq_term_upto_univ Σ.1 (compare_ulvl Σ) (compare_univ Σ) Conv (bbody x) (bbody y))).
   Proof using Type. intros brs; eapply All2_refl; split; reflexivity. Qed.
 
   Lemma ws_cumul_pb_Case_p {Γ ci c brs p p'} :
@@ -3376,7 +3376,7 @@ Qed.
 
 Lemma subst_instance_ws_cumul_ctx_pb {cf:checker_flags} {Σ : global_env_ext} {wfΣ : wf Σ} {Δ u u'} pb :
   wf_local Σ (subst_instance u Δ) ->
-  cmp_universe_instance (eq_universe (global_ext_constraints Σ)) u u' ->
+  cmp_ulvl_instance (eq_ulvl (global_ext_constraints Σ)) u u' ->
   ws_cumul_ctx_pb pb Σ (subst_instance u Δ) (subst_instance u' Δ).
 Proof.
   move=> wf equ.
@@ -3435,7 +3435,7 @@ Qed.
 
 Lemma subst_instance_ws_cumul_ctx_pb_rel {cf:checker_flags} {Σ} {wfΣ : wf Σ} {Γ Δ u u' pb} :
   is_closed_context (Γ ,,, Δ) ->
-  cmp_universe_instance (eq_universe Σ) u u' ->
+  cmp_ulvl_instance (eq_ulvl Σ) u u' ->
   ws_cumul_ctx_pb_rel pb Σ Γ (subst_instance u Δ) (subst_instance u' Δ).
 Proof.
   move=> equ.
@@ -3482,7 +3482,7 @@ Proof.
 Qed.
 
 Lemma eq_term_inds {cf:checker_flags} (Σ : global_env_ext) u u' ind mdecl :
-  cmp_universe_instance (eq_universe (global_ext_constraints Σ)) u u' ->
+  cmp_ulvl_instance (eq_ulvl (global_ext_constraints Σ)) u u' ->
   All2 (eq_term Σ Σ) (inds (inductive_mind ind) u (ind_bodies mdecl))
     (inds (inductive_mind ind) u' (ind_bodies mdecl)).
 Proof.
@@ -3495,7 +3495,7 @@ Proof.
 Qed.
 
 Lemma conv_inds {cf:checker_flags} (Σ : global_env_ext) Γ u u' ind mdecl :
-  cmp_universe_instance (eq_universe (global_ext_constraints Σ)) u u' ->
+  cmp_ulvl_instance (eq_ulvl (global_ext_constraints Σ)) u u' ->
   is_closed_context Γ ->
   ws_cumul_pb_terms Σ Γ (inds (inductive_mind ind) u (ind_bodies mdecl))
     (inds (inductive_mind ind) u' (ind_bodies mdecl)).
@@ -3901,7 +3901,7 @@ Section MoreCongruenceLemmas.
 Defined.
 
 Lemma ws_cumul_pb_Prim {pb Γ p p'} :
-  onPrims (ws_cumul_pb Conv Σ Γ) (eq_universe Σ) p p' -> is_closed_context Γ ->
+  onPrims (ws_cumul_pb Conv Σ Γ) (eq_ulvl Σ) p p' -> is_closed_context Γ ->
   Σ;;; Γ ⊢ tPrim p ≤[pb] tPrim p'.
 Proof.
   intros Hp HΓ.
@@ -4081,7 +4081,7 @@ End CumulSpecIsCumulAlgo.
 
 Lemma cumulSpec_typed_cumulAlgo {cf} {Σ} {wfΣ : wf Σ} {Γ : context} {t A B s} :
   Σ ;;; Γ |- t : A ->
-  Σ ;;; Γ |- B : tSort s ->
+  Σ ;;; Γ |- B : tUniv s ->
   Σ ;;; Γ |- A <=s B  ->
   Σ ;;; Γ ⊢ A ≤ B.
 Proof.

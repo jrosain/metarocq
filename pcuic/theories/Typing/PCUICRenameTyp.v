@@ -435,7 +435,7 @@ Proof.
     * inv_on_free_vars. repeat toAll.
       eapply All2_impl. 1: tea. cbn; intros.
       destruct_head'_prod; eauto.
-  - eapply cumul_Sort; eauto.
+  - eapply cumul_Univ; eauto.
   - eapply cumul_Const; eauto.
 Defined.
 
@@ -830,7 +830,7 @@ Proof.
       eapply renaming_vass. 2: eauto.
       constructor.
       * destruct hf as [hΔ hf]. assumption.
-      * eapply lift_sorting_forget_univ, X0.
+      * eapply lift_univing_forget_univ, X0.
   - intros Σ wfΣ Γ wfΓ na A t B X hA ihA ht iht P Δ f hf.
     assert (lift_typing0 (typing Σ Δ) (j_vass na (rename f A))).
     + eapply ihA; eauto.

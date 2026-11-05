@@ -20,16 +20,16 @@ Implicit Types cf : checker_flags.
 
 Notation isWAT := (isWfArity typing).
 
-Lemma isType_Sort {cf:checker_flags} {Σ Γ s} :
-  wf_sort Σ s ->
+Lemma isType_Univ {cf:checker_flags} {Σ Γ s} :
+  wf_univ Σ s ->
   wf_local Σ Γ ->
-  isType Σ Γ (tSort s).
+  isType Σ Γ (tUniv s).
 Proof.
   intros wfs wfΓ.
-  eapply has_sort_isType.
+  eapply has_univ_isType.
   econstructor; eauto.
 Qed.
-#[global] Hint Resolve isType_Sort : pcuic.
+#[global] Hint Resolve isType_Univ : pcuic.
 
 Definition wf_typing_spine {cf} {Σ Γ T args T'} :=
   isType Σ Γ T × typing_spine Σ Γ T args T'.
@@ -66,8 +66,8 @@ Qed.
 
 Lemma subslet_inds_gen {cf} {Σ : global_env} {wfΣ : wf Σ} ind mdecl idecl :
   declared_inductive Σ ind mdecl idecl ->
-  let u := abstract_instance (ind_universes mdecl) in
-  subslet (Σ, ind_universes mdecl) [] (inds (inductive_mind ind) u (ind_bodies mdecl))
+  let u := abstract_instance (ind_ulvls mdecl) in
+  subslet (Σ, ind_ulvls mdecl) [] (inds (inductive_mind ind) u (ind_bodies mdecl))
     (arities_context (ind_bodies mdecl)).
 Proof.
   intros isdecl u.
@@ -76,7 +76,7 @@ Proof.
   apply on_declared_minductive in declm' as [oind oc]; auto.
   clear oc.
   assert (Alli (fun i x =>
-  (Σ, ind_universes mdecl) ;;; [] |- tInd {| inductive_mind := inductive_mind ind; inductive_ind := i |} u : (ind_type x)) 0 (ind_bodies mdecl)).
+  (Σ, ind_ulvls mdecl) ;;; [] |- tInd {| inductive_mind := inductive_mind ind; inductive_ind := i |} u : (ind_type x)) 0 (ind_bodies mdecl)).
   { apply forall_nth_error_Alli. intros.
     eapply Alli_nth_error in oind; eauto. simpl in oind.
     destruct oind. destruct onArity as (_ & s & Hs & _).
@@ -143,7 +143,7 @@ Section WfEnv.
       ∑ T' ctx' s',
         [× Σ ;;; Γ ⊢ T ⇝ T', (destArity [] T' = Some (ctx', s')),
           Σ ⊢ Γ ,,, smash_context [] ctx = Γ ,,, ctx' &
-          leq_sort (global_ext_constraints Σ) s s']
+          leq_univ (global_ext_constraints Σ) s s']
     | None => unit
     end.
   Proof using wfΣ.
@@ -155,12 +155,12 @@ Section WfEnv.
     generalize (#|ctx|) at 2. intros n; revert ctx.
     induction n; intros ctx Hlen Γ T HT.
     - destruct ctx; simpl in Hlen; try lia.
-      eapply ws_cumul_pb_Sort_l_inv in HT as [u' [redT leqT]].
-      exists (tSort u'), [], u'; split; auto.
+      eapply ws_cumul_pb_Univ_l_inv in HT as [u' [redT leqT]].
+      exists (tUniv u'), [], u'; split; auto.
       cbn. eapply ws_cumul_ctx_pb_refl; eauto with fvs.
     - destruct ctx using rev_ind.
-      * eapply ws_cumul_pb_Sort_l_inv in HT as [u' [redT leqT]].
-        exists (tSort u'), [], u'; split; auto; cbn.
+      * eapply ws_cumul_pb_Univ_l_inv in HT as [u' [redT leqT]].
+        exists (tUniv u'), [], u'; split; auto; cbn.
         apply ws_cumul_ctx_pb_refl; eauto with fvs.
       * rewrite it_mkProd_or_LetIn_app in HT; simpl in HT.
         destruct x as [na [b|] ty]; unfold mkProd_or_LetIn in HT; simpl in *.
@@ -216,12 +216,12 @@ Section WfEnv.
     split; intro HH.
     - destruct HH as (_ & s & H & _).
       apply inversion_Prod in H; tas. destruct H as [s1 [s2 [HA [HB Hs]]]].
-      apply lift_sorting_forget_univ in HA.
+      apply lift_univing_forget_univ in HA.
       split; pcuic.
     - destruct HH as [HA HB].
-      pose proof (lift_sorting_extract HA).
+      pose proof (lift_univing_extract HA).
       destruct HB as (_ & sB & HB & _).
-      eapply has_sort_isType.
+      eapply has_univ_isType.
       econstructor; eassumption.
   Defined.
 
@@ -243,13 +243,13 @@ Section WfEnv.
     : isType Σ Γ (tLetIn na t A B) -> isType Σ Γ (B {0:=t}).
   Proof using wfΣ.
     intro HH.
-    apply lift_sorting_it_impl_gen with HH => // H.
-    assert (Hs := typing_wf_sort _ H).
+    apply lift_univing_it_impl_gen with HH => // H.
+    assert (Hs := typing_wf_univ _ H).
     apply inversion_LetIn in H; tas. destruct H as (A' & Ht & HB & H).
     eapply (type_ws_cumul_pb (pb:=Cumul)) with (A' {0 := t}). eapply substitution_let in HB; eauto.
     * pcuic.
-    * eapply ws_cumul_pb_Sort_r_inv in H as [s' [H H']].
-      transitivity (tSort s'); eauto.
+    * eapply ws_cumul_pb_Univ_r_inv in H as [s' [H H']].
+      transitivity (tUniv s'); eauto.
       eapply red_ws_cumul_pb.
       apply invert_red_letin in H as [H|H] => //.
       destruct H as (d' & ty' & b' & [reds ]).
@@ -372,17 +372,17 @@ Section WfEnv.
 
   Lemma type_mkProd_or_LetIn {Γ} d {u t s} :
     lift_typing typing Σ Γ (j_decl_s d (Some u)) ->
-    Σ ;;; Γ ,, d |- t : tSort s ->
+    Σ ;;; Γ ,, d |- t : tUniv s ->
     match decl_body d return Type with
-    | Some b => Σ ;;; Γ |- mkProd_or_LetIn d t : tSort s
-    | None => Σ ;;; Γ |- mkProd_or_LetIn d t : tSort (Sort.sort_of_product u s)
+    | Some b => Σ ;;; Γ |- mkProd_or_LetIn d t : tUniv s
+    | None => Σ ;;; Γ |- mkProd_or_LetIn d t : tUniv (Universe.univ_of_product u s)
     end.
   Proof using wfΣ.
     destruct d as [na [b|] dty] => [Hd Ht|Hd Ht]; rewrite /mkProd_or_LetIn /=.
     - have wf := typing_wf_local Ht.
       depelim wf.
       eapply type_Cumul. econstructor; eauto.
-      econstructor; eauto. now eapply typing_wf_sort in Ht; pcuic.
+      econstructor; eauto. now eapply typing_wf_univ in Ht; pcuic.
       eapply convSpec_cumulSpec, red1_cumulSpec. constructor.
     - have wf := typing_wf_local Ht.
       depelim wf; clear l.
@@ -390,63 +390,63 @@ Section WfEnv.
   Qed.
 
   Lemma type_it_mkProd_or_LetIn {Γ Γ' u t s} :
-    wf_sort Σ u ->
+    wf_univ Σ u ->
     type_local_ctx (lift_typing typing) Σ Γ Γ' u ->
-    Σ ;;; Γ ,,, Γ' |- t : tSort s ->
-    Σ ;;; Γ |- it_mkProd_or_LetIn Γ' t : tSort (Sort.sort_of_product u s).
+    Σ ;;; Γ ,,, Γ' |- t : tUniv s ->
+    Σ ;;; Γ |- it_mkProd_or_LetIn Γ' t : tUniv (Universe.univ_of_product u s).
   Proof using wfΣ.
     revert Γ u s t.
     induction Γ'; simpl; auto; move=> Γ u s t wfu equ Ht.
     - eapply type_Cumul; eauto.
       econstructor; eauto using typing_wf_local with pcuic.
-      eapply typing_wf_sort in Ht; auto with pcuic.
-      eapply cumul_Sort. eapply leq_sort_product.
-    - specialize (IHΓ' Γ  u (Sort.sort_of_product u s)); auto.
+      eapply typing_wf_univ in Ht; auto with pcuic.
+      eapply cumul_Univ. eapply leq_univ_product.
+    - specialize (IHΓ' Γ  u (Universe.univ_of_product u s)); auto.
       unfold app_context in Ht.
       eapply type_Cumul.
       eapply IHΓ'; auto.
       destruct a as [na [b|] ty]; intuition auto.
       destruct a as [na [b|] ty]; cbn; destruct equ as (? & Hdecl).
       { apply typing_wf_local in Ht as XX. inversion XX; subst.
-        pose proof (lift_sorting_extract Hdecl).
+        pose proof (lift_univing_extract Hdecl).
         eapply (type_mkProd_or_LetIn {| decl_body := Some b |}); eauto.
         eapply type_Cumul; eauto.
         econstructor; eauto with pcuic.
-        eapply cumul_Sort. eapply leq_sort_product. }
+        eapply cumul_Univ. eapply leq_univ_product. }
       eapply (type_mkProd_or_LetIn {| decl_body := None |}) => /=; eauto.
       econstructor; eauto with pcuic.
       eapply typing_wf_local in Ht.
       depelim Ht; eapply All_local_env_app_inv in Ht; intuition auto.
-      now rewrite sort_of_product_twice.
+      apply convSpec_cumulSpec; apply cumul_Univ, univ_of_product_twice.
   Qed.
 
-  Fixpoint sort_of_products us s :=
+  Fixpoint univ_of_products us s :=
     match us with
     | [] => s
-    | u :: us => sort_of_products us (Sort.sort_of_product u s)
+    | u :: us => univ_of_products us (Universe.univ_of_product u s)
     end.
 
-  Lemma leq_sort_sort_of_products_mon {u u' v v'} :
-    Forall2 (leq_sort Σ) u u' ->
-    leq_sort Σ v v' ->
-    leq_sort Σ (sort_of_products u v) (sort_of_products u' v').
+  Lemma leq_univ_univ_of_products_mon {u u' v v'} :
+    Forall2 (leq_univ Σ) u u' ->
+    leq_univ Σ v v' ->
+    leq_univ Σ (univ_of_products u v) (univ_of_products u' v').
   Proof using Type.
     intros hu; induction hu in v, v' |- *; simpl; auto with pcuic.
     intros lev. eapply IHhu.
-    eapply leq_sort_product_mon => //.
+    eapply leq_univ_product_mon => //.
   Qed.
 
-  Lemma type_it_mkProd_or_LetIn_sorts {Γ Γ' us t s} :
-    sorts_local_ctx (lift_typing typing) Σ Γ Γ' us ->
-    Σ ;;; Γ ,,, Γ' |- t : tSort s ->
-    Σ ;;; Γ |- it_mkProd_or_LetIn Γ' t : tSort (sort_of_products us s).
+  Lemma type_it_mkProd_or_LetIn_univs {Γ Γ' us t s} :
+    univs_local_ctx (lift_typing typing) Σ Γ Γ' us ->
+    Σ ;;; Γ ,,, Γ' |- t : tUniv s ->
+    Σ ;;; Γ |- it_mkProd_or_LetIn Γ' t : tUniv (univ_of_products us s).
   Proof using wfΣ.
     revert Γ us s t.
     induction Γ'; simpl; auto; move=> Γ us s t equ Ht.
     - destruct us => //.
     - destruct a as [na [b|] ty]; intuition auto.
       * eapply IHΓ'; eauto.
-        pose proof (lift_sorting_extract b0).
+        pose proof (lift_univing_extract b0).
         eapply (type_mkProd_or_LetIn {| decl_body := Some b |}); eauto.
       * destruct us => //. destruct equ.
         simpl.
@@ -455,12 +455,12 @@ Section WfEnv.
   Qed.
 
   Lemma isType_it_mkProd_or_LetIn {Γ Γ' us t} :
-    sorts_local_ctx (lift_typing typing) Σ Γ Γ' us ->
+    univs_local_ctx (lift_typing typing) Σ Γ Γ' us ->
     isType Σ (Γ ,,, Γ') t ->
     isType Σ Γ (it_mkProd_or_LetIn Γ' t).
   Proof using cf Σ wfΣ.
-    move=> equs [_ [s [ttyp _]]]; eapply @has_sort_isType with (s := sort_of_products us s).
-    apply: type_it_mkProd_or_LetIn_sorts=> //.
+    move=> equs [_ [s [ttyp _]]]; eapply @has_univ_isType with (s := univ_of_products us s).
+    apply: type_it_mkProd_or_LetIn_univs=> //.
   Qed.
 
   Hint Extern 4 (_ ;;; _ |- _ <= _) => reflexivity : pcuic.
@@ -526,7 +526,7 @@ Section WfEnv.
 
   Lemma subslet_inds {ind u mdecl idecl} :
     declared_inductive Σ.1 ind mdecl idecl ->
-    consistent_instance_ext Σ (ind_universes mdecl) u ->
+    consistent_instance_ext Σ (ind_ulvls mdecl) u ->
     subslet Σ [] (inds (inductive_mind ind) u (ind_bodies mdecl))
       (subst_instance u (arities_context (ind_bodies mdecl))).
   Proof using wfΣ.
@@ -576,7 +576,7 @@ Section WfEnv.
     isType Σ Γ (subst0 s T).
   Proof using wfΣ.
     intros sub HT.
-    apply lift_sorting_it_impl_gen with HT => // Hs.
+    apply lift_univing_it_impl_gen with HT => // Hs.
     set (s' := HT.2.π1) in *; clearbody s'. clear HT.
     revert Γ s sub Hs.
     generalize (le_n #|Δ|).
@@ -595,7 +595,7 @@ Section WfEnv.
       rewrite it_mkProd_or_LetIn_app /= /mkProd_or_LetIn /=.
 
       intros Hs.
-      assert (wfs' := typing_wf_sort wfΣ Hs).
+      assert (wfs' := typing_wf_univ wfΣ Hs).
       eapply inversion_LetIn in Hs as (T' & wfT' & HT' & hlt); auto.
       eapply substitution_let in HT'; auto.
       eapply ws_cumul_pb_LetIn_l_inv in hlt; auto.
@@ -611,7 +611,7 @@ Section WfEnv.
       now rewrite -subst_app_simpl -H0 firstn_skipn in IHn.
 
       intros Hs.
-      assert (wfs' := typing_wf_sort wfΣ Hs).
+      assert (wfs' := typing_wf_univ wfΣ Hs).
       eapply inversion_Prod in Hs as (s1 & s2 & wfty & Hty & hlt); auto.
       pose proof (subslet_app_inv sub) as [subl subr].
       depelim subl; depelim subl. rewrite subst_empty in t0. rewrite H0 in subr.
@@ -623,16 +623,16 @@ Section WfEnv.
       forward IHn.
       eapply type_Cumul. simpl in X. eapply X.
       econstructor; eauto with pcuic.
-      eapply ws_cumul_pb_Sort_inv in hlt. eapply cumul_Sort.
-      transitivity (Sort.sort_of_product s1 s2).
-      eapply leq_sort_product. auto.
+      eapply ws_cumul_pb_Univ_inv in hlt. eapply cumul_Univ.
+      transitivity (Universe.univ_of_product s1 s2).
+      eapply leq_univ_product. auto.
       rewrite {2}Hl in IHn.
       now rewrite -subst_app_simpl -H0 firstn_skipn in IHn.
   Qed.
 
   Lemma on_minductive_wf_params {ind mdecl} {u} :
     declared_minductive Σ.1 ind mdecl ->
-    consistent_instance_ext Σ (ind_universes mdecl) u ->
+    consistent_instance_ext Σ (ind_ulvls mdecl) u ->
     wf_local Σ (subst_instance u (ind_params mdecl)).
   Proof using wfΣ.
     intros.
@@ -659,7 +659,7 @@ Section WfEnv.
         now rewrite app_context_assoc.
       * apply inversion_Prod in H as (s1 & s2 & wfty & HT & hlt); auto.
         eapply All_local_env_app. 1: eapply unlift_TypUniv in wfty; cbn in wfty; pcuic.
-        eapply All_local_env_app. apply lift_sorting_forget_univ in wfty. repeat (constructor; tea).
+        eapply All_local_env_app. apply lift_univing_forget_univ in wfty. repeat (constructor; tea).
         apply IHΔ in HT.
         eapply All_local_env_app_inv in HT. intuition auto.
         eapply All_local_env_impl; eauto. simpl. intros.

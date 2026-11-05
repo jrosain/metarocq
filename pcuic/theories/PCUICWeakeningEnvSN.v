@@ -9,8 +9,8 @@ Class normalizationInAdjustUniversesIn {cf} {no} (Σ : global_env_ext) :=
     : forall kn cb,
       lookup_env Σ.1 kn = Some (ConstantDecl cb) ->
       PCUICTyping.wf_ext Σ ->
-      PCUICTyping.wf_ext (Σ.1, cst_universes cb) ->
-      @NormalizationIn cf no Σ -> @NormalizationIn cf no (Σ.1, cst_universes cb).
+      PCUICTyping.wf_ext (Σ.1, cst_ulvls cb) ->
+      @NormalizationIn cf no Σ -> @NormalizationIn cf no (Σ.1, cst_ulvls cb).
 
 Lemma weakening_env_normalization_in {cf} {no}
   Σ Σ' ϕ (Hext : extends Σ Σ')

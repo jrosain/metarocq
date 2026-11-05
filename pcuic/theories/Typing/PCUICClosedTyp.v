@@ -75,7 +75,7 @@ Lemma declared_decl_closed_ind {cf : checker_flags} {Σ : global_env} {wfΣ : wf
   lookup_env Σ cst = Some decl ->
   on_global_env cumulSpec0 (fun _ => lift_wfb_term1 (fun Γ t => closedn #|Γ| t)) Σ ->
   on_global_decl cumulSpec0 (fun _ => lift_wfb_term1 (fun Γ t => closedn #|Γ| t))
-                 (Σ, universes_decl_of_decl decl) cst decl.
+                 (Σ, ulvls_decl_of_decl decl) cst decl.
 Proof.
   intros.
   eapply weaken_lookup_on_global_env; eauto. do 2 red; eauto.
@@ -514,7 +514,7 @@ Qed.
 Lemma declared_decl_closed `{checker_flags} {Σ : global_env} {cst decl} :
   wf Σ ->
   lookup_env Σ cst = Some decl ->
-  on_global_decl cumulSpec0 (fun _ => lift_wfb_term1 (fun Γ t => closedn #|Γ| t)) (Σ, universes_decl_of_decl decl) cst decl.
+  on_global_decl cumulSpec0 (fun _ => lift_wfb_term1 (fun Γ t => closedn #|Γ| t)) (Σ, ulvls_decl_of_decl decl) cst decl.
 Proof.
   intros.
   apply declared_decl_closed_ind; eauto.
@@ -851,7 +851,7 @@ Lemma term_closedn_list_ind :
     (forall k (n : nat), n < k -> P k (tRel n)) ->
     (forall k (i : ident), P k (tVar i)) ->
     (forall k (n : nat) (l : list term), All (P k) l -> P k (tEvar n l)) ->
-    (forall k s, P k (tSort s)) ->
+    (forall k s, P k (tUniv s)) ->
     (forall k (n : aname) (t : term), P k t -> forall t0 : term, P (S k) t0 -> P k (tProd n t t0)) ->
     (forall k (n : aname) (t : term), P k t -> forall t0 : term, P (S k)  t0 -> P k (tLambda n t t0)) ->
     (forall k (n : aname) (t : term),
@@ -969,7 +969,7 @@ Lemma term_noccur_between_list_ind :
     (forall k n (i : nat), i < k \/ k + n <= i -> P k n (tRel i)) ->
     (forall k n (i : ident), P k n (tVar i)) ->
     (forall k n (id : nat) (l : list term), All (P k n) l -> P k n (tEvar id l)) ->
-    (forall k n s, P k n (tSort s)) ->
+    (forall k n s, P k n (tUniv s)) ->
     (forall k n (na : aname) (t : term), P k n t -> forall t0 : term, P (S k) n t0 -> P k n (tProd na t t0)) ->
     (forall k n (na : aname) (t : term), P k n t -> forall t0 : term, P (S k) n t0 -> P k n (tLambda na t t0)) ->
     (forall k n (na : aname) (t : term),

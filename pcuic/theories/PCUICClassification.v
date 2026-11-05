@@ -800,10 +800,10 @@ Section classification.
     pose proof (subject_closed typed) as cl.
     depelim ne; simpl in *.
     - exfalso. eauto using wh_neutral_empty.
-    - eapply inversion_Sort in typed as (? & ? & e); auto.
-      now eapply invert_cumul_sort_ind in e.
+    - eapply inversion_Univ in typed as (? & ? & e); auto.
+      now eapply invert_cumul_univ_ind in e.
     - eapply inversion_Prod in typed as (? & ? & ? & ? & e); auto.
-      now eapply invert_cumul_sort_ind in e.
+      now eapply invert_cumul_univ_ind in e.
     - eapply inversion_Lambda in typed as (? & ? & ? & e); auto.
       now eapply invert_cumul_prod_ind in e.
     - now rewrite head_mkApps /= /head /=.

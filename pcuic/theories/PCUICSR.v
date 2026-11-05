@@ -26,7 +26,7 @@ Derive Signature for OnOne2_local_env.
 Ltac rename_hyp h ht ::= my_rename_hyp h ht.
 
 Arguments Nat.sub : simpl nomatch.
-Arguments Sort.sort_of_product : simpl nomatch.
+Arguments Universe.univ_of_product : simpl nomatch.
 
 (* Preservation of wf_*fixpoint *)
 
@@ -171,7 +171,7 @@ Qed.
 #[global] Hint Extern 0 (cumul_context _ _ _) => constructor : pcuic.
 
 Ltac unfold_pcuic :=
-  progress (unfold PCUICTypingDef.typing, PCUICLookup.wf_sort in * ).
+  progress (unfold PCUICTypingDef.typing, PCUICLookup.wf_univ in * ).
 #[global] Hint Extern 10 => unfold_pcuic : pcuic.
 
 #[global] Hint Resolve red_conv red1_red red_cumul : pcuic.
@@ -407,8 +407,8 @@ Qed.
     we don't need to compare their instances when fully applied. *)
 Lemma cmp_global_instance_cstr_irrelevant {cf} {Σ} {wfΣ  : wf Σ} {ci c} {mdecl idecl cdecl u u'} :
   declared_constructor Σ (ci, c) mdecl idecl cdecl ->
-  cmp_ind_universes Σ ci (context_assumptions (ind_params mdecl) + #|cstr_indices cdecl|) u u' ->
-  cmp_global_instance Σ.1 (compare_universe Σ) Conv (ConstructRef ci c)
+  cmp_ind_ulvls Σ ci (context_assumptions (ind_params mdecl) + #|cstr_indices cdecl|) u u' ->
+  cmp_global_instance Σ.1 (compare_ulvl Σ) Conv (ConstructRef ci c)
     (ind_npars mdecl + context_assumptions (cstr_args cdecl)) u u'.
 Proof.
   intros declc.
@@ -425,7 +425,7 @@ Qed.
 Lemma wf_pre_case_branch_context {cf} {Σ} {wfΣ : wf Σ} {Γ ci mdecl idecl p} {br : branch term} {cdecl} :
   declared_inductive Σ ci mdecl idecl ->
   wf_branch_gen cdecl (forget_types (bcontext br)) ->
-  consistent_instance_ext Σ (ind_universes mdecl) (puinst p) ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) (puinst p) ->
   wf_local Σ (Γ,,, case_branch_context ci mdecl p (forget_types (bcontext br)) cdecl) ->
   wf_local Σ (Γ,,, pre_case_branch_context ci mdecl (pparams p) (puinst p) cdecl).
 Proof.
@@ -486,7 +486,7 @@ Qed.
 
 Lemma on_constructor_wf_args {cf} {Σ} {wfΣ : wf Σ} {ind c mdecl idecl cdecl u} :
   declared_constructor Σ (ind, c) mdecl idecl cdecl ->
-  consistent_instance_ext Σ (ind_universes mdecl) u ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) u ->
   wf_local Σ (subst_instance u (ind_params mdecl) ,,,
     (subst_context (ind_subst mdecl ind u)) #|ind_params mdecl| (subst_instance u (cstr_args cdecl))).
 Proof.
@@ -1196,11 +1196,11 @@ Qed.
 
 Lemma on_constructor_wf_arities_pars_args {cf} {Σ} {wfΣ : wf Σ} {i mdecl idecl cdecl} :
   declared_constructor Σ.1 i mdecl idecl cdecl ->
-  wf_local (Σ.1, ind_universes mdecl) (arities_context (ind_bodies mdecl) ,,, ind_params mdecl ,,, cstr_args cdecl).
+  wf_local (Σ.1, ind_ulvls mdecl) (arities_context (ind_bodies mdecl) ,,, ind_params mdecl ,,, cstr_args cdecl).
 Proof.
   move=> H.
   pose proof (on_declared_constructor H) as [[onmind oib] [cs [hnth onc]]].
-  move/on_cargs/sorts_local_ctx_wf_local: onc => H'.
+  move/on_cargs/univs_local_ctx_wf_local: onc => H'.
   apply H'.
   apply weaken_wf_local; tea.
   eapply (wf_arities_context H).
@@ -1220,7 +1220,7 @@ Qed.
 
 Lemma on_constructor_closed_indices_inst {cf} {Σ} {wfΣ : wf Σ} {i mdecl idecl cdecl u} :
   declared_constructor Σ.1 i mdecl idecl cdecl ->
-  consistent_instance_ext Σ (ind_universes mdecl) u ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) u ->
   All (is_open_term (ind_params mdecl ,,, cstr_args cdecl)@[u])
     (map (subst (inds (inductive_mind (fst i)) u (ind_bodies mdecl))
            (#|cstr_args cdecl| + #|ind_params mdecl|)) (cstr_indices cdecl)@[u]).
@@ -1362,7 +1362,7 @@ Qed.
 
 Lemma inst_case_branch_context_eq {cf} {Σ} {wfΣ : wf Σ} {p br} {ind mdecl cdecl} :
   declared_minductive Σ (inductive_mind ind) mdecl ->
-  consistent_instance_ext Σ (ind_universes mdecl) p.(puinst) ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) p.(puinst) ->
   eq_context_upto_names br.(bcontext) (cstr_branch_context ind mdecl cdecl) ->
   eq_context_upto_names (inst_case_branch_context p br) (pre_case_branch_context ind mdecl p.(pparams) p.(puinst) cdecl).
 Proof.
@@ -1427,7 +1427,7 @@ Qed.
 
 Lemma isType_subst_arities {cf} {Σ} {wfΣ : wf Σ} {ind mdecl idecl u} {Γ T} :
   declared_inductive Σ ind mdecl idecl ->
-  consistent_instance_ext Σ (ind_universes mdecl) u ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) u ->
   isType Σ ((arities_context (ind_bodies mdecl))@[u] ,,, Γ) T ->
   isType Σ (subst_context (ind_subst mdecl ind u) 0 Γ) (subst (ind_subst mdecl ind u) #|Γ| T).
 Proof.
@@ -1452,7 +1452,7 @@ Lemma isType_expand_lets  {cf} {Σ} {wfΣ : wf Σ} {Γ Δ T} :
   isType Σ (Γ ,,, Δ) T ->
   isType Σ (smash_context [] Γ ,,, expand_lets_ctx Γ Δ) (expand_lets_k Γ #|Δ| T).
 Proof.
-  intros (_ & s & Hs & _). eapply has_sort_isType. revert Hs.
+  intros (_ & s & Hs & _). eapply has_univ_isType. revert Hs.
   rewrite -[_ ,,, _]app_context_nil_l app_context_assoc.
   move/typing_expand_lets_gen; rewrite app_context_nil_l => hs.
   apply hs.
@@ -1463,7 +1463,7 @@ Lemma isType_subst_extended_subst {cf} {Σ} {wfΣ : wf Σ} {Γ Δ T} :
   isType Σ (smash_context [] Γ ,,, subst_context (extended_subst Γ 0) 0 Δ)
     (subst (extended_subst Γ 0) #|Δ| T).
 Proof.
-  intros (_ & s & Hs & _). eapply has_sort_isType.
+  intros (_ & s & Hs & _). eapply has_univ_isType.
   have wfctx := typing_wf_local Hs.
   generalize Hs.
   rewrite -[_ ,,, _]app_context_nil_l app_context_assoc.
@@ -1484,7 +1484,7 @@ Lemma isType_mkApps_Ind_proj_inv {cf:checker_flags} {Σ Γ p u pars} (wfΣ : wf 
     [× spine_subst Σ Γ pars (List.rev pars) (smash_context [] parctx),
        #|pars| = ind_npars mdecl,
        idecl.(ind_indices) = [] &
-       consistent_instance_ext Σ (ind_universes mdecl) u].
+       consistent_instance_ext Σ (ind_ulvls mdecl) u].
 Proof.
   move=> isTy. generalize isTy. apply isType_wf_local in isTy.
   move/(isType_mkApps_Ind_inv _ declm isTy) => [parsubst [argsubst [sp sargs hp hargs cu]]].
@@ -1519,9 +1519,9 @@ Lemma lift_judgment_SR {cf : checker_flags} {Σ : global_env_ext} {wfΣ : wf Σ}
 Proof.
   cbn; intros tu Hdecl.
   destruct tm as [tm|], tm' as [tm'|] => //; destruct Hdecl as (<- & h). 1: destruct h as [[h <-] | [h <-]].
-  all: apply lift_sorting_it_impl_gen with tu => //= [] [] HT IHT; eauto.
+  all: apply lift_univing_it_impl_gen with tu => //= [] [] HT IHT; eauto.
   eapply type_ws_cumul_pb; tea.
-  { eapply lift_sorting_forget_rel, lift_sorting_forget_univ, lift_sorting_it_impl_gen with tu => // Ht. now apply Ht. }
+  { eapply lift_univing_forget_rel, lift_univing_forget_univ, lift_univing_it_impl_gen with tu => // Ht. now apply Ht. }
   eapply (red_ws_cumul_pb (pb:=Cumul)).
   now eapply closed_red1_red.
 Qed.
@@ -1560,11 +1560,11 @@ Proof.
     * depelim X. apply All_local_rel_abs.
       now eapply All_local_env_app_inv.
       eapply lift_judgment_SR with (2 := p).
-      eapply lift_sorting_it_impl_gen with (tu := tu) => //.
+      eapply lift_univing_it_impl_gen with (tu := tu) => //.
     * depelim X. apply All_local_rel_def.
       now eapply All_local_env_app_inv.
       eapply lift_judgment_SR with (2 := p); tea.
-      eapply lift_sorting_it_impl_gen with tu => //=.
+      eapply lift_univing_it_impl_gen with tu => //=.
 
     * assert (wf_local Σ (Γ' ,,, Γ'0) × lift_typing typing Σ (Γ' ,,, Γ) (j_decl d) × is_closed_context (Γ' ,,, Γ)) as (wfΓ' & ond & clΓ').
       { depelim X; specialize (IHX0 _ X); clear X; pose proof (wf_local_closed_context all).
@@ -1596,7 +1596,7 @@ Proof.
     constructor; eauto.
     unshelve eapply (closed_context_conversion _ typeb).
     1: constructor; tas.
-    1: now eapply lift_sorting_forget_univ.
+    1: now eapply lift_univing_forget_univ.
     constructor.
     now eapply ws_cumul_ctx_pb_refl, wf_local_closed_context.
     constructor; auto. eapply red_conv.
@@ -1744,9 +1744,9 @@ Proof.
     assert(wfparu : wf_local Σ (subst_instance (puinst p) (ind_params mdecl))).
     { eapply on_minductive_wf_params; eauto.
       destruct isdecl; eauto.  }
-    assert (wfps : wf_sort Σ ps).
-    { eapply validity in IHp; auto. eapply PCUICWfUniverses.isType_wf_universes in IHp; tea.
-      move: IHp => /= /PCUICWfUniverses.wf_sort_reflect //. }
+    assert (wfps : wf_univ Σ ps).
+    { eapply validity in IHp; auto. eapply PCUICWfUniverses.isType_wf_ulvls in IHp; tea.
+      move: IHp => /= /PCUICWfUniverses.wf_univ_reflect //. }
     have lenpars := (wf_predicate_length_pars H0).
     unfold hidebody in X8.
     set (ptm := it_mkLambda_or_LetIn _ _).
@@ -2176,7 +2176,7 @@ Proof.
       eapply closedn_smash_context.
       now eapply declared_inductive_closed_params_inst. }
     have isty' : isType Σ Γ (mkApps (tInd ci (puinst p)) (params' ++ indices)).
-    { eapply has_sort_isType; eapply isType_mkApps_Ind; tea. }
+    { eapply has_univ_isType; eapply isType_mkApps_Ind; tea. }
     have wfcpc' : wf_local Σ (Γ ,,, case_predicate_context ci mdecl idecl (set_pparams p params')).
     { eapply wf_case_predicate_context; tea. }
     have eqindices : ws_cumul_pb_terms Σ Γ indices indices.
@@ -2248,7 +2248,7 @@ Proof.
         apply weaken_wf_local => //. eapply on_minductive_wf_params; tea. eapply isdecl. }
       eapply (type_ws_cumul_pb (pb:=Conv)); tea.
       + eapply closed_context_conversion; tea.
-      + eapply has_sort_isType with (s := ps). exact wfcbcty'.
+      + eapply has_univ_isType with (s := ps). exact wfcbcty'.
       + eapply ws_cumul_pb_mkApps; tea.
         { rewrite /ptm. cbn [preturn set_pparams].
           rewrite !lift_it_mkLambda_or_LetIn.
@@ -2260,7 +2260,7 @@ Proof.
           rewrite !case_predicate_context_length // /= Nat.add_0_r.
           relativize #|pcontext p|. relativize #|cstr_args cdecl|.
           eapply weakening_ws_cumul_pb; tea.
-          apply isType_ws_cumul_pb_refl. now eapply has_sort_isType.
+          apply isType_ws_cumul_pb_refl. now eapply has_univ_isType.
           now apply wf_local_closed_context.
           now apply case_branch_context_length_args.
           now rewrite case_predicate_context_length. }
@@ -2359,7 +2359,7 @@ Proof.
       destruct a1 as [wfparctx wfparctx' wfcbc wfcbty].
       split => //. split => //.
       eapply type_ws_cumul_pb; tea.
-      now eapply has_sort_isType.
+      now eapply has_univ_isType.
       eapply (ws_cumul_pb_ws_cumul_ctx (pb':=Cumul)); tea.
       2:eapply closed_red1_ws_cumul_pb, btyred.
       now apply ws_cumul_ctx_pb_refl, wf_local_closed_context.
@@ -2600,14 +2600,14 @@ Proof.
     { rewrite firstn_skipn.
       unshelve epose proof (isdecl' := declared_projection_to_gen isdecl); eauto.
       eapply (isType_subst_instance_decl _ _ _ _ _ u wf isdecl'.p1.p1.p1) in projty; eauto.
-      apply lift_sorting_f_it_impl with (tu := projty) => // Hs.
+      apply lift_univing_f_it_impl with (tu := projty) => // Hs.
       rewrite /= /map_decl /= in Hs.
       eapply (weaken_ctx Γ) in Hs; auto.
       rewrite (subst_app_simpl [_]).
       destruct projeq as [decl' [hnthargs hty wf' projeq1 projty']].
-      eapply (substitution0 (T := tSort _)).
+      eapply (substitution0 (T := tUniv _)).
       eapply (PCUICSubstitution.substitution (Γ' := subst_instance u (smash_context [] (ind_params mdecl)))
-        (Δ := [vass _ _]) (T := tSort _)); eauto.
+        (Δ := [vass _ _]) (T := tUniv _)); eauto.
       rewrite firstn_all2 in iparsubst0. lia.
       eapply spine_subst_smash in iparsubst0; auto.
       rewrite subst_instance_smash.
@@ -2870,7 +2870,7 @@ Proof.
       * intros d HT.
         apply lift_typing_impl with (1 := HT); now intros ?? [Hty _].
       * intros d d' [[red _] eq] HT'. noconf eq. rewrite /on_def_type -H3.
-        apply lift_sorting_it_impl_gen with HT' => //; now intros [_ IH]. }
+        apply lift_univing_it_impl_gen with HT' => //; now intros [_ IH]. }
     assert (wf_local Σ (Γ ,,, fix_context mfix1)).
     { apply All_mfix_wf; auto. }
     destruct (OnOne2_nth_error _ _ _ decl _ X4 heq_nth_error) as [decl' [eqnth disj]].
@@ -2890,13 +2890,13 @@ Proof.
         rewrite /= in red, Hred, eq, HB, HT.
         noconf eq.
         destruct HB as ((Hb & IHb) & s & (Ht & IHt) & e & er); cbn in *.
-        eassert (Σ ;;; Γ ,,, _ |- lift0 _ ty' : tSort s).
+        eassert (Σ ;;; Γ ,,, _ |- lift0 _ ty' : tUniv s).
         2: repeat (eexists; cbn). 4: eassumption.
         2,3: eapply context_conversion; eauto.
         all: rewrite -fixl.
         { eapply IHt. eapply @weakening_closed_red1 with (Γ' := []); eauto. now eapply wf_local_closed_context. }
         eapply type_Cumul_alt. eapply Hb.
-        eapply has_sort_isType. rewrite fixl. eassumption.
+        eapply has_univ_isType. rewrite fixl. eassumption.
         apply red_cumul, red1_red.
         eapply (weakening_red1 _ []); auto.
         2:eapply red.
@@ -2946,7 +2946,7 @@ Proof.
       + move=> [na ty b rarg] [na' ty' b' rarg'] /= [[[red IH] eq] HT] HB.
         noconf eq.
         rewrite -convctx.
-        apply lift_sorting_it_impl_gen with HB => //= [] [Ht IHt] //. eauto.
+        apply lift_univing_it_impl_gen with HB => //= [] [Ht IHt] //. eauto.
     * eapply wf_fixpoint_red1_body; eauto.
       eapply OnOne2_impl; tea; cbn; intuition auto.
       apply a2. apply a2.
@@ -2980,7 +2980,7 @@ Proof.
       * intros d HT.
         apply lift_typing_impl with (1 := HT); now intros ?? [Hty _].
       * intros d d' [[red _] eq] HT'. noconf eq. rewrite /on_def_type -H3.
-        apply lift_sorting_it_impl_gen with HT' => //. now intros [_ IH]. }
+        apply lift_univing_it_impl_gen with HT' => //. now intros [_ IH]. }
     assert (wf_local Σ (Γ ,,, fix_context mfix1)).
     { apply All_mfix_wf; auto. }
     destruct (OnOne2_nth_error _ _ _ decl _ X4 heq_nth_error) as [decl' [eqnth disj]].
@@ -3000,13 +3000,13 @@ Proof.
         rewrite /= in red, Hred, eq, HB, HT.
         noconf eq.
         destruct HB as ((Hb & IHb) & s & (Ht & IHt) & e & er); cbn in *.
-        eassert (Σ ;;; Γ ,,, _ |- lift0 _ ty' : tSort s).
+        eassert (Σ ;;; Γ ,,, _ |- lift0 _ ty' : tUniv s).
         2: repeat (eexists; cbn). 4: eassumption.
         2,3: eapply context_conversion; eauto.
         all: rewrite -fixl.
         { eapply IHt. eapply @weakening_closed_red1 with (Γ' := []); eauto. now eapply wf_local_closed_context. }
         eapply type_Cumul_alt. eapply Hb.
-        eapply has_sort_isType. rewrite fixl. eassumption.
+        eapply has_univ_isType. rewrite fixl. eassumption.
         apply red_cumul, red1_red.
         eapply (weakening_red1 _ []); auto.
         2:eapply red.
@@ -3056,7 +3056,7 @@ Proof.
       + move=> [na ty b rarg] [na' ty' b' rarg'] /= [[[red IH] eq] HT] HB.
         noconf eq.
         rewrite -convctx.
-        apply lift_sorting_it_impl_gen with HB => //= [] [Ht IHt] //. eauto.
+        apply lift_univing_it_impl_gen with HB => //= [] [Ht IHt] //. eauto.
     * eapply wf_cofixpoint_red1_body; eauto.
       eapply OnOne2_impl; tea; cbn; intuition auto.
       apply a2. apply a2.
@@ -3082,10 +3082,10 @@ Proof.
     eapply (type_ws_cumul_pb (pb:=Conv)); tea.
     eapply (type_Prim _ _ (primArray; primArrayModel (set_array_type arr ty))); tea.
     constructor; cbn; eauto.
-    * eapply type_ws_cumul_pb; tea. eapply has_sort_isType; eauto.
+    * eapply type_ws_cumul_pb; tea. eapply has_univ_isType; eauto.
       now eapply (red_ws_cumul_pb (pb:=Conv)), closed_red1_red.
     * solve_all.
-      eapply type_ws_cumul_pb; tea. eapply has_sort_isType; eauto.
+      eapply type_ws_cumul_pb; tea. eapply has_univ_isType; eauto.
       now eapply (red_ws_cumul_pb (pb:=Conv)), closed_red1_red.
     * simp prim_type. eapply ws_cumul_pb_App.
       eapply ws_cumul_pb_refl; fvs. cbn.
@@ -3156,7 +3156,7 @@ Lemma type_reduction {cf} {Σ} {wfΣ : wf Σ} {Γ t A B} :
 Proof.
   intros Ht Hr.
   eapply type_Cumul_alt. eassumption.
-  apply lift_sorting_it_impl_gen with (validity Ht) => // HA.
+  apply lift_univing_it_impl_gen with (validity Ht) => // HA.
   eapply subject_reduction; eassumption.
   eapply conv_cumul. now apply PCUICCumulativity.red_conv.
 Defined.
@@ -3204,7 +3204,7 @@ Section SRContext.
   Lemma wf_local_isType_nth {Σ} {wfΣ : wf Σ} Γ n decl :
     wf_local Σ Γ ->
     nth_error Γ n = Some decl ->
-    ∑ s, Σ ;;; Γ |- lift0 (S n) (decl_type decl) : tSort s.
+    ∑ s, Σ ;;; Γ |- lift0 (S n) (decl_type decl) : tUniv s.
   Proof using Type.
     intros wfΓ Hnth.
     eapply All_local_env_nth_error in wfΓ as H; tea.
@@ -3246,22 +3246,22 @@ Section SRContext.
     induction H in Γ', r, X |-  *; depelim r.
     - constructor; auto. cbn in o.
       destruct o as [<- r].
-      apply lift_sorting_it_impl_gen with t1 => // Hs.
+      apply lift_univing_it_impl_gen with t1 => // Hs.
       eapply subject_reduction1 in Hs; eauto.
     - depelim X.
       constructor; auto.
-      apply lift_sorting_it_impl_gen with t1 => // Hs.
+      apply lift_univing_it_impl_gen with t1 => // Hs.
       eapply context_conversion; eauto.
     - depelim X.
       destruct o as [<- [[r ->]|[r <-]]].
       all: constructor; auto.
-      all: apply lift_sorting_it_impl_gen with t1 => // Hs.
+      all: apply lift_univing_it_impl_gen with t1 => // Hs.
       + eapply type_reduction; tea. pcuic.
       + eapply subject_reduction1; eauto.
       + eapply subject_reduction1; eauto.
     - depelim X.
       constructor; auto.
-      apply lift_sorting_it_impl_gen with t1 => // Hs.
+      apply lift_univing_it_impl_gen with t1 => // Hs.
       all: eapply context_conversion; eauto.
     - eapply context_conversion; eauto.
   Qed.
@@ -3272,16 +3272,16 @@ Section SRContext.
     induction 1; cbn in *.
     - destruct p as [-> r]. intro e. inversion e; subst; cbn in *.
       constructor; tas.
-      apply lift_sorting_it_impl_gen with X0 => // Hs.
+      apply lift_univing_it_impl_gen with X0 => // Hs.
       eapply subject_reduction1; tea.
     - intro e. inversion e; subst; cbn in *.
       destruct p as [-> [[? []]|[? []]]]; constructor; cbn; tas.
-      all: apply lift_sorting_it_impl_gen with X0 => // Hs.
+      all: apply lift_univing_it_impl_gen with X0 => // Hs.
       + eapply type_reduction; tea. pcuic.
       + eapply subject_reduction1; tea.
       + eapply subject_reduction1; tea.
     - intro H; inversion H; subst; constructor; cbn in *; auto.
-      all: apply lift_sorting_it_impl_gen with X1 => // Hs.
+      all: apply lift_univing_it_impl_gen with X1 => // Hs.
       all: eapply subject_reduction_ctx; tea.
   Qed.
 
@@ -3367,7 +3367,7 @@ Section SRContext.
      isType Σ Γ B.
    Proof using Type.
      intros HT red.
-     apply lift_sorting_it_impl_gen with HT => // Hs.
+     apply lift_univing_it_impl_gen with HT => // Hs.
      eapply subject_reduction1; eauto.
    Qed.
 
@@ -3426,7 +3426,7 @@ Section SRContext.
    Lemma isType_red {Σ} {wfΣ : wf Σ} {Γ T U} :
     isType Σ Γ T -> red Σ Γ T U -> isType Σ Γ U.
    Proof using Type.
-     intros HT red; apply lift_sorting_it_impl_gen with HT => // Hs.
+     intros HT red; apply lift_univing_it_impl_gen with HT => // Hs.
      eapply subject_reduction; eauto.
    Qed.
 
@@ -3440,22 +3440,22 @@ Proof.
   - destruct HH as (_ & s & H & _).
     apply inversion_LetIn in H as (A' & HtA & HB & H); tas.
     split; tas.
-    apply ws_cumul_pb_Sort_r_inv in H as [s' [H H']].
-    eapply has_sort_isType.
+    apply ws_cumul_pb_Univ_r_inv in H as [s' [H H']].
+    eapply has_univ_isType.
     eapply type_reduction; tea.
     apply invert_red_letin in H as [[? [? [? [H ? ? ?]]]]|H]; tas.
     * discriminate.
     * etransitivity.
       + exact (@red_rel_all _ (Γ ,, vdef na t A) 0 t A' eq_refl).
-      + eapply (weakening_red_0 (Γ' := [_]) (N := tSort _)); tea; [reflexivity|..].
+      + eapply (weakening_red_0 (Γ' := [_]) (N := tUniv _)); tea; [reflexivity|..].
         erewrite -> on_free_vars_ctx_on_ctx_free_vars. apply H.
         apply H. apply H.
   - destruct HH as (HtA & HB).
-    apply lift_sorting_f_it_impl with HB => // Hs.
+    apply lift_univing_f_it_impl with HB => // Hs.
     eapply type_reduction; tas.
     * econstructor; tea.
     * apply red1_red.
-      apply red_zeta with (b':=tSort _).
+      apply red_zeta with (b':=tUniv _).
 Defined.
 
 (** Keep at the end to not disturb asynchronous proof processing *)

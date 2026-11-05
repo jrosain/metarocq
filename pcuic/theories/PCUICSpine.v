@@ -344,16 +344,16 @@ Section WfEnv.
   Lemma inversion_mkApps_direct {Γ f u T} :
     isType Σ Γ T ->
     Σ ;;; Γ |- mkApps f u : T ->
-    ∑ A s', Σ ;;; Γ |- f : A × Σ ;;; Γ |- A : tSort s' × typing_spine Σ Γ A u T.
+    ∑ A s', Σ ;;; Γ |- f : A × Σ ;;; Γ |- A : tUniv s' × typing_spine Σ Γ A u T.
   Proof using wfΣ.
     induction u in f, T |- *. simpl. intros.
-    { destruct X as (_ & s & X & _). exists T, s. intuition pcuic. eapply typing_spine_refl. eapply has_sort_isType; eauto. }
+    { destruct X as (_ & s & X & _). exists T, s. intuition pcuic. eapply typing_spine_refl. eapply has_univ_isType; eauto. }
     intros HT Hf. simpl in Hf.
     destruct u. simpl in Hf, IHu.
     - edestruct @inversion_App_size with (H := Hf) as (na' & A' & B' & s & Hf' & Ha & HA & _ & _ & _ & HA'''); tea.
       eexists _, _; intuition eauto.
       econstructor; eauto with pcuic.
-      eapply isType_ws_cumul_pb_refl; eapply has_sort_isType; eauto.
+      eapply isType_ws_cumul_pb_refl; eapply has_univ_isType; eauto.
       econstructor. all:eauto with pcuic.
 
       eapply inversion_Prod in HA as (? & ? & ? & ? & ?); tea.
@@ -391,11 +391,11 @@ Section WfEnv.
     all: now rewrite app_context_length in b0.
   Qed.
 
-  Lemma subst_sorts_local_ctx {Γ Γ' Δ Δ' s ctxs} :
+  Lemma subst_univs_local_ctx {Γ Γ' Δ Δ' s ctxs} :
     wf_local Σ (Γ ,,, Δ ,,, Γ') ->
-    sorts_local_ctx (lift_typing typing) Σ (Γ ,,, Δ ,,, Γ') Δ' ctxs ->
+    univs_local_ctx (lift_typing typing) Σ (Γ ,,, Δ ,,, Γ') Δ' ctxs ->
     subslet Σ Γ s Δ ->
-    sorts_local_ctx (lift_typing typing) Σ (Γ ,,, subst_context s 0 Γ') (subst_context s #|Γ'| Δ') ctxs.
+    univs_local_ctx (lift_typing typing) Σ (Γ ,,, subst_context s 0 Γ') (subst_context s #|Γ'| Δ') ctxs.
   Proof using wfΣ.
     induction Δ' in Γ', ctxs |- *; simpl; auto.
     destruct a as [na [b|] ty]; rewrite subst_context_snoc /= /subst_decl /map_decl /=;
@@ -427,8 +427,8 @@ Section WfEnv.
   Import PCUICConversion.
 
   Lemma arity_typing_spine {Γ Γ' s inst s'} :
-    typing_spine Σ Γ (it_mkProd_or_LetIn Γ' (tSort s)) inst (tSort s') ->
-    [× (#|inst| = context_assumptions Γ'), leq_sort (global_ext_constraints Σ) s s' &
+    typing_spine Σ Γ (it_mkProd_or_LetIn Γ' (tUniv s)) inst (tUniv s') ->
+    [× (#|inst| = context_assumptions Γ'), leq_univ (global_ext_constraints Σ) s s' &
       ∑ instsubst, spine_subst Σ Γ inst instsubst Γ'].
   Proof using wfΣ.
     revert s inst s'.
@@ -440,19 +440,19 @@ Section WfEnv.
     - destruct Γ' using rev_ind; try clear IHΓ'; simpl; intros len s inst s' Hsp.
       + dependent elimination Hsp as [spnil _ _ cum|spcons isty isty' cum tyhd sp].
         ++ split=>//.
-          now eapply ws_cumul_pb_Sort_inv in cum.
+          now eapply ws_cumul_pb_Univ_inv in cum.
           exists []. split; try constructor; eauto with pcuic.
           all:now eapply isType_wf_local.
-        ++ now eapply ws_cumul_pb_Sort_Prod_inv in cum.
+        ++ now eapply ws_cumul_pb_Univ_Prod_inv in cum.
       + rewrite length_app /= in len; exfalso; lia.
     - intros len s inst s' Hsp.
       destruct Γ' using rev_ind; try clear IHΓ'.
       -- dependent elimination Hsp as [spnil _ _ cum|spcons isty isty' cum tyhd sp].
         1:split; auto.
-        --- now eapply ws_cumul_pb_Sort_inv in cum.
+        --- now eapply ws_cumul_pb_Univ_inv in cum.
         --- exists []; split; try constructor; auto.
             all:now eapply isType_wf_local.
-        --- now eapply ws_cumul_pb_Sort_Prod_inv in cum.
+        --- now eapply ws_cumul_pb_Univ_Prod_inv in cum.
       -- rewrite length_app /= in len.
         destruct x as [na [b|] ty]; simpl in *; rewrite /mkProd_or_LetIn /= in Hsp.
         + rewrite context_assumptions_app /= Nat.add_0_r.
@@ -485,7 +485,7 @@ Section WfEnv.
           assert (Hsp' := Hsp).
           rewrite it_mkProd_or_LetIn_app in Hsp'.
           dependent elimination Hsp' as [spnil typ tys cum|type_spine_cons typ tys cum tyhd sp].
-          { now eapply ws_cumul_pb_Prod_Sort_inv in cum. }
+          { now eapply ws_cumul_pb_Prod_Univ_inv in cum. }
           eapply ws_cumul_pb_Prod_Prod_inv in cum as [eqna conva cumulB].
           eapply (PCUICConversion.substitution_ws_cumul_pb (Γ' := [vass na0 A]) (Γ'':=[]) (s := [hd0])) in cumulB; auto.
           rewrite /subst1 subst_it_mkProd_or_LetIn /= in cumulB.
@@ -1030,16 +1030,16 @@ Qed.*)
   Qed.
   Hint Resolve spine_subst_is_closed_context spine_subst_is_closed_context_codom : fvs.
 
-  Lemma arity_spine_it_mkProd_or_LetIn_Sort {Γ ctx s s' args inst} :
-    wf_sort Σ s' ->
-    leq_sort Σ s s' ->
+  Lemma arity_spine_it_mkProd_or_LetIn_Univ {Γ ctx s s' args inst} :
+    wf_univ Σ s' ->
+    leq_univ Σ s s' ->
     spine_subst Σ Γ args inst ctx ->
-    arity_spine Σ Γ (it_mkProd_or_LetIn ctx (tSort s)) args (tSort s').
+    arity_spine Σ Γ (it_mkProd_or_LetIn ctx (tUniv s)) args (tUniv s').
   Proof using wfΣ.
     intros wfs le sp. rewrite -(app_nil_r args).
     eapply arity_spine_it_mkProd_or_LetIn => //.
     eauto. constructor.
-    eapply isType_Sort; eauto.
+    eapply isType_Univ; eauto.
     eapply sp. simpl.
     apply ws_cumul_pb_compare => //; eauto with pcuic fvs. now constructor.
   Qed.
@@ -1650,13 +1650,13 @@ Section WfEnv.
         constructor. auto.
         rewrite -eql nth_error_app_lt ?length_app /=; try lia.
         rewrite nth_error_app_ge // ?Nat.sub_diag //.
-        apply lift_sorting_forget_rel in l0.
-        apply lift_sorting_f_it_impl with (f := fun t => _ (_ t)) (tu := l0) => // Hs.
+        apply lift_univing_forget_rel in l0.
+        apply lift_univing_f_it_impl with (f := fun t => _ (_ t)) (tu := l0) => // Hs.
         set (s := l0.2.π1).
-        change (tSort s) with
-          (subst0 (all_rels c (S #|l|) #|Δ|) (lift #|Δ| #|c| (tSort s))).
+        change (tUniv s) with
+          (subst0 (all_rels c (S #|l|) #|Δ|) (lift #|Δ| #|c| (tUniv s))).
         { eapply (substitution (Γ' := lift_context #|Δ| 0 c) (Δ := [])); cbn; auto.
-          change (tSort s) with (lift #|Δ| #|c| (tSort s)).
+          change (tUniv s) with (lift #|Δ| #|c| (tUniv s)).
           eapply (weakening_typing); eauto. }
         eapply ws_cumul_pb_eq_le. simpl.
         rewrite -{1}eql. simpl.
@@ -1692,38 +1692,38 @@ Section WfEnv.
   Qed.
 
   Lemma type_it_mkProd_or_LetIn_inv {Γ Δ t s} :
-    Σ ;;; Γ |- it_mkProd_or_LetIn Δ t : tSort s ->
+    Σ ;;; Γ |- it_mkProd_or_LetIn Δ t : tUniv s ->
     ∑ Δs ts,
-      [× sorts_local_ctx (lift_typing typing) Σ Γ Δ Δs,
-          Σ ;;; Γ ,,, Δ |- t : tSort ts,
-          wf_sort Σ s &
-          leq_sort Σ (sort_of_products Δs ts) s].
+      [× univs_local_ctx (lift_typing typing) Σ Γ Δ Δs,
+          Σ ;;; Γ ,,, Δ |- t : tUniv ts,
+          wf_univ Σ s &
+          leq_univ Σ (univ_of_products Δs ts) s].
   Proof using wfΣ.
     intros h. revert Γ t s h.
     induction Δ; intros.
-    - exists [], s; splits. apply h. eauto with pcuic. apply leq_sort_refl.
+    - exists [], s; splits. apply h. eauto with pcuic. apply leq_univ_refl.
     - destruct a as [na [b|] ty]; simpl in *;
       rewrite /mkProd_or_LetIn /= in h.
       * specialize (IHΔ _ _ _ h) as (Δs & ts & [sorts IHΔ leq]).
         exists Δs, ts.
-        pose proof (PCUICWfUniverses.typing_wf_sort _ IHΔ) as wfts.
+        pose proof (PCUICWfUniverses.typing_wf_univ _ IHΔ) as wfts.
         eapply inversion_LetIn in IHΔ as (T & wfty & HT & hlt); auto.
         split; eauto.
-        eapply (type_ws_cumul_pb (pb:=Cumul)). eapply HT. apply isType_Sort; pcuic.
+        eapply (type_ws_cumul_pb (pb:=Cumul)). eapply HT. apply isType_Univ; pcuic.
         eapply ws_cumul_pb_LetIn_l_inv in hlt; auto.
-        eapply ws_cumul_pb_Sort_r_inv in hlt as [u' [redu' cumu']].
-        transitivity (tSort u').
+        eapply ws_cumul_pb_Univ_r_inv in hlt as [u' [redu' cumu']].
+        transitivity (tUniv u').
         2:{ eapply ws_cumul_pb_compare; eauto with fvs.
             eapply typing_wf_local in HT. eauto with fvs.
             econstructor. eauto with fvs. }
         eapply ws_cumul_pb_red.
-        exists (tSort u'), (tSort u'). split; auto.
+        exists (tUniv u'), (tUniv u'). split; auto.
         3:now constructor.
         transitivity (lift0 1 (T {0 := b})).
         eapply red_expand_let. pcuic.
         eapply type_closed in HT.
         rewrite -is_open_term_closed //.
-        change (tSort u') with (lift0 1 (tSort u')).
+        change (tUniv u') with (lift0 1 (tUniv u')).
         eapply (weakening_closed_red (Γ := Γ ,,, Δ) (Γ' := []) (Γ'' := [_])); auto with fvs.
         apply typing_wf_local in HT. eauto with fvs.
         eapply closed_red_refl; eapply typing_wf_local in HT; eauto with fvs.
@@ -1731,39 +1731,39 @@ Section WfEnv.
       * specialize (IHΔ _ _ _ h) as (Δs & ts & [sorts IHΔ leq]).
         eapply inversion_Prod in IHΔ as (s1 & s2 & wfty & Ht & hlt); tea.
         exists (s1 :: Δs), s2. split; tea. split; tas.
-        eapply ws_cumul_pb_Sort_inv in hlt.
-        transitivity (sort_of_products Δs ts); auto using leq_sort_product.
-        simpl. eapply leq_sort_sort_of_products_mon.
+        eapply ws_cumul_pb_Univ_inv in hlt.
+        transitivity (univ_of_products Δs ts); auto using leq_univ_product.
+        simpl. eapply leq_univ_univ_of_products_mon.
         eapply Forall2_same. reflexivity.
         exact: hlt.
   Qed.
 
-  Lemma leq_sort_sort_of_products {u v} :
-    leq_sort Σ v (sort_of_products u v).
+  Lemma leq_univ_univ_of_products {u v} :
+    leq_univ Σ v (univ_of_products u v).
   Proof using Type.
     induction u; simpl; auto.
     - reflexivity.
     - etransitivity; tea.
-      eapply leq_sort_sort_of_products_mon => //.
+      eapply leq_univ_univ_of_products_mon => //.
       eapply Forall2_same. reflexivity.
-      eapply leq_sort_product.
+      eapply leq_univ_product.
   Qed.
 
   Lemma inversion_it_mkProd_or_LetIn {Γ Δ t s} :
-    Σ ;;; Γ |- it_mkProd_or_LetIn Δ t : tSort s ->
-    Σ ;;; Γ ,,, Δ |- t : tSort s.
+    Σ ;;; Γ |- it_mkProd_or_LetIn Δ t : tUniv s ->
+    Σ ;;; Γ ,,, Δ |- t : tUniv s.
   Proof using wfΣ.
     move/type_it_mkProd_or_LetIn_inv => [Δs [ts [hΔ ht hs leq]]].
     eapply type_Cumul; tea. eapply type_Sort; pcuic.
-    eapply cumul_Sort.
-    transitivity (sort_of_products Δs ts); auto using leq_sort_product.
-    apply leq_sort_sort_of_products.
+    eapply cumul_Univ.
+    transitivity (univ_of_products Δs ts); auto using leq_univ_product.
+    apply leq_univ_univ_of_products.
   Qed.
 
   Lemma isType_it_mkProd_or_LetIn_app {Γ Δ Δ' args T s} :
-    Σ ;;; Γ |- it_mkProd_or_LetIn (Δ ,,, Δ') T : tSort s ->
+    Σ ;;; Γ |- it_mkProd_or_LetIn (Δ ,,, Δ') T : tUniv s ->
     subslet Σ Γ args (smash_context [] Δ) ->
-    Σ ;;; Γ |- subst_let_expand args Δ (it_mkProd_or_LetIn Δ' T) : tSort s.
+    Σ ;;; Γ |- subst_let_expand args Δ (it_mkProd_or_LetIn Δ' T) : tUniv s.
   Proof using wfΣ.
     intros Hs sub.
     move: Hs. rewrite it_mkProd_or_LetIn_app.
@@ -2955,7 +2955,7 @@ Section WfEnv.
         eapply type_ws_cumul_pb; tea.
         + eapply typing_expand_lets in Hs.
           eapply (substitution (s := List.rev i) (Δ := [])) in Hs; tea.
-          simpl in Hs. eapply has_sort_isType. now rewrite subst_context_nil /= in Hs.
+          simpl in Hs. eapply has_univ_isType. now rewrite subst_context_nil /= in Hs.
           exact X.
         + unshelve epose proof (ctx_inst_spine_subst _ dom); tea.
           eapply All_local_env_app; tea. now eapply typing_wf_local.
@@ -3215,7 +3215,7 @@ Lemma wf_local_nth_isTypeRel {cf} {Σ} {Γ n d} :
 Proof.
   intros Hwf hnth.
   eapply All_local_env_nth_error in Hwf; tea.
-  now apply lift_sorting_forget_body in Hwf.
+  now apply lift_univing_forget_body in Hwf.
 Qed.
 
 

@@ -9,7 +9,7 @@ Section lookups.
 
   Definition lookup_ind_decl ind i :=
     match lookup_env Σ ind with
-    | Some (InductiveDecl {| ind_bodies := l; ind_universes := uctx |}) =>
+    | Some (InductiveDecl {| ind_bodies := l; ind_ulvls := uctx |}) =>
       match nth_error l i with
       | Some body => Some (l, uctx, body)
       | None => None
@@ -39,7 +39,7 @@ Section fresh.
   Fixpoint name_from_term (t : term) :=
     match t with
     | tRel _ | tVar _ | tEvar _ _ => "H"
-    | tSort s => "X"
+    | tUniv s => "X"
     | tProd na b t => "f"
     | tLambda na b t => "f"
     | tLetIn na b _ t' => name_from_term t'
@@ -185,7 +185,7 @@ Module PrintTermTree.
       end
     | tVar n => "Var(" ^ n ^ ")"
     | tEvar ev args => "Evar(" ^ string_of_nat ev ^ "[]" (* TODO *)  ^ ")"
-    | tSort s => string_of_sort s
+    | tUniv s => string_of_univ s
     | tProd na dom codom =>
       let na' := fresh_name Σ Γ na.(binder_name) (Some dom) in
       parens top
@@ -287,7 +287,7 @@ Module PrintTermTree.
     Definition print_one_ind (short : bool) Γ (mib : mutual_inductive_body) (oib : one_inductive_body) : t :=
       let '(Γpars, spars) := print_context Γ mib.(ind_params) in
       let '(Γinds, sinds) := print_context Γpars oib.(ind_indices) in
-      oib.(ind_name) ^ spars ^ " : " ^ sinds ^ " " ^ pr_term Γinds true (tSort oib.(ind_sort)) ^ ":=" ^ nl ^
+      oib.(ind_name) ^ spars ^ " : " ^ sinds ^ " " ^ pr_term Γinds true (tUniv oib.(ind_univ)) ^ ":=" ^ nl ^
       if short then "..."
       else print_list (print_one_cstr Γpars mib) nl oib.(ind_ctors).
   End env.
@@ -306,14 +306,14 @@ Module PrintTermTree.
       match Σ.(declarations) with
       | [] => acc
       | (kn, InductiveDecl mib) :: decls =>
-        let Σ' := (set_declarations Σ decls, mib.(ind_universes)) in
+        let Σ' := (set_declarations Σ decls, mib.(ind_ulvls)) in
         let names := fresh_names Σ' [] (arities_context mib.(ind_bodies)) in
         print_env_aux short n Σ'.1
           (print_recursivity_kind mib.(ind_finite) ^ " " ^
           print_list (print_one_ind Σ' short names mib) (nl ^ "with ") mib.(ind_bodies) ^ "." ^
           nl ^ acc)
       | (kn, ConstantDecl cb) :: decls =>
-        let Σ' := (set_declarations Σ decls, cb.(cst_universes)) in
+        let Σ' := (set_declarations Σ decls, cb.(cst_ulvls)) in
         print_env_aux short n Σ'.1
           ((match cb.(cst_body) with
             | Some _ => "Definition "

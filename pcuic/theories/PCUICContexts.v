@@ -127,26 +127,26 @@ Lemma type_local_ctx_wf_local {cf:checker_flags} Σ Γ Δ s :
 Proof.
   induction Δ; simpl; auto.
   destruct a as [na [b|] ty];
-  intros wfΓ wfctx; constructor; intuition auto. now eapply lift_sorting_forget_univ.
+  intros wfΓ wfctx; constructor; intuition auto. now eapply lift_univing_forget_univ.
 Qed.
 
-Lemma sorts_local_ctx_wf_local {cf:checker_flags} Σ Γ Δ s :
+Lemma univs_local_ctx_wf_local {cf:checker_flags} Σ Γ Δ s :
   wf_local Σ Γ ->
-  sorts_local_ctx (lift_typing typing) Σ Γ Δ s ->
+  univs_local_ctx (lift_typing typing) Σ Γ Δ s ->
   wf_local Σ (Γ ,,, Δ).
 Proof.
   induction Δ in s |- *; simpl; auto.
   destruct a as [na [b|] ty];
   intros wfΓ wfctx; constructor; intuition auto. pcuic.
   destruct s => //. destruct wfctx; eauto.
-  destruct s => //. destruct wfctx. now eapply lift_sorting_forget_univ.
+  destruct s => //. destruct wfctx. now eapply lift_univing_forget_univ.
 Qed.
 
 Lemma instantiate_minductive {cf:checker_flags} Σ ind mdecl u Γ t T :
   wf Σ.1 ->
   declared_minductive Σ.1 ind mdecl ->
-  consistent_instance_ext Σ (ind_universes mdecl) u ->
-  (Σ.1, ind_universes mdecl) ;;; Γ |- t : T ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) u ->
+  (Σ.1, ind_ulvls mdecl) ;;; Γ |- t : T ->
   Σ ;;; subst_instance u Γ |- subst_instance u t : subst_instance u T.
 Proof.
   intros wfΣ isdecl Hu Ht.
@@ -157,26 +157,26 @@ Qed.
 Lemma type_local_ctx_instantiate {cf:checker_flags} Σ ind mdecl Γ Δ u s :
   wf Σ.1 ->
   declared_minductive Σ.1 ind mdecl ->
-  type_local_ctx (lift_typing typing) (Σ.1, ind_universes mdecl) Γ Δ s ->
-  consistent_instance_ext Σ (ind_universes mdecl) u ->
-  type_local_ctx (lift_typing typing) Σ (subst_instance u Γ) (subst_instance u Δ) (subst_instance_sort u s).
+  type_local_ctx (lift_typing typing) (Σ.1, ind_ulvls mdecl) Γ Δ s ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) u ->
+  type_local_ctx (lift_typing typing) Σ (subst_instance u Γ) (subst_instance u Δ) (subst_instance_univ u s).
 Proof.
   intros Hctx Hu.
   induction Δ; simpl in *; intuition auto.
-  { destruct Σ as [Σ univs]. eapply (wf_sort_subst_instance (Σ, ind_universes mdecl)); eauto. }
+  { destruct Σ as [Σ univs]. eapply (wf_univ_subst_instance (Σ, ind_ulvls mdecl)); eauto. }
   destruct a as [na [b|] ty]; simpl; destruct X as (Hwfctx & Hj); split; eauto.
   all: eapply lift_typing_fu_impl with (1 := Hj) => //= ?? Hs; auto using relevance_subst_opt.
   all: eapply instantiate_minductive in Hs; eauto.
   all: now rewrite subst_instance_app in Hs.
 Qed.
 
-Lemma sorts_local_ctx_instantiate {cf:checker_flags} Σ ind mdecl Γ Δ u s :
+Lemma univs_local_ctx_instantiate {cf:checker_flags} Σ ind mdecl Γ Δ u s :
   wf Σ.1 ->
   declared_minductive Σ.1 ind mdecl ->
-  sorts_local_ctx (lift_typing typing) (Σ.1, ind_universes mdecl) Γ Δ s ->
-  consistent_instance_ext Σ (ind_universes mdecl) u ->
-  sorts_local_ctx (lift_typing typing) Σ (subst_instance u Γ) (subst_instance u Δ)
-    (List.map (subst_instance_sort u) s).
+  univs_local_ctx (lift_typing typing) (Σ.1, ind_ulvls mdecl) Γ Δ s ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) u ->
+  univs_local_ctx (lift_typing typing) Σ (subst_instance u Γ) (subst_instance u Δ)
+    (List.map (subst_instance_univ u) s).
 Proof.
   intros Hctx Hu.
   induction Δ in s |- *; simpl in *; intuition auto.
@@ -205,12 +205,12 @@ Proof.
   all: now eapply substitution in HT.
 Qed.
 
-Lemma subst_sorts_local_ctx {cf:checker_flags} Σ Γ Δ Δ' s ctxs :
+Lemma subst_univs_local_ctx {cf:checker_flags} Σ Γ Δ Δ' s ctxs :
   wf Σ.1 ->
   wf_local Σ (Γ ,,, Δ) ->
-  sorts_local_ctx (lift_typing typing) Σ (Γ ,,, Δ) Δ' ctxs ->
+  univs_local_ctx (lift_typing typing) Σ (Γ ,,, Δ) Δ' ctxs ->
   subslet Σ Γ s Δ ->
-  sorts_local_ctx (lift_typing typing) Σ Γ (subst_context s 0 Δ') ctxs.
+  univs_local_ctx (lift_typing typing) Σ Γ (subst_context s 0 Δ') ctxs.
 Proof.
   intros wfΣ wfΓ X Hs. revert X.
   induction Δ' in ctxs |- *; simpl; auto.
@@ -236,11 +236,11 @@ Proof.
   all: eapply (weaken_ctx Γ); auto.
 Qed.
 
-Lemma weaken_sorts_local_ctx {cf:checker_flags} Σ Γ Γ' Δ ctxs :
+Lemma weaken_univs_local_ctx {cf:checker_flags} Σ Γ Γ' Δ ctxs :
   wf Σ.1 ->
   wf_local Σ Γ ->
-  sorts_local_ctx (lift_typing typing) Σ Γ' Δ ctxs ->
-  sorts_local_ctx (lift_typing typing) Σ (Γ ,,, Γ') Δ ctxs.
+  univs_local_ctx (lift_typing typing) Σ Γ' Δ ctxs ->
+  univs_local_ctx (lift_typing typing) Σ (Γ ,,, Γ') Δ ctxs.
 Proof.
   intros wfΣ wfΓ.
   induction Δ in ctxs |- *; simpl; auto.
@@ -542,8 +542,8 @@ Definition subst_context_let_expand args Δ Γ :=
   (subst_context args 0 (expand_lets_ctx Δ Γ)).
 
 Definition subst_let_expand_tProd args Δ na T s :
-  subst_let_expand args Δ (tProd na T (tSort s)) =
-  tProd na (subst_let_expand args Δ T) (tSort s).
+  subst_let_expand args Δ (tProd na T (tUniv s)) =
+  tProd na (subst_let_expand args Δ T) (tUniv s).
 Proof.
   reflexivity.
 Qed.
@@ -561,8 +561,8 @@ Definition subst_let_expand_tInd s Δ ind u :
 Proof. reflexivity. Qed.
 
 Lemma subst_let_expand_it_mkProd_or_LetIn s Γ Δ u :
-  subst_let_expand s Γ (it_mkProd_or_LetIn Δ (tSort u)) =
-  it_mkProd_or_LetIn (subst_context_let_expand s Γ Δ) (tSort u).
+  subst_let_expand s Γ (it_mkProd_or_LetIn Δ (tUniv u)) =
+  it_mkProd_or_LetIn (subst_context_let_expand s Γ Δ) (tUniv u).
 Proof.
   rewrite /subst_let_expand /expand_lets.
   rewrite expand_lets_it_mkProd_or_LetIn /= subst_it_mkProd_or_LetIn /=.
@@ -753,9 +753,9 @@ Proof.
 Qed.
 
 Lemma sorts_local_ctx_app P Σ Γ Δ1 Δ2 us1 us2 :
-  sorts_local_ctx P Σ Γ Δ1 us1 ->
-  sorts_local_ctx P Σ (Γ ,,, Δ1) Δ2 us2 ->
-  sorts_local_ctx P Σ Γ (Δ1 ,,, Δ2) (us2 ++ us1).
+  univs_local_ctx P Σ Γ Δ1 us1 ->
+  univs_local_ctx P Σ (Γ ,,, Δ1) Δ2 us2 ->
+  univs_local_ctx P Σ Γ (Δ1 ,,, Δ2) (us2 ++ us1).
 Proof.
   elim: Δ2 us2 Δ1 us1=> [|+ Δ2 ih].
   1: move=> [|u us2] //=.

@@ -29,7 +29,7 @@ Definition inst_constructor_body mdecl f c :=
 Definition rigid_head t :=
   match t with
   | tVar _
-  | tSort _
+  | tUniv _
   | tConst _ _
   | tInd _ _
   | tConstruct _ _ _ => true

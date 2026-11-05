@@ -15,7 +15,7 @@ Program Definition build_global_env_map (g : global_env) : global_env_map :=
   {| trans_env_env := g;
      trans_env_map := EnvMap.EnvMap.of_global_env g.(declarations) |}.
 
-Definition global_env_ext_map := global_env_map * universes_decl.
+Definition global_env_ext_map := global_env_map * ulvls_decl.
 
 Definition pcuic_program : Type := global_env_ext_map * term.
 

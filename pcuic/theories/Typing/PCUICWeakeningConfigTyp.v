@@ -28,7 +28,7 @@ Lemma weakening_config_wf_local_sized {cf1 cf2 : checker_flags} Σ Γ
 Proof.
   simpl in *.
   induction Hwf; [ constructor 1 | constructor 2 | constructor 3 ].
-  2,4: eapply @lift_typing_size_impl with (Psize := @typing_size _ _ _) (tu := t0); unfold lift_sorting_size; cbn; intros.
+  2,4: eapply @lift_typing_size_impl with (Psize := @typing_size _ _ _) (tu := t0); unfold lift_univing_size; cbn; intros.
   all: try (unshelve eapply IH; [ eassumption | ];
             try solve [ constructor; simpl in *; cbn in *; lia ]).
   all: repeat (exactly_once (idtac; multimatch goal with H : _ |- _ => unshelve eapply H; [ try eassumption .. | intros; simpl in * ]; clear H end)).
@@ -71,13 +71,13 @@ Proof.
   all: try (set (k := fix_context _) in *; clearbody k).
   all: match goal with
        | [ H : lift_typing0 _ ?j |- lift_typing0 _ ?j ]
-         => eapply @lift_typing_size_impl with (Psize := @typing_size _ _ _) (tu := H); unfold lift_sorting_size, on_def_type_sorting_size in *; cbn; intros
+         => eapply @lift_typing_size_impl with (Psize := @typing_size _ _ _) (tu := H); unfold lift_univing_size, on_def_type_univing_size in *; cbn; intros
        | [ H : All (on_def_type _ _) ?l |- All (on_def_type _ _) ?l ]
          => is_var l; clear -H IH; induction H as [|???? IH']; constructor;
-            [eapply @lift_typing_size_impl with (Psize := @typing_size _ _ _) (tu := p); unfold lift_sorting_size, on_def_type_sorting_size in *; cbn; intros|]
+            [eapply @lift_typing_size_impl with (Psize := @typing_size _ _ _) (tu := p); unfold lift_univing_size, on_def_type_univing_size in *; cbn; intros|]
        | [ H : All (on_def_body _ _ _) ?l |- All (on_def_body _ _ _) ?l ]
          => is_var l; clear -H IH; induction H as [|???? IH']; constructor;
-            [eapply @lift_typing_size_impl with (Psize := @typing_size _ _ _) (tu := p); unfold lift_sorting_size, on_def_body_sorting_size in *; cbn; intros|]
+            [eapply @lift_typing_size_impl with (Psize := @typing_size _ _ _) (tu := p); unfold lift_univing_size, on_def_body_univing_size in *; cbn; intros|]
        | [ H : case_side_conditions _ _ _ _ _ _ _ _ _ _ _ |- case_side_conditions _ _ _ _ _ _ _ _ _ _ _ ] => destruct H; constructor
        | [ H : case_branch_typing _ _ _ _ _ _ _ _ _ _ _ |- case_branch_typing _ _ _ _ _ _ _ _ _ _ _ ] => destruct H; constructor
        | _ => idtac
@@ -116,7 +116,7 @@ Proof.
   all: try assumption.
   2:{ eapply (All_map_size (fun x H => typing_size H) _ hvalue). intros. eapply (IH _ _ _ p). lia. }
   all: [ > unshelve eapply (@weakening_config_wf_local_sized cf1 cf2); [ eassumption | ] .. ].
-  all: intros; unshelve eapply IH; [ eassumption | ].
+  all: (intros; unshelve eapply IH; [ eassumption | ]).
   all: simpl in *; try lia.
   all: cbn in *; try lia.
   all: try assumption.

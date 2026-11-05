@@ -56,7 +56,7 @@ Section firstorder.
       (List.rev (c.(cstr_args) ++ mind.(ind_params)))%list.
 
   Definition firstorder_oneind mind (ind : one_inductive_body) :=
-    forallb (firstorder_con mind) ind.(ind_ctors) && negb (Sort.is_level (ind_sort ind)).
+    forallb (firstorder_con mind) ind.(ind_ctors) && negb (Universe.is_level (ind_univ ind)).
 
   Definition firstorder_mutind (mind : mutual_inductive_body) :=
     (* if forallb (fun decl => firstorder_type decl.(decl_type)) mind.(ind_params) then *)
@@ -102,7 +102,7 @@ Context {cf : config.checker_flags}.
 
 Definition isPropositionalArity ar :=
   match destArity [] ar with
-  | Some (_, s) => Sort.is_propositional s
+  | Some (_, s) => Universe.is_propositional s
   | None => false
   end.
 
@@ -151,7 +151,7 @@ Proof using Type.
   eapply forallb_nth_error in H0; tea.
   erewrite d2 in H0. cbn in H0.
   unfold firstorder_oneind in H0. solve_all.
-  destruct (ind_sort oind) eqn:E2; inv H0.
+  destruct (ind_univ oind) as [[| |] u] eqn:E2; inv H0.
   eapply PCUICInductives.declared_inductive_type in d.
   rewrite d. rewrite E2. unfold isPropositionalArity.
   now rewrite destArity_it_mkProd_or_LetIn.
@@ -284,7 +284,7 @@ Proof using.
   case: eqb_specT.
   * intros ->.
     destruct d => //; cbn; rewrite eqb_refl => [=] <-;
-    exists {| universes := univs; declarations := Σ; retroknowledge := retro |}.
+    exists {| ulvls := univs; declarations := Σ; retroknowledge := retro |}.
     eexists; split => //. cbn. split => //.
     red. split => //. eexists (_ :: []); cbn; trea.
     eexists; split => //. cbn; split => //.
@@ -612,10 +612,10 @@ Proof using Type.
 Qed.
 
 Lemma invert_cumul_it_mkProd_or_LetIn_Sort_Ind {Σ : global_env_ext} {wfΣ : wf Σ} {Γ Δ s i u args} :
-  Σ ;;; Γ ⊢ it_mkProd_or_LetIn Δ (tSort s) ≤ mkApps (tInd i u) args -> False.
+  Σ ;;; Γ ⊢ it_mkProd_or_LetIn Δ (tUniv s) ≤ mkApps (tInd i u) args -> False.
 Proof using Type.
   induction Δ using PCUICInduction.ctx_length_rev_ind; cbn.
-  - eapply invert_cumul_sort_ind.
+  - eapply invert_cumul_univ_ind.
   - rewrite it_mkProd_or_LetIn_app; destruct d as [na [b|] ty]; cbn.
     * intros hl.
       eapply ws_cumul_pb_LetIn_l_inv in hl.
@@ -637,17 +637,17 @@ Proof using Type.
   induction Hvalue as [ t Hvalue | p pv ih | t args' Hhead Hargs IH ] using PCUICWcbvEval.value_values_ind;
    intros i u args Hty Hfo.
   - destruct t; inversion_clear Hvalue.
-    + exfalso. eapply inversion_Sort in Hty as (? & ? & Hcumul); eauto.
-      now eapply invert_cumul_sort_ind in Hcumul.
+    + exfalso. eapply inversion_Univ in Hty as (? & ? & Hcumul); eauto.
+      now eapply invert_cumul_univ_ind in Hcumul.
     + exfalso. eapply inversion_Prod in Hty as (? & ? & ? & ? & Hcumul); eauto.
-      now eapply invert_cumul_sort_ind in Hcumul.
+      now eapply invert_cumul_univ_ind in Hcumul.
     + exfalso. eapply inversion_Lambda in Hty as (? & ? & ? & Hcumul); eauto.
       now eapply invert_cumul_prod_ind in Hcumul.
     + exfalso. eapply inversion_Ind in Hty as (? & ? & ? & ? & ? & ?); eauto.
       eapply PCUICInductives.declared_inductive_type in d.
       rewrite d in w.
       destruct (ind_params x ,,, ind_indices x0) as [ | [? [] ?] ? _] using rev_ind.
-      * cbn in w. now eapply invert_cumul_sort_ind in w.
+      * cbn in w. now eapply invert_cumul_univ_ind in w.
       * rewrite it_mkProd_or_LetIn_app in w. cbn in w.
         eapply ws_cumul_pb_LetIn_l_inv in w.
         rewrite /subst1 PCUICUnivSubst.subst_instance_it_mkProd_or_LetIn PCUICLiftSubst.subst_it_mkProd_or_LetIn in w.
@@ -724,7 +724,7 @@ Proof.
   intros Ha H. induction H in t', Ha |- using firstorder_value_inds.
   eapply eq_term_upto_univ_napp_mkApps_l_inv in Ha as (? & ? & [] & ->).
   invs e. repeat f_equal.
-  - now eapply cmp_universe_instance_eq.
+  - now eapply cmp_ulvl_instance_eq.
   - revert x0 a. clear - H0. induction H0; intros; invs a; f_equal; eauto.
 Qed.
 

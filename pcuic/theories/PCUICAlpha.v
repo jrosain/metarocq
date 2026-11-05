@@ -93,9 +93,9 @@ Section Alpha.
     destruct t; congruence.
   Qed.
 
-  Lemma upto_names_destInd cmp_universe cmp_sort pb napp t u :
-    eq_term_upto_univ_napp empty_global_env cmp_universe cmp_sort pb napp t u ->
-    rel_option (fun '(ind, u) '(ind', u') => (ind = ind') * cmp_universe_instance (cmp_universe Conv) u u')%type (destInd t) (destInd u).
+  Lemma upto_names_destInd cmp_ulvl cmp_univ pb napp t u :
+    eq_term_upto_univ_napp empty_global_env cmp_ulvl cmp_univ pb napp t u ->
+    rel_option (fun '(ind, u) '(ind', u') => (ind = ind') * cmp_ulvl_instance (cmp_ulvl Conv) u u')%type (destInd t) (destInd u).
   Proof using Type.
     induction 1; simpl; constructor; try congruence.
     split; auto.
@@ -260,7 +260,7 @@ Section Alpha.
     eq_context_upto Σ (fun _ => eq) (fun _ => eq) pb (subst_instance i u) (subst_instance i v).
   Proof using Type.
     intros pb u v i vc.
-    eapply PCUICUnivSubstitutionConv.eq_context_upto_subst_preserved with (cmp_universe := fun _ _ => eq) (cmp_sort := fun _ _ => eq).
+    eapply PCUICUnivSubstitutionConv.eq_context_upto_subst_preserved with (cmp_ulvl := fun _ _ => eq) (cmp_sort := fun _ _ => eq).
     5: eassumption.
     all: intros ??????[]; reflexivity.
   Qed.
@@ -281,7 +281,7 @@ Section Alpha.
     eapply eq_context_gen_map2_set_binder_name => //.
     now eapply eq_context_upto_names_eq_context_alpha.
     rewrite /pre_case_predicate_context_gen.
-    eapply cmp_universe_instance_eq in eqinst. rewrite -eqinst.
+    eapply cmp_ulvl_instance_eq in eqinst. rewrite -eqinst.
     apply eq_context_upto_subst_context; tea; tc.
     reflexivity.
     now apply All2_rev.
@@ -294,7 +294,7 @@ Section Alpha.
     (case_branch_context ind mdecl p' (forget_types bctx') cdecl).
   Proof using Type.
     intros [eqpars [eqinst [eqctx eqret]]] eqctx'.
-    eapply cmp_universe_instance_eq in eqinst.
+    eapply cmp_ulvl_instance_eq in eqinst.
     rewrite /case_branch_context /case_branch_context_gen -eqinst.
     eapply eq_context_gen_map2_set_binder_name => //; tea.
     rewrite /pre_case_branch_context_gen.
@@ -314,7 +314,7 @@ Section Alpha.
       (case_branch_type ind mdecl idecl p' br' ptm' c cdecl).2.
   Proof using Type.
     intros [eqpars [eqinst [eqctx eqret]]] eqctx'.
-    eapply cmp_universe_instance_eq in eqinst.
+    eapply cmp_ulvl_instance_eq in eqinst.
     intros ptm ptm'.
     rewrite /case_branch_type /case_branch_type_gen -eqinst. cbn.
     eapply eq_term_mkApps.
@@ -454,12 +454,12 @@ Section Alpha.
     lift_typing typing Σ Γ (Judge tm' t' u r).
   Proof.
     intros tu Htm Hty.
-    apply lift_sorting_it_impl_gen with tu => //.
+    apply lift_univing_it_impl_gen with tu => //.
     2: intro HT; now apply HT.
     destruct tm' as [tm'|], tm as [tm|] => // HT.
     specialize (HT _ Htm).
     eapply type_Cumul'; tea.
-    { eapply lift_sorting_forget_rel, lift_sorting_forget_univ, lift_sorting_it_impl_gen with tu => // Ht. now apply Ht. }
+    { eapply lift_univing_forget_rel, lift_univing_forget_univ, lift_univing_it_impl_gen with tu => // Ht. now apply Ht. }
     eapply eq_term_upto_univ_cumulSpec.
     eapply eq_term_leq_term.
     now eapply upto_names_impl_eq_term.
@@ -517,7 +517,7 @@ Section Alpha.
         eapply context_conversion.
         * eapply ihB. assumption. reflexivity.
         * constructor; eauto.
-          now eapply lift_sorting_forget_univ.
+          now eapply lift_univing_forget_univ.
         * constructor.
           -- now eapply upto_names_conv_context.
           -- constructor. assumption. constructor.
@@ -578,13 +578,13 @@ Section Alpha.
         eapply upto_names_impl_eq_term.
         eapply eq_term_upto_univ_subst ; now auto.
     - intros cst u decl ? ? hdecl hcons Δ v e e'; invs e.
-      eapply cmp_universe_instance_eq in H2. subst.
+      eapply cmp_ulvl_instance_eq in H2. subst.
       constructor; eauto.
     - intros ind u mdecl idecl isdecl ? ? hcons Δ v e e'; invs e.
-      eapply cmp_universe_instance_eq in H2. subst.
+      eapply cmp_ulvl_instance_eq in H2. subst.
       econstructor ; eauto.
     - intros ind i u mdecl idecl cdecl isdecl ? ? ? Δ v e e'; invs e.
-      eapply cmp_universe_instance_eq in H4. subst.
+      eapply cmp_ulvl_instance_eq in H4. subst.
       econstructor ; eauto.
     - intros ind p c brs args ps mdecl idecl isdecl X X0 H Hpctx cpc wfp
         cup wfpctx Hret IHret
@@ -606,13 +606,13 @@ Section Alpha.
       have wfcpc' := wfcpc (Δ ,,, case_predicate_context ind mdecl idecl p').
       forward wfcpc'. { eapply eq_context_upto_cat; auto.
       apply (case_predicate_context_equiv eqp). }
-      eapply cmp_universe_instance_eq in eqinst.
+      eapply cmp_ulvl_instance_eq in eqinst.
       assert (isType Σ Δ (mkApps ptm (args ++ [c]))).
       { eapply isType_eq_context_conversion. eapply validity. econstructor; eauto.
         constructor; eauto. constructor; eauto.
         solve_all. eapply a0; eauto; reflexivity. all:auto. }
       eapply type_Cumul'; tea.
-      + have cu' : consistent_instance_ext Σ (ind_universes mdecl) (puinst p').
+      + have cu' : consistent_instance_ext Σ (ind_ulvls mdecl) (puinst p').
         { now rewrite -eqinst. }
         have convctx' : eq_context_upto_names (pcontext p') (ind_predicate_context ind mdecl idecl).
         { etransitivity; tea. now symmetry. }
@@ -624,7 +624,7 @@ Section Alpha.
         assert (wf_local Σ (Δ,,, inst_case_predicate_context p')).
         { eapply wf_local_eq_context_upto_names.
           exact wfcpc'. assumption. }
-        have ty' : Σ;;; Δ,,, case_predicate_context ind mdecl idecl p' |- preturn p' : tSort ps.
+        have ty' : Σ;;; Δ,,, case_predicate_context ind mdecl idecl p' |- preturn p' : tUniv ps.
         { eapply eq_context_conversion. eapply IHret. eauto. reflexivity. all:eauto.
           eapply eq_context_upto_cat; eauto. now eapply case_predicate_context_equiv. }
         have ctxinst' : ctx_inst Σ Δ (pparams p' ++ args)
@@ -659,7 +659,7 @@ Section Alpha.
         econstructor; tea; eauto. 2,3: constructor; tea ; eauto.
         * eapply (type_ws_cumul_pb (pb:=Cumul)).
           eapply IHc; eauto.
-          eapply has_sort_isType; eapply isType_mkApps_Ind; tea.
+          eapply has_univ_isType; eapply isType_mkApps_Ind; tea.
           unshelve eapply (ctx_inst_spine_subst _ ctxinst').
           eapply weaken_wf_local; tea.
           now eapply (on_minductive_wf_params_indices_inst isdecl).
@@ -685,7 +685,7 @@ Section Alpha.
           2:now eapply Forall2_All2 in wfbrs.
           epose proof (wf_case_branches_types' (p:=p') ps args brs' isdecl) as a.
           forward a.
-          { eapply has_sort_isType; eapply isType_mkApps_Ind; tea.
+          { eapply has_univ_isType; eapply isType_mkApps_Ind; tea.
             unshelve eapply (ctx_inst_spine_subst _ ctxinst').
             eapply weaken_wf_local; tea.
             eapply (on_minductive_wf_params_indices_inst isdecl _ cu'). }
@@ -883,7 +883,7 @@ Section Alpha.
         eapply eq_term_upto_univ_cumulSpec.
         eapply eq_term_leq_term. eapply e1.
       * eapply eq_context_conversion in Hs; eauto.
-      * simp prim_type. eapply Universe.make'_inj in e. rewrite e.
+      * simp prim_type. eapply UnivLvl.make'_inj in e. rewrite e.
         eapply eq_term_upto_univ_cumulSpec.
         eapply upto_names_impl_leq_term.
         constructor. constructor. reflexivity. now symmetry.
@@ -891,7 +891,7 @@ Section Alpha.
     - intros t A B X wf ht iht har ihar hcu Δ v e e'.
       eapply (type_ws_cumul_pb (pb:=Cumul)).
       + eapply iht; tea.
-      + eapply has_sort_isType.
+      + eapply has_univ_isType.
         specialize (wf _ e'). now eapply eq_context_conversion.
       + eapply (ws_cumul_pb_ws_cumul_ctx (pb':=Conv)); tea.
         2:eapply PCUICInversion.into_ws_cumul; tea.
@@ -985,7 +985,7 @@ Section Alpha.
     isType Σ Γ v.
   Proof using Type.
     intros Hty eq.
-    apply lift_sorting_it_impl_gen with Hty => // Hs.
+    apply lift_univing_it_impl_gen with Hty => // Hs.
     eapply typing_alpha; eauto.
   Qed.
 
@@ -996,7 +996,7 @@ Section Alpha.
     isType Σ Δ v.
   Proof using Type.
     intros Hty eqctx eqtm.
-    apply lift_sorting_it_impl_gen with Hty => // Hs.
+    apply lift_univing_it_impl_gen with Hty => // Hs.
     eapply typing_alpha_prop; eauto.
   Qed.
 

@@ -147,7 +147,7 @@ Section CaseDefinitions.
 
   Lemma pre_case_predicate_context_gen_indpred_ctx Σ Γ :
     spine_subst Σ Γ pparams (List.rev pparams) (smash_context [] (ind_params mib)@[puinst]) ->
-    consistent_instance_ext Σ (ind_universes mib) puinst ->
+    consistent_instance_ext Σ (ind_ulvls mib) puinst ->
     pre_case_predicate_context_gen ind mib oib pparams puinst = indpred_ctx.
   Proof using cf.
     move=> pparamssubst ?.
@@ -422,7 +422,7 @@ Section RandomLemmas.
       apply: PCUICGlobalEnv.declared_minductive_ind_npars; exact: proj1 inddecl.
     * rewrite -app_context_assoc-subst_instance_app_ctx; apply: weaken_wf_local=> //.
       set (Δ := _ ,,, _). destruct Σ as [Σ1 Σ2].
-      refine (PCUICUnivSubstitutionTyp.typing_subst_instance_wf_local Σ1 Σ2 Δ puinst (ind_universes mib) _ _ _)=> //.
+      refine (PCUICUnivSubstitutionTyp.typing_subst_instance_wf_local Σ1 Σ2 Δ puinst (ind_ulvls mib) _ _ _)=> //.
       destruct (onArity on_body) as (_ & s & lind & _). move: lind => /=.
       rewrite (PCUICGlobalMaps.ind_arity_eq on_body).
       move=> /PCUICSpine.type_it_mkProd_or_LetIn_inv [uparams [? [slparams + _ _]]].
@@ -449,7 +449,7 @@ Lemma type_Case_helper
   (rettyp : term)
   (brs : list term)
   (indices : list term)
-  (ps : sort) (Σ : global_env_ext) Γ :
+  (ps : Universe.t) (Σ : global_env_ext) Γ :
   wf_ext Σ ->
 
   declared_inductive Σ ind mib oib ->
@@ -462,12 +462,12 @@ Lemma type_Case_helper
   let predctx := case_predicate_context ind mib oib p in
 
 
-  (wf_local Σ (Γ,,, predctx) -> Σ ;;; Γ,,, predctx |- preturn p : tSort ps) ->
+  (wf_local Σ (Γ,,, predctx) -> Σ ;;; Γ,,, predctx |- preturn p : tUniv ps) ->
 
   (* consistent_instance_ext Σ (ind_universes mib) puinst -> *)
 
   is_allowed_elimination Σ (ind_kelim oib) ps ->
-  isSortRel ps oib.(ind_relevance) ->
+  isUnivRel ps oib.(ind_relevance) ->
 
   isCoFinite (ind_finite mib) = false ->
 
@@ -480,7 +480,7 @@ Lemma type_Case_helper
       let br := make_br ind mib (* pparams puinst *) cdecl brt in
       let brctxty := case_branch_type ind mib oib p br ptm i cdecl in
         wf_local Σ (Γ,,, brctxty.1) ->
-        typing Σ (Γ,,, brctxty.1) brctxty.2 (tSort ps) ->
+        typing Σ (Γ,,, brctxty.1) brctxty.2 (tUniv ps) ->
         typing Σ (Γ,,, brctxty.1) (bbody br) brctxty.2
     )
     0 (ind_ctors oib) brs ->
@@ -510,7 +510,7 @@ Proof.
 
   specialize (ptyp predctxwf).
 
-  have puinstok : consistent_instance_ext Σ (ind_universes mib) puinst.
+  have puinstok : consistent_instance_ext Σ (ind_ulvls mib) puinst.
   by move: (discrtypok)=> /(isType_mkApps_Ind_inv wfΣ inddecl Γwf) [? [?] [?? _ ?]]//.
 
   have [s ssparamsindxs] : ∑ s, spine_subst Σ Γ (pparams ++ indices) s
@@ -568,7 +568,7 @@ Lemma type_Case_subst_helper
   (rettyp : term)
   (brs : list term)
   (indices : list term)
-  (ps : sort) (Σ : global_env_ext) Γ :
+  (ps : Universe.t) (Σ : global_env_ext) Γ :
   wf_ext Σ ->
 
   declared_inductive Σ ind mib oib ->
@@ -581,10 +581,10 @@ Lemma type_Case_subst_helper
   let predctx := case_predicate_context ind mib oib p in
 
 
-  (wf_local Σ (Γ,,, predctx) -> Σ ;;; Γ,,, predctx |- preturn p : tSort ps) ->
+  (wf_local Σ (Γ,,, predctx) -> Σ ;;; Γ,,, predctx |- preturn p : tUniv ps) ->
 
   is_allowed_elimination Σ (ind_kelim oib) ps ->
-  isSortRel ps oib.(ind_relevance) ->
+  isUnivRel ps oib.(ind_relevance) ->
 
   isCoFinite (ind_finite mib) = false ->
 
@@ -597,7 +597,7 @@ Lemma type_Case_subst_helper
       let brctx := case_branch_context ind mib p br cdecl in
       let brty := case_branch_type_subst ind mib p predctx rettyp i cdecl in
       wf_local Σ (Γ,,, brctx) ->
-      typing Σ (Γ,,, brctx) brty (tSort ps) ->
+      typing Σ (Γ,,, brctx) brty (tUniv ps) ->
       typing Σ (Γ,,, brctx) (bbody br) brty
     )
     0 (ind_ctors oib) brs ->
@@ -702,7 +702,7 @@ Lemma type_Case_simple_subst_helper
   (rettyp : term)
   (brs : list term)
   (indices : list term)
-  (ps : sort) (Σ : global_env_ext) Γ :
+  (ps : Universe.t) (Σ : global_env_ext) Γ :
   wf_ext Σ ->
 
   declared_inductive Σ ind mib oib ->
@@ -717,10 +717,10 @@ Lemma type_Case_simple_subst_helper
   let predctx := case_predicate_context ind mib oib p in
 
 
-  Σ ;;; Γ |- rettyp : tSort ps ->
+  Σ ;;; Γ |- rettyp : tUniv ps ->
 
   is_allowed_elimination Σ (ind_kelim oib) ps ->
-  isSortRel ps oib.(ind_relevance) ->
+  isUnivRel ps oib.(ind_relevance) ->
 
   isCoFinite (ind_finite mib) = false ->
 
@@ -733,7 +733,7 @@ Lemma type_Case_simple_subst_helper
       let brctx := case_branch_context ind mib p br cdecl in
       let brty := lift0 #|brctx| rettyp in
       wf_local Σ (Γ,,, brctx) ->
-      typing Σ (Γ,,, brctx) brty (tSort ps) ->
+      typing Σ (Γ,,, brctx) brty (tUniv ps) ->
       typing Σ (Γ,,, brctx) (bbody br) brty
     )
     0 (ind_ctors oib) brs ->
@@ -779,7 +779,7 @@ Proof.
 
   apply: type_Case_subst_helper=> //; try eassumption.
   - rewrite -/predctx=> ? /=.
-    have -> : tSort ps = lift0 (S #|ind_indices oib|) (tSort ps) by reflexivity.
+    have -> : tUniv ps = lift0 (S #|ind_indices oib|) (tUniv ps) by reflexivity.
     apply: weakening_gen=> //.
   - pose proof (declctors := declared_ind_declared_constructors inddecl).
     apply: (All2i_impl (All2i_Alli_mix_left declctors brsok)) => i x t [declctor h] br brctx brty wfctx wfty.

@@ -17,8 +17,8 @@ Lemma compare_term_subset {cf} pb Σ φ φ' t t'
     -> compare_term Σ φ pb t t' -> compare_term Σ φ' pb t t'.
 Proof.
   intro H. apply eq_term_upto_univ_impl; auto.
-  1,2: intros ??; now eapply cmp_universe_subset.
-  1,2: intros ??; now eapply cmp_sort_subset.
+  1,2: intros ??; now eapply cmp_ulvl_subset.
+  1,2: intros ??; now eapply cmp_univ_subset.
 Qed.
 
 Lemma eq_term_subset {cf} Σ φ φ' t t'
@@ -87,10 +87,10 @@ Proof using P Pcmp cf.
   destruct global_variance_gen as [| |v] => //.
   all: [> intros _ | intros ->; cbn ..]; auto.
   1: intro H; apply: cmp_instance_opt_variance; move: H => /=.
-  - now apply cmp_universe_instance_impl.
+  - now apply cmp_ulvl_instance_impl.
   - intros [H | H]; [left | right].
-    1: eapply cmp_universe_instance_impl; tea.
-    eapply cmp_universe_instance_variance_impl; eassumption.
+    1: eapply cmp_ulvl_instance_impl; tea.
+    eapply cmp_ulvl_instance_variance_impl; eassumption.
 Qed.
 
 #[global]
@@ -105,32 +105,30 @@ Instance eq_term_upto_univ_weaken_env Σ Σ' cmp_universe cmp_universe' cmp_sort
 Proof using P Pcmp cf.
   intros wfΣ ext univ_sub_conv univ_sub_pb sort_sub_conv sort_sub_pb t t'.
   induction t in napp, t', pb, pb', univ_sub_pb, sort_sub_pb, t' |- * using PCUICInduction.term_forall_list_ind;
-    try (inversion 1; subst; constructor;
-         eauto using cmp_universe_instance_impl'; fail).
-  - inversion 1; subst; constructor.
-    eapply All2_impl'; tea.
+    try (inversion 1; subst; constructor; auto;
+      repeat (progress (match goal with
+                       | H : context [ RelationClasses.subrelation _ _ -> RelationClasses.subrelation _ _ -> _ ] |- _ =>
+                           eapply H; eauto
+                       end))).
+  - eapply All2_impl'; tea.
     eapply All_impl; eauto.
-  - inversion 1; subst; constructor.
-    eapply cmp_global_instance_weaken_env. 5:eauto. all:eauto.
-  - inversion 1; subst; constructor.
-    eapply cmp_global_instance_weaken_env. 5:eauto. all:eauto.
-  - inversion 1; subst; destruct X as [? [? ?]]; constructor; eauto.
-    * destruct X2 as [? [? ?]].
-      constructor; intuition auto; solve_all.
-      + eauto using cmp_universe_instance_impl'.
-    * eapply All2_impl'; tea.
-      eapply All_impl; eauto.
-      cbn. intros x [? ?] y [? ?]. split; eauto.
-  - inversion 1; subst; constructor.
-    eapply All2_impl'; tea.
+  - eauto using cmp_ulvl_instance_impl'.
+  - eapply cmp_global_instance_weaken_env. 5:eauto. all:eauto.
+  - eapply cmp_global_instance_weaken_env. 5:eauto. all:eauto.
+  - destruct X as [? [? ?]]; eauto.
+    destruct X2 as [? [? ?]].
+    constructor; intuition auto; solve_all.
+    eauto using cmp_ulvl_instance_impl'.
+  - eapply All2_impl'; tea.
     eapply All_impl; eauto.
-    cbn. intros x [? ?] y (?&?&?&?). repeat split; eauto.
-  - inversion 1; subst; constructor.
-    eapply All2_impl'; tea.
+    cbn. intros x [? ?] y [? ?]. split; eauto.
+  - eapply All2_impl'; tea.
     eapply All_impl; eauto.
     cbn. intros x [? ?] y (?&?&?&?). repeat split; eauto.
-  - inversion 1; subst; constructor.
-    depelim X1; constructor; cbn in X; intuition eauto. solve_all.
+  - eapply All2_impl'; tea.
+    eapply All_impl; eauto.
+    cbn. intros x [? ?] y (?&?&?&?). repeat split; eauto.
+  - depelim X1; constructor; cbn in X; intuition eauto. solve_all.
 Qed.
 
 Lemma weakening_env_red1 Σ Σ' Γ M N :
@@ -192,7 +190,7 @@ Proof.
   - eapply cumul_Case.
     * cbv [cumul_predicate] in *; destruct_head'_prod. clear c0. repeat split; tas.
       + solve_all.
-      + eapply cmp_universe_instance_impl'; tea. tc.
+      + eapply cmp_ulvl_instance_impl'; tea. tc.
       + eauto.
     * eauto.
     * unfold cumul_branches, cumul_branch in *. solve_all.
@@ -200,16 +198,15 @@ Proof.
   - eapply cumul_CoFix; unfold cumul_mfixpoint in *; solve_all.
   - eapply cumul_Prim; solve_all.
     destruct X; constructor; eauto.
-    * eapply subrel_extends_cmp_universe; tea.
+    * eapply subrel_extends_cmp_ulvl; tea.
     * solve_all.
   - eapply cumul_Ind; eauto. 2:solve_all.
     eapply @cmp_global_instance_weaken_env. 1,2,5:eauto. all: tc.
   - eapply cumul_Construct; eauto. 2:solve_all.
     eapply @cmp_global_instance_weaken_env. 1,2,5:eauto. all: tc.
-  - eapply cumul_Sort. eapply subrelations_compare_extends; tea.
-  - eapply cumul_Const. eapply cmp_universe_instance_impl'; eauto; tc.
+  - eapply cumul_Univ. eapply subrelations_compare_extends; tea.
+  - eapply cumul_Const. eapply cmp_ulvl_instance_impl'; eauto; tc.
 Defined.
-
 
 Lemma weakening_env_convSpec Σ Σ' φ Γ M N :
   wf Σ' ->

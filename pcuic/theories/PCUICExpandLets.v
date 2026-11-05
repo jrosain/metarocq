@@ -22,7 +22,7 @@ Fixpoint trans (t : term) : term :=
   | tRel n => tRel n
   | tVar n => tVar n
   | tEvar ev args => tEvar ev (List.map trans args)
-  | tSort u => tSort u
+  | tUniv u => tUniv u
   | tConst c u => tConst c u
   | tInd c u => tInd c u
   | tConstruct c k u => tConstruct c k u
@@ -78,7 +78,7 @@ Definition trans_one_ind_body mdecl i (d : PCUICEnvironment.one_inductive_body) 
      ind_relevance := d.(PCUICEnvironment.ind_relevance);
      ind_indices := trans_local d.(PCUICEnvironment.ind_indices);
      ind_type := trans d.(PCUICEnvironment.ind_type);
-     ind_sort := d.(PCUICEnvironment.ind_sort);
+     ind_univ := d.(PCUICEnvironment.ind_univ);
      ind_kelim := d.(PCUICEnvironment.ind_kelim);
      ind_ctors := List.map (trans_constructor_body i mdecl) d.(PCUICEnvironment.ind_ctors);
      ind_projs := List.map trans_projection_body d.(PCUICEnvironment.ind_projs) |}.
@@ -88,14 +88,14 @@ Definition trans_minductive_body md :=
      ind_npars := md.(PCUICEnvironment.ind_npars);
      ind_params := trans_local md.(PCUICEnvironment.ind_params);
      ind_bodies := mapi (trans_one_ind_body md) md.(PCUICEnvironment.ind_bodies);
-     ind_universes := md.(PCUICEnvironment.ind_universes);
+     ind_ulvls := md.(PCUICEnvironment.ind_ulvls);
      ind_variance := md.(PCUICEnvironment.ind_variance)
   |}.
 
 Definition trans_constant_body bd :=
   {| cst_type := trans bd.(PCUICEnvironment.cst_type);
      cst_body := option_map trans bd.(PCUICEnvironment.cst_body);
-     cst_universes := bd.(PCUICEnvironment.cst_universes);
+     cst_ulvls := bd.(PCUICEnvironment.cst_ulvls);
      cst_relevance := bd.(PCUICEnvironment.cst_relevance) |}.
 
 Definition trans_global_decl (d : PCUICEnvironment.global_decl) :=
@@ -108,7 +108,7 @@ Definition trans_global_decls (d : PCUICEnvironment.global_declarations) : globa
   List.map (on_snd trans_global_decl) d.
 
 Definition trans_global_env (d : PCUICEnvironment.global_env) : global_env :=
-  {| universes := d.(PCUICEnvironment.universes);
+  {| ulvls := d.(PCUICEnvironment.ulvls);
      declarations := trans_global_decls d.(PCUICEnvironment.declarations);
      retroknowledge := d.(PCUICEnvironment.retroknowledge) |}.
 

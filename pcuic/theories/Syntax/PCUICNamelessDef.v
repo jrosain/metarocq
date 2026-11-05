@@ -37,7 +37,7 @@ Fixpoint nameless (t : term) : bool :=
   | tRel n => true
   | tVar n => true
   | tEvar n l => forallb nameless l
-  | tSort s => true
+  | tUniv s => true
   | tProd na A B => banon na && nameless A && nameless B
   | tLambda na A b => banon na && nameless A && nameless b
   | tLetIn na b B t => banon na && nameless b && nameless B && nameless t
@@ -93,7 +93,7 @@ Fixpoint nl (t : term) : term :=
   | tRel n => tRel n
   | tVar n => tVar n
   | tEvar n l => tEvar n (map nl l)
-  | tSort s => tSort s
+  | tUniv s => tUniv s
   | tProd na A B => tProd (anonymize na) (nl A) (nl B)
   | tLambda na A b => tLambda (anonymize na) (nl A) (nl b)
   | tLetIn na b B t => tLetIn (anonymize na) (nl b) (nl B) (nl t)
@@ -113,7 +113,7 @@ Definition nlctx (Γ : context) : context :=
 
 Definition nl_constant_body c :=
   Build_constant_body
-    (nl c.(cst_type)) (option_map nl c.(cst_body)) c.(cst_universes)
+    (nl c.(cst_type)) (option_map nl c.(cst_body)) c.(cst_ulvls)
     c.(cst_relevance).
 
 Definition nl_constructor_body c :=
@@ -132,7 +132,7 @@ Definition nl_one_inductive_body o :=
   Build_one_inductive_body
     o.(ind_name)
     (nlctx o.(ind_indices))
-    o.(ind_sort)
+    o.(ind_univ)
     (nl o.(ind_type))
     o.(ind_kelim)
     (map nl_constructor_body o.(ind_ctors))
@@ -145,7 +145,7 @@ Definition nl_mutual_inductive_body m :=
     m.(ind_npars)
     (nlctx m.(ind_params))
     (map nl_one_inductive_body m.(ind_bodies))
-    m.(ind_universes) m.(ind_variance).
+    m.(ind_ulvls) m.(ind_variance).
 
 Definition nl_global_decl (d : global_decl) : global_decl :=
   match d with
@@ -157,7 +157,7 @@ Definition nl_global_declarations (Σ : global_declarations) : global_declaratio
   (map (on_snd nl_global_decl) Σ).
 
 Definition nl_global_env (Σ : global_env) : global_env :=
-  {| universes := Σ.(universes);
+  {| ulvls := Σ.(ulvls);
      declarations := nl_global_declarations Σ.(declarations);
      retroknowledge := Σ.(retroknowledge) |}.
 

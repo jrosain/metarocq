@@ -104,17 +104,17 @@ Proof.
       * eapply H0 ; eauto.
       * eapply IHl ; assumption.
   - f_equal ; try solve [ ih ].
-    apply cmp_universe_instance_eq. assumption.
+    apply cmp_ulvl_instance_eq. assumption.
   - f_equal ; try solve [ ih ].
-    apply cmp_universe_instance_eq. assumption.
+    apply cmp_ulvl_instance_eq. assumption.
   - f_equal ; try solve [ ih ].
-    apply cmp_universe_instance_eq. assumption.
+    apply cmp_ulvl_instance_eq. assumption.
   - f_equal ; try solve [ ih ].
     * destruct e as [eqpar [eqinst [eqctx eqret]]].
       destruct X as [? [? ?]].
       destruct p, p'; simpl in *. f_equal.
       + apply All2_eq; solve_all.
-      + apply cmp_universe_instance_eq. assumption.
+      + apply cmp_ulvl_instance_eq. assumption.
       + simpl in *.
         eapply nameless_eqctx_IH; eauto.
       + ih.
@@ -136,7 +136,7 @@ Proof.
   - f_equal.
     destruct o; auto.
     f_equal. f_equal. cbn in X, hu, hv. rtoProp.
-    destruct X as (hty & hdef & harr). eapply Universe.make'_inj in e.
+    destruct X as (hty & hdef & harr). eapply UnivLvl.make'_inj in e.
     destruct a, a'; cbn in *. f_equal; intuition eauto.
     apply All2_eq. solve_all.
 Qed.

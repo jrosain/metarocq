@@ -16,41 +16,42 @@ Set Default Goal Selector "!".
 
 #[global] Instance subrel_config_impl_cmp cf1 cf2 cs pb :
   config.impl cf1 cf2 ->
-  RelationClasses.subrelation (@compare_sort cf1 cs pb) (@compare_sort cf2 cs pb).
+  RelationClasses.subrelation (@compare_univ cf1 cs pb) (@compare_univ cf2 cs pb).
 Proof.
-  cbv [compare_sort eq_sort eq_sort_ leq_sort leq_sort_n leq_sort_n_ eq_universe leq_universe_n config.impl].
+  cbv [compare_univ eq_univ eq_univ_ leq_univ leq_univ_n leq_univ_n_ eq_ulvl leq_ulvl_n config.impl].
   destruct cf1, cf2; cbn.
   move => H u1 u2; move: H.
   repeat match goal with
          | [ |- context[match ?x with _ => _ end] ] => is_var x; destruct x
          end; cbn => //=; try reflexivity.
-  repeat move => /andP[]; cbv [is_true]; intros; repeat (cbn in *; subst).
-  reflexivity.
+  all: repeat move => /andP[]; cbv [is_true]; intros; repeat (cbn in *; subst).
+  all: destruct u1 as [[| |] u1], u2 as [[| |] u2]; cbn in *; auto.
+  all: subst; auto.
 Qed.
 
 #[global] Instance subrel_config_impl_eq_pb cf1 cf2 cs pb :
   config.impl cf1 cf2 ->
-  RelationClasses.subrelation (@eq_sort cf1 cs) (@compare_sort cf2 cs pb).
+  RelationClasses.subrelation (@eq_univ cf1 cs) (@compare_univ cf2 cs pb).
 Proof.
-  change (@eq_sort ?cf ?φ) with (@compare_sort cf φ Conv).
+  change (@eq_univ ?cf ?φ) with (@compare_univ cf φ Conv).
   etransitivity; [ now eapply (@subrel_config_impl_cmp cf1 cf2) | ].
   tc.
 Qed.
 
 #[global] Instance subrel_config_impl_eq cf1 cf2 u :
   config.impl cf1 cf2 ->
-  RelationClasses.subrelation (@eq_sort cf1 u) (@eq_sort cf2 u).
-Proof. change (@eq_sort ?cf ?φ) with (@compare_sort cf φ Conv). tc. Qed.
+  RelationClasses.subrelation (@eq_univ cf1 u) (@eq_univ cf2 u).
+Proof. change (@eq_univ ?cf ?φ) with (@compare_univ cf φ Conv). tc. Qed.
 
 #[global] Instance subrel_config_impl_le cf1 cf2 u :
   config.impl cf1 cf2 ->
-  RelationClasses.subrelation (@leq_sort cf1 u) (@leq_sort cf2 u).
-Proof. change (@leq_sort ?cf ?φ) with (@compare_sort cf φ Cumul). tc. Qed.
+  RelationClasses.subrelation (@leq_univ cf1 u) (@leq_univ cf2 u).
+Proof. change (@leq_univ ?cf ?φ) with (@compare_univ cf φ Cumul). tc. Qed.
 
 #[global] Instance subrel_config_impl_eq_le cf1 cf2 u :
   config.impl cf1 cf2 ->
-  RelationClasses.subrelation (@eq_sort cf1 u) (@leq_sort cf2 u).
-Proof. change (@leq_sort ?cf ?φ) with (@compare_sort cf φ Cumul). tc. Qed.
+  RelationClasses.subrelation (@eq_univ cf1 u) (@leq_univ cf2 u).
+Proof. change (@leq_univ ?cf ?φ) with (@compare_univ cf φ Cumul). tc. Qed.
 
 Lemma weakening_config_is_allowed_elimination cf1 cf2 cs u allowed :
   config.impl cf1 cf2 ->

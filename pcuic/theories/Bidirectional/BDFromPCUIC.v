@@ -52,13 +52,13 @@ Proof.
   now apply ws_cumul_pb_forget_cumul.
 Qed.
 
-Lemma conv_infer_sort `{checker_flags} Σ (wfΣ : wf Σ) Γ t s :
-  Σ ;;; Γ |- t : tSort s ->
-  (∑ T' : term, Σ ;;; Γ |- t ▹ T' × Σ ;;; Γ ⊢ T' ≤ tSort s) ->
-  {s' & Σ ;;; Γ |- t ▹□ s' × leq_sort Σ s' s}.
+Lemma conv_infer_univ `{checker_flags} Σ (wfΣ : wf Σ) Γ t s :
+  Σ ;;; Γ |- t : tUniv s ->
+  (∑ T' : term, Σ ;;; Γ |- t ▹ T' × Σ ;;; Γ ⊢ T' ≤ tUniv s) ->
+  {s' & Σ ;;; Γ |- t ▹□ s' × leq_univ Σ s' s}.
 Proof.
   intros tyt (T'&?&Cumt).
-  apply ws_cumul_pb_Sort_r_inv in Cumt as (?&?&?) ; auto.
+  apply ws_cumul_pb_Univ_r_inv in Cumt as (?&?&?) ; auto.
   eexists.
   split ; tea.
   econstructor ; tea.
@@ -82,7 +82,7 @@ Lemma conv_infer_ind `{checker_flags} Σ (wfΣ : wf Σ) Γ t ind ui args :
   Σ ;;; Γ |- t : mkApps (tInd ind ui) args ->
   (∑ T', (Σ ;;; Γ |- t ▹ T') × (Σ ;;; Γ ⊢ T' ≤ mkApps (tInd ind ui) args)) ->
   ∑ ui' args', [× Σ ;;; Γ |- t ▹{ind} (ui',args'),
-      cmp_ind_universes Σ ind #|args| ui' ui
+      cmp_ind_ulvls Σ ind #|args| ui' ui
       & ws_cumul_pb_terms Σ Γ args' args].
 Proof.
   intros tyt (T'&?&Cumt).
@@ -93,18 +93,18 @@ Proof.
 Qed.
 
 Lemma conv_lift_judgment `{checker_flags} Σ Γ na b ty :
-  lift_sorting (checking Σ Γ) (fun T u => ∑ u', Σ;;; Γ |- T ▹□ u' × leq_sort Σ u' u) (j_decl (mkdecl na b ty)) ->
-  lift_sorting (checking Σ Γ) (infering_sort Σ Γ) (j_decl (mkdecl na b ty)).
+  lift_univing (checking Σ Γ) (fun T u => ∑ u', Σ;;; Γ |- T ▹□ u' × leq_univ Σ u' u) (j_decl (mkdecl na b ty)) ->
+  lift_univing (checking Σ Γ) (infering_univ Σ Γ) (j_decl (mkdecl na b ty)).
 Proof.
   intro Hj.
-  apply lift_sorting_ex_it_impl_gen with Hj => //=.
+  apply lift_univing_ex_it_impl_gen with Hj => //=.
   1: now destruct b.
   intros (u' & ? & Hle) er; eexists; split; tea. eapply geq_relevance; tea.
 Qed.
 
 Lemma conv_lift_judgment_univ `{checker_flags} Σ Γ na b ty u :
-  lift_sorting (checking Σ Γ) (fun T u => ∑ u', Σ;;; Γ |- T ▹□ u' × leq_sort Σ u' u) (j_decl_s (mkdecl na b ty) (Some u)) ->
-  ∑ u', lift_sorting (checking Σ Γ) (infering_sort Σ Γ) (j_decl_s (mkdecl na b ty) (Some u')) × leq_sort Σ u' u.
+  lift_univing (checking Σ Γ) (fun T u => ∑ u', Σ;;; Γ |- T ▹□ u' × leq_univ Σ u' u) (j_decl_s (mkdecl na b ty) (Some u)) ->
+  ∑ u', lift_univing (checking Σ Γ) (infering_univ Σ Γ) (j_decl_s (mkdecl na b ty) (Some u')) × leq_univ Σ u' u.
 Proof.
   intros (Htm & u0 & (u' & Hty & Hle) & <- & Her); cbn in *.
   exists u'; split; tas.
@@ -118,16 +118,16 @@ Section BDFromPCUIC.
 (** The big theorem*)
 Lemma bidirectional_from_pcuic `{checker_flags} :
       env_prop (fun Σ Γ t T => {T' & Σ ;;; Γ |- t ▹ T' × Σ ;;; Γ ⊢ T' ≤ T})
-        (fun Σ Γ j => lift_sorting (fun t T => Σ ;;; Γ |- t ◃ T) (fun T u => ∑ u', Σ ;;; Γ |- T ▹□ u' × leq_sort Σ u' u) j)
+        (fun Σ Γ j => lift_univing (fun t T => Σ ;;; Γ |- t ◃ T) (fun T u => ∑ u', Σ ;;; Γ |- T ▹□ u' × leq_univ Σ u' u) j)
         (fun Σ Γ => wf_local_bd Σ Γ).
 Proof.
   apply typing_ind_env.
 
   { intros Σ wfΣ Γ j Hj.
-    apply lift_sorting_impl with (1 := Hj) => //.
+    apply lift_univing_impl with (1 := Hj) => //.
     - intros t T []. now apply conv_check.
     - intros t u [HT0 HT1].
-      eapply conv_infer_sort. all: done. }
+      eapply conv_infer_univ. all: done. }
 
   all: intros Σ wfΣ Γ wfΓ.
 
@@ -153,7 +153,7 @@ Proof.
 
   - intros na A B ? ? ? ? CumA ? CumB.
     apply conv_lift_judgment_univ with (na := na) in CumA as (?&?&?).
-    apply conv_infer_sort in CumB ; auto.
+    apply conv_infer_univ in CumB ; auto.
     destruct CumB as (?&?&?).
     eexists.
     split.
@@ -161,7 +161,7 @@ Proof.
     + constructor ; cbn ; auto.
       1: by apply wf_local_closed_context.
       constructor.
-      apply leq_sort_product_mon.
+      apply leq_univ_product_mon.
       all: assumption.
 
   - intros na A t ? ? ? CumA ? (?&?&?).
@@ -222,7 +222,7 @@ Proof.
 
   - intros ci p c brs indices ps mdecl idecl isdecl wfΣ' wfbΓ epar ? predctx wfpred ? ? ty_p Cump ? ? Her Hinst ty_c Cumc ? ? ? ty_br.
 
-    apply conv_infer_sort in Cump as (?&?&?) ; auto.
+    apply conv_infer_univ in Cump as (?&?&?) ; auto.
     apply conv_infer_ind in Cumc as (?&?&[]) ; auto.
     eexists.
     split.
@@ -304,13 +304,13 @@ Proof.
 
     + assert (Σ ;;; Γ |- c : mkApps (tInd p.(proj_ind) ui') args')
         by (apply infering_ind_typing in i ; auto).
-      assert (consistent_instance_ext Σ (ind_universes mdecl) u).
+      assert (consistent_instance_ext Σ (ind_ulvls mdecl) u).
         { destruct isdecl.
           apply validity in X1 as (_ & s1 & Hs1 & _).
           eapply invert_type_mkApps_ind ; eauto.
           apply H1.p1.
         }
-      assert (consistent_instance_ext Σ (ind_universes mdecl) ui').
+      assert (consistent_instance_ext Σ (ind_ulvls mdecl) ui').
         { destruct isdecl.
           apply validity in X2 as (_ & s2 & Hs2 & _) ; auto.
           eapply invert_type_mkApps_ind ; eauto.
@@ -404,38 +404,38 @@ Proof.
   now apply ws_cumul_pb_forget_cumul.
 Qed.
 
-Lemma typing_infering_sort `{checker_flags} {Σ : global_env_ext} {wfΣ : wf Σ} {Γ t u} :
-  Σ ;;; Γ |- t : tSort u -> ∑ u', Σ ;;; Γ |- t ▹□ u' × leq_sort Σ u' u.
+Lemma typing_infering_univ `{checker_flags} {Σ : global_env_ext} {wfΣ : wf Σ} {Γ t u} :
+  Σ ;;; Γ |- t : tUniv u -> ∑ u', Σ ;;; Γ |- t ▹□ u' × leq_univ Σ u' u.
 Proof.
   intros.
-  apply conv_infer_sort ; tea.
+  apply conv_infer_univ ; tea.
   now apply typing_infering.
 Qed.
 
-Lemma lift_typing_lift_sorting `{checker_flags} {Σ} (wfΣ : wf Σ) {Γ} {tm ty rel} :
-  lift_typing typing Σ Γ (Judge tm ty None rel) -> lift_sorting (checking Σ Γ) (infering_sort Σ Γ) (Judge tm ty None rel).
+Lemma lift_typing_lift_univing `{checker_flags} {Σ} (wfΣ : wf Σ) {Γ} {tm ty rel} :
+  lift_typing typing Σ Γ (Judge tm ty None rel) -> lift_univing (checking Σ Γ) (infering_univ Σ Γ) (Judge tm ty None rel).
 Proof.
   intro Hj.
-  apply lift_sorting_ex_it_impl_gen with Hj.
+  apply lift_univing_ex_it_impl_gen with Hj.
   - destruct tm => //. apply typing_checking.
   - intros Hty Her.
-    eapply typing_infering_sort in Hty as [? []]; tea.
+    eapply typing_infering_univ in Hty as [? []]; tea.
     eexists; split; tea. destruct rel as [rel|] => //=.
     now eapply geq_relevance; tea.
 Qed.
 
-Lemma isType_infering_sort `{checker_flags} {Σ : global_env_ext} {wfΣ : wf Σ} {Γ t} :
+Lemma isType_infering_univ `{checker_flags} {Σ : global_env_ext} {wfΣ : wf Σ} {Γ t} :
   isType Σ Γ t -> ∑ u', Σ ;;; Γ |- t ▹□ u'.
 Proof.
-  move/lift_typing_lift_sorting.
+  move/lift_typing_lift_univing.
   intros (_ & s & ty & _).
   now eexists.
 Qed.
 
-Theorem isTypeRel_infering_sort `{checker_flags} (Σ : global_env_ext) Γ t r (wfΣ : wf Σ) :
-  isTypeRel Σ Γ t r -> ∑ u, Σ ;;; Γ |- t ▹□ u × relevance_of_sort u = r.
+Theorem isTypeRel_infering_univ `{checker_flags} (Σ : global_env_ext) Γ t r (wfΣ : wf Σ) :
+  isTypeRel Σ Γ t r -> ∑ u, Σ ;;; Γ |- t ▹□ u × relevance_of_univ u = r.
 Proof.
-  move/lift_typing_lift_sorting.
+  move/lift_typing_lift_univing.
   intros (_ & s & ty & _ & Her).
   now eexists; split; tea.
 Qed.
@@ -453,7 +453,7 @@ Qed.
 Lemma typing_infer_ind `{checker_flags} Σ (wfΣ : wf Σ) Γ t ind ui args :
   Σ ;;; Γ |- t : mkApps (tInd ind ui) args ->
   ∑ ui' args', [× Σ ;;; Γ |- t ▹{ind} (ui',args'),
-      cmp_ind_universes Σ ind #|args| ui' ui
+      cmp_ind_ulvls Σ ind #|args| ui' ui
       & ws_cumul_pb_terms Σ Γ args' args].
 Proof.
   intros.
@@ -477,9 +477,9 @@ Proof.
   intros wfΓ'.
   apply All_local_env_impl_gen with (1 := wfΓ'); clear Γ' wfΓ'.
   intros Γ' ? Hj.
-  apply lift_sorting_ex_it_impl_gen with Hj => //.
+  apply lift_univing_ex_it_impl_gen with Hj => //.
   - destruct decl_body => //= Hb. now apply typing_checking.
-  - intros Hty Her. eapply typing_infering_sort in Hty as [? []]; tea. eexists; split; tea. eapply geq_relevance; tea.
+  - intros Hty Her. eapply typing_infering_univ in Hty as [? []]; tea. eexists; split; tea. eapply geq_relevance; tea.
 Qed.
 
 Theorem ctx_inst_typing_bd `{checker_flags} (Σ : global_env_ext) Γ l Δ (wfΣ : wf Σ) :

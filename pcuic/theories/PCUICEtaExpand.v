@@ -74,7 +74,7 @@ Inductive expanded (Γ : list nat) : term -> Prop :=
 | expanded_tRel (n : nat) m args : nth_error Γ n = Some m -> forall Hle : m <= #|args|, Forall (expanded Γ) args -> expanded Γ (mkApps (tRel n) args)
 | expanded_tVar (id : ident) : expanded Γ (tVar id)
 | expanded_tEvar (ev : nat) (args : list term) : Forall (expanded Γ) args -> expanded Γ (tEvar ev args)
-| expanded_tSort (s : sort) : expanded Γ (tSort s)
+| expanded_tSort (s : Universe.t) : expanded Γ (tUniv s)
 | expanded_tProd (na : aname) (ty : term) (body : term) : expanded Γ (tProd na ty body)
 | expanded_tLambda (na : aname) (ty : term) (body : term) : expanded (0 :: Γ) body -> expanded Γ (tLambda na ty body)
 | expanded_tLetIn (na : aname) (def : term) (def_ty : term) (body : term) : expanded Γ def -> expanded (0 :: Γ) body -> expanded Γ (tLetIn na def def_ty body)
@@ -118,7 +118,7 @@ Lemma expanded_ind :
   (forall (Γ : list nat) (id : ident), P Γ (tVar id)) ->
   (forall (Γ : list nat) (ev : nat) (args : list term),
   Forall (expanded Σ Γ) args -> Forall (P Γ) args -> P Γ (tEvar ev args)) ->
-  (forall (Γ : list nat) (s : sort), P Γ (tSort s)) ->
+  (forall (Γ : list nat) (s : Universe.t), P Γ (tUniv s)) ->
   (forall (Γ : list nat) (na : aname) (ty body : term), P Γ (tProd na ty body)) ->
   (forall (Γ : list nat) (na : aname) (ty body : term),
   expanded Σ (0 :: Γ) body -> P (0 :: Γ) body -> P Γ (tLambda na ty body)) ->
@@ -232,12 +232,12 @@ Definition expanded_decl Σ d :=
 Inductive expanded_global_declarations (univs : ContextSet.t) retro : forall (Σ : global_declarations), Prop :=
 | expanded_global_nil : expanded_global_declarations univs retro []
 | expanded_global_cons decl Σ : expanded_global_declarations univs retro Σ ->
-  expanded_decl {| universes := univs; declarations := Σ; retroknowledge := retro |} decl.2 ->
+  expanded_decl {| ulvls := univs; declarations := Σ; retroknowledge := retro |} decl.2 ->
   expanded_global_declarations univs retro (decl :: Σ).
 Derive Signature for expanded_global_declarations.
 
 Definition expanded_global_env (g : global_env) :=
-  expanded_global_declarations g.(universes) g.(retroknowledge) g.(declarations).
+  expanded_global_declarations g.(ulvls) g.(retroknowledge) g.(declarations).
 
 Definition expanded_pcuic_program (p : pcuic_program) :=
   expanded_global_env p.1 /\ expanded p.1 [] p.2.

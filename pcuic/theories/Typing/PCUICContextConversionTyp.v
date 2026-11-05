@@ -112,7 +112,7 @@ Qed.
 
 Lemma wt_cum_ws_cumul_pb {cf:checker_flags} {Σ : global_env_ext} {wfΣ : wf Σ} {Γ : context} {t A B : term} {s} :
   Σ ;;; Γ |- t : A ->
-  Σ ;;; Γ |- B : tSort s ->
+  Σ ;;; Γ |- B : tUniv s ->
   Σ ;;; Γ |- A <= B ->
   Σ ;;; Γ ⊢ A ≤ B.
 Proof.
@@ -207,7 +207,7 @@ Proof.
     eapply type_Cumul with _ s.
     * econstructor. auto. eauto.
     * rewrite -(firstn_skipn (S n) Γ').
-      change (tSort s) with (lift0 (S n) (tSort s)).
+      change (tUniv s) with (lift0 (S n) (tUniv s)).
       eapply weakening_length. auto.
       rewrite firstn_length_le. eapply nth_error_Some_length in Hnth. lia. auto.
       now rewrite /app_context firstn_skipn.
@@ -228,7 +228,7 @@ Proof.
       unshelve eapply (@cumulAlgo_cumulSpec _ _ Cumul). apply into_ws_cumul_pb; eauto.
       now intuition.
   - constructor; pcuic.
-    eapply forall_Γ'0; constructor; pcuic. eapply lift_sorting_forget_univ. now eapply forall_Γ'.
+    eapply forall_Γ'0; constructor; pcuic. eapply lift_univing_forget_univ. now eapply forall_Γ'.
   - econstructor; pcuic.
     eapply forall_Γ'0; repeat (constructor; pcuic).
   - econstructor; pcuic.

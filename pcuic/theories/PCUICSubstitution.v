@@ -574,7 +574,7 @@ Proof.
 Qed.
 
 Lemma wf_arities_context {cf:checker_flags} {Σ : global_env} {wfΣ : wf Σ} {mind mdecl} :
-  declared_minductive Σ mind mdecl -> wf_local (Σ, ind_universes mdecl) (arities_context mdecl.(ind_bodies)).
+  declared_minductive Σ mind mdecl -> wf_local (Σ, ind_ulvls mdecl) (arities_context mdecl.(ind_bodies)).
 Proof.
   intros Hdecl.
   eapply declared_minductive_inv in Hdecl. 2:exact weaken_env_prop_typing. all:eauto.
@@ -582,7 +582,7 @@ Proof.
 Qed.
 
 Lemma on_constructor_closed_arities {cf:checker_flags} {Σ : global_env} {wfΣ : wf Σ} {mind mdecl idecl indices cdecl cs} :
-  on_constructor cumulSpec0 (lift_typing typing) (Σ, ind_universes mdecl) mdecl (inductive_ind mind) indices idecl cdecl cs ->
+  on_constructor cumulSpec0 (lift_typing typing) (Σ, ind_ulvls mdecl) mdecl (inductive_ind mind) indices idecl cdecl cs ->
   closedn #|arities_context (ind_bodies mdecl)| cdecl.(cstr_type).
 Proof.
   intros [? ? (_ & s & Hs & _) _ _ _ _].
@@ -592,7 +592,7 @@ Proof.
 Qed.
 
 Lemma on_constructor_closed {cf:checker_flags} {Σ : global_env} {wfΣ : wf Σ} {mind mdecl u idecl indices cdecl cs} :
-  on_constructor cumulSpec0 (lift_typing typing) (Σ, ind_universes mdecl) mdecl (inductive_ind mind) indices idecl cdecl cs ->
+  on_constructor cumulSpec0 (lift_typing typing) (Σ, ind_ulvls mdecl) mdecl (inductive_ind mind) indices idecl cdecl cs ->
   let cty := subst0 (inds (inductive_mind mind) u (ind_bodies mdecl))
                     (subst_instance u cdecl.(cstr_type))
   in closed cty.
@@ -725,9 +725,9 @@ Lemma subst_build_branches_type {cf:checker_flags}
   wf Σ ->
   declared_inductive Σ ind mdecl idecl ->
   closed_ctx (subst_instance u (ind_params mdecl)) ->
-  on_inductive (lift_typing typing) (Σ, ind_universes mdecl)
+  on_inductive (lift_typing typing) (Σ, ind_ulvls mdecl)
                (inductive_mind ind) mdecl ->
-  on_constructors (lift_typing typing) (Σ, ind_universes mdecl)
+  on_constructors (lift_typing typing) (Σ, ind_ulvls mdecl)
                   mdecl (inductive_ind ind) idecl indices (ind_ctors idecl) cs ->
   map_option_out (build_branches_type ind mdecl idecl args u p) = Some brs ->
   map_option_out (build_branches_type ind mdecl

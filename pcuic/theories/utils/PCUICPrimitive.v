@@ -194,7 +194,7 @@ Inductive onPrims {term} (eq_term : term -> term -> Type) Re : prim_val term -> 
   | onPrimsFloat f : onPrims eq_term Re (primFloat; primFloatModel f) (primFloat; primFloatModel f)
   | onPrimsString s : onPrims eq_term Re (primString; primStringModel s) (primString; primStringModel s)
   | onPrimsArray a a' :
-    Re (Universe.make' a.(array_level)) (Universe.make' a'.(array_level)) ->
+    Re (UnivLvl.make' a.(array_level)) (UnivLvl.make' a'.(array_level)) ->
     eq_term a.(array_default) a'.(array_default) ->
     eq_term a.(array_type) a'.(array_type) ->
     All2 eq_term a.(array_value) a'.(array_value) ->
@@ -210,12 +210,12 @@ Definition tPrimProp {term} (P : term -> Type) (p : PCUICPrimitive.prim_val term
   end.
 
 
-Inductive onPrims_dep {term} (eq_term : term -> term -> Type) (Re : Universe.t -> Universe.t -> Prop) (eq_term_dep : forall x y, eq_term x y -> Type) (Re' : forall a b, Re a b -> Type) : forall x y : prim_val term, onPrims eq_term Re x y -> Type :=
+Inductive onPrims_dep {term} (eq_term : term -> term -> Type) (Re : UnivLvl.t -> UnivLvl.t -> Prop) (eq_term_dep : forall x y, eq_term x y -> Type) (Re' : forall a b, Re a b -> Type) : forall x y : prim_val term, onPrims eq_term Re x y -> Type :=
   | onPrimsInt_dep i : onPrims_dep eq_term Re eq_term_dep Re' (primInt; primIntModel i) (primInt; primIntModel i) (onPrimsInt eq_term Re i)
   | onPrimsFloat_dep f : onPrims_dep eq_term Re eq_term_dep Re' (primFloat; primFloatModel f) (primFloat; primFloatModel f) (onPrimsFloat _ _ f)
   | onPrimsString_dep s : onPrims_dep eq_term Re eq_term_dep Re' (primString; primStringModel s) (primString; primStringModel s) (onPrimsString _ _ s)
   | onPrimsArray_dep a a' :
-    forall (hre : Re (Universe.make' a.(array_level)) (Universe.make' a'.(array_level)))
+    forall (hre : Re (UnivLvl.make' a.(array_level)) (UnivLvl.make' a'.(array_level)))
     (eqdef : eq_term a.(array_default) a'.(array_default))
     (eqty : eq_term a.(array_type) a'.(array_type))
     (eqt : All2 eq_term a.(array_value) a'.(array_value)),

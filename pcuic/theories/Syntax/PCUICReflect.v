@@ -25,7 +25,7 @@ Local Ltac fcase c :=
 Local Ltac term_dec_tac term_dec :=
   repeat match goal with
          | t : term, u : term |- _ => fcase (term_dec t u)
-         | u : sort, u' : sort |- _ => fcase (eq_dec u u')
+         | u : Universe.t, u' : Universe.t |- _ => fcase (eq_dec u u')
          | x : Instance.t, y : Instance.t |- _ =>
            fcase (eq_dec x y)
          | x : list Level.t, y : Instance.t |- _ =>
@@ -59,7 +59,7 @@ Fixpoint eqb_term (u v : term) : bool :=
   | tVar id, tVar id' =>
     eqb id id'
 
-  | tSort u, tSort u' =>
+  | tUniv u, tUniv u' =>
     eqb u u'
 
   | tApp u v, tApp u' v' => eqb_term u u' && eqb_term v v'
@@ -344,7 +344,7 @@ Qed.
 Definition eqb_one_inductive_body (x y : one_inductive_body) :=
   x.(ind_name) ==? y.(ind_name) &&
   x.(ind_indices) ==? y.(ind_indices) &&
-  x.(ind_sort) ==? y.(ind_sort) &&
+  x.(ind_univ) ==? y.(ind_univ) &&
   x.(ind_type) ==? y.(ind_type) &&
   x.(ind_kelim) ==? y.(ind_kelim) &&
   x.(ind_ctors) ==? y.(ind_ctors) &&

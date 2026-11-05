@@ -25,20 +25,20 @@ Section no_prop_leq_type.
 Context `{cf : checker_flags}.
 Variable Hcf : prop_sub_type = false.
 
-Lemma cumul_sort_confluence {Σ} {wfΣ : wf Σ} {Γ A u v} :
-  Σ ;;; Γ ⊢ A ≤ tSort u ->
-  Σ ;;; Γ ⊢ A ≤ tSort v ->
-  ∑ v', (Σ ;;; Γ ⊢ A = tSort v') *
-        (leq_sort (global_ext_constraints Σ) v' u /\
-          leq_sort (global_ext_constraints Σ) v' v).
+Lemma cumul_univ_confluence {Σ} {wfΣ : wf Σ} {Γ A u v} :
+  Σ ;;; Γ ⊢ A ≤ tUniv u ->
+  Σ ;;; Γ ⊢ A ≤ tUniv v ->
+  ∑ v', (Σ ;;; Γ ⊢ A = tUniv v') *
+        (leq_univ (global_ext_constraints Σ) v' u /\
+          leq_univ (global_ext_constraints Σ) v' v).
 Proof using Type.
   move=> H H'.
-  eapply ws_cumul_pb_Sort_r_inv in H as [u'u ?].
-  eapply ws_cumul_pb_Sort_r_inv in H' as [vu ?].
+  eapply ws_cumul_pb_Univ_r_inv in H as [u'u ?].
+  eapply ws_cumul_pb_Univ_r_inv in H' as [vu ?].
   destruct p, p0.
   destruct (closed_red_confluence c c1) as [x [r1 r2]].
-  eapply invert_red_sort in r1.
-  eapply invert_red_sort in r2. subst. noconf r2.
+  eapply invert_red_univ in r1.
+  eapply invert_red_univ in r2. subst. noconf r2.
   exists u'u. split; auto. now apply red_conv.
 Qed.
 
@@ -49,8 +49,8 @@ Lemma cumul_ind_confluence {Σ : global_env_ext} {wfΣ : wf Σ} {Γ A ind u v l 
     [× Σ ;;; Γ ⊢ A ⇝ (mkApps (tInd ind v') l''),
        ws_cumul_pb_terms Σ Γ l l'',
        ws_cumul_pb_terms Σ Γ l' l'',
-       cmp_ind_universes Σ ind #|l| v' u &
-       cmp_ind_universes Σ ind #|l'| v' v].
+       cmp_ind_ulvls Σ ind #|l| v' u &
+       cmp_ind_ulvls Σ ind #|l'| v' v].
 Proof using Type.
   move=> H H'.
   eapply ws_cumul_pb_Ind_r_inv in H as [u'u [l'u [redl ru ?]]].
@@ -85,99 +85,99 @@ Qed.
 
 Lemma is_propositional_bottom {Σ Γ T s s'} :
   wf_ext Σ ->
-  Σ ;;; Γ ⊢ T ≤ tSort s ->
-  Σ ;;; Γ ⊢ T ≤ tSort s' ->
-  Sort.is_propositional s -> Sort.is_propositional s'.
+  Σ ;;; Γ ⊢ T ≤ tUniv s ->
+  Σ ;;; Γ ⊢ T ≤ tUniv s' ->
+  Universe.is_propositional s -> Universe.is_propositional s'.
 Proof using Hcf.
   intros wfΣ hs hs'.
-  destruct (cumul_sort_confluence hs hs') as [x' [conv [leq leq']]].
+  destruct (cumul_univ_confluence hs hs') as [x' [conv [leq leq']]].
   move: leq leq'.
-  destruct x', s, s' => //=.
+  destruct x' as [[| |] x'], s as [[| |] u], s' as [[| |] u'] => //=; cbn in *.
   now rewrite Hcf.
 Qed.
 
 Lemma is_prop_bottom {Σ Γ T s s'} :
   wf_ext Σ ->
-  Σ ;;; Γ ⊢ T ≤ tSort s ->
-  Σ ;;; Γ ⊢ T ≤ tSort s' ->
-  Sort.is_prop s -> Sort.is_prop s'.
+  Σ ;;; Γ ⊢ T ≤ tUniv s ->
+  Σ ;;; Γ ⊢ T ≤ tUniv s' ->
+  Universe.is_prop s -> Universe.is_prop s'.
 Proof using Hcf.
   intros wfΣ hs hs'.
-  destruct (cumul_sort_confluence hs hs') as [x' [conv [leq leq']]].
+  destruct (cumul_univ_confluence hs hs') as [x' [conv [leq leq']]].
   move: leq leq'.
-  destruct x', s, s' => //=.
+  destruct x' as [[| |] x'], s as [[| |] u], s' as [[| |] u'] => //=; cbn in *.
   now rewrite Hcf.
 Qed.
 
 Lemma is_sprop_bottom {Σ Γ T s s'} :
   wf_ext Σ ->
-  Σ ;;; Γ ⊢ T ≤ tSort s ->
-  Σ ;;; Γ ⊢ T ≤ tSort s' ->
-  Sort.is_sprop s -> Sort.is_sprop s'.
+  Σ ;;; Γ ⊢ T ≤ tUniv s ->
+  Σ ;;; Γ ⊢ T ≤ tUniv s' ->
+  Universe.is_sprop s -> Universe.is_sprop s'.
 Proof using Type.
   intros wfΣ hs hs'.
-  destruct (cumul_sort_confluence hs hs') as [x' [conv [leq leq']]].
+  destruct (cumul_univ_confluence hs hs') as [x' [conv [leq leq']]].
   move: leq leq'.
-  destruct x', s, s' => //=.
+  destruct x' as [[| |] x'], s as [[| |] u], s' as [[| |] u'] => //=.
 Qed.
 
-Lemma prop_sort_eq {Σ Γ u u'} : Sort.is_prop u -> Sort.is_prop u' ->
+Lemma prop_univ_eq {Σ Γ u u'} : Universe.is_prop u -> Universe.is_prop u' ->
   is_closed_context Γ ->
-  Σ ;;; Γ ⊢ tSort u = tSort u'.
+  Σ ;;; Γ ⊢ tUniv u = tUniv u'.
 Proof using Type.
-  destruct u, u';
+  destruct u as [[| |] u], u' as [[| |] u'];
   move=> //_ //_.
   constructor => //. constructor.
   red. red. constructor.
 Qed.
 
-Lemma sprop_sort_eq {Σ Γ u u'} : Sort.is_sprop u -> Sort.is_sprop u' ->
+Lemma sprop_univ_eq {Σ Γ u u'} : Universe.is_sprop u -> Universe.is_sprop u' ->
   is_closed_context Γ ->
-  Σ ;;; Γ ⊢ tSort u = tSort u'.
+  Σ ;;; Γ ⊢ tUniv u = tUniv u'.
 Proof using Type.
-  destruct u, u';
+  destruct u as [[| |] u], u' as [[| |] u'];
   move=> //_ //_.
   constructor => //. constructor.
   do 2 red. constructor.
 Qed.
 
-Lemma conv_sort_inv {Σ : global_env_ext} {wfΣ : wf Σ} Γ s s' :
-  Σ ;;; Γ ⊢ tSort s = tSort s' ->
-  eq_sort (global_ext_constraints Σ) s s'.
+Lemma conv_univ_inv {Σ : global_env_ext} {wfΣ : wf Σ} Γ s s' :
+  Σ ;;; Γ ⊢ tUniv s = tUniv s' ->
+  eq_univ (global_ext_constraints Σ) s s'.
 Proof using Type.
   intros H.
   eapply ws_cumul_pb_alt_closed in H as [v [v' [redv redv' eqvv']]].
-  eapply invert_red_sort in redv.
-  eapply invert_red_sort in redv'. subst.
+  eapply invert_red_univ in redv.
+  eapply invert_red_univ in redv'. subst.
   now depelim eqvv'.
 Qed.
 
-Lemma is_prop_superE {l} : Sort.is_prop (Sort.super l) -> False.
+Lemma is_prop_superE {l} : Universe.is_prop (Universe.super l) -> False.
 Proof using Type.
-  destruct l => //.
+  destruct l as [[| |] l] => //.
 Qed.
 
-Lemma is_sprop_superE {l} : Sort.is_sprop (Sort.super l) -> False.
+Lemma is_sprop_superE {l} : Universe.is_sprop (Universe.super l) -> False.
 Proof using Type.
-  destruct l => //.
+  destruct l as [[| |] l] => //.
 Qed.
 
-Lemma is_prop_prod {s s'} : Sort.is_prop s' -> Sort.is_prop (Sort.sort_of_product s s').
+Lemma is_prop_prod {s s'} : Universe.is_prop s' -> Universe.is_prop (Universe.univ_of_product s s').
 Proof using Type.
-  destruct s' => //.
+  destruct s' as [[| |] s'] => //.
 Qed.
 
-Lemma is_sprop_prod {s s'} : Sort.is_sprop s' -> Sort.is_sprop (Sort.sort_of_product s s').
+Lemma is_sprop_prod {s s'} : Universe.is_sprop s' -> Universe.is_sprop (Universe.univ_of_product s s').
 Proof using Type.
-  destruct s' => //.
+  destruct s' as [[| |] s'] => //.
 Qed.
 
-Definition eq_univ_prop (u v : sort) :=
-  match Sort.to_family u, Sort.to_family v with
-  | Sort.fSProp, Sort.fSProp => true
-  | Sort.fProp, Sort.fProp => true
-  | Sort.fType, Sort.fType => true
-  | Sort.fType, Sort.fProp | Sort.fProp, Sort.fType => prop_sub_type
+Definition eq_univ_prop (u v : Universe.t) :=
+  match Universe.to_family u, Universe.to_family v with
+  | Sort.sSProp, Sort.sSProp => true
+  | Sort.sProp, Sort.sProp => true
+  | Sort.sType, Sort.sType => true
+  | Sort.sType, Sort.sProp | Sort.sProp, Sort.sType => prop_sub_type
   | _, _ => false
   end.
 
@@ -221,10 +221,10 @@ Qed.
 
 #[global]
 Instance subrelation_compare_sort_eq_prop φ pb :
-  RelationClasses.subrelation (compare_sort φ pb) eq_univ_prop.
+  RelationClasses.subrelation (compare_univ φ pb) eq_univ_prop.
 Proof using Type.
   intros s s'.
-  destruct pb, s, s' => //=.
+  destruct pb, s as [[| |] s], s' as [[| |] s'] => //=.
 Qed.
 
 Lemma eq_term_eq_term_prop_impl Σ φ pb napp t u :
@@ -275,48 +275,48 @@ Proof using Type.
       econstructor 2; eauto.
 Qed.
 
-Lemma cumul_prop_sort {Σ Γ s s'} {wfΣ : wf Σ} :
-  Σ ;;; Γ |- tSort s ~~ tSort s' ->
+Lemma cumul_prop_univ {Σ Γ s s'} {wfΣ : wf Σ} :
+  Σ ;;; Γ |- tUniv s ~~ tUniv s' ->
   eq_univ_prop s s'.
 Proof.
   intros equiv.
   eapply cumul_prop_alt in equiv as [nf [nf' [redl redr eq]]].
-  eapply invert_red_sort in redl. apply invert_red_sort in redr.
+  eapply invert_red_univ in redl. apply invert_red_univ in redr.
   subst.
   now depelim eq.
 Qed.
 
 Lemma cumul_prop_props {Σ Γ u u'} {wfΣ : wf Σ}:
-  Sort.is_prop u ->
-  Σ ;;; Γ |- tSort u ~~ tSort u' ->
-  Sort.is_prop u'.
+  Universe.is_prop u ->
+  Σ ;;; Γ |- tUniv u ~~ tUniv u' ->
+  Universe.is_prop u'.
 Proof using Hcf.
-  move => isp /cumul_prop_sort. move: isp.
-  destruct u, u' => //=. cbn. rewrite Hcf //.
+  move => isp /cumul_prop_univ. move: isp.
+  destruct u as [[| |] u], u' as [[| |] u'] => //=. cbn. rewrite Hcf //.
 Qed.
 
 Lemma cumul_sprop_props {Σ Γ u u'} {wfΣ : wf Σ} :
-  Sort.is_sprop u ->
-  Σ ;;; Γ |- tSort u ~~ tSort u' ->
-  Sort.is_sprop u'.
+  Universe.is_sprop u ->
+  Σ ;;; Γ |- tUniv u ~~ tUniv u' ->
+  Universe.is_sprop u'.
 Proof using Type.
-  move => isp /cumul_prop_sort. move: isp.
-  destruct u, u' => //.
+  move => isp /cumul_prop_univ. move: isp.
+  destruct u as [[| |] u], u' as [[| |] u'] => //.
 Qed.
 
 Instance refl_eq_univ_prop : RelationClasses.Reflexive eq_univ_prop.
 Proof using Type.
-  now intros [].
+  now intros [[| |] u].
 Qed.
 
 Instance sym_eq_univ_prop : RelationClasses.Symmetric eq_univ_prop.
 Proof using Type.
-  now intros [] [].
+  now intros [[| |] u] [].
 Qed.
 
 Instance trans_eq_univ_prop : RelationClasses.Transitive eq_univ_prop.
 Proof using Type.
-  now intros [] [] [].
+  now intros [[| |] u1] [[| |] u2] [[| |] u3].
 Qed.
 
 #[global]
@@ -346,10 +346,10 @@ Qed.
 #[global]
 Instance substu_True_eq_univ_prop : SubstUnivPreserving (fun _ _ => True) eq_univ_prop.
 Proof using Type.
-  now intros []???.
+  now intros [[| |] u]???.
 Qed.
 
-Lemma LevelExprSet_For_all (P : LevelExpr.t -> Prop) (u : Universe.t) :
+Lemma LevelExprSet_For_all (P : LevelExpr.t -> Prop) (u : UnivLvl.t) :
   LevelExprSet.For_all P u <->
   Forall P (LevelExprSet.elements u).
 Proof using Type.
@@ -752,7 +752,7 @@ Lemma cmp_True_subst_instance Σ univs u u' (i : Instance.t) :
   wf Σ.1 ->
   consistent_instance_ext Σ univs u ->
   consistent_instance_ext Σ univs u' ->
-  cmp_universe_instance (fun _ _ => True) (subst_instance u i) (subst_instance u' i).
+  cmp_ulvl_instance (fun _ _ => True) (subst_instance u i) (subst_instance u' i).
 Proof using Type.
   intros wfΣ cu cu'. red.
   eapply All2_Forall2, All2_map, All2_refl => ui.
@@ -775,7 +775,7 @@ Proof using Type.
   induction T using PCUICInduction.term_forall_list_ind; cbn; intros;
     try solve [constructor; eauto; solve_all].
   - cbn. constructor.
-    destruct s; split; reflexivity.
+    destruct s as [[| |] l]; split; reflexivity.
   - constructor. eapply PCUICEquality.eq_term_upto_univ_impl in IHT1; eauto.
     all:try typeclasses eauto.
     apply IHT2.
@@ -805,7 +805,7 @@ Lemma cmp_True_instance Σ univs u u' :
   wf Σ.1 ->
   consistent_instance_ext Σ univs u ->
   consistent_instance_ext Σ univs u' ->
-  cmp_universe_instance (fun _ _ => True) u u'.
+  cmp_ulvl_instance (fun _ _ => True) u u'.
 Proof using Type.
   intros wfΣ cu cu'.
   destruct univs; simpl in *.
@@ -960,10 +960,10 @@ Proof using Type.
 Qed.
 
 Notation eq_term_napp Σ n x y :=
-  (eq_term_upto_univ_napp Σ (eq_sort Σ) (eq_sort Σ) n x y).
+  (eq_term_upto_univ_napp Σ (eq_univ Σ) (eq_univ Σ) n x y).
 
 Notation leq_term_napp Σ n x y :=
-    (eq_term_upto_univ_napp Σ (eq_sort Σ) (leq_sort Σ) n x y).
+    (eq_term_upto_univ_napp Σ (eq_univ Σ) (leq_univ Σ) n x y).
 
 Lemma cumul_prop_is_open {Σ Γ T U} :
   Σ ;;; Γ |- T ~~ U ->
@@ -1033,12 +1033,12 @@ Proof using Type Hcf cf.
   - eapply inversion_Rel in X0 as [decl' [wfΓ' [Hnth Hcum]]]; auto.
     rewrite Hnth in H; noconf H. now eapply cumul_pb_cumul_prop in Hcum.
 
-  - eapply inversion_Sort in X0 as [wf [wfs Hs]]; auto.
+  - eapply inversion_Univ in X0 as [wf [wfs Hs]]; auto.
     apply subrelation_compare_sort_eq_prop in c => //.
     apply cumul_pb_cumul_prop in Hs => //.
     eapply cumul_prop_trans; eauto.
     destruct (cumul_prop_is_open Hs) as [].
-    constructor => //. constructor. rewrite /eq_univ_prop !Sort.sType_super //.
+    constructor => //. constructor. rewrite /eq_univ_prop !Universe.sType_super //.
 
   - eapply inversion_Prod in X4 as [s1' [s2' [Ha [Hb Hs]]]]; auto.
     specialize (X1 H). apply unlift_TypUniv in X1, Ha.
@@ -1051,10 +1051,10 @@ Proof using Type Hcf cf.
     eapply cumul_pb_cumul_prop in Hs => //.
     eapply cumul_prop_trans; eauto.
     constructor; fvs. constructor.
-    apply cumul_prop_sort in X1, X3. move: X1 X3. clear.
+    apply cumul_prop_univ in X1, X3. move: X1 X3. clear.
     unfold eq_univ_prop.
-    destruct s2, s2' => //=.
-    all: destruct s1, s1' => //=.
+    destruct s2 as [[| |] l2], s2' as [[| |] l2'] => //=.
+    all: destruct s1 as [[| |] l1], s1' as [[| |] l1'] => //=.
 
   - eapply inversion_Lambda in X4 as (B & dom & bod & cum); tas.
     specialize (X3 t0 B H).

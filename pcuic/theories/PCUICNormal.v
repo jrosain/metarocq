@@ -106,7 +106,7 @@ Section Normal.
   (* Relative to reduction flags *)
   Inductive whnf (Γ : context) : term -> Type :=
   | whnf_ne t : whne Γ t -> whnf Γ t
-  | whnf_sort s : whnf Γ (tSort s)
+  | whnf_sort s : whnf Γ (tUniv s)
   | whnf_prod na A B : whnf Γ (tProd na A B)
   | whnf_lam na A B : whnf Γ (tLambda na A B)
   | whnf_cstrapp i n u v : whnf Γ (mkApps (tConstruct i n u) v)
@@ -579,13 +579,13 @@ Proof.
   solve_discr.
 Qed.
 
-Lemma whnf_mkApps_tSort_inv f Σ Γ s args :
-  whnf f Σ Γ (mkApps (tSort s) args) -> args = [].
+Lemma whnf_mkApps_tUniv_inv f Σ Γ s args :
+  whnf f Σ Γ (mkApps (tUniv s) args) -> args = [].
 Proof.
   intros wh.
   inversion wh; solve_discr.
   clear -X.
-  remember (mkApps (tSort s) args) eqn:teq.
+  remember (mkApps (tUniv s) args) eqn:teq.
   exfalso.
   revert teq.
   induction X in args |- *; intros; solve_discr.
@@ -984,7 +984,7 @@ Inductive whnf_red Σ Γ : term -> term -> Type :=
 | whnf_red_tProj p c c' :
     red Σ Γ c c' ->
     whnf_red Σ Γ (tProj p c) (tProj p c')
-| whnf_red_tSort s : whnf_red Σ Γ (tSort s) (tSort s)
+| whnf_red_tUniv s : whnf_red Σ Γ (tUniv s) (tUniv s)
 | whnf_red_tProd na A A' B B' :
     red Σ Γ A A' ->
     red Σ (Γ,, vass na A) B B' ->
@@ -1049,7 +1049,7 @@ Proof.
     eauto.
   - depelim o. 1-3: reflexivity.
     eapply red_primArray_congr; eauto.
-    now eapply Universe.make'_inj in e.
+    now eapply UnivLvl.make'_inj in e.
 Qed.
 
 #[global]
@@ -1208,7 +1208,7 @@ Qed.
 Definition fake_params n : context :=
     unfold n (fun x => {| decl_name := {| binder_name := nAnon; binder_relevance := Relevant |};
                           decl_body := None;
-                          decl_type := tSort Sort.type0 |}).
+                          decl_type := tUniv Universe.type0 |}).
 
 Lemma fake_params_length n : #|fake_params n| = n.
 Proof.

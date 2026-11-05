@@ -448,7 +448,7 @@ Definition atom t :=
   match t with
   | tRel _
   | tVar _
-  | tSort _
+  | tUniv _
   | tConst _ _
   | tInd _ _
   | tConstruct _ _ _ => true

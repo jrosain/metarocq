@@ -655,7 +655,7 @@ Section Rho.
   rho Γ (tProd na t u) => tProd na (rho Γ t) (rho (vass na (rho Γ t) :: Γ) u);
   rho Γ (tVar i) => tVar i;
   rho Γ (tEvar n l) => tEvar n (map_terms rho Γ l _);
-  rho Γ (tSort s) => tSort s;
+  rho Γ (tUniv s) => tUniv s;
   rho Γ (tFix mfix idx) =>
     let mfixctx := fold_fix_context_wf mfix (fun Γ x Hx => rho Γ x) Γ [] in
     tFix (map_fix_rho (t:=tFix mfix idx) (fun Γ x Hx => rho Γ x) Γ mfixctx mfix _) idx;
@@ -3200,7 +3200,7 @@ Section Rho.
   Definition fake_params n : context :=
     unfold n (fun x => {| decl_name := {| binder_name := nAnon; binder_relevance := Relevant |};
                           decl_body := None;
-                          decl_type := tSort Sort.type0 |}).
+                          decl_type := tUniv Universe.type0 |}).
 
   Lemma context_assumptions_fake_params n :
     context_assumptions (fake_params n) = n.

@@ -40,7 +40,7 @@ Section Inversion.
 
   Lemma into_ws_cumul {Γ t T U s} :
     Σ ;;; Γ |- t : T ->
-    Σ ;;; Γ |- U : tSort s ->
+    Σ ;;; Γ |- U : tUniv s ->
     Σ ;;; Γ |- T <= U ->
     Σ ;;; Γ ⊢ T ≤ U.
   Proof using wfΣ.
@@ -88,8 +88,6 @@ Section Inversion.
         try solve [eapply into_ws_cumul; tea] ]
     ].
 
-  Derive Signature for typing.
-
   Import PCUICClosed PCUICOnFreeVars.
 
   Lemma nth_error_closed_context {Γ n d} :
@@ -131,12 +129,12 @@ Section Inversion.
     intros Γ n l T h. dependent induction h. assumption.
   Qed.
 
-  Lemma inversion_Sort :
+  Lemma inversion_Univ :
     forall {Γ s T},
-      Σ ;;; Γ |- tSort s : T ->
+      Σ ;;; Γ |- tUniv s : T ->
       wf_local Σ Γ ×
-      wf_sort Σ s ×
-      Σ ;;; Γ ⊢ tSort (Sort.super s) ≤ T.
+      wf_univ Σ s ×
+      Σ ;;; Γ ⊢ tUniv (Universe.super s) ≤ T.
   Proof using wfΣ.
     intros Γ s T h. invtac h.
   Qed.
@@ -146,8 +144,8 @@ Section Inversion.
       Σ ;;; Γ |- tProd na A B : T ->
       ∑ s1 s2,
         lift_typing typing Σ Γ (j_vass_s na A s1) ×
-        Σ ;;; Γ ,, vass na A |- B : tSort s2 ×
-        Σ ;;; Γ ⊢ tSort (Sort.sort_of_product s1 s2) ≤ T.
+        Σ ;;; Γ ,, vass na A |- B : tUniv s2 ×
+        Σ ;;; Γ ⊢ tUniv (Universe.univ_of_product s1 s2) ≤ T.
   Proof using wfΣ.
     intros Γ na A B T h. invtac h.
   Qed.
@@ -155,9 +153,9 @@ Section Inversion.
   Lemma inversion_Prod_size :
     forall {Γ na A B T},
       forall H : Σ ;;; Γ |- tProd na A B : T,
-      ∑ s1 s2 (H1 : lift_typing typing Σ Γ (j_vass_s na A s1)) (H2 : Σ ;;; Γ ,, vass na A |- B : tSort s2),
+      ∑ s1 s2 (H1 : lift_typing typing Σ Γ (j_vass_s na A s1)) (H2 : Σ ;;; Γ ,, vass na A |- B : tUniv s2),
         lift_typing_size (@typing_size _ _ _) _ H1 < typing_size H × typing_size H2 < typing_size H ×
-        Σ ;;; Γ ⊢ tSort (Sort.sort_of_product s1 s2) ≤ T.
+        Σ ;;; Γ ⊢ tUniv (Universe.univ_of_product s1 s2) ≤ T.
   Proof using wfΣ.
     intros Γ na A B T h. unshelve invtac h; eauto.
     all: try revert l; try revert l0; simpl; cbn; lia.
@@ -199,7 +197,7 @@ Section Inversion.
   Lemma inversion_App_size :
   forall {Γ u v T}
       (H : Σ ;;; Γ |- tApp u v : T),
-      ∑ na A B s  (H1 : Σ ;;; Γ |- u : tProd na A B) (H2 : Σ ;;; Γ |- v : A) (H3 : Σ ;;; Γ |- tProd na A B : tSort s),
+      ∑ na A B s  (H1 : Σ ;;; Γ |- u : tProd na A B) (H2 : Σ ;;; Γ |- v : A) (H3 : Σ ;;; Γ |- tProd na A B : tUniv s),
       typing_size H1 < typing_size H × typing_size H2 < typing_size H × typing_size H3 < typing_size H ×
         Σ ;;; Γ ⊢ B{ 0 := v } ≤ T.
   Proof using wfΣ.
@@ -214,7 +212,7 @@ Section Inversion.
       ∑ decl,
         wf_local Σ Γ ×
         declared_constant Σ c decl ×
-        (consistent_instance_ext Σ decl.(cst_universes) u) ×
+        (consistent_instance_ext Σ decl.(cst_ulvls) u) ×
         Σ ;;; Γ ⊢ subst_instance u (cst_type decl) ≤ T.
   Proof using wfΣ.
     intros Γ c u T h. invtac h.
@@ -226,7 +224,7 @@ Section Inversion.
       ∑ mdecl idecl,
         wf_local Σ Γ ×
         declared_inductive Σ ind mdecl idecl ×
-        consistent_instance_ext Σ (ind_universes mdecl) u ×
+        consistent_instance_ext Σ (ind_ulvls mdecl) u ×
         Σ ;;; Γ ⊢ subst_instance u idecl.(ind_type) ≤ T.
   Proof using wfΣ.
     intros Γ ind u T h. invtac h.
@@ -238,7 +236,7 @@ Section Inversion.
       ∑ mdecl idecl cdecl,
         wf_local Σ Γ ×
         declared_constructor (fst Σ) (ind, i) mdecl idecl cdecl ×
-        consistent_instance_ext Σ (ind_universes mdecl) u ×
+        consistent_instance_ext Σ (ind_ulvls mdecl) u ×
         Σ;;; Γ ⊢ type_of_constructor mdecl cdecl (ind, i) u ≤ T.
   Proof using wfΣ.
     intros Γ ind i u T h. invtac h.
@@ -246,16 +244,16 @@ Section Inversion.
   Import PCUICEquality.
   Variant case_inversion_data Γ ci p c brs mdecl idecl indices :=
    | case_inv
-       (ps : sort)
+       (ps : Universe.t)
        (eq_npars : mdecl.(ind_npars) = ci.(ci_npar))
        (predctx := case_predicate_context ci.(ci_ind) mdecl idecl p)
        (wf_pred : wf_predicate mdecl idecl p)
-       (cons : consistent_instance_ext Σ (ind_universes mdecl) p.(puinst))
+       (cons : consistent_instance_ext Σ (ind_ulvls mdecl) p.(puinst))
        (wf_pctx : wf_local Σ (Γ ,,, predctx))
        (conv_pctx : eq_context_upto_names p.(pcontext) (ind_predicate_context ci.(ci_ind) mdecl idecl))
-       (pret_ty : Σ ;;; Γ ,,, predctx |- p.(preturn) : tSort ps)
+       (pret_ty : Σ ;;; Γ ,,, predctx |- p.(preturn) : tUniv ps)
        (allowed_elim : is_allowed_elimination Σ idecl.(ind_kelim) ps)
-       (elim_relevance : isSortRel ps ci.(ci_relevance))
+       (elim_relevance : isUnivRel ps ci.(ci_relevance))
        (ind_inst : ctx_inst (typing Σ) Γ (p.(pparams) ++ indices)
                             (List.rev (subst_instance p.(puinst)
                                                       (ind_params mdecl ,,, ind_indices idecl : context))))
@@ -269,7 +267,7 @@ Section Inversion.
                    let brctxty := case_branch_type ci.(ci_ind) mdecl idecl p br ptm i cdecl in
                    (wf_local Σ (Γ ,,, brctxty.1) ×
                    ((Σ ;;; Γ ,,, brctxty.1 |- br.(bbody) : brctxty.2) ×
-                    (Σ ;;; Γ ,,, brctxty.1 |- brctxty.2 : tSort ps))))
+                    (Σ ;;; Γ ,,, brctxty.1 |- brctxty.2 : tUniv ps))))
                 0 idecl.(ind_ctors) brs).
 
   Lemma inversion_Case :

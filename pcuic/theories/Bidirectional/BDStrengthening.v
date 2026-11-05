@@ -358,7 +358,7 @@ Section OnFreeVars.
     on_free_vars P t ->
     on_free_vars P T.
 
-  Let Psort (Γ : context) (t : term) (u : sort) := True.
+  Let Puniv (Γ : context) (t : term) (u : Universe.t) := True.
 
   Let Pprod Γ t (na : aname) A B :=
     forall P,
@@ -381,7 +381,7 @@ Section OnFreeVars.
 
   Let PΓ_rel (Γ Γ' : context) := True.
 
-  Theorem bidirectional_on_free_vars : env_prop_bd Σ Pcheck Pinfer Psort Pprod Pind Pj PΓ PΓ_rel.
+  Theorem bidirectional_on_free_vars : env_prop_bd Σ Pcheck Pinfer Puniv Pprod Pind Pj PΓ PΓ_rel.
   Proof using wfΣ.
     apply bidir_ind_env.
 
@@ -547,7 +547,7 @@ Let Pinfer Γ t T :=
   on_free_vars P t ->
   Σ ;;; Δ |- rename f t ▹ rename f T.
 
-Let Psort Γ t u :=
+Let Puniv Γ t u :=
   forall P Δ f,
   urenaming P Γ Δ f ->
   on_ctx_free_vars P Γ ->
@@ -581,7 +581,7 @@ Let Pj Γ j :=
   forall P Δ f,
     urenaming P Γ Δ f ->
     on_ctx_free_vars P Γ ->
-    lift_sorting
+    lift_univing
       (fun t T => on_free_vars P t -> on_free_vars P T -> Σ ;;; Δ |- rename f t ◃ rename f T)
       (fun T u => on_free_vars P T -> Σ ;;; Δ |- rename f T ▹□ u) j.
 
@@ -629,18 +629,18 @@ Proof using Type.
     by rewrite /= andb_true_r.
 Qed.
 
-Theorem bidirectional_renaming : env_prop_bd Σ Pcheck Pinfer Psort Pprod Pind Pj PΓ PΓ_rel.
+Theorem bidirectional_renaming : env_prop_bd Σ Pcheck Pinfer Puniv Pprod Pind Pj PΓ PΓ_rel.
 Proof using wfΣ.
   apply bidir_ind_env.
 
   - intros Γ j Hj P Δ f hf hΓ.
-    apply lift_sorting_impl with (1 := Hj) => //; intros ?? [Ht IHt] **.
+    apply lift_univing_impl with (1 := Hj) => //; intros ?? [Ht IHt] **.
     all: eapply IHt; eauto.
 
   - intros Γ _ _ hΓ. red.
     apply All_local_env_impl with (1 := hΓ); clear Γ hΓ.
     intros Γ j Hj P Δ f hf hΓ'.
-    apply lift_sorting_impl with (1 := Hj) => //; intros ?? IHt **.
+    apply lift_univing_impl with (1 := Hj) => //; intros ?? IHt **.
     all: eapply IHt; eauto.
 
   - intros Γ Γ' _ _ HΓ P Δ f hf hΓ hΓ'.
@@ -649,7 +649,7 @@ Proof using wfΣ.
     rewrite on_free_vars_ctx_snoc in hΓ'. move/andP: hΓ' => [hΓ'] /andP [onb ont].
     apply All_local_env_snoc; auto.
     eapply urenaming_context in hf ; tea.
-    apply lift_sorting_f_it_impl with X => //.
+    apply lift_univing_f_it_impl with X => //.
     1: destruct decl_body => //; cbn in onb |- *.
     all: intros IHt; eapply IHt; eauto.
     all: rewrite on_ctx_free_vars_concat hΓ /= on_free_vars_ctx_on_ctx_free_vars //.
@@ -666,7 +666,7 @@ Proof using wfΣ.
   - intros. red. move => P Δ f hf hΓ /= /andP [] ? ?.
     econstructor.
     { specialize (X0 _ _ _ hf hΓ).
-      eapply lift_sorting_f_it_impl with X0 => //= IH. now apply IH. }
+      eapply lift_univing_f_it_impl with X0 => //= IH. now apply IH. }
     eapply X2 ; tea.
     1: by apply urenaming_vass.
     rewrite on_ctx_free_vars_snoc /=.
@@ -675,7 +675,7 @@ Proof using wfΣ.
   - intros. red. move => P Δ f hf hΓ /= /andP [] ? ?.
     econstructor ; eauto.
     { specialize (X0 _ _ _ hf hΓ).
-      eapply lift_sorting_f_it_impl with X0 => //= IH. now apply IH. }
+      eapply lift_univing_f_it_impl with X0 => //= IH. now apply IH. }
     eapply X2 ; tea.
     1: by apply urenaming_vass.
     rewrite on_ctx_free_vars_snoc /=.
@@ -684,7 +684,7 @@ Proof using wfΣ.
   - intros. red. move => P Δ f hf hΓ /= /andP [] ? /andP [] ? ?.
     econstructor ; eauto.
     { specialize (X0 _ _ _ hf hΓ).
-      eapply lift_sorting_f_it_impl with X0 => //= IH. all: now apply IH. }
+      eapply lift_univing_f_it_impl with X0 => //= IH. all: now apply IH. }
     eapply X2 ; tea.
     1: by apply urenaming_vdef.
     rewrite on_ctx_free_vars_snoc.
@@ -824,7 +824,7 @@ Proof using wfΣ.
       apply All_map, All_impl with (1 := X0).
       move => d [] /andP [] hT hb p.
       specialize (p _ _ _ hf hΓ).
-      eapply lift_sorting_it_impl_gen with p => // IHp.
+      eapply lift_univing_it_impl_gen with p => // IHp.
       eapply IHp ; tea.
     + apply All_mix with (1 := ht) in X2.
       apply All_map, All_impl with (1 := X2).
@@ -834,7 +834,7 @@ Proof using wfΣ.
       eapply on_ctx_free_vars_fix_context in hΓ; tea. rewrite -(fix_context_length mfix) in hΓ.
       specialize (p _ _ _ hf hΓ).
       rewrite <-(shiftnP0 P) in hT. eapply on_free_vars_lift_impl in hT. rewrite Nat.add_0_r in hT.
-      apply lift_sorting_f_it_impl with p => //= IHp.
+      apply lift_univing_f_it_impl with p => //= IHp.
       all: eapply IHp ; tea.
     + by apply rename_wf_fixpoint.
 
@@ -847,7 +847,7 @@ Proof using wfΣ.
       apply All_map, All_impl with (1 := X0).
       move => d [] /andP [] hT hb p.
       specialize (p _ _ _ hf hΓ).
-      eapply lift_sorting_it_impl_gen with p => // IHp.
+      eapply lift_univing_it_impl_gen with p => // IHp.
       eapply IHp ; tea.
     + apply All_mix with (1 := ht) in X2.
       apply All_map, All_impl with (1 := X2).
@@ -857,7 +857,7 @@ Proof using wfΣ.
       eapply on_ctx_free_vars_fix_context in hΓ; tea. rewrite -(fix_context_length mfix) in hΓ.
       specialize (p _ _ _ hf hΓ).
       rewrite <-(shiftnP0 P) in hT. eapply on_free_vars_lift_impl in hT. rewrite Nat.add_0_r in hT.
-      apply lift_sorting_f_it_impl with p => //= IHp.
+      apply lift_univing_f_it_impl with p => //= IHp.
       all: eapply IHp ; tea.
     + by apply rename_wf_cofixpoint.
 
@@ -870,7 +870,7 @@ Proof using wfΣ.
 
   - intros. red. intros P Δ f hf ht.
     econstructor ; eauto.
-    rewrite -/(rename f (tSort u)).
+    rewrite -/(rename f (tUniv u)).
     eapply red_rename ; tea.
     now eapply infering_on_free_vars.
 
@@ -1057,8 +1057,8 @@ Qed.
 
 
 Lemma strengthening_type `{cf: checker_flags} {Σ : global_env_ext} {wfΣ : PCUICTyping.wf Σ} Γ Γ' Γ'' t s :
-  Σ ;;; Γ ,,, Γ' ,,, lift_context #|Γ'| 0 Γ'' |- lift #|Γ'| #|Γ''| t : tSort s ->
-  ∑ s', Σ ;;; Γ ,,, Γ'' |- t : tSort s' × leq_sort Σ s' s.
+  Σ ;;; Γ ,,, Γ' ,,, lift_context #|Γ'| 0 Γ'' |- lift #|Γ'| #|Γ''| t : tUniv s ->
+  ∑ s', Σ ;;; Γ ,,, Γ'' |- t : tUniv s' × leq_univ Σ s' s.
 Proof.
   intros H; pose proof (H' := H); eapply strengthening in H. destruct H as [T' [? HT Hcumul HT']].
   pose proof (Hcumul' := Hcumul).
@@ -1068,11 +1068,11 @@ Proof.
   eapply closedn_on_free_vars in H0.
   pose proof (wf_local_closed_context (typing_wf_local H')).
   eapply into_ws_cumul_pb in Hcumul; eauto.
-  eapply PCUICConversion.ws_cumul_pb_Sort_r_inv in Hcumul as [s' [Hred Hcumul]].
+  eapply PCUICConversion.ws_cumul_pb_Univ_r_inv in Hcumul as [s' [Hred Hcumul]].
   eapply closed_red_red in Hred. pose proof (HT'':=HT'). eapply PCUICValidity.validity in HT' as (_ & ? & ? & _).
   exists s'; split; eauto.
-  assert (PCUICReduction.red Σ (Γ,,, Γ'') (unlift #|Γ'| #|Γ''| T') (tSort s')).
-  { assert (tSort s' = unlift #|Γ'| #|Γ''| (tSort s')) by reflexivity. rewrite H2; clear H2.
+  assert (PCUICReduction.red Σ (Γ,,, Γ'') (unlift #|Γ'| #|Γ''| T') (tUniv s')).
+  { assert (tUniv s' = unlift #|Γ'| #|Γ''| (tUniv s')) by reflexivity. rewrite H2; clear H2.
     eapply red_rename. eauto. eapply (urenaming_strengthen _ _ _ _); eauto.
     2-3: eauto. eapply typing_wf_local in HT''.
     eapply wf_local_closed_context in HT''. revert HT''.
@@ -1081,7 +1081,7 @@ Proof.
     all: eapply on_free_vars_ctx_on_ctx_free_vars_xpredT; eauto.
   }
   eapply type_Cumul; eauto. eapply PCUICSR.subject_reduction; eauto.
-  assert (liftSort : unlift #|Γ'| #|Γ''| (tSort s') = tSort s') by reflexivity. rewrite <- liftSort; clear liftSort.
+  assert (liftUniv : unlift #|Γ'| #|Γ''| (tUniv s') = tUniv s') by reflexivity. rewrite <- liftUniv; clear liftUniv.
   eapply PCUICConversion.cumulAlgo_cumulSpec. eapply PCUICConversion.ws_cumul_pb_red_r_inv; eauto.
   eapply ws_cumul_pb_refl; eauto. eapply PCUICInversion.typing_closed_ctx; eauto.
 Qed.

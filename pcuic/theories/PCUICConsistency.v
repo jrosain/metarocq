@@ -22,8 +22,8 @@ From Equations Require Import Equations.
 Definition False_oib : one_inductive_body :=
   {| ind_name := "False";
      ind_indices := [];
-     ind_sort := sProp;
-     ind_type := tSort sProp;
+     ind_univ := uProp;
+     ind_type := tUniv uProp;
      ind_kelim := IntoAny;
      ind_ctors := [];
      ind_projs := [];
@@ -34,7 +34,7 @@ Definition False_mib : mutual_inductive_body :=
      ind_npars := 0;
      ind_params := [];
      ind_bodies := [False_oib];
-     ind_universes := Monomorphic_ctx;
+     ind_ulvls := Monomorphic_ctx;
      ind_variance := None |}.
 
 Theorem pcuic_consistent {cf:checker_flags} {nor : normalizing_flags} Σ

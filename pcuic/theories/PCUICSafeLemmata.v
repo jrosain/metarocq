@@ -27,7 +27,7 @@ Lemma wf_inst_case_context {cf Σ} {wfΣ : wf Σ} {Γ} {ci : case_info}
   {mdecl idecl} {uinst params} ctx :
   declared_inductive Σ ci mdecl idecl ->
   wf_local Σ Γ ->
-  consistent_instance_ext Σ (ind_universes mdecl) uinst ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) uinst ->
   spine_subst Σ Γ params (List.rev params) (smash_context [] (subst_instance uinst (ind_params mdecl))) ->
   wf_local_rel Σ (Γ,,, smash_context [] (ind_params mdecl)@[uinst]) ctx@[uinst] ->
   wf_local Σ (Γ ,,, inst_case_context params uinst ctx).
@@ -74,7 +74,7 @@ Lemma wf_case_inst_case_context {cf Σ} {wfΣ : wf Σ}
   isType Σ Γ (mkApps (tInd ci.(ci_ind) p.(puinst)) (p.(pparams) ++ args)) ->
   wf_predicate mdecl idecl p ->
   let predctx := case_predicate_context ci mdecl idecl p in
-  Σ;;; Γ ,,, predctx |- p.(preturn) : tSort ps ->
+  Σ;;; Γ ,,, predctx |- p.(preturn) : tUniv ps ->
   let ptm := it_mkLambda_or_LetIn predctx p.(preturn) in
   eq_context_upto_names p.(pcontext) (ind_predicate_context ci.(ci_ind) mdecl idecl) ->
   forall i cdecl br,
@@ -375,12 +375,12 @@ Section Lemmata.
         apply inversion_mkApps in typ as (?&_&spine); auto; simpl in *.
         clear -spine.
         rewrite -app_assoc -app_comm_cons in spine.
-        revert spine; generalize (tSort x3); intros t' spine.
+        revert spine; generalize (tUniv x3); intros t' spine.
         induction params1 in spine, x4, t' |- *; cbn in *.
         * depelim spine.
           econstructor; eauto.
         * depelim spine; eauto.
-      + cbn. exists (tSort ps).
+      + cbn. exists (tUniv ps).
         cbn. move: pret_ty. cbn [fill_predicate_hole preturn].
         move=> Ht.
         cbn [fill_predicate_hole preturn] in predctx.
@@ -446,7 +446,7 @@ Section Lemmata.
     - apply unlift_TypUniv in l. now econstructor.
     - now eapply isTypeRel_welltyped.
     - apply unlift_TermTyp in l. now econstructor.
-    - apply lift_sorting_forget_body in l. now eapply isTypeRel_welltyped.
+    - apply lift_univing_forget_body in l. now eapply isTypeRel_welltyped.
     - eapply inversion_Prim in typ as (?&?&[]); eauto.
       depelim p0. now eexists.
     - eapply inversion_Prim in typ as (?&?&[]); eauto.
@@ -610,7 +610,7 @@ Section Lemmata.
 
   Lemma red_const :
     forall {Γ c u cty cb cu rel},
-      Some (ConstantDecl {| cst_type := cty ; cst_body := Some cb ; cst_universes := cu;
+      Some (ConstantDecl {| cst_type := cty ; cst_body := Some cb ; cst_ulvls := cu;
         cst_relevance := rel |})
       = lookup_env Σ c ->
       red (fst Σ) Γ (tConst c u) (subst_instance u cb).
@@ -623,7 +623,7 @@ Section Lemmata.
 
   Lemma cored_const :
     forall {Γ c u cty cb cu rel},
-      Some (ConstantDecl {| cst_type := cty ; cst_body := Some cb ; cst_universes := cu;
+      Some (ConstantDecl {| cst_type := cty ; cst_body := Some cb ; cst_ulvls := cu;
         cst_relevance := rel |})
       = lookup_env Σ c ->
       cored Σ Γ (subst_instance u cb) (tConst c u).
@@ -680,7 +680,7 @@ Section Lemmata.
 
   Lemma isSortmkApps :
     forall t l,
-      isSort (mkApps t l) ->
+      isUniv (mkApps t l) ->
       l = [].
   Proof using Type.
     intros t l h.
@@ -716,7 +716,7 @@ Section Lemmata.
       apply inversion_App in hw' as ihw' ; auto.
       destruct ihw' as [na' [A' [B' [hP [? ?]]]]].
       apply inversion_Prod in hP as [s1 [s2 [? [? bot]]]] ; auto.
-      apply ws_cumul_pb_Sort_Prod_inv in bot ; auto.
+      apply ws_cumul_pb_Univ_Prod_inv in bot ; auto.
   Qed.
 
   Lemma mkApps_Prod_nil :

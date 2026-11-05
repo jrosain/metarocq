@@ -822,7 +822,7 @@ Proof.
 Qed.
 
 Lemma it_mkProd_or_LetIn_inj ctx s ctx' s' :
-  it_mkProd_or_LetIn ctx (tSort s) = it_mkProd_or_LetIn ctx' (tSort s') ->
+  it_mkProd_or_LetIn ctx (tUniv s) = it_mkProd_or_LetIn ctx' (tUniv s') ->
   ctx = ctx' /\ s = s'.
 Proof.
   move/(f_equal (destArity [])).
@@ -832,7 +832,7 @@ Qed.
 
 Lemma destArity_spec ctx T :
   match destArity ctx T with
-  | Some (ctx', s) => it_mkProd_or_LetIn ctx T = it_mkProd_or_LetIn ctx' (tSort s)
+  | Some (ctx', s) => it_mkProd_or_LetIn ctx T = it_mkProd_or_LetIn ctx' (tUniv s)
   | None => True
   end.
 Proof.
@@ -843,7 +843,7 @@ Qed.
 
 Lemma destArity_spec_Some ctx T ctx' s :
   destArity ctx T = Some (ctx', s)
-  -> it_mkProd_or_LetIn ctx T = it_mkProd_or_LetIn ctx' (tSort s).
+  -> it_mkProd_or_LetIn ctx T = it_mkProd_or_LetIn ctx' (tUniv s).
 Proof.
   pose proof (destArity_spec ctx T) as H.
   intro e; now rewrite e in H.

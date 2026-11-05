@@ -29,7 +29,7 @@ Let Pinfer Γ t T :=
   forall T', Σ ;;; Γ |- t ▹ T' ->
   ∑ T'', Σ ;;; Γ ⊢ T ⇝ T'' × Σ ;;; Γ ⊢ T' ⇝ T''.
 
-Let Psort Γ t u :=
+Let Puniv Γ t u :=
   wf_local Σ Γ ->
   forall u', Σ ;;; Γ |- t ▹□ u' ->
   u = u'.
@@ -52,19 +52,19 @@ Let Pind Γ ind t u args :=
 
 Let Pcheck (Γ : context) (t T : term) := True.
 
-Let Pj (Γ : context) (j : judgment) := lift_sorting (Pcheck Γ) (Psort Γ) j.
+Let Pj (Γ : context) (j : judgment) := lift_univing (Pcheck Γ) (Puniv Γ) j.
 
 Let PΓ (Γ : context) := True.
 
 Let PΓ_rel (Γ Γ' : context) := True.
 
-Theorem bidirectional_unique : env_prop_bd Σ Pcheck Pinfer Psort Pprod Pind Pj PΓ PΓ_rel.
+Theorem bidirectional_unique : env_prop_bd Σ Pcheck Pinfer Puniv Pprod Pind Pj PΓ PΓ_rel.
 Proof using wfΣ.
 
   apply bidir_ind_env.
 
   all: intros ; red ; auto.
-  { apply lift_sorting_impl with (1 := X) => ?? [] //. }
+  { apply lift_univing_impl with (1 := X) => ?? [] //. }
   1-9,11-13: intros ? T' ty_T' ; inversion_clear ty_T'.
   14-17: intros.
 
@@ -81,17 +81,17 @@ Proof using wfΣ.
   - apply unlift_TypUniv in X0, X3.
     apply X0 in X3 => //.
     apply H in X4.
-    2:{ constructor ; auto. now eapply lift_sorting_forget_univ, lift_sorting_lift_typing. }
+    2:{ constructor ; auto. now eapply lift_univing_forget_univ, lift_univing_lift_typing. }
     subst.
     eexists ; split.
     all: eapply closed_red_refl ; fvs.
 
   - apply X2 in X5 as [bty' []].
-    2:{ constructor ; auto. now apply lift_sorting_lift_typing. }
+    2:{ constructor ; auto. now apply lift_univing_lift_typing. }
     exists (tProd na t bty') ; split.
     all: now eapply closed_red_prod_codom.
 
-  - apply lift_sorting_lift_typing in X, X4; tas.
+  - apply lift_univing_lift_typing in X, X4; tas.
     apply lift_typing_is_open_term in X4 as [X4_1 X4_2]; tas; cbn in *.
     apply X2 in X5 as [A' []].
     2: now constructor.
@@ -201,14 +201,14 @@ Proof using wfΣ.
     eexists ; split.
     all: eapply closed_red_refl.
     1,3:fvs.
-    all: now eapply subject_is_open_term, infering_sort_typing.
+    all: now eapply subject_is_open_term, infering_univ_typing.
 
   - rewrite H3 in H0 ; injection H0 as ->.
     eapply nth_error_all in X as (?&[]); tea.
     eexists ; split.
     all: eapply closed_red_refl.
     1,3:fvs.
-    all: now eapply subject_is_open_term, infering_sort_typing.
+    all: now eapply subject_is_open_term, infering_univ_typing.
 
   - intros ? T' ty_T'.
     inversion ty_T' ; subst.
@@ -253,19 +253,19 @@ Proof using wfΣ.
     * inversion X2 ; subst. rewrite H3 in H; noconf H. eexists. split; eapply closed_red_refl; fvs.
       all:simp prim_type; cbn. cbn in hty.
       all:eapply type_is_open_term, checking_typing; tea.
-      all:eapply has_sort_isType; eapply checking_typing; tea.
-      all:eapply has_sort_isType; econstructor; tea.
+      all:eapply has_univ_isType; eapply checking_typing; tea.
+      all:eapply has_univ_isType; econstructor; tea.
 
   - inversion X3 ; subst.
     eapply X0 in X4 as [T'' []]; subst ; tea.
     eapply into_closed_red in X1 ; fvs.
     eapply into_closed_red in X5 ; fvs.
     eapply closed_red_confluence in X5 as [? [? ru']]; tea.
-    eapply invert_red_sort in ru' ; subst.
+    eapply invert_red_univ in ru' ; subst.
     eapply closed_red_confluence in X1 as [? [ru' ru]].
     2: now etransitivity.
-    eapply invert_red_sort in ru ; subst.
-    eapply invert_red_sort in ru'.
+    eapply invert_red_univ in ru ; subst.
+    eapply invert_red_univ in ru'.
     now congruence.
 
   - inversion X3 ; subst.
@@ -340,17 +340,17 @@ Proof.
   - now eapply ws_cumul_pb_eq_le.
 Qed.
 
-Theorem infering_sort_sort `{checker_flags} {Σ} (wfΣ : wf Σ) {Γ} (wfΓ : wf_local Σ Γ) {t u u'} :
+Theorem infering_univ_univ `{checker_flags} {Σ} (wfΣ : wf Σ) {Γ} (wfΓ : wf_local Σ Γ) {t u u'} :
   Σ ;;; Γ |- t ▹□ u -> Σ ;;; Γ |- t ▹□ u' -> u = u'.
 Proof.
   intros ty ty'.
   now eapply bidirectional_unique in ty'.
 Qed.
 
-Theorem infering_sort_infering `{checker_flags} {Σ} (wfΣ : wf Σ)
+Theorem infering_univ_infering `{checker_flags} {Σ} (wfΣ : wf Σ)
   {Γ} {wfΓ : wf_local Σ Γ} {t u T} :
   Σ ;;; Γ |- t ▹□ u -> Σ ;;; Γ |- t ▹ T ->
-  Σ ;;; Γ ⊢ T ⇝ tSort u.
+  Σ ;;; Γ ⊢ T ⇝ tUniv u.
 Proof.
   intros ty ty'.
   depelim ty.
@@ -359,7 +359,7 @@ Proof.
   2: now eapply type_is_open_term, infering_typing.
   eapply bidirectional_unique in i as [T'' []]; tea.
   eapply closed_red_confluence in r as [? [? ru]]; tea.
-  eapply invert_red_sort in ru ; subst.
+  eapply invert_red_univ in ru ; subst.
   now etransitivity.
 Qed.
 
@@ -489,9 +489,9 @@ Corollary isTypeRel_unique `{checker_flags} {Σ} (wfΣ : wf Σ) {Γ T rel rel'} 
 Proof.
   intros (_ & s1 & H1 & _ & <-) (_ & s2 & H2 & _ & <-). cbn in H1, H2.
   apply typing_wf_local in H1 as wfΓ.
-  apply typing_infering_sort in H1 as (u1 & H1 & Hle), H2 as (u2 & H2 & Hle').
+  apply typing_infering_univ in H1 as (u1 & H1 & Hle), H2 as (u2 & H2 & Hle').
   apply leq_relevance_eq in Hle as <-, Hle' as <-.
-  eapply infering_sort_sort in H2 as ->; tea.
+  eapply infering_univ_univ in H2 as ->; tea.
   reflexivity.
 Qed.
 

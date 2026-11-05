@@ -98,7 +98,7 @@ Lemma inst_case_ws_cumul_ctx_pb {cf Σ} {wfΣ : wf Σ} {ind mdecl idecl Γ pars 
   on_free_vars_ctx (closedP #|pars'| xpredT) ctx' ->
   is_closed_context Γ ->
   ws_cumul_pb_terms Σ Γ pars pars' ->
-  cmp_universe_instance (eq_universe Σ) puinst puinst' ->
+  cmp_ulvl_instance (eq_ulvl Σ) puinst puinst' ->
   eq_context_upto_names ctx ctx' ->
   Σ ⊢ Γ,,, inst_case_context pars puinst ctx = Γ,,, inst_case_context pars' puinst' ctx'.
 Proof.

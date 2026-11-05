@@ -880,7 +880,7 @@ Definition wt {cf} Σ Γ t := ∑ T, Σ ;;; Γ |- t : T.
 
 Lemma isType_wt {cf} {Σ Γ T} : isType Σ Γ T -> wt Σ Γ T.
 Proof.
-  intros (_ & s & hs & _); now exists (PCUICAst.tSort s).
+  intros (_ & s & hs & _); now exists (PCUICAst.tUniv s).
 Qed.
 Coercion isType_wt : isType >-> wt.
 
@@ -911,7 +911,7 @@ Section wtsub.
       All (wt Γ) p.(pparams) ×
       ∑ mdecl idecl,
       [× declared_inductive Σ ci mdecl idecl,
-         consistent_instance_ext Σ (PCUICEnvironment.ind_universes mdecl) (PCUICAst.puinst p),
+         consistent_instance_ext Σ (PCUICEnvironment.ind_ulvls mdecl) (PCUICAst.puinst p),
          wf_predicate mdecl idecl p,
          eq_context_upto_names (PCUICCases.ind_predicate_context ci mdecl idecl) (PCUICAst.pcontext p),
          wf_local_rel Σ (Γ ,,, smash_context [] (ind_params mdecl)@[p.(puinst)]) p.(pcontext)@[p.(puinst)],
@@ -1406,7 +1406,7 @@ Qed.
 Lemma trans_case_predicate_context {cf} {Σ : PCUICEnvironment.global_env_ext}
   {wfΣ : PCUICTyping.wf Σ} {Γ ci mdecl idecl p} :
   S.declared_inductive Σ ci mdecl idecl ->
-  S.consistent_instance_ext Σ (PCUICEnvironment.ind_universes mdecl) (PCUICAst.puinst p) →
+  S.consistent_instance_ext Σ (PCUICEnvironment.ind_ulvls mdecl) (PCUICAst.puinst p) →
   let parctx := (PCUICEnvironment.ind_params mdecl)@[PCUICAst.puinst p] in
   PCUICSpine.spine_subst Σ Γ (PCUICAst.pparams p)
       (List.rev (PCUICAst.pparams p))
@@ -1871,7 +1871,7 @@ Qed.
 Lemma wf_local_ind_params_weaken {cf} {Σ : global_env_ext} {wfΣ : wf Σ} {Γ} {ind mdecl u} :
   declared_minductive Σ ind mdecl ->
   wf_local Σ Γ ->
-  consistent_instance_ext Σ (ind_universes mdecl) u ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) u ->
   wf_local Σ (Γ ,,, (ind_params mdecl)@[u]).
 Proof.
   intros decli wfΓ cu.
@@ -2441,7 +2441,7 @@ Lemma trans_lift_typing_it {P Q} {tm tm' : option term} {t t' : term} {u r} :
   forall tu: ST.lift_typing0 P (Judge tm t u r),
   let s := tu.2.π1 in
   match tm', tm with None, _ => unit | Some tm', Some tm => P tm t -> Q tm' t' | _, _ => False end ->
-  (P t (tSort s) -> Q t' (tSort s)) ->
+  (P t (tUniv s) -> Q t' (tUniv s)) ->
   TT.lift_typing0 Q (Judge tm' t' u r).
 Proof.
   intros (? & ? & Hs & e) s HPQc HPQs.
@@ -2495,13 +2495,13 @@ Lemma trans_branches {cf} Σ Γ brs btys ps:
     (fun br bty : nat × PCUICAst.term =>
       (((br.1 = bty.1 × ST.typing Σ Γ br.2 bty.2)
         × TT.typing (trans_global Σ) (trans_local Γ) (trans br.2) (trans bty.2))
-      × ST.typing Σ Γ bty.2 (PCUICAst.tSort ps))
+      × ST.typing Σ Γ bty.2 (PCUICAst.tUniv ps))
       × TT.typing (trans_global Σ) (trans_local Γ) (trans bty.2)
-        (trans (PCUICAst.tSort ps))) brs btys ->
+        (trans (PCUICAst.tUniv ps))) brs btys ->
   All2
     (fun br bty : nat × term =>
     (br.1 = bty.1 × TT.typing (trans_global Σ) (trans_local Γ) br.2 bty.2)
-    × TT.typing (trans_global Σ) (trans_local Γ) bty.2 (tSort ps))
+    × TT.typing (trans_global Σ) (trans_local Γ) bty.2 (tUniv ps))
     (map (on_snd trans) brs) (map (fun '(x, y) => (x, trans y)) btys).
 Proof.
   induction 1;cbn.
@@ -2955,7 +2955,7 @@ Qed.
 
 Lemma trans_case_branch_type {cf} {Σ : global_env_ext} {wfΣ : wf Σ} {Γ : context} {ci : case_info} {mdecl idecl cdecl i p br} :
   declared_constructor Σ (ci, i) mdecl idecl cdecl ->
-  consistent_instance_ext Σ (ind_universes mdecl) (puinst p) ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) (puinst p) ->
   wf_predicate mdecl idecl p ->
   wf_branch cdecl br ->
   eq_context_upto_names (pcontext p) (ind_predicate_context ci mdecl idecl) ->
@@ -3175,7 +3175,7 @@ Lemma trans_type_of_constructor {cf} {Σ : global_env_ext} {wfΣ : wf Σ} {wfΣ'
   {mdecl idecl cdecl ind i u} :
   declared_constructor Σ (ind, i) mdecl idecl cdecl ->
   consistent_instance_ext (trans_global Σ)
-    (ind_universes (trans_minductive_body mdecl)) u ->
+    (ind_ulvls (trans_minductive_body mdecl)) u ->
   ws_cumul_pb (cf := cf' cf) Conv (trans_global Σ) [] (trans (ST.type_of_constructor mdecl cdecl (ind, i) u))
   (TT.type_of_constructor
     (trans_minductive_body mdecl)
@@ -3442,7 +3442,7 @@ Definition map_trans_one_ind_body (d : PCUICEnvironment.one_inductive_body) :=
      ind_relevance := d.(PCUICEnvironment.ind_relevance);
      ind_indices := trans_local d.(PCUICEnvironment.ind_indices);
      ind_type := trans d.(PCUICEnvironment.ind_type);
-     ind_sort := d.(PCUICEnvironment.ind_sort);
+     ind_univ := d.(PCUICEnvironment.ind_univ);
      ind_kelim := d.(PCUICEnvironment.ind_kelim);
      ind_ctors := List.map map_trans_constructor_body d.(PCUICEnvironment.ind_ctors);
      ind_projs := List.map trans_projection_body d.(PCUICEnvironment.ind_projs) |}.
@@ -3452,7 +3452,7 @@ Definition map_trans_minductive_body md :=
      ind_npars := md.(PCUICEnvironment.ind_npars);
      ind_params := trans_local md.(PCUICEnvironment.ind_params);
      ind_bodies := map map_trans_one_ind_body md.(PCUICEnvironment.ind_bodies);
-     ind_universes := md.(PCUICEnvironment.ind_universes);
+     ind_ulvls := md.(PCUICEnvironment.ind_ulvls);
      ind_variance := md.(PCUICEnvironment.ind_variance)
   |}.
 
@@ -3476,7 +3476,7 @@ Proof.
   have fvssi : on_free_vars_ctx
     (shiftnP #|ind_params mdecl| xpred0)
     (subst_context
-      (inds (inductive_mind ci) (abstract_instance (ind_universes mdecl))
+      (inds (inductive_mind ci) (abstract_instance (ind_ulvls mdecl))
         (ind_bodies mdecl)) #|ind_params mdecl| (cstr_args cdecl)).
     { eapply on_free_vars_ctx_subst_context. len.
       now rewrite Nat.add_comm. eapply (inds_is_open_terms []). }
@@ -3513,7 +3513,7 @@ Proof.
   rewrite trans_inds. len.
   cbn [cstr_args map_trans_constructor_body].
   cbn [ind_params map_trans_minductive_body].
-  cbn [ind_universes map_trans_minductive_body].
+  cbn [ind_ulvls map_trans_minductive_body].
   rewrite /inds. len. reflexivity.
 Qed.
 
@@ -3536,14 +3536,14 @@ Proof.
   induction H;cbn.
   - constructor.
   - constructor.
-    + apply IHAll_local_env_over_sorting.
+    + apply IHAll_local_env_over_univing.
     + cbn in *.
-      apply lift_sorting_it_impl with tu => //.
+      apply lift_univing_it_impl with tu => //.
       intros HT wfΣ; split; tas. auto.
   - constructor.
-    + apply IHAll_local_env_over_sorting.
+    + apply IHAll_local_env_over_univing.
     + cbn in *.
-      apply lift_sorting_it_impl with tu => //=.
+      apply lift_univing_it_impl with tu => //=.
       all: intros HT wfΣ; split; tas. all: auto.
 Qed.
 
@@ -3604,14 +3604,14 @@ Proof.
     + now apply trans_consistent_instance_ext.
     + red in X. epose proof (declared_constructor_inv weaken_prop _ X isdecl) as [cs [hnth onc]].
       destruct onc. red in on_ctype.
-      unshelve eapply lift_sorting_ex_it_impl_gen with (on_ctype _) => //= Hs _.
+      unshelve eapply lift_univing_ex_it_impl_gen with (on_ctype _) => //= Hs _.
       rewrite /type_of_constructor.
       rewrite (trans_subst (shiftnP #|ind_bodies mdecl| xpred0) (shiftnP 0 xpred0)).
       pose proof (declared_constructor_closed_gen_type isdecl).
       eapply closedn_on_free_vars. len in H0. now rewrite closedn_subst_instance.
       eapply (inds_is_open_terms []).
       eexists; split => //.
-      eapply (substitution (Γ := trans_local Γ) (Δ := []) (T:=tSort _@[u])).
+      eapply (substitution (Γ := trans_local Γ) (Δ := []) (T:=tUniv _@[u])).
       rewrite trans_inds. eapply (weaken_subslet (Γ := trans_local Γ) (Γ' := [])); eauto with pcuic.
       eapply subslet_inds. eapply (trans_declared_inductive _ _ _ _ isdecl).
       now eapply trans_consistent_instance_ext.
@@ -3719,7 +3719,7 @@ Proof.
       eapply trans_eq_context_upto_names in cd.
       eapply eq_context_upto_names_smash_context in cd.
       intros eqann.
-      eapply (eq_annots_subst_context _ (map trans (inds (inductive_mind ci) (abstract_instance (ind_universes mdecl)) (ind_bodies mdecl))) #|ind_params mdecl|).
+      eapply (eq_annots_subst_context _ (map trans (inds (inductive_mind ci) (abstract_instance (ind_ulvls mdecl)) (ind_bodies mdecl))) #|ind_params mdecl|).
       eapply (eq_annots_expand_lets_ctx _ (trans_local (ind_params mdecl))).
       rewrite -(smash_context_subst []) /= subst_context_nil.
       rewrite (expand_lets_smash_context _ []) /=. len; rewrite expand_lets_k_ctx_nil.
@@ -3802,7 +3802,7 @@ Proof.
         move: Hbty. rewrite /cbt. len.
         now rewrite shiftnP_add.
         rewrite (trans_smash_context (shiftnP #|Γ| xpred0)) //.
-        eapply (typing_expand_lets (Σ := trans_global Σ) _ _ _ (tSort ps)).
+        eapply (typing_expand_lets (Σ := trans_global Σ) _ _ _ (tUniv ps)).
         now rewrite trans_local_app in IHbty.
 
   - rewrite (trans_subst (shiftnP #|projection_context p.(proj_ind) mdecl idecl u| xpred0) (shiftnP #|Γ| xpred0)).
@@ -3880,12 +3880,12 @@ Proof.
     * depelim X0; depelim X1; constructor; intuition eauto. cbn. solve_all.
   - eapply (type_ws_cumul_pb (pb:=Cumul)).
     + eauto.
-    + now eapply has_sort_isType.
+    + now eapply has_univ_isType.
     + eapply cumulSpec_cumulAlgo_curry in X4; fvs.
       eapply ws_cumul_pb_forget in X4.
       eapply cumul_decorate in X4; tea.
       2:eapply validity; tea.
-      2:now eapply has_sort_isType.
+      2:now eapply has_univ_isType.
       eapply into_ws_cumul_pb.
       eapply (trans_cumul (Σ := Σ)); eauto.
       eapply (trans_on_free_vars_ctx 0). now eapply wf_local_closed_context in wfΓ.
@@ -3921,8 +3921,8 @@ Lemma trans_global_constraints {Σ : global_env} : PCUICLookup.global_constraint
 Proof. reflexivity. Qed.
 
 Lemma type_it_mkProd_or_LetIn_smash_middle {cf} {Σ : global_env_ext} {wfΣ : wf Σ} {Γ Δ Δ' T s} :
-  Σ ;;; Γ |- it_mkProd_or_LetIn Δ (it_mkProd_or_LetIn Δ' T) : tSort s ->
-  Σ ;;; Γ |- it_mkProd_or_LetIn Δ (it_mkProd_or_LetIn (smash_context [] Δ') (expand_lets Δ' T)) : tSort s.
+  Σ ;;; Γ |- it_mkProd_or_LetIn Δ (it_mkProd_or_LetIn Δ' T) : tUniv s ->
+  Σ ;;; Γ |- it_mkProd_or_LetIn Δ (it_mkProd_or_LetIn (smash_context [] Δ') (expand_lets Δ' T)) : tUniv s.
 Proof.
   intros hit.
   eapply subject_reduction; tea. clear hit.
@@ -4309,8 +4309,8 @@ Proof.
   all: depelim wfl; depelim wfr; destruct l as (? & ? & ? & _), l0 as (? & ? & ? & _); cbn in *.
   - rewrite -trans_local_app.
     eapply trans_cumulSpec in eqt; tea.
-    { now eapply has_sort_isType. }
-    { eapply has_sort_isType. eapply context_cumulativity_spec; tea.
+    { now eapply has_univ_isType. }
+    { eapply has_univ_isType. eapply context_cumulativity_spec; tea.
       eapply All2_fold_app. reflexivity. apply X. }
   - rewrite -trans_local_app.
     eapply (trans_convSpec (Σ := Σ)) => //.
@@ -4319,8 +4319,8 @@ Proof.
       eapply All2_fold_app. reflexivity. apply X. }
   - rewrite -trans_local_app.
     eapply (trans_cumulSpec (Σ := Σ)) => //.
-    { now eapply has_sort_isType. }
-    { eapply has_sort_isType. eapply context_cumulativity_spec; tea.
+    { now eapply has_univ_isType. }
+    { eapply has_univ_isType. eapply context_cumulativity_spec; tea.
       eapply All2_fold_app. reflexivity. apply X. }
 Qed.
 
@@ -4532,7 +4532,7 @@ Proof.
     eapply (cumulAlgo_cumulSpec _ (pb:=Cumul)).
     apply into_ws_cumul_pb.
     eapply (trans_cumul' (Σ := Σ) (Γ' := Γ' ,,, Γ'0)) => //.
-    eapply cumul_decorate_hetero; eauto using has_sort_isType.
+    eapply cumul_decorate_hetero; eauto using has_univ_isType.
     len. now rewrite (All2_fold_length X) eqlen.
     now depelim ass. now depelim ass'.
     eapply cumulSpec_cumulAlgo_curry in eqt; eauto.
@@ -4578,7 +4578,7 @@ Lemma trans_type_local_ctx {cf} {Σ Γ Δ s} :
 Proof.
   intros wf wf'.
   induction Δ; cbn.
-  unfold PCUICLookup.wf_sort, wf_sort.
+  unfold PCUICLookup.wf_univ, wf_univ.
   destruct s => //.
   destruct a as [? [?|] ?] => /= //; intuition auto.
   all: apply lift_typing_f_impl with (1 := b) => //; intros.
@@ -4617,7 +4617,7 @@ Proof.
   intros x hin. cbn in hin. now eapply ConstraintSetFact.empty_iff in hin.
 Qed.
 
-Lemma wt_subst_instance {cf} {Σ : global_env} {ϕ : universes_decl} {Γ T u univs} :
+Lemma wt_subst_instance {cf} {Σ : global_env} {ϕ : ulvls_decl} {Γ T u univs} :
   wf_ext_wk (Σ, Polymorphic_ctx univs) ->
   wt (Σ, Polymorphic_ctx univs) Γ T ->
   consistent_instance_ext (Σ, ϕ) (Polymorphic_ctx univs) u ->
@@ -4717,11 +4717,11 @@ Proof.
   rewrite /PCUICEnvironment.fst_ctx.
   destruct Σ as [[gunivs Σ retro] udecl]; cbn. intros [onu wfΣ]; cbn in *.
   induction wfΣ as [|Σ0 kn d X IHX [f udecl' onu' ond]]. constructor; auto. constructor.
-  have onud : on_udecl gunivs (PCUICLookup.universes_decl_of_decl (trans_global_decl d)).
-  { apply (trans_on_udecl (Σ:= {| universes := gunivs; declarations := Σ0; retroknowledge := retro |})) in onu'. destruct d => //. }
+  have onud : on_udecl gunivs (PCUICLookup.ulvls_decl_of_decl (trans_global_decl d)).
+  { apply (trans_on_udecl (Σ:= {| ulvls := gunivs; declarations := Σ0; retroknowledge := retro |})) in onu'. destruct d => //. }
   cbn; constructor; eauto.
   rename Σ0 into Σd.
-  set (Σ0 := {| universes := gunivs; declarations := Σd; retroknowledge := retro |}).
+  set (Σ0 := {| ulvls := gunivs; declarations := Σd; retroknowledge := retro |}).
   rename X into Xd.
   set (X := (onu, Xd) : wf Σ0).
   constructor; try constructor; auto; try apply IHX.
@@ -4735,7 +4735,7 @@ Proof.
       intros n idecl onind; generalize onind; intros []; econstructor; tea.
       { cbn. rewrite ind_arity_eq !trans_it_mkProd_or_LetIn //. }
       { cbn. apply lift_typing_f_impl with (1 := onArity) => // ?? Hty.
-        exact (pcuic_expand_lets (Σ0, ind_universes m) [] _ _ X Hty IHX). }
+        exact (pcuic_expand_lets (Σ0, ind_ulvls m) [] _ _ X Hty IHX). }
       { instantiate (1 := ind_cunivs).
         red in onConstructors.
         eapply All2_map_left, All2_impl; tea.
@@ -4744,7 +4744,7 @@ Proof.
         { red in onParams. now eapply wf_local_closed_context in onParams. }
         have oncargs: on_free_vars_ctx (shiftnP (#|ind_params m| + #|ind_bodies m|) xpred0)
           (cstr_args cdecl).
-        { eapply sorts_local_ctx_wf_local in on_cargs.
+        { eapply univs_local_ctx_wf_local in on_cargs.
           eapply wf_local_closed_context in on_cargs.
           now move/onfvs_app: on_cargs; len.
           rewrite cstr_eq in on_ctype. destruct on_ctype as (_ & s & Hs & _).
@@ -4762,7 +4762,7 @@ Proof.
           rewrite context_assumptions_smash_context context_assumptions_map //. }
         { cbn; rewrite /trans_cstr_concl /trans_cstr_concl_head /cstr_concl_head. now len. }
         { eapply trans_lift_typing_it with on_ctype => // Hty. set (s := _.2.π1) in *; clearbody s.
-          epose proof (pcuic_expand_lets (Σ0, ind_universes m) _ _ _ X Hty IHX).
+          epose proof (pcuic_expand_lets (Σ0, ind_ulvls m) _ _ _ X Hty IHX).
           rewrite trans_arities_context. cbn.
           rewrite cstr_eq in X0. rewrite !trans_it_mkProd_or_LetIn in X0.
           eapply type_it_mkProd_or_LetIn_smash_middle in X0.
@@ -4789,7 +4789,7 @@ Proof.
             destruct univs => //.
             split. cbn in IHc. apply IHc, on_cargs.
             destruct on_cargs as [hs hj].
-            apply lift_sorting_f_it_impl with (f := fun t => _ (_ t)) (tu := hj) => // ht.
+            apply lift_univing_f_it_impl with (f := fun t => _ (_ t)) (tu := hj) => // ht.
             have fvsc : on_free_vars_ctx (shiftnP (#|ind_params m| + #|ind_bodies m|) xpred0) c.
             { eapply typing_wf_local, wf_local_closed_context in ht.
                 move/onfvs_app: ht. now len. }
@@ -4809,7 +4809,7 @@ Proof.
           rewrite -[trans_local (ind_params m) ++ _]trans_local_app.
           rewrite -[_ ++ _]trans_local_app.
           intros ci.
-          eapply (ctx_inst_expand_lets (Σ := (Σ0, ind_universes m))) in ci; cbn in ci.
+          eapply (ctx_inst_expand_lets (Σ := (Σ0, ind_ulvls m))) in ci; cbn in ci.
           rewrite List.rev_involutive in ci.
           rewrite expand_lets_ctx_lift_context_cancel in ci.
           rewrite -(trans_expand_lets_map (shiftnP (#|ind_params m| + #|ind_bodies m|) xpred0)) //.
@@ -4832,10 +4832,10 @@ Proof.
             destruct onArity as (_ & s & Hs & _).
             rewrite -it_mkProd_or_LetIn_app in Hs.
             eapply type_it_mkProd_or_LetIn_inv in Hs as [? [? [Hs _]]].
-            eapply PCUICClosedConv.sorts_local_ctx_All_local_env in Hs; eauto.
+            eapply PCUICClosedConv.univs_local_ctx_All_local_env in Hs; eauto.
             now rewrite app_context_nil_l in Hs. }
           { eapply wf_local_smash_end.
-            eapply sorts_local_ctx_wf_local in on_cargs => //.
+            eapply univs_local_ctx_wf_local in on_cargs => //.
             eapply weaken_wf_local => //.
             eapply wf_arities_context'; eauto. }
         }
@@ -4869,7 +4869,7 @@ Proof.
         { intros v indv.
           move: (on_ctype_variance v indv). clear -indv parsfvs onVariance onc X onu ond onud IHX onParams oncargs oncindices.
           rewrite indv in onVariance.
-          eapply variance_universes_insts in onVariance as [univs' [u [u' [eqv hunivs cu cu' equlen eqvlen equ' cli equ]]]].
+          eapply variance_ulvls_insts in onVariance as [univs' [u [u' [eqv hunivs cu cu' equlen eqvlen equ' cli equ]]]].
           rewrite /cstr_respects_variance.
           rewrite eqv.
           intuition auto.
@@ -4893,10 +4893,10 @@ Proof.
               rewrite subst_instance_smash. unshelve eapply wf_local_smash_end. cbn; auto.
               rewrite -!subst_instance_app_ctx.
               pose proof (on_cargs onc). simpl in X.
-              eapply sorts_local_ctx_wf_local in X0 => //.
+              eapply univs_local_ctx_wf_local in X0 => //.
               eapply typing_subst_instance_wf_local; tea.
               split => //. cbn. try apply onu.
-              destruct ind_universes. cbn in eqv. noconf eqv.
+              destruct ind_ulvls. cbn in eqv. noconf eqv.
               - now eapply on_udecl_on_udecl_prop.
               - eapply weaken_wf_local => //.
               now eapply wf_arities_context'. }
@@ -4906,10 +4906,10 @@ Proof.
               rewrite subst_instance_smash. unshelve eapply wf_local_smash_end. cbn; auto.
               rewrite -!subst_instance_app_ctx.
               pose proof (on_cargs onc). simpl in X0.
-              eapply sorts_local_ctx_wf_local in X0 => //.
+              eapply univs_local_ctx_wf_local in X0 => //.
               eapply typing_subst_instance_wf_local; tea.
               split => //. cbn.
-              - destruct ind_universes. cbn in eqv. noconf eqv.
+              - destruct ind_ulvls. cbn in eqv. noconf eqv.
                 now eapply on_udecl_on_udecl_prop.
               - eapply weaken_wf_local => //.
                 now eapply wf_arities_context'. }
@@ -4931,7 +4931,7 @@ Proof.
             eapply All_mix in b; tea. clear hi.
             eapply (All_mix X0) in b; clear X0.
             eapply All_impl; tea; cbv beta.
-            destruct (ind_universes m) eqn:eqind. noconf eqv.
+            destruct (ind_ulvls m) eqn:eqind. noconf eqv.
             intros x [wtx [onfvs cv]].
             rewrite -!(trans_expand_lets (shiftnP (#|ind_params m| + #|ind_bodies m|) xpred0)) //.
             rewrite shiftnP_add Nat.add_assoc //.
@@ -4987,8 +4987,8 @@ Proof.
       destruct (ind_projs idecl) eqn:indps => //=.
       cbn. destruct (ind_ctors idecl) as [|c []] eqn:hctors => /= //.
       depelim onConstructors. depelim onConstructors.
-      have wfargs : wf_local (Σ0, ind_universes m) (arities_context (ind_bodies m),,, ind_params m,,, cstr_args c).
-      { destruct o. eapply sorts_local_ctx_wf_local in on_cargs => //.
+      have wfargs : wf_local (Σ0, ind_ulvls m) (arities_context (ind_bodies m),,, ind_params m,,, cstr_args c).
+      { destruct o. eapply univs_local_ctx_wf_local in on_cargs => //.
         rewrite cstr_eq in on_ctype. destruct on_ctype as (_ & s & Hs & _).
         eapply typing_wf_local in Hs. eapply weaken_wf_local; tea. }
       have oncargs: on_free_vars_ctx (shiftnP (#|ind_params m| + #|ind_bodies m|) xpred0)
@@ -5044,16 +5044,16 @@ Proof.
     }
     { cbn. move: ind_sorts.
       rewrite /check_ind_sorts.
-      destruct Sort.to_family => //.
+      destruct Universe.to_family => //.
       intuition auto.
       rewrite /PCUICLookup.global_ext_constraints.
       destruct indices_matter => //.
-      now eapply (trans_type_local_ctx (Σ := (Σ0, ind_universes m))). }
+      now eapply (trans_type_local_ctx (Σ := (Σ0, ind_ulvls m))). }
     { simpl ind_variance in *.
       move: onIndices. rewrite /ind_respects_variance.
       destruct (ind_variance m) => //.
-      eapply variance_universes_insts in onVariance as [univs' [u [u' [eqv hunivs cu cu' equlen eqvlen equ' cli equ]]]].
-      cbn [variance_universes ind_universes trans_minductive_body].
+      eapply variance_ulvls_insts in onVariance as [univs' [u [u' [eqv hunivs cu cu' equlen eqvlen equ' cli equ]]]].
+      cbn [variance_ulvls ind_ulvls trans_minductive_body].
       rewrite eqv.
       cbn [cstr_args trans_constructor_body].
       cbn [ind_params trans_minductive_body].
@@ -5068,8 +5068,8 @@ Proof.
       rewrite -(trans_expand_lets_ctx xpred0 (shiftnP (#|ind_params m|) xpred0)) //.
       rewrite on_free_vars_ctx_smash //.
       rewrite -!trans_subst_instance_ctx.
-      have wf_ext : wf_global_ext Σ0 (ind_universes m).
-      { destruct (ind_universes m) eqn:equniv => //.
+      have wf_ext : wf_global_ext Σ0 (ind_ulvls m).
+      { destruct (ind_ulvls m) eqn:equniv => //.
         cbn. split => //. cbn. now eapply on_udecl_on_udecl_prop. }
       eapply (trans_cumul_ctx_rel' (Σ := (Σ0, univs'))
           (Γ' := (smash_context [] (ind_params m))@[u'])) => //.
@@ -5471,8 +5471,8 @@ Proof.
 Qed.
 
 Lemma wf_cons_inv {cf} univs retro (Σ : global_declarations) d :
-  wf {| universes := univs; declarations := d :: Σ; retroknowledge := retro |} ->
-  wf {| universes := univs; declarations := Σ; retroknowledge := retro |}.
+  wf {| ulvls := univs; declarations := d :: Σ; retroknowledge := retro |} ->
+  wf {| ulvls := univs; declarations := Σ; retroknowledge := retro |}.
 Proof.
   intros []. split => //. now depelim o0.
 Qed.
@@ -5492,8 +5492,8 @@ Proof.
       unshelve eapply expanded_expand_lets in expanded_body; eauto.
       destruct wfΣ; econstructor; eauto.
       cbn in *. inversion o0; eauto.
-    * set (Σ' := {| T.PCUICEnvironment.universes := _; T.PCUICEnvironment.declarations := Σ |}) in *.
-      change {| T.PCUICEnvironment.universes := _ |} with (trans_global_env Σ').
+    * set (Σ' := {| T.PCUICEnvironment.ulvls := _; T.PCUICEnvironment.declarations := Σ |}) in *.
+      change {| T.PCUICEnvironment.ulvls := _ |} with (trans_global_env Σ').
       constructor.
       + cbn. eapply (expanded_trans_local (Σ := (Σ', udecl)) _ _ expanded_params).
       + cbn. solve_all. eapply All_mapi. eapply All_Alli; tea. intros n x [].

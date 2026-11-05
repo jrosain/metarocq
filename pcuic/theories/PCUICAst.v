@@ -196,7 +196,7 @@ Inductive term :=
 | tRel (n : nat)
 | tVar (i : ident) (* For free variables (e.g. in a goal) *)
 | tEvar (n : nat) (l : list term)
-| tSort (u : sort)
+| tUniv (u : Universe.t)
 | tProd (na : aname) (A B : term)
 | tLambda (na : aname) (A t : term)
 | tLetIn (na : aname) (b B t : term) (* let na := b : B in t *)
@@ -406,7 +406,7 @@ Instance subst_instance_constr : UnivSubst term :=
   match c with
   | tRel _ | tVar _ => c
   | tEvar ev args => tEvar ev (List.map (subst_instance_constr u) args)
-  | tSort s => tSort (subst_instance_sort u s)
+  | tUniv s => tUniv (subst_instance_univ u s)
   | tConst c u' => tConst c (subst_instance_instance u u')
   | tInd i u' => tInd i (subst_instance_instance u u')
   | tConstruct ind k u' => tConstruct ind k (subst_instance_instance u u')
@@ -432,7 +432,7 @@ Instance subst_instance_constr : UnivSubst term :=
 (** Tests that the term is closed over [k] universe variables *)
 Fixpoint closedu (k : nat) (t : term) : bool :=
   match t with
-  | tSort s => closedu_sort k s
+  | tUniv s => closedu_universe k s
   | tInd _ u => closedu_instance k u
   | tConstruct _ _ u => closedu_instance k u
   | tConst _ u => closedu_instance k u
@@ -459,7 +459,7 @@ Module PCUICTerm <: Term.
   Definition term := term.
 
   Definition tRel := tRel.
-  Definition tSort := tSort.
+  Definition tUniv := tUniv.
   Definition tProd := tProd.
   Definition tLambda := tLambda.
   Definition tLetIn := tLetIn.
@@ -487,7 +487,7 @@ Fixpoint destArity Γ (t : term) :=
   match t with
   | tProd na t b => destArity (Γ ,, vass na t) b
   | tLetIn na b b_ty b' => destArity (Γ ,, vdef na b b_ty) b'
-  | tSort s => Some (Γ, s)
+  | tUniv s => Some (Γ, s)
   | _ => None
   end.
 
@@ -509,7 +509,7 @@ End PCUICTermUtils.
 
 
 Ltac unf_term := unfold PCUICTerm.term in *; unfold PCUICTerm.tRel in *;
-                 unfold PCUICTerm.tSort in *; unfold PCUICTerm.tProd in *;
+                 unfold PCUICTerm.tUniv in *; unfold PCUICTerm.tProd in *;
                  unfold PCUICTerm.tLambda in *; unfold PCUICTerm.tLetIn in *;
                  unfold PCUICTerm.tInd in *; unfold PCUICTerm.tProj in *;
                  unfold PCUICTerm.lift in *; unfold PCUICTerm.subst in *;
@@ -1421,12 +1421,12 @@ Include PCUICGlobalMaps.
 
 Record parameter_entry := {
   parameter_entry_type      : term;
-  parameter_entry_universes : universes_decl }.
+  parameter_entry_universes : ulvls_decl }.
 
 Record definition_entry := {
   definition_entry_type      : term;
   definition_entry_body      : term;
-  definition_entry_universes : universes_decl;
+  definition_entry_universes : ulvls_decl;
   definition_entry_opaque    : bool }.
 
 Inductive constant_entry :=
@@ -1474,7 +1474,7 @@ Record mutual_inductive_entry := {
   mind_entry_finite    : recursivity_kind;
   mind_entry_params    : context;
   mind_entry_inds      : list one_inductive_entry;
-  mind_entry_universes : universes_decl;
+  mind_entry_universes : ulvls_decl;
   mind_entry_private   : option bool
   (* Private flag for sealing an inductive definition in an enclosing
      module. Not handled by.Common Rocq yet. *) }.

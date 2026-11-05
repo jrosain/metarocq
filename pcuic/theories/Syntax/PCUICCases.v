@@ -35,7 +35,7 @@ Qed.
 
 Definition ind_predicate_context ind mdecl idecl : context :=
   let ictx := (expand_lets_ctx mdecl.(ind_params) idecl.(ind_indices)) in
-  let indty := mkApps (tInd ind (abstract_instance mdecl.(ind_universes)))
+  let indty := mkApps (tInd ind (abstract_instance mdecl.(ind_ulvls)))
     (to_extended_list (smash_context [] mdecl.(ind_params) ,,, ictx)) in
   let inddecl :=
     {| decl_name :=
@@ -96,7 +96,7 @@ Arguments case_predicate_context _ _ _ !_.
 
 Definition cstr_branch_context ind mdecl cdecl : context :=
   expand_lets_ctx mdecl.(ind_params)
-    (subst_context (inds (inductive_mind ind) (abstract_instance mdecl.(ind_universes))
+    (subst_context (inds (inductive_mind ind) (abstract_instance mdecl.(ind_ulvls))
        mdecl.(ind_bodies)) #|mdecl.(ind_params)|
       cdecl.(cstr_args)).
 

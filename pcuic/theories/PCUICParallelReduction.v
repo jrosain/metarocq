@@ -229,7 +229,7 @@ Section ParallelReduction.
   Definition pred_atom t :=
     match t with
     | tVar _
-    | tSort _
+    | tUniv _
     | tInd _ _
     | tConstruct _ _ _  => true
     | _ => false

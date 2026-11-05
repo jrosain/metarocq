@@ -21,17 +21,17 @@ Local Ltac aa := rdest; eauto with univ_subst.
 Section SubstIdentity.
   Context `{cf:checker_flags}.
 
-Lemma compare_sort_subst_instance pb {Σ : global_env_ext} univs u :
+Lemma compare_univ_subst_instance pb {Σ : global_env_ext} univs u :
   valid_constraints (global_ext_constraints (Σ.1, univs)) (subst_instance_cstrs u Σ) ->
-  RelationClasses.subrelation (compare_sort Σ pb)
-    (fun x y : sort =>
-    compare_sort (global_ext_constraints (Σ.1, univs)) pb (subst_instance_sort u x)
-      (subst_instance_sort u y)).
+  RelationClasses.subrelation (compare_univ Σ pb)
+    (fun x y : Universe.t =>
+    compare_univ (global_ext_constraints (Σ.1, univs)) pb (subst_instance_univ u x)
+      (subst_instance_univ u y)).
 Proof using Type.
   intros v.
   destruct pb; cbn.
-  - now apply eq_sort_subst_instance.
-  - now apply leq_sort_subst_instance.
+  - now apply eq_univ_subst_instance.
+  - now apply leq_univ_subst_instance.
 Qed.
 
 Lemma cumulSpec_subst_instance (Σ : global_env_ext) Γ u A B pb univs :
@@ -105,7 +105,7 @@ Proof.
   - eapply cumul_Case; try solve [intuition eauto; eauto].
     * cbv [cumul_predicate] in *; destruct_head'_prod. repeat split; eauto; cbn.
       + apply All2_map. repeat toAll. eapply All2_impl. 1: tea. cbn; intros. destruct_head'_prod; eauto.
-      + apply precompose_subst_instance. eapply cmp_universe_instance_impl.
+      + apply precompose_subst_instance. eapply cmp_ulvl_instance_impl.
         1:now apply eq_universe_subst_instance.
         eauto.
       + rewrite -> subst_instance_app, inst_case_predicate_context_subst_instance in *.
@@ -120,28 +120,28 @@ Proof.
   - eapply cumul_CoFix. apply All2_map. repeat toAll. eapply All2_impl. 1: tea.
     cbn; intros; intuition eauto.
     rewrite -> subst_instance_app, fix_context_subst_instance in *; eauto.
-  - eapply cumul_Prim. depelim e0; depelim X; cbn in H; cbn; noconf H; cbn in H; constructor; cbn -[Universe.make]; eauto.
-    + rewrite -!subst_instance_universe_make.
+  - eapply cumul_Prim. depelim e0; depelim X; cbn in H; cbn; noconf H; cbn in H; constructor; cbn -[UnivLvl.make]; eauto.
+    + rewrite -!subst_instance_ulvl_make.
       eapply eq_universe_subst_instance; tea.
     + solve_all.
  - repeat rewrite subst_instance_mkApps. eapply cumul_Ind.
     * apply precompose_subst_instance_global.
       rewrite length_map. eapply cmp_global_instance_impl_same_napp; try eapply H; eauto.
       { now apply eq_universe_subst_instance. }
-      { now apply compare_universe_subst_instance. }
+      { now apply compare_ulvl_subst_instance. }
     * eapply All2_map. repeat toAll. eapply All2_impl. 1: tea. cbn; intros.
       eapply X0.2; eauto.
  - repeat rewrite subst_instance_mkApps. eapply cumul_Construct.
     * apply precompose_subst_instance_global. cbn.
       rewrite length_map. eapply cmp_global_instance_impl_same_napp; try eapply H; eauto.
       { now apply eq_universe_subst_instance. }
-      { now apply compare_universe_subst_instance. }
+      { now apply compare_ulvl_subst_instance. }
     * eapply All2_map. repeat toAll. eapply All2_impl. 1: tea. cbn; intros.
       eapply X0.2; eauto.
-  - eapply cumul_Sort. now apply compare_sort_subst_instance.
+  - eapply cumul_Univ. now apply compare_univ_subst_instance.
   - eapply cumul_Const. apply precompose_subst_instance.
-    eapply cmp_universe_instance_impl; eauto.
-    now apply compare_universe_subst_instance.
+    eapply cmp_ulvl_instance_impl; eauto.
+    now apply compare_ulvl_subst_instance.
 Defined.
 
 Lemma convSpec_subst_instance (Σ : global_env_ext) Γ u A B univs :
@@ -246,7 +246,7 @@ Lemma typing_subst_instance :
           consistent_instance_ext (Σ.1, univs) Σ.2 u ->
           wf_local(Σ.1,univs) (subst_instance u Γ)).
 Proof using Type.
-  apply typing_ind_env; intros Σ wfΣ Γ wfΓ; cbn  -[Universe.make] in *.
+  apply typing_ind_env; intros Σ wfΣ Γ wfΓ; cbn  -[UnivLvl.make] in *.
   - intros X ????.
     apply lift_typing_impl with (1 := X) => t T [_ IH].
     now eapply IH.
@@ -265,7 +265,7 @@ Proof using Type.
     rewrite subst_instance_univ_super.
     + econstructor.
       * aa.
-      * now apply wf_sort_subst_instance.
+      * now apply wf_univ_subst_instance.
   - intros n t0 b s1 s2 X X0 X1 X2 X3 u univs wfΣ' H.
     rewrite product_subst_instance; aa. econstructor.
     + eapply lift_typing_mapu with (tm := None) (u := Some _) => //;
@@ -310,7 +310,7 @@ Proof using Type.
     change (map_predicate _ _ _ _ _) with (subst_instance i p).
     rewrite subst_instance_case_predicate_context.
     eapply type_Case with (p:=subst_instance i p)
-                          (ps:=subst_instance_sort i u); eauto with pcuic.
+                          (ps:=subst_instance_univ i u); eauto with pcuic.
     3,4: constructor; eauto with pcuic.
     + rewrite -subst_instance_case_predicate_context - !subst_instance_app_ctx.
       eapply Hpty; eauto.
@@ -320,7 +320,6 @@ Proof using Type.
     + now rewrite -subst_instance_case_predicate_context -subst_instance_app_ctx.
     + cbn in *.
       eapply is_allowed_elimination_subst_instance; aa.
-    + now apply relevance_subst.
     + move: IHctxi. simpl.
       rewrite -subst_instance_app.
       rewrite -subst_instance_two_context.
@@ -397,10 +396,11 @@ Proof using Type.
     + exact H0.
     + now rewrite subst_instance_prim_val_tag.
     + destruct p as [? []]; depelim X1; constructor; eauto.
-      * rewrite -subst_instance_universe_make. eapply wf_universe_subst_instance => //.
-      * cbn -[Universe.make'] in hty.
+      * rewrite -subst_instance_ulvl_make. eapply wf_ulvl_subst_instance => //.
+      * cbn -[UnivLvl.make'] in hty.
         specialize (hty u univs).
-        rewrite /subst_instance subst_instance_universe_make in hty. now eapply hty.
+        rewrite /subst_instance /subst_instance_univ /= /subst_instance subst_instance_ulvl_make in hty.
+        now eapply hty.
       * cbn. solve_all.
 
   - intros t0 A B X X0 X1 X2 X3 X4 cum u univs wfΣ' H.
@@ -458,8 +458,8 @@ Qed.
 Lemma typing_subst_instance_decl Σ Γ t T c decl u :
   wf Σ.1 ->
   lookup_env Σ.1 c = Some decl ->
-  (Σ.1, universes_decl_of_decl decl) ;;; Γ |- t : T ->
-  consistent_instance_ext Σ (universes_decl_of_decl decl) u ->
+  (Σ.1, ulvls_decl_of_decl decl) ;;; Γ |- t : T ->
+  consistent_instance_ext Σ (ulvls_decl_of_decl decl) u ->
   Σ ;;; subst_instance u Γ
             |- subst_instance u t : subst_instance u T.
 Proof using Type.
@@ -469,9 +469,6 @@ Proof using Type.
   eapply weaken_lookup_on_global_env'; tea.
 Qed.
 
-
-
-
 Lemma wf_local_instantiate_poly {Σ ctx Γ u} :
   wf_ext (Σ.1, Polymorphic_ctx ctx) ->
   consistent_instance_ext Σ (Polymorphic_ctx ctx) u ->
@@ -479,8 +476,8 @@ Lemma wf_local_instantiate_poly {Σ ctx Γ u} :
   wf_local Σ (subst_instance u Γ).
 Proof using Type.
   intros wfΣ Huniv wf.
-  epose proof (type_Sort _ _ sProp wf) as ty. forward ty.
-  - now simpl.
+  epose proof (type_Sort _ _ uSProp wf) as ty. forward ty.
+  - apply wf_uSProp.
   - eapply typing_subst_instance_ctx in ty;
     cbn; eauto using typing_wf_local.
     * apply wfΣ.
@@ -490,13 +487,13 @@ Qed.
 Lemma wf_local_instantiate {Σ} {decl : global_decl} {Γ u c} :
   wf Σ.1 ->
   lookup_env Σ.1 c = Some decl ->
-  consistent_instance_ext Σ (universes_decl_of_decl decl) u ->
-  wf_local (Σ.1, universes_decl_of_decl decl) Γ ->
+  consistent_instance_ext Σ (ulvls_decl_of_decl decl) u ->
+  wf_local (Σ.1, ulvls_decl_of_decl decl) Γ ->
   wf_local Σ (subst_instance u Γ).
 Proof using Type.
   intros wfΣ Hdecl Huniv wf.
-  epose proof (type_Sort _ _ sProp wf) as ty. forward ty.
-  - now simpl.
+  epose proof (type_Sort _ _ uSProp wf) as ty. forward ty.
+  - apply wf_uSProp.
   - eapply typing_subst_instance_decl in ty;
     cbn; eauto using typing_wf_local.
 Qed.
@@ -504,8 +501,8 @@ Qed.
 Lemma lift_typing_subst_instance_decl Σ Γ j c decl u :
   wf Σ.1 ->
   lookup_env Σ.1 c = Some decl ->
-  lift_typing typing (Σ.1, universes_decl_of_decl decl) Γ j ->
-  consistent_instance_ext Σ (universes_decl_of_decl decl) u ->
+  lift_typing typing (Σ.1, ulvls_decl_of_decl decl) Γ j ->
+  consistent_instance_ext Σ (ulvls_decl_of_decl decl) u ->
   lift_typing typing Σ (subst_instance u Γ) {| j_term := option_map (subst_instance u) (j_term j); j_typ := subst_instance u (j_typ j);
                                                j_univ := option_map (subst_instance u) (j_univ j); j_rel := j_rel j |}.
 Proof.
@@ -517,8 +514,8 @@ Qed.
 Lemma isType_subst_instance_decl Σ Γ T c decl u :
   wf Σ.1 ->
   lookup_env Σ.1 c = Some decl ->
-  isType (Σ.1, universes_decl_of_decl decl) Γ T ->
-  consistent_instance_ext Σ (universes_decl_of_decl decl) u ->
+  isType (Σ.1, ulvls_decl_of_decl decl) Γ T ->
+  consistent_instance_ext Σ (ulvls_decl_of_decl decl) u ->
   isType Σ (subst_instance u Γ) (subst_instance u T).
 Proof using Type.
   apply lift_typing_subst_instance_decl.
@@ -527,8 +524,8 @@ Qed.
 Lemma isTypeRel_subst_instance_decl Σ Γ T r c decl u :
   wf Σ.1 ->
   lookup_env Σ.1 c = Some decl ->
-  isTypeRel (Σ.1, universes_decl_of_decl decl) Γ T r ->
-  consistent_instance_ext Σ (universes_decl_of_decl decl) u ->
+  isTypeRel (Σ.1, ulvls_decl_of_decl decl) Γ T r ->
+  consistent_instance_ext Σ (ulvls_decl_of_decl decl) u ->
   isTypeRel Σ (subst_instance u Γ) (subst_instance u T) r.
 Proof using Type.
   apply lift_typing_subst_instance_decl.
@@ -556,8 +553,8 @@ Qed.
 Lemma wf_local_subst_instance_decl Σ Γ c decl u :
   wf Σ.1 ->
   lookup_env Σ.1 c = Some decl ->
-  wf_local (Σ.1, universes_decl_of_decl decl) Γ ->
-  consistent_instance_ext Σ (universes_decl_of_decl decl) u ->
+  wf_local (Σ.1, ulvls_decl_of_decl decl) Γ ->
+  consistent_instance_ext Σ (ulvls_decl_of_decl decl) u ->
   wf_local Σ (subst_instance u Γ).
 Proof using Type.
   destruct Σ as [Σ φ]. intros X X0 X1 X2.
@@ -586,11 +583,11 @@ Qed.
     eapply typed_subst_abstract_instance in Hs; auto.
   Qed.
 
-  Lemma subst_instance_ind_sort_id Σ mdecl ind idecl :
+  Lemma subst_instance_ind_univ_id Σ mdecl ind idecl :
     wf Σ ->
     declared_inductive Σ ind mdecl idecl ->
-    let u := abstract_instance (ind_universes mdecl) in
-    subst_instance_sort u (ind_sort idecl) = ind_sort idecl.
+    let u := abstract_instance (ind_ulvls mdecl) in
+    subst_instance_univ u (ind_univ idecl) = ind_univ idecl.
   Proof using Type.
     intros wfΣ decli u.
     pose proof (on_declared_inductive decli) as [onmind oib].
@@ -610,7 +607,7 @@ Qed.
   Lemma subst_instance_ind_type_id Σ mdecl ind idecl :
     wf Σ ->
     declared_inductive Σ ind mdecl idecl ->
-    let u := abstract_instance (ind_universes mdecl) in
+    let u := abstract_instance (ind_ulvls mdecl) in
     subst_instance u (ind_type idecl) = ind_type idecl.
   Proof using Type.
     intros wfΣ decli u.

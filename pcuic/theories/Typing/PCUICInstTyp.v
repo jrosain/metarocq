@@ -339,7 +339,7 @@ Proof.
        eapply All2_impl. 1: tea. cbn; intros.
        destruct_head'_prod.
        eauto.
-   - eapply cumul_Sort; eauto.
+   - eapply cumul_Univ; eauto.
    - eapply cumul_Const; eauto.
 Defined.
 
@@ -392,7 +392,7 @@ Proof.
     autorewrite with sigma. simpl.
     assert (ihA' : lift_typing0 (typing Σ Δ) (j_vass_s na A.[σ] s1)) by now eapply ihA.
     econstructor; tas.
-    apply lift_sorting_forget_univ in ihA'.
+    apply lift_univing_forget_univ in ihA'.
     eassert (wf_local Σ (Δ ,, _)) by (constructor; eassumption).
     eapply ihB; tea.
     eapply well_subst_Up ; assumption.

@@ -58,15 +58,15 @@ Section Principality.
       destruct ih as [? ?]
     end.
 
-  Lemma isWfArity_sort Γ u :
+  Lemma isWfArity_univ Γ u :
     wf_local Σ Γ ->
-    wf_sort Σ u ->
-    isWfArity Σ Γ (tSort u).
+    wf_univ Σ u ->
+    isWfArity Σ Γ (tUniv u).
   Proof using Type.
     move=> wfΓ wfu.
-    split. eapply isType_Sort; eauto. exists [], u. intuition auto.
+    split. eapply isType_Univ; eauto. exists [], u. intuition auto.
   Qed.
-  Hint Extern 10 (isWfArity _ _ (tSort _)) => apply isWfArity_sort : pcuic.
+  Hint Extern 10 (isWfArity _ _ (tUniv _)) => apply isWfArity_univ : pcuic.
 
   Ltac int inv := intros B hB; eapply inv in hB; auto; split; [|econstructor; eauto].
   Hint Resolve wf_ext_wf : core.
@@ -84,10 +84,10 @@ Section Principality.
       all: try eassumption.
     - apply inversion_Var in hA. destruct hA.
     - apply inversion_Evar in hA. destruct hA.
-    - apply inversion_Sort in hA as iA. 2: auto.
+    - apply inversion_Univ in hA as iA. 2: auto.
       repeat outsum. repeat outtimes. subst.
-      exists (tSort (Sort.super s)).
-      int inversion_Sort.
+      exists (tUniv (Universe.super s)).
+      int inversion_Univ.
       repeat outsum. repeat outtimes. now subst.
     - apply inversion_Prod in hA as (dom1 & codom1 & t & t0 & w); auto.
       pose proof (t.2.π2.2.p2) as Her. rewrite -t.2.π2.2.p1 /= in Her.
@@ -95,26 +95,26 @@ Section Principality.
       specialize (IHu1 _ _ t) as [dom Hdom].
       specialize (IHu2 _ _ t0) as [codom Hcodom].
       destruct (Hdom _ t) as [e e'].
-      eapply ws_cumul_pb_Sort_r_inv in e as [domu [red leq]].
+      eapply ws_cumul_pb_Univ_r_inv in e as [domu [red leq]].
       destruct (Hcodom _ t0) as [e e''].
-      eapply ws_cumul_pb_Sort_r_inv in e as [codomu [cored coleq]].
-      exists (tSort (Sort.sort_of_product domu codomu)).
+      eapply ws_cumul_pb_Univ_r_inv in e as [codomu [cored coleq]].
+      exists (tUniv (Universe.univ_of_product domu codomu)).
       int inversion_Prod.
       destruct hB as (x & x0 & t1 & t2 & w0).
       apply unlift_TypUniv in t1.
       + etransitivity. 1: auto. 2:eapply w0.
         destruct (Hdom _ t1) as [le' u1'].
-        eapply ws_cumul_pb_Sort_r_inv in le' as [u' [redu' leu']].
+        eapply ws_cumul_pb_Univ_r_inv in le' as [u' [redu' leu']].
         destruct (Hcodom _ t2) as [le'' u2'].
-        eapply ws_cumul_pb_Sort_r_inv in le'' as [u'' [redu'' leu'']].
+        eapply ws_cumul_pb_Univ_r_inv in le'' as [u'' [redu'' leu'']].
         constructor => //. fvs. constructor.
-        apply leq_sort_product_mon; auto.
+        apply leq_univ_product_mon; auto.
         pose proof (closed_red_confluence red redu') as [v' [redl redr]].
-        eapply invert_red_sort in redl.
-        eapply invert_red_sort in redr. subst. now noconf redr.
+        eapply invert_red_univ in redl.
+        eapply invert_red_univ in redr. subst. now noconf redr.
         pose proof (closed_red_confluence cored redu'') as [v' [redl redr]].
-        eapply invert_red_sort in redl.
-        eapply invert_red_sort in redr. subst. now noconf redr.
+        eapply invert_red_univ in redl.
+        eapply invert_red_univ in redr. subst. now noconf redr.
       + repeat (eexists; eauto).
         2: eapply geq_relevance, Her; tea.
         eapply type_reduction; eauto. eapply red.
@@ -278,12 +278,12 @@ Section Principality.
       eapply invert_red_mkApps_tInd in redr'' as [? [[=] conv']]; auto.
       solve_discr.
       etransitivity; eauto.
-      assert (consistent_instance_ext Σ (ind_universes x6) u').
+      assert (consistent_instance_ext Σ (ind_ulvls x6) u').
       { eapply type_reduction in t2. 2:eapply redr.
         eapply validity in t2; eauto.
         destruct t2 as (_ & s & Hs & _).
         eapply invert_type_mkApps_ind in Hs. intuition eauto. all:auto. eapply d. }
-      assert (consistent_instance_ext Σ (ind_universes x6) x5).
+      assert (consistent_instance_ext Σ (ind_ulvls x6) x5).
         { eapply validity in t1; eauto.
           destruct t1 as (_ & s & Hs & _).
           eapply invert_type_mkApps_ind in Hs. intuition eauto. all:auto. eapply d. }
@@ -366,8 +366,8 @@ Lemma principal_type_ind {cf:checker_flags} {Σ Γ c ind ind' u u' args args'} {
   Σ ;;; Γ |- c : mkApps (tInd ind u) args ->
   Σ ;;; Γ |- c : mkApps (tInd ind' u') args' ->
   (∑ ui',
-    cmp_ind_universes Σ ind #|args| ui' u *
-    cmp_ind_universes Σ ind' #|args'| ui' u') *
+    cmp_ind_ulvls Σ ind #|args| ui' u *
+    cmp_ind_ulvls Σ ind' #|args'| ui' u') *
   ws_cumul_pb_terms Σ Γ args args' *
   (ind = ind').
 Proof.
@@ -427,9 +427,9 @@ Proof.
 Qed.
 
 Lemma eq_context_upto_inst_case_context {cf : checker_flags} {Σ : global_env_ext} pars pars' puinst puinst' ctx :
-  All2 (eq_term_upto_univ empty_global_env (compare_universe Σ) (compare_sort Σ) Conv) pars pars' ->
-  cmp_universe_instance (eq_universe Σ) puinst puinst' ->
-  eq_context_upto Σ.1 (compare_universe Σ) (compare_sort Σ) Conv (inst_case_context pars puinst ctx)
+  All2 (eq_term_upto_univ empty_global_env (compare_ulvl Σ) (compare_univ Σ) Conv) pars pars' ->
+  cmp_ulvl_instance (eq_ulvl Σ) puinst puinst' ->
+  eq_context_upto Σ.1 (compare_ulvl Σ) (compare_univ Σ) Conv (inst_case_context pars puinst ctx)
     (inst_case_context pars' puinst' ctx).
 Proof.
   intros onps oninst.
@@ -474,10 +474,10 @@ Proof.
     end.
   all:try solve [econstructor; eauto].
 
-  - eapply inversion_Sort in X0 as [wf [wfs cum]]; auto.
-    eapply type_Cumul' with (tSort (Sort.super s)).
-    constructor; auto. eapply PCUICArities.isType_Sort; pcuic.
-    apply cumul_Sort. now apply leq_sort_super.
+  - eapply inversion_Univ in X0 as [wf [wfs cum]]; auto.
+    eapply type_Cumul' with (tUniv (Universe.super s)).
+    constructor; auto. eapply PCUICArities.isType_Univ; pcuic.
+    apply cumul_Univ. now apply leq_univ_super.
 
   - eapply inversion_Prod in X4 as [s1' [s2' [Ha [Hb Hs]]]]; auto.
     apply eq_term_empty_leq_term in X5_1 as X5_1'.
@@ -488,10 +488,10 @@ Proof.
     2:{ pcuic. }
     specialize (X3 onu _ _ Hb X5_2).
     econstructor; eauto.
-    { specialize (X1 onu). rewrite e. apply lift_sorting_it_impl_gen with X1 => // IH. eapply IH; tea. 1: now eapply unlift_TypUniv in Ha. }
+    { specialize (X1 onu). rewrite e. apply lift_univing_it_impl_gen with X1 => // IH. eapply IH; tea. 1: now eapply unlift_TypUniv in Ha. }
     apply leq_term_empty_leq_term in X5_2.
     eapply context_conversion; eauto.
-    constructor; pcuic. 1: now eapply lift_sorting_forget_univ. constructor; try now symmetry; now constructor.
+    constructor; pcuic. 1: now eapply lift_univing_forget_univ. constructor; try now symmetry; now constructor.
     pcuic.
     constructor; pcuic.
     constructor. now symmetry.
@@ -741,7 +741,7 @@ Proof.
       now eapply eq_term_empty_eq_term.
 
   - eapply type_Cumul'.
-    eapply X1; eauto. now eapply has_sort_isType.
+    eapply X1; eauto. now eapply has_univ_isType.
     auto.
 Qed.
 
