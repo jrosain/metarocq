@@ -119,8 +119,8 @@ Proof.
 Qed.
 
 Lemma LevelSet_in_union_global Σ l ls :
-  LevelSet.In l (LevelSet.union ls (universes Σ).1) ->
-  LevelSet.In l (LevelSet.union ls (global_levels (universes Σ))).
+  LevelSet.In l (LevelSet.union ls (ulvls Σ).1) ->
+  LevelSet.In l (LevelSet.union ls (global_levels (ulvls Σ))).
 Proof.
   intros H % LevelSet.union_spec.
   apply LevelSet.union_spec. intuition auto.
