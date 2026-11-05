@@ -30,7 +30,7 @@ Inductive wf {Σ} : term -> Type :=
 | wf_tRel n : wf (tRel n)
 | wf_tVar id : wf (tVar id)
 | wf_tEvar n l : All wf l -> wf (tEvar n l)
-| wf_tSort u : wf (tSort u)
+| wf_tUniv u : wf (tUniv u)
 | wf_tCast t k t' : wf t -> wf t' -> wf (tCast t k t')
 | wf_tProd na t b : wf t -> wf b -> wf (tProd na t b)
 | wf_tLambda na t b : wf t -> wf b -> wf (tLambda na t b)
@@ -67,7 +67,7 @@ Derive Signature for wf.
 
 Definition wf_Inv Σ (t : term) : Type :=
   match t with
-  | tRel _ | tVar _ | tSort _ => unit
+  | tRel _ | tVar _ | tUniv _ => unit
   | tInt _ | tFloat _ | tString _ => unit
   | tArray u arr def ty => All (wf Σ) arr * wf Σ def * wf Σ ty
   | tEvar n l => All (wf Σ) l
@@ -125,7 +125,7 @@ Lemma term_wf_forall_list_ind Σ :
     (forall n : nat, P (tRel n)) ->
     (forall i : ident, P (tVar i)) ->
     (forall (n : nat) (l : list term), All P l -> P (tEvar n l)) ->
-    (forall s, P (tSort s)) ->
+    (forall s, P (tUniv s)) ->
     (forall t : term, P t -> forall (c : cast_kind) (t0 : term), P t0 -> P (tCast t c t0)) ->
     (forall (n : aname) (t : term), P t -> forall t0 : term, P t0 -> P (tProd n t t0)) ->
     (forall (n : aname) (t : term), P t -> forall t0 : term, P t0 -> P (tLambda n t t0)) ->
