@@ -1,7 +1,8 @@
 From Stdlib Require Import OrdersAlt MSetList MSetAVL MSetFacts MSetProperties MSetDecide FMapAVL.
 From Equations Require Import Equations.
 From MetaRocq.Utils Require Import utils MRMSets MRFSets.
-From MetaRocq.Common Require Import BasicAst config Levels Sorts.
+From MetaRocq.Common Require Import BasicAst config.
+From MetaRocq.Common Require Export Levels Sorts.
 From Stdlib Require Import ssreflect.
 
 Local Open Scope nat_scope.
