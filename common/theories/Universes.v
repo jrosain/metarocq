@@ -234,7 +234,8 @@ Module Universe.
   End OT.
   Module OTOrig <: OrderedTypeOrig := Backport_OT OT.
 End Universe.
-
+Notation uProp := (Universe.mk sProp UnivLvl.type0).
+Notation uSProp := (Universe.mk sSProp UnivLvl.type0).
 
 Module UnivMap := FMapAVL.Make Universe.OTOrig.
 Module UnivMapFact := FMapFacts.WProperties UnivMap.
