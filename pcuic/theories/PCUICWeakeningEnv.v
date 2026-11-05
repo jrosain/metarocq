@@ -11,7 +11,7 @@ Set Default Goal Selector "!".
 Implicit Types (cf : checker_flags).
 
 Lemma global_ext_constraints_app Σ Σ' φ
-  : ConstraintSet.Subset (universes Σ).2 (universes Σ').2 ->
+  : ConstraintSet.Subset (ulvls Σ).2 (ulvls Σ').2 ->
     ConstraintSet.Subset (global_ext_constraints (Σ, φ))
                          (global_ext_constraints (Σ', φ)).
 Proof.
@@ -67,76 +67,76 @@ Proof.
   apply global_ext_constraints_app, sub.
 Qed.
 
-#[global] Instance subrel_extends_cmp_universe {cf} pb (Σ Σ' : global_env) (ϕ : universes_decl) :
+#[global] Instance subrel_extends_cmp_ulvl {cf} pb (Σ Σ' : global_env) (ϕ : ulvls_decl) :
   extends Σ Σ' ->
-  RelationClasses.subrelation (compare_universe (global_ext_constraints (Σ, ϕ)) pb)
-    (compare_universe (global_ext_constraints (Σ', ϕ)) pb).
+  RelationClasses.subrelation (compare_ulvl (global_ext_constraints (Σ, ϕ)) pb)
+    (compare_ulvl (global_ext_constraints (Σ', ϕ)) pb).
 Proof.
   intros ext u u'.
-  apply cmp_universe_subset.
+  apply cmp_ulvl_subset.
   apply weakening_env_global_ext_constraints, ext.
 Qed.
 
-#[global] Instance subrel_extends_cmp {cf} pb (Σ Σ' : global_env) (ϕ : universes_decl) :
+#[global] Instance subrel_extends_cmp {cf} pb (Σ Σ' : global_env) (ϕ : ulvls_decl) :
   extends Σ Σ' ->
-  RelationClasses.subrelation (compare_sort (global_ext_constraints (Σ, ϕ)) pb)
-    (compare_sort (global_ext_constraints (Σ', ϕ)) pb).
+  RelationClasses.subrelation (compare_univ (global_ext_constraints (Σ, ϕ)) pb)
+    (compare_univ (global_ext_constraints (Σ', ϕ)) pb).
 Proof.
   intros ext u u'.
-  apply cmp_sort_subset.
+  apply cmp_univ_subset.
   apply weakening_env_global_ext_constraints, ext.
 Qed.
 
-#[global] Instance subrel_extends_eq_pb {cf} pb (Σ Σ' : global_env) (ϕ : universes_decl) :
+#[global] Instance subrel_extends_eq_pb {cf} pb (Σ Σ' : global_env) (ϕ : ulvls_decl) :
   extends Σ Σ' ->
-  RelationClasses.subrelation (eq_sort (global_ext_constraints (Σ, ϕ)))
-    (compare_sort (global_ext_constraints (Σ', ϕ)) pb).
+  RelationClasses.subrelation (eq_univ (global_ext_constraints (Σ, ϕ)))
+    (compare_univ (global_ext_constraints (Σ', ϕ)) pb).
 Proof.
-  change (eq_sort ?φ) with (compare_sort φ Conv).
+  change (eq_univ ?φ) with (compare_univ φ Conv).
   intros ext.
   destruct pb.
   - tc.
-  - transitivity (compare_sort (global_ext_constraints (Σ', ϕ)) Conv); tc.
+  - transitivity (compare_univ (global_ext_constraints (Σ', ϕ)) Conv); tc.
 Qed.
 
-#[global] Instance subrel_extends_eq {cf} (Σ Σ' : global_env) (ϕ : universes_decl) :
+#[global] Instance subrel_extends_eq {cf} (Σ Σ' : global_env) (ϕ : ulvls_decl) :
   extends Σ Σ' ->
-  RelationClasses.subrelation (eq_sort (global_ext_constraints (Σ, ϕ)))
-    (eq_sort (global_ext_constraints (Σ', ϕ))).
-Proof. change (eq_sort ?φ) with (compare_sort φ Conv). tc. Qed.
+  RelationClasses.subrelation (eq_univ (global_ext_constraints (Σ, ϕ)))
+    (eq_univ (global_ext_constraints (Σ', ϕ))).
+Proof. change (eq_univ ?φ) with (compare_univ φ Conv). tc. Qed.
 
-#[global] Instance subrel_extends_le {cf} (Σ Σ' : global_env) (ϕ : universes_decl) :
+#[global] Instance subrel_extends_le {cf} (Σ Σ' : global_env) (ϕ : ulvls_decl) :
   extends Σ Σ' ->
-  RelationClasses.subrelation (leq_sort (global_ext_constraints (Σ, ϕ)))
-    (leq_sort (global_ext_constraints (Σ', ϕ))).
-Proof. change (leq_sort ?φ) with (compare_sort φ Cumul). tc. Qed.
+  RelationClasses.subrelation (leq_univ (global_ext_constraints (Σ, ϕ)))
+    (leq_univ (global_ext_constraints (Σ', ϕ))).
+Proof. change (leq_univ ?φ) with (compare_univ φ Cumul). tc. Qed.
 
-#[global] Instance subrel_extends_eq_le {cf} (Σ Σ' : global_env) (ϕ : universes_decl) :
+#[global] Instance subrel_extends_eq_le {cf} (Σ Σ' : global_env) (ϕ : ulvls_decl) :
   extends Σ Σ' ->
-  RelationClasses.subrelation (eq_sort (global_ext_constraints (Σ, ϕ)))
-    (leq_sort (global_ext_constraints (Σ', ϕ))).
-Proof. change (leq_sort ?φ) with (compare_sort φ Cumul). tc. Qed.
+  RelationClasses.subrelation (eq_univ (global_ext_constraints (Σ, ϕ)))
+    (leq_univ (global_ext_constraints (Σ', ϕ))).
+Proof. change (leq_univ ?φ) with (compare_univ φ Cumul). tc. Qed.
 
 Lemma subrelations_extends {cf} Σ Σ' φ :
   extends Σ Σ' ->
-  RelationClasses.subrelation (eq_sort (global_ext_constraints (Σ,φ))) (eq_sort (global_ext_constraints (Σ',φ))).
+  RelationClasses.subrelation (eq_univ (global_ext_constraints (Σ,φ))) (eq_univ (global_ext_constraints (Σ',φ))).
 Proof. typeclasses eauto. Qed.
 
 Lemma subrelations_leq_extends {cf} Σ Σ' φ :
   extends Σ Σ' ->
-  RelationClasses.subrelation (leq_sort (global_ext_constraints (Σ,φ))) (leq_sort (global_ext_constraints (Σ',φ))).
+  RelationClasses.subrelation (leq_univ (global_ext_constraints (Σ,φ))) (leq_univ (global_ext_constraints (Σ',φ))).
 Proof. typeclasses eauto. Qed.
 
 Lemma subrelations_compare_extends {cf} Σ Σ' pb φ :
   extends Σ Σ' ->
-  RelationClasses.subrelation (compare_sort (global_ext_constraints (Σ,φ)) pb)
-    (compare_sort (global_ext_constraints (Σ',φ)) pb).
+  RelationClasses.subrelation (compare_univ (global_ext_constraints (Σ,φ)) pb)
+    (compare_univ (global_ext_constraints (Σ',φ)) pb).
 Proof. destruct pb; typeclasses eauto. Qed.
 
 Lemma subrelations_eq_compare_extends {cf} Σ Σ' pb φ :
   extends Σ Σ' ->
-  RelationClasses.subrelation (eq_sort (global_ext_constraints (Σ,φ)))
-    (compare_sort (global_ext_constraints (Σ',φ)) pb).
+  RelationClasses.subrelation (eq_univ (global_ext_constraints (Σ,φ)))
+    (compare_univ (global_ext_constraints (Σ',φ)) pb).
 Proof. destruct pb; typeclasses eauto. Qed.
 
 
@@ -147,7 +147,7 @@ Lemma weakening_env_is_allowed_elimination {cf} Σ Σ' φ u allowed :
 Proof.
   destruct allowed; cbnr; trivial.
   intros ext [ | al]; auto.
-  destruct u; cbn in *; try now right.
+  destruct u as [[| |] u]; cbn in *; try now right.
   right.
   unfold_univ_rel.
   apply al.
@@ -189,8 +189,8 @@ Proof.
   intuition auto. left. now apply sub.
 Qed.
 
-Lemma extends_wf_universe {Σ : global_env_ext} Σ' u : extends Σ Σ' ->
-  wf_universe Σ u -> wf_universe (Σ', Σ.2) u.
+Lemma extends_wf_ulvl {Σ : global_env_ext} Σ' u : extends Σ Σ' ->
+  wf_ulvl Σ u -> wf_ulvl (Σ', Σ.2) u.
 Proof.
   destruct Σ as [Σ univ]; cbn.
   intros [sub _].
@@ -204,17 +204,17 @@ Proof.
   - right. eapply global_levels_sub; tea.
 Qed.
 
-Lemma extends_wf_sort {Σ : global_env_ext} Σ' s : extends Σ Σ' ->
-  wf_sort Σ s -> wf_sort (Σ', Σ.2) s.
+Lemma extends_wf_univ {Σ : global_env_ext} Σ' s : extends Σ Σ' ->
+  wf_univ Σ s -> wf_univ (Σ', Σ.2) s.
 Proof.
-  destruct s => //=.
-  apply extends_wf_universe.
+  destruct s as [[| |] u] => //=.
+  apply extends_wf_ulvl.
 Qed.
 
 
-Definition on_udecl_prop (Σ : global_env) (udecl : universes_decl)
+Definition on_udecl_prop (Σ : global_env) (udecl : ulvls_decl)
   := let levels := levels_of_udecl udecl in
-     let global_levels := global_levels Σ.(universes) in
+     let global_levels := global_levels Σ.(ulvls) in
      let all_levels := LevelSet.union levels global_levels in
      ConstraintSet.For_all (declared_cstr_levels all_levels) (constraints_of_udecl udecl).
      (* /\ match udecl with
@@ -241,7 +241,7 @@ Proof.
 Qed.
 
 Lemma on_udecl_on_udecl_prop (Σ : global_env) ctx :
-  on_udecl Σ.(universes) (Polymorphic_ctx ctx) -> on_udecl_prop Σ (Polymorphic_ctx ctx).
+  on_udecl Σ.(ulvls) (Polymorphic_ctx ctx) -> on_udecl_prop Σ (Polymorphic_ctx ctx).
 Proof.
   intros [? [? ?]]. red.
   intros x hin. specialize (H0 x hin).
@@ -373,7 +373,7 @@ Qed. *)
 Lemma weaken_lookup_on_global_env' Σ c decl :
   wf Σ ->
   lookup_env Σ c = Some decl ->
-  on_udecl_prop Σ (universes_decl_of_decl decl).
+  on_udecl_prop Σ (ulvls_decl_of_decl decl).
 Proof using P Pcmp cf.
   intros [onu wfΣ] HH.
   destruct Σ as [univs Σ]; cbn in *.
@@ -411,7 +411,7 @@ Proof using P Pcmp cf.
            now apply ConstraintSet.empty_spec in Hc.
       -- apply ConstraintSet.union_spec; now right.*)
   - specialize (IHwfΣ HH). revert IHwfΣ o; clear.
-    generalize (universes_decl_of_decl decl); intros d' HH Hd.
+    generalize (ulvls_decl_of_decl decl); intros d' HH Hd.
     unfold on_udecl_prop in *.
     intros [[? ?] ?] Hc. specialize (HH _ Hc).
     destruct HH as [H' H'']. simpl. split.
