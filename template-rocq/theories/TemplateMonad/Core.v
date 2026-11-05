@@ -204,21 +204,21 @@ Definition TypeInstanceOptimized : Common.TMInstance :=
 Definition TypeInstance : Common.TMInstance :=
   Eval hnf in TypeInstanceUnoptimized.
 
-Definition tmQuoteSort@{U t u} : TemplateMonad@{t u} sort
+Definition tmQuoteSort@{U t u} : TemplateMonad@{t u} Universe.t
   := p <- @tmQuote Prop (Type@{U} -> True);;
      match p with
-     | tProd _ (tSort s) _ => ret s
-     | _ => tmFail "Anomaly: tmQuote (Type -> True) should be (tProd _ (tSort _) _)!"%bs
+     | tProd _ (tUniv s) _ => ret s
+     | _ => tmFail "Anomaly: tmQuote (Type -> True) should be (tProd _ (tUniv _) _)!"%bs
      end.
-Definition tmQuoteUniverse@{U t u} : TemplateMonad@{t u} Universe.t
+Definition tmQuoteUniverse@{U t u} : TemplateMonad@{t u} UnivLvl.t
   := s <- @tmQuoteSort@{U t u};;
-     match s with
-     | sType u => ret u
+     match usort s with
+     | sType => ret (ulvl s)
      | _ => tmFail "Sort does not carry a universe (is not Type)"%bs
      end.
 Definition tmQuoteLevel@{U t u} : TemplateMonad@{t u} Level.t
   := u <- tmQuoteUniverse@{U t u};;
-     match Universe.get_is_level u with
+     match UnivLvl.get_is_level u with
      | Some l => ret l
      | None => tmFail "Universe is not a level"%bs
      end.
