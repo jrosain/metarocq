@@ -135,7 +135,7 @@ Section Lookups.
   Definition lookup_ind_type_cstrs ind i (u : list Level.t) :=
     res <- lookup_ind_decl ind i ;;
     let '(mib, body) := res in
-    let uctx := mib.(ind_universes) in
+    let uctx := mib.(ind_ulvls) in
     let cstrs := polymorphic_constraints uctx in
     ret (subst_instance u body.(ind_type), subst_instance_cstrs u cstrs).
 
@@ -155,7 +155,7 @@ Section Lookups.
   Definition lookup_constructor_type_cstrs ind i k u :=
     res <- lookup_constructor_decl ind i k ;;
     let '(mib, cdecl) := res in
-    let cstrs := polymorphic_constraints mib.(ind_universes) in
+    let cstrs := polymorphic_constraints mib.(ind_ulvls) in
     ret (subst0 (inds ind u mib.(ind_bodies)) (subst_instance u cdecl.(cstr_type)),
         subst_instance_cstrs u cstrs).
 End Lookups.
@@ -301,20 +301,20 @@ Fixpoint eq_term `{checker_flags} (φ : universes_graph) (t u : term) {struct t}
   | tRel n, tRel n' => Nat.eqb n n'
   | tEvar ev args, tEvar ev' args' => Nat.eqb ev ev' && forallb2 (eq_term φ) args args'
   | tVar id, tVar id' => eqb id id'
-  | tSort s, tSort s' => check_eqb_sort φ s s'
+  | tUniv s, tUniv s' => check_eqb_univ φ s s'
   | tCast f k T, tCast f' k' T' => eq_term φ f f' && eq_term φ T T'
   | tApp f args, tApp f' args' => eq_term φ f f' && forallb2 (eq_term φ) args args'
-  | tConst c u, tConst c' u' => eq_constant c c' && eqb_univ_instance φ u u'
-  | tInd i u, tInd i' u' => eq_inductive i i' && eqb_univ_instance φ u u'
+  | tConst c u, tConst c' u' => eq_constant c c' && eqb_ulvl_instance φ u u'
+  | tInd i u, tInd i' u' => eq_inductive i i' && eqb_ulvl_instance φ u u'
   | tConstruct i k u, tConstruct i' k' u' => eq_inductive i i' && Nat.eqb k k'
-                                                    && eqb_univ_instance φ u u'
+                                                    && eqb_ulvl_instance φ u u'
   | tLambda _ b t, tLambda _ b' t' => eq_term φ b b' && eq_term φ t t'
   | tProd _ b t, tProd _ b' t' => eq_term φ b b' && eq_term φ t t'
   | tLetIn _ b t c, tLetIn _ b' t' c' => eq_term φ b b' && eq_term φ t t' && eq_term φ c c'
   | tCase ci p c brs,
     tCase ci' p' c' brs' =>
     eq_case_info ci ci' &&
-    eqb_predicate (eqb_univ_instance φ) (eq_term φ) p p' && eq_term φ c c' && forallb2 (fun br br' => eq_term φ br.(bbody) br'.(bbody)) brs brs'
+    eqb_predicate (eqb_ulvl_instance φ) (eq_term φ) p p' && eq_term φ c c' && forallb2 (fun br br' => eq_term φ br.(bbody) br'.(bbody)) brs brs'
   | tProj p c, tProj p' c' => eq_projection p p' && eq_term φ c c'
   | tFix mfix idx, tFix mfix' idx' =>
     forallb2 (fun x y =>
@@ -333,19 +333,19 @@ Fixpoint leq_term `{checker_flags} (φ : universes_graph) (t u : term) {struct t
   | tRel n, tRel n' => Nat.eqb n n'
   | tEvar ev args, tEvar ev' args' => Nat.eqb ev ev' && forallb2 (eq_term φ) args args'
   | tVar id, tVar id' => eqb id id'
-  | tSort s, tSort s' => check_leqb_sort φ s s'
+  | tUniv s, tUniv s' => check_leqb_univ φ s s'
   | tApp f args, tApp f' args' => eq_term φ f f' && forallb2 (eq_term φ) args args'
   | tCast f k T, tCast f' k' T' => eq_term φ f f' && eq_term φ T T'
-  | tConst c u, tConst c' u' => eq_constant c c' && eqb_univ_instance φ u u'
-  | tInd i u, tInd i' u' => eq_inductive i i' && eqb_univ_instance φ u u'
+  | tConst c u, tConst c' u' => eq_constant c c' && eqb_ulvl_instance φ u u'
+  | tInd i u, tInd i' u' => eq_inductive i i' && eqb_ulvl_instance φ u u'
   | tConstruct i k u, tConstruct i' k' u' => eq_inductive i i' && Nat.eqb k k' &&
-                                                    eqb_univ_instance φ u u'
+                                                    eqb_ulvl_instance φ u u'
   | tLambda _ b t, tLambda _ b' t' => eq_term φ b b' && eq_term φ t t'
   | tProd _ b t, tProd _ b' t' => eq_term φ b b' && leq_term φ t t'
   | tLetIn _ b t c, tLetIn _ b' t' c' => eq_term φ b b' && eq_term φ t t' && leq_term φ c c'
   | tCase ci p c brs, tCase ci' p' c' brs' =>
     eq_case_info ci ci' &&
-    eqb_predicate (eqb_univ_instance φ) (eq_term φ) p p' && eq_term φ c c' && forallb2 (fun br br' => eq_term φ br.(bbody) br'.(bbody)) brs brs'
+    eqb_predicate (eqb_ulvl_instance φ) (eq_term φ) p p' && eq_term φ c c' && forallb2 (fun br br' => eq_term φ br.(bbody) br'.(bbody)) brs brs'
   | tProj p c, tProj p' c' => eq_projection p p' && eq_term φ c c'
   | tFix mfix idx, tFix mfix' idx' =>
     forallb2 (fun x y =>
@@ -490,7 +490,7 @@ Section Conversion.
 
     | tCase ci p c brs,
       tCase ci' p' c' brs' => (* Hnf did not reduce, maybe delta needed in c *)
-      if eq_case_info ci ci' && eqb_predicate (eqb_univ_instance G) (eq_term G) p p' && eq_term G c c'
+      if eq_case_info ci ci' && eqb_predicate (eqb_ulvl_instance G) (eq_term G) p p' && eq_term G c c'
       && forallb2 (fun br br' => eq_term G br.(bbody) br'.(bbody)) brs brs' then
         ret true
       else
@@ -564,13 +564,13 @@ Section Typecheck.
     | None => raise (NotEnoughFuel fuel)
     end.
 
-  Definition reduce_to_sort Γ (t : term) : typing_result sort :=
+  Definition reduce_to_sort Γ (t : term) : typing_result Universe.t :=
     match t with
-    | tSort s => ret s
+    | tUniv s => ret s
     | _ =>
       t' <- hnf_stack Γ t ;;
       match t' with
-      | (tSort s, []) => ret s
+      | (tUniv s, []) => ret s
       | _ => raise (NotASort t)
       end
     end.
@@ -656,7 +656,7 @@ Section Typecheck.
     | tVar n => raise (UnboundVar n)
     | tEvar ev args => raise (UnboundEvar ev)
 
-    | tSort s => ret (tSort (Sort.super s))
+    | tUniv s => ret (tUniv (Universe.super s))
 
     | tCast c k t =>
       infer_type infer Γ t ;;
@@ -666,7 +666,7 @@ Section Typecheck.
     | tProd n t b =>
       s1 <- infer_type infer Γ t ;;
       s2 <- infer_type infer (Γ ,, vass n t) b ;;
-      ret (tSort (Sort.sort_of_product s1 s2))
+      ret (tUniv (Universe.univ_of_product s1 s2))
 
     | tLambda n t b =>
       infer_type infer Γ t ;;
@@ -832,14 +832,14 @@ Section Checker.
     | [] => ret tt
     | g :: env =>
       check_wf_declarations univs retro G env ;;
-      check_wf_decl {| universes := univs; declarations := env; retroknowledge := retro |} G g.1 g.2 ;;
+      check_wf_decl {| ulvls := univs; declarations := env; retroknowledge := retro |} G g.1 g.2 ;;
       check_fresh g.1 env ;;
       ret tt
     end.
 
   Definition typecheck_program (p : program) : EnvCheck term :=
     let Σ := fst p in
-    let '(univs, decls, retro) := (Σ.(universes), Σ.(declarations), Σ.(retroknowledge)) in
+    let '(univs, decls, retro) := (Σ.(ulvls), Σ.(declarations), Σ.(retroknowledge)) in
     match gc_of_constraints (snd univs) with
     | None => EnvError (IllFormedDecl "toplevel"
         (UnsatisfiableConstraints univs.2))
