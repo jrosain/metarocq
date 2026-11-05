@@ -328,7 +328,7 @@ Lemma term_forall_ctx_list_ind :
     (forall Γ (n : nat), P Γ (tRel n)) ->
     (forall Γ (i : ident), P Γ (tVar i)) ->
     (forall Γ (n : nat) (l : list term), All (P Γ) l -> P Γ (tEvar n l)) ->
-    (forall Γ s, P Γ (tSort s)) ->
+    (forall Γ s, P Γ (tUniv s)) ->
     (forall Γ (n : aname) (t : term), P Γ t -> forall t0 : term, P (vass n t :: Γ) t0 -> P Γ (tProd n t t0)) ->
     (forall Γ (n : aname) (t : term), P Γ t -> forall t0 : term, P (vass n t :: Γ) t0 -> P Γ (tLambda n t t0)) ->
     (forall Γ (n : aname) (t : term),
@@ -454,7 +454,7 @@ Lemma term_ind_depth_app :
     (forall (n : nat), P (tRel n)) ->
     (forall (i : ident), P (tVar i)) ->
     (forall (n : nat) (l : list term), All (P) l -> P (tEvar n l)) ->
-    (forall s, P (tSort s)) ->
+    (forall s, P (tUniv s)) ->
     (forall (n : aname) (t : term), P t -> forall t0 : term, P t0 -> P (tProd n t t0)) ->
     (forall (n : aname) (t : term), P t -> forall t0 : term, P t0 -> P (tLambda n t t0)) ->
     (forall (n : aname) (t : term),
