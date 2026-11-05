@@ -20,11 +20,11 @@ Instance All2_fold_len {A} P (Γ Δ : list A) : HasLen (All2_fold P Γ Δ) #|Γ|
 
 Implicit Types (cf : checker_flags).
 
-Definition cmp_universe_instance (cmp_univ : Universe.t -> Universe.t -> Prop) : Instance.t -> Instance.t -> Prop :=
-  Forall2 (on_rel cmp_univ Universe.make').
+Definition cmp_ulvl_instance (cmp_ulvl : UnivLvl.t -> UnivLvl.t -> Prop) : Instance.t -> Instance.t -> Prop :=
+  Forall2 (on_rel cmp_ulvl UnivLvl.make').
 
-Definition cmp_universe_instance_dep cmp_univ P' :=
-  fun {u u'} (H : cmp_universe_instance cmp_univ u u') => Forall2_dep P' H.
+Definition cmp_ulvl_instance_dep cmp_univ P' :=
+  fun {u u'} (H : cmp_ulvl_instance cmp_univ u u') => Forall2_dep P' H.
 
 (** Cumulative inductive types:
 
@@ -33,15 +33,15 @@ Definition cmp_universe_instance_dep cmp_univ P' :=
   even on ill-formed terms. It corresponds to the right notion on well-formed terms.
 *)
 
-Definition cmp_universe_variance (cmp_univ : conv_pb -> Universe.t -> Universe.t -> Prop) pb v u u' :=
+Definition cmp_ulvl_variance (cmp_ulvl : conv_pb -> UnivLvl.t -> UnivLvl.t -> Prop) pb v u u' :=
   match v with
   | Variance.Irrelevant => True
-  | Variance.Covariant => on_rel (cmp_univ pb) Universe.make' u u'
-  | Variance.Invariant => on_rel (cmp_univ Conv) Universe.make' u u'
+  | Variance.Covariant => on_rel (cmp_ulvl pb) UnivLvl.make' u u'
+  | Variance.Invariant => on_rel (cmp_ulvl Conv) UnivLvl.make' u u'
   end.
 
-Definition cmp_universe_instance_variance cmp_univ pb v u u' :=
-  Forall3 (cmp_universe_variance cmp_univ pb) v u u'.
+Definition cmp_ulvl_instance_variance cmp_univ pb v u u' :=
+  Forall3 (cmp_ulvl_variance cmp_univ pb) v u u'.
 
 Definition global_variance_gen lookup gr napp :=
   match gr with
@@ -75,35 +75,35 @@ Definition global_variance_gen lookup gr napp :=
 
 Notation global_variance Σ := (global_variance_gen (lookup_env Σ)).
 
-Definition cmp_opt_variance cmp_univ pb v :=
+Definition cmp_opt_variance cmp_ulvl pb v :=
   match v with
-  | AllEqual => cmp_universe_instance (cmp_univ Conv)
+  | AllEqual => cmp_ulvl_instance (cmp_ulvl Conv)
   | AllIrrelevant => fun l l' => #|l| = #|l'|
-  | Variance v => fun u u' => cmp_universe_instance (cmp_univ Conv) u u' \/ cmp_universe_instance_variance cmp_univ pb v u u'
+  | Variance v => fun u u' => cmp_ulvl_instance (cmp_ulvl Conv) u u' \/ cmp_ulvl_instance_variance cmp_ulvl pb v u u'
   end.
 
-Lemma cmp_universe_universe_variance (cmp_univ : conv_pb -> Universe.t -> Universe.t -> Prop) pb v u u' :
-  RelationClasses.subrelation (cmp_univ Conv) (cmp_univ pb) ->
-  on_rel (cmp_univ Conv) Universe.make' u u' -> cmp_universe_variance cmp_univ pb v u u'.
+Lemma cmp_ulvl_ulvl_variance (cmp_ulvl : conv_pb -> UnivLvl.t -> UnivLvl.t -> Prop) pb v u u' :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl pb) ->
+  on_rel (cmp_ulvl Conv) UnivLvl.make' u u' -> cmp_ulvl_variance cmp_ulvl pb v u u'.
 Proof.
   destruct v => //=.
   intros H H1; apply H, H1.
 Qed.
 
-Lemma cmp_instance_variance cmp_univ pb v u u' :
-  RelationClasses.subrelation (cmp_univ Conv) (cmp_univ pb) ->
+Lemma cmp_instance_variance cmp_ulvl pb v u u' :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl pb) ->
   #|v| = #|u| ->
-  cmp_universe_instance (cmp_univ Conv) u u' -> cmp_universe_instance_variance cmp_univ pb v u u'.
+  cmp_ulvl_instance (cmp_ulvl Conv) u u' -> cmp_ulvl_instance_variance cmp_ulvl pb v u u'.
 Proof.
   intros Hsub Hlen Hu.
   apply Forall2_triv in Hlen.
   eapply Forall2_Forall2_Forall3 in Hu; tea.
   apply Forall3_impl with (1 := Hu) => v1 u1 u1' [] _ H1.
-  now apply cmp_universe_universe_variance.
+  now apply cmp_ulvl_ulvl_variance.
 Qed.
 
-Lemma cmp_instance_opt_variance cmp_univ pb v :
-  RelationClasses.subrelation (cmp_opt_variance cmp_univ pb AllEqual) (cmp_opt_variance cmp_univ pb v).
+Lemma cmp_instance_opt_variance cmp_ulvl pb v :
+  RelationClasses.subrelation (cmp_opt_variance cmp_ulvl pb AllEqual) (cmp_opt_variance cmp_ulvl pb v).
 Proof.
   intros u u' H.
   destruct v as [| |v] => //=.
@@ -111,10 +111,10 @@ Proof.
   now left.
 Qed.
 
-Lemma cmp_opt_variance_var_dec cmp_univ pb v ui ui' :
-  RelationClasses.subrelation (cmp_univ Conv) (cmp_univ pb) ->
-  cmp_universe_instance (cmp_univ Conv) ui ui' \/ cmp_universe_instance_variance cmp_univ pb v ui ui' ->
-  { cmp_universe_instance (cmp_univ Conv) ui ui' } + { cmp_universe_instance_variance cmp_univ pb v ui ui' }.
+Lemma cmp_opt_variance_var_dec cmp_ulvl pb v ui ui' :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl pb) ->
+  cmp_ulvl_instance (cmp_ulvl Conv) ui ui' \/ cmp_ulvl_instance_variance cmp_ulvl pb v ui ui' ->
+  { cmp_ulvl_instance (cmp_ulvl Conv) ui ui' } + { cmp_ulvl_instance_variance cmp_ulvl pb v ui ui' }.
 Proof.
   intros subr H.
   elim:(eq_dec #|v| #|ui|).
@@ -140,15 +140,15 @@ Proof.
   now eapply Forall3_Forall2_right => //.
 Qed.
 
-Lemma cmp_opt_variance_or_impl cmp_universe1 cmp_universe2 cmp_universe3 pb1 pb2 pb3 v u1 u1' u2 u2' u3 u3' :
-  RelationClasses.subrelation (cmp_universe1 Conv) (cmp_universe1 pb1) ->
-  RelationClasses.subrelation (cmp_universe2 Conv) (cmp_universe2 pb2) ->
-  (cmp_universe_instance (cmp_universe1 Conv) u1 u1' -> cmp_universe_instance (cmp_universe2 Conv) u2 u2' -> cmp_universe_instance (cmp_universe3 Conv) u3 u3') ->
-  (cmp_universe_instance_variance cmp_universe1 pb1 v u1 u1' -> cmp_universe_instance_variance cmp_universe2 pb2 v u2 u2' -> cmp_universe_instance_variance cmp_universe3 pb3 v u3 u3') ->
+Lemma cmp_opt_variance_or_impl cmp_ulvl1 cmp_ulvl2 cmp_ulvl3 pb1 pb2 pb3 v u1 u1' u2 u2' u3 u3' :
+  RelationClasses.subrelation (cmp_ulvl1 Conv) (cmp_ulvl1 pb1) ->
+  RelationClasses.subrelation (cmp_ulvl2 Conv) (cmp_ulvl2 pb2) ->
+  (cmp_ulvl_instance (cmp_ulvl1 Conv) u1 u1' -> cmp_ulvl_instance (cmp_ulvl2 Conv) u2 u2' -> cmp_ulvl_instance (cmp_ulvl3 Conv) u3 u3') ->
+  (cmp_ulvl_instance_variance cmp_ulvl1 pb1 v u1 u1' -> cmp_ulvl_instance_variance cmp_ulvl2 pb2 v u2 u2' -> cmp_ulvl_instance_variance cmp_ulvl3 pb3 v u3 u3') ->
   (#|u1| = #|u1'| -> #|u2| = #|u2'| -> #|u1| = #|u2|) ->
-  cmp_universe_instance (cmp_universe1 Conv) u1 u1' \/ cmp_universe_instance_variance cmp_universe1 pb1 v u1 u1' ->
-  cmp_universe_instance (cmp_universe2 Conv) u2 u2' \/ cmp_universe_instance_variance cmp_universe2 pb2 v u2 u2' ->
-  cmp_universe_instance (cmp_universe3 Conv) u3 u3' \/ cmp_universe_instance_variance cmp_universe3 pb3 v u3 u3'.
+  cmp_ulvl_instance (cmp_ulvl1 Conv) u1 u1' \/ cmp_ulvl_instance_variance cmp_ulvl1 pb1 v u1 u1' ->
+  cmp_ulvl_instance (cmp_ulvl2 Conv) u2 u2' \/ cmp_ulvl_instance_variance cmp_ulvl2 pb2 v u2 u2' ->
+  cmp_ulvl_instance (cmp_ulvl3 Conv) u3 u3' \/ cmp_ulvl_instance_variance cmp_ulvl3 pb3 v u3 u3'.
 Proof.
   intros Hsub1 Hsub2 Hl Hr e [H|H] [H'|H']; [left; apply Hl| right; apply Hr ..]; auto.
   all: apply cmp_instance_variance; tas.
@@ -162,47 +162,47 @@ Proof.
     + eapply @Forall3_Forall2_left with (Q := fun _ _ => True); eauto.
 Qed.
 
-Definition cmp_global_instance_gen Σ cmp_universe pb gr napp :=
-  cmp_opt_variance cmp_universe pb (global_variance_gen Σ gr napp).
+Definition cmp_global_instance_gen Σ cmp_ulvl pb gr napp :=
+  cmp_opt_variance cmp_ulvl pb (global_variance_gen Σ gr napp).
 
 Notation cmp_global_instance Σ := (cmp_global_instance_gen (lookup_env Σ)).
 
-Definition cmp_ind_universes {cf:checker_flags} (Σ : global_env_ext) ind n i i' :=
-  cmp_global_instance Σ (compare_universe (global_ext_constraints Σ)) Cumul (IndRef ind) n i i'.
+Definition cmp_ind_ulvls {cf:checker_flags} (Σ : global_env_ext) ind n i i' :=
+  cmp_global_instance Σ (compare_ulvl (global_ext_constraints Σ)) Cumul (IndRef ind) n i i'.
 
-Lemma cmp_universe_instance_impl R R' :
+Lemma cmp_ulvl_instance_impl R R' :
   RelationClasses.subrelation R R' ->
-  RelationClasses.subrelation (cmp_universe_instance R) (cmp_universe_instance R').
+  RelationClasses.subrelation (cmp_ulvl_instance R) (cmp_ulvl_instance R').
 Proof.
   intros H x y xy. eapply Forall2_impl; tea; unfold on_rel; auto.
 Qed.
 
-Lemma cmp_universe_instance_impl' R R' :
+Lemma cmp_ulvl_instance_impl' R R' :
   RelationClasses.subrelation R R' ->
-  forall u u', cmp_universe_instance R u u' -> cmp_universe_instance R' u u'.
+  forall u u', cmp_ulvl_instance R u u' -> cmp_ulvl_instance R' u u'.
 Proof.
   intros H x y xy. eapply Forall2_impl; tea; unfold on_rel; auto.
 Qed.
 
-Lemma cmp_universe_variance_impl R R' pb pb' v :
+Lemma cmp_ulvl_variance_impl R R' pb pb' v :
   RelationClasses.subrelation (R Conv) (R' Conv) ->
   RelationClasses.subrelation (R pb) (R' pb') ->
-  RelationClasses.subrelation (cmp_universe_variance R pb v) (cmp_universe_variance R' pb' v).
+  RelationClasses.subrelation (cmp_ulvl_variance R pb v) (cmp_ulvl_variance R' pb' v).
 Proof.
   intros HConv Hpb x y.
   destruct v => //=.
   all: unfold on_rel; now auto.
 Qed.
 
-Lemma cmp_universe_instance_variance_impl R R' pb pb' v :
+Lemma cmp_ulvl_instance_variance_impl R R' pb pb' v :
   RelationClasses.subrelation (R Conv) (R' Conv) ->
   RelationClasses.subrelation (R pb) (R' pb') ->
-  RelationClasses.subrelation (cmp_universe_instance_variance R pb v) (cmp_universe_instance_variance R' pb' v).
+  RelationClasses.subrelation (cmp_ulvl_instance_variance R pb v) (cmp_ulvl_instance_variance R' pb' v).
 Proof.
   intros HConv Hpb x y xy.
   eapply Forall3_impl; tea.
   intros ???.
-  now apply cmp_universe_variance_impl.
+  now apply cmp_ulvl_variance_impl.
 Qed.
 
 Inductive eq_decl_upto_names : context_decl -> context_decl -> Type :=
@@ -368,9 +368,9 @@ Proof.
   now transitivity y0.
 Qed.
 
-Definition eq_predicate (eq_term : term -> term -> Type) eq_universe p p' :=
+Definition eq_predicate (eq_term : term -> term -> Type) eq_ulvl p p' :=
   All2 eq_term p.(pparams) p'.(pparams) ×
-  cmp_universe_instance eq_universe p.(puinst) p'.(puinst) ×
+  cmp_ulvl_instance eq_ulvl p.(puinst) p'.(puinst) ×
   eq_context_upto_names p.(pcontext) p'.(pcontext) ×
   eq_term p.(preturn) p'.(preturn).
 
@@ -389,7 +389,7 @@ Definition eq_mfixpoint (eq_term : term -> term -> Type) mfix mfix' :=
   ) mfix mfix'.
 
 
-(** ** Syntactic ws_cumul_pb up-to universes
+(** ** Syntactic ws_cumul_pb up-to ulvls
   We don't look at printing annotations *)
 
 (** ws_cumul_pb is indexed by a natural number that counts the number of applications
@@ -400,8 +400,8 @@ Reserved Notation " Σ ⊢ t <==[ Rle , napp ] u" (at level 50, t, u at next lev
   format "Σ  ⊢  t  <==[ Rle , napp ]  u").
 
 Inductive eq_term_upto_univ_napp Σ
-  (cmp_universe : conv_pb -> Universe.t -> Universe.t -> Prop)
-  (cmp_sort : conv_pb -> sort -> sort -> Prop)
+  (cmp_ulvl : conv_pb -> UnivLvl.t -> UnivLvl.t -> Prop)
+  (cmp_univ : conv_pb -> Universe.t -> Universe.t -> Prop)
   (pb : conv_pb) (napp : nat) : term -> term -> Type :=
 | eq_Rel : forall n,
     Σ ⊢ tRel n <==[ pb , napp ] tRel n
@@ -413,9 +413,9 @@ Inductive eq_term_upto_univ_napp Σ
 | eq_Var : forall id,
     Σ ⊢ tVar id <==[ pb , napp ] tVar id
 
-| eq_Sort : forall s s',
-    cmp_sort pb s s' ->
-    Σ ⊢ tSort s  <==[ pb , napp ] tSort s'
+| eq_Univ : forall s s',
+    cmp_univ pb s s' ->
+    Σ ⊢ tUniv s  <==[ pb , napp ] tUniv s'
 
 | eq_App : forall t t' u u',
     Σ ⊢ t <==[ pb , S napp ] t' ->
@@ -423,15 +423,15 @@ Inductive eq_term_upto_univ_napp Σ
     Σ ⊢ tApp t u <==[ pb , napp ] tApp t' u'
 
 | eq_Const : forall c u u',
-    cmp_universe_instance (cmp_universe Conv) u u' ->
+    cmp_ulvl_instance (cmp_ulvl Conv) u u' ->
     Σ ⊢ tConst c u <==[ pb , napp ] tConst c u'
 
 | eq_Ind : forall i u u',
-    cmp_global_instance Σ cmp_universe pb (IndRef i) napp u u' ->
+    cmp_global_instance Σ cmp_ulvl pb (IndRef i) napp u u' ->
     Σ ⊢ tInd i u <==[ pb , napp ] tInd i u'
 
 | eq_Construct : forall i k u u',
-    cmp_global_instance Σ cmp_universe pb (ConstructRef i k) napp u u' ->
+    cmp_global_instance Σ cmp_ulvl pb (ConstructRef i k) napp u u' ->
     Σ ⊢ tConstruct i k u <==[ pb , napp ] tConstruct i k u'
 
 | eq_Lambda : forall na na' ty ty' t t',
@@ -454,7 +454,7 @@ Inductive eq_term_upto_univ_napp Σ
     Σ ⊢ tLetIn na t ty u <==[ pb , napp ] tLetIn na' t' ty' u'
 
 | eq_Case : forall indn p p' c c' brs brs',
-    eq_predicate (fun t t' => Σ ⊢ t <==[ Conv , 0 ] t') (cmp_universe Conv) p p' ->
+    eq_predicate (fun t t' => Σ ⊢ t <==[ Conv , 0 ] t') (cmp_ulvl Conv) p p' ->
     Σ ⊢ c <==[ Conv , 0 ] c' ->
     eq_branches (fun t t' => Σ ⊢ t <==[ Conv , 0 ] t') brs brs' ->
     Σ ⊢ tCase indn p c brs <==[ pb , napp ] tCase indn p' c' brs'
@@ -472,25 +472,25 @@ Inductive eq_term_upto_univ_napp Σ
     Σ ⊢ tCoFix mfix idx <==[ pb , napp ] tCoFix mfix' idx
 
 | eq_Prim i i' :
-    onPrims (fun t t' => Σ ⊢ t <==[ Conv , 0 ] t') (cmp_universe Conv) i i' ->
+    onPrims (fun t t' => Σ ⊢ t <==[ Conv , 0 ] t') (cmp_ulvl Conv) i i' ->
     Σ ⊢ tPrim i <==[ pb , napp ] tPrim i'
 where " Σ ⊢ t <==[ pb , napp ] u " := (eq_term_upto_univ_napp Σ _ _ pb napp t u) : type_scope.
 
-Notation eq_term_upto_univ Σ cmp_universe cmp_sort pb := (eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb 0) (only parsing).
+Notation eq_term_upto_univ Σ cmp_ulvl cmp_sort pb := (eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb 0) (only parsing).
 
-(* ** Syntactic conparison up-to universes *)
+(* ** Syntactic conparison up-to ulvls *)
 
 Definition compare_term_napp `{checker_flags} Σ φ (pb : conv_pb) napp (t u : term) :=
-  eq_term_upto_univ_napp Σ (compare_universe φ) (compare_sort φ) pb napp t u.
+  eq_term_upto_univ_napp Σ (compare_ulvl φ) (compare_univ φ) pb napp t u.
 
 Definition compare_term `{checker_flags} Σ φ (pb : conv_pb) (t u : term) :=
-  eq_term_upto_univ Σ (compare_universe φ) (compare_sort φ) pb t u.
+  eq_term_upto_univ Σ (compare_ulvl φ) (compare_univ φ) pb t u.
 
-(* ** Syntactic conversion up-to universes *)
+(* ** Syntactic conversion up-to ulvls *)
 
 Notation eq_term Σ φ := (compare_term Σ φ Conv).
 
-(* ** Syntactic cumulativity up-to universes *)
+(* ** Syntactic cumulativity up-to ulvls *)
 
 Notation leq_term Σ φ := (compare_term Σ φ Cumul).
 
@@ -513,8 +513,8 @@ Definition compare_context `{checker_flags} Σ φ pb (Γ Δ : context) :=
 Notation eq_context Σ φ := (compare_context Σ φ Conv).
 Notation leq_context Σ φ := (compare_context Σ φ Cumul).
 
-Notation eq_context_upto Σ cmp_universe cmp_sort pb :=
-  (eq_context_gen (fun pb0 => eq_term_upto_univ Σ cmp_universe cmp_sort pb0) pb).
+Notation eq_context_upto Σ cmp_ulvl cmp_sort pb :=
+  (eq_context_gen (fun pb0 => eq_term_upto_univ Σ cmp_ulvl cmp_sort pb0) pb).
 
 (* TODO MOVE *)
 #[global]
@@ -525,31 +525,31 @@ Existing Instance All2_symP.
 Existing Instance Forall2_symP.
 
 #[global]
-Instance cmp_universe_instance_refl cmp_universe :
-  RelationClasses.Reflexive cmp_universe ->
-  RelationClasses.Reflexive (cmp_universe_instance cmp_universe).
+Instance cmp_ulvl_instance_refl cmp_ulvl :
+  RelationClasses.Reflexive cmp_ulvl ->
+  RelationClasses.Reflexive (cmp_ulvl_instance cmp_ulvl).
 Proof.
   intros refl_univ u.
   apply Forall2_same; reflexivity.
 Qed.
 
 #[global]
-Instance cmp_universe_instance_sym cmp_universe :
-  RelationClasses.Symmetric cmp_universe ->
-  RelationClasses.Symmetric (cmp_universe_instance cmp_universe).
+Instance cmp_ulvl_instance_sym cmp_ulvl :
+  RelationClasses.Symmetric cmp_ulvl ->
+  RelationClasses.Symmetric (cmp_ulvl_instance cmp_ulvl).
 Proof. intros tRe x y. now eapply Forall2_symP. Qed.
 
 #[global]
-Instance cmp_universe_instance_trans cmp_universe :
-  RelationClasses.Transitive cmp_universe ->
-  RelationClasses.Transitive (cmp_universe_instance cmp_universe).
+Instance cmp_ulvl_instance_trans cmp_ulvl :
+  RelationClasses.Transitive cmp_ulvl ->
+  RelationClasses.Transitive (cmp_ulvl_instance cmp_ulvl).
 Proof. intros tRe x y z. eapply Forall2_trans. tc. Qed.
 
 #[global]
-Instance cmp_universe_variance_sym cmp_universe pb v :
-  RelationClasses.Symmetric (cmp_universe Conv) ->
-  RelationClasses.Symmetric (cmp_universe pb) ->
-  RelationClasses.Symmetric (cmp_universe_variance cmp_universe pb v).
+Instance cmp_ulvl_variance_sym cmp_ulvl pb v :
+  RelationClasses.Symmetric (cmp_ulvl Conv) ->
+  RelationClasses.Symmetric (cmp_ulvl pb) ->
+  RelationClasses.Symmetric (cmp_ulvl_variance cmp_ulvl pb v).
 Proof.
   intros univ_sym univ_sym' u u' u''.
   destruct v as [| |] => //=.
@@ -557,10 +557,10 @@ Proof.
 Qed.
 
 #[global]
-Instance cmp_universe_variance_trans cmp_universe pb v :
-  RelationClasses.Transitive (cmp_universe Conv) ->
-  RelationClasses.Transitive (cmp_universe pb) ->
-  RelationClasses.Transitive (cmp_universe_variance cmp_universe pb v).
+Instance cmp_ulvl_variance_trans cmp_ulvl pb v :
+  RelationClasses.Transitive (cmp_ulvl Conv) ->
+  RelationClasses.Transitive (cmp_ulvl pb) ->
+  RelationClasses.Transitive (cmp_ulvl_variance cmp_ulvl pb v).
 Proof.
   intros univ_trans univ_trans' u u' u''.
   destruct v as [| |] => //=.
@@ -568,43 +568,43 @@ Proof.
 Qed.
 
 #[global]
-Instance cmp_universe_instance_variance_sym cmp_universe pb v :
-  RelationClasses.Symmetric (cmp_universe Conv) ->
-  RelationClasses.Symmetric (cmp_universe pb) ->
-  RelationClasses.Symmetric (cmp_universe_instance_variance cmp_universe pb v).
+Instance cmp_ulvl_instance_variance_sym cmp_ulvl pb v :
+  RelationClasses.Symmetric (cmp_ulvl Conv) ->
+  RelationClasses.Symmetric (cmp_ulvl pb) ->
+  RelationClasses.Symmetric (cmp_ulvl_instance_variance cmp_ulvl pb v).
 Proof.
   intros univ_sym univ_sym' u u'.
   apply Forall3_symP. tc.
 Qed.
 
 #[global]
-Instance cmp_universe_instance_variance_trans cmp_universe pb v :
-  RelationClasses.Transitive (cmp_universe Conv) ->
-  RelationClasses.Transitive (cmp_universe pb) ->
-  RelationClasses.Transitive (cmp_universe_instance_variance cmp_universe pb v).
+Instance cmp_ulvl_instance_variance_trans cmp_ulvl pb v :
+  RelationClasses.Transitive (cmp_ulvl Conv) ->
+  RelationClasses.Transitive (cmp_ulvl pb) ->
+  RelationClasses.Transitive (cmp_ulvl_instance_variance cmp_ulvl pb v).
 Proof.
   intros univ_trans univ_trans' u u' u''.
   apply Forall3_transP. tc.
 Qed.
 
 #[global]
-Instance cmp_global_instance_refl Σ cmp_universe pb gr napp :
-  RelationClasses.Reflexive (cmp_universe Conv) ->
-  RelationClasses.Reflexive (cmp_universe pb) ->
-  RelationClasses.Reflexive (cmp_global_instance Σ cmp_universe pb gr napp).
+Instance cmp_global_instance_refl Σ cmp_ulvl pb gr napp :
+  RelationClasses.Reflexive (cmp_ulvl Conv) ->
+  RelationClasses.Reflexive (cmp_ulvl pb) ->
+  RelationClasses.Reflexive (cmp_global_instance Σ cmp_ulvl pb gr napp).
 Proof.
   intros rRE rRle.
   unfold cmp_global_instance_gen.
   destruct global_variance_gen as [| |v] => //= u.
-  - now apply cmp_universe_instance_refl.
-  - left. now apply cmp_universe_instance_refl.
+  - now apply cmp_ulvl_instance_refl.
+  - left. now apply cmp_ulvl_instance_refl.
 Qed.
 
 #[global]
-Instance cmp_global_instance_sym Σ cmp_universe pb gr napp :
-  RelationClasses.Symmetric (cmp_universe Conv) ->
-  RelationClasses.Symmetric (cmp_universe pb) ->
-  RelationClasses.Symmetric (cmp_global_instance Σ cmp_universe pb gr napp).
+Instance cmp_global_instance_sym Σ cmp_ulvl pb gr napp :
+  RelationClasses.Symmetric (cmp_ulvl Conv) ->
+  RelationClasses.Symmetric (cmp_ulvl pb) ->
+  RelationClasses.Symmetric (cmp_global_instance Σ cmp_ulvl pb gr napp).
 Proof.
   intros univ_sym univ_sym'.
   unfold cmp_global_instance_gen.
@@ -615,11 +615,11 @@ Proof.
 Qed.
 
 #[global]
-Instance cmp_global_instance_trans Σ cmp_universe pb gr napp :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb) ->
-  RelationClasses.Transitive (cmp_universe Conv) ->
-  RelationClasses.Transitive (cmp_universe pb) ->
-  RelationClasses.Transitive (cmp_global_instance Σ cmp_universe pb gr napp).
+Instance cmp_global_instance_trans Σ cmp_ulvl pb gr napp :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl pb) ->
+  RelationClasses.Transitive (cmp_ulvl Conv) ->
+  RelationClasses.Transitive (cmp_ulvl pb) ->
+  RelationClasses.Transitive (cmp_global_instance Σ cmp_ulvl pb gr napp).
 Proof.
   intros univ_sub univ_trans univ_trans'.
   unfold cmp_global_instance_gen.
@@ -703,12 +703,12 @@ Qed.
 
 
 #[global]
-Polymorphic Instance eq_term_upto_univ_refl Σ cmp_universe cmp_sort pb napp :
-  RelationClasses.Reflexive (cmp_universe Conv) ->
-  RelationClasses.Reflexive (cmp_universe pb) ->
+Polymorphic Instance eq_term_upto_univ_refl Σ cmp_ulvl cmp_sort pb napp :
+  RelationClasses.Reflexive (cmp_ulvl Conv) ->
+  RelationClasses.Reflexive (cmp_ulvl pb) ->
   RelationClasses.Reflexive (cmp_sort Conv) ->
   RelationClasses.Reflexive (cmp_sort pb) ->
-  Reflexive (eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp).
+  Reflexive (eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp).
 Proof.
   intros refl_univ refl_univ' refl_sort refl_sort' t.
   induction t in napp, pb, refl_univ', refl_sort' |- * using term_forall_list_ind.
@@ -729,10 +729,10 @@ Proof.
 Qed.
 
 #[global]
-Polymorphic Instance All2_eq_refl Σ cmp_universe cmp_sort :
-  RelationClasses.Reflexive (cmp_universe Conv) ->
+Polymorphic Instance All2_eq_refl Σ cmp_ulvl cmp_sort :
+  RelationClasses.Reflexive (cmp_ulvl Conv) ->
   RelationClasses.Reflexive (cmp_sort Conv) ->
-  CRelationClasses.Reflexive (All2 (eq_term_upto_univ Σ cmp_universe cmp_sort Conv)).
+  CRelationClasses.Reflexive (All2 (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv)).
 Proof using Type.
   intros h h' x. apply All2_same. reflexivity.
 Qed.
@@ -756,12 +756,12 @@ Proof.
 Qed.
 
 #[global]
-Polymorphic Instance eq_term_upto_univ_sym Σ cmp_universe cmp_sort pb napp :
-  RelationClasses.Symmetric (cmp_universe Conv) ->
-  RelationClasses.Symmetric (cmp_universe pb) ->
+Polymorphic Instance eq_term_upto_univ_sym Σ cmp_ulvl cmp_sort pb napp :
+  RelationClasses.Symmetric (cmp_ulvl Conv) ->
+  RelationClasses.Symmetric (cmp_ulvl pb) ->
   RelationClasses.Symmetric (cmp_sort Conv) ->
   RelationClasses.Symmetric (cmp_sort pb) ->
-  Symmetric (eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp).
+  Symmetric (eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp).
 Proof.
   intros sym_univ sym_univ' sym_sort sym_sort' u v e.
   pose proof (@RelationClasses.symmetry _ (@eq_binder_annot name name) _).
@@ -832,17 +832,17 @@ Proof.
 Qed.
 
 #[global]
-Polymorphic Instance eq_term_upto_univ_trans Σ cmp_universe cmp_sort pb napp :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb) ->
-  RelationClasses.Transitive (cmp_universe Conv) ->
-  RelationClasses.Transitive (cmp_universe pb) ->
+Polymorphic Instance eq_term_upto_univ_trans Σ cmp_ulvl cmp_sort pb napp :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl pb) ->
+  RelationClasses.Transitive (cmp_ulvl Conv) ->
+  RelationClasses.Transitive (cmp_ulvl pb) ->
   RelationClasses.Transitive (cmp_sort Conv) ->
   RelationClasses.Transitive (cmp_sort pb) ->
-  Transitive (eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp).
+  Transitive (eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp).
 Proof.
   intros sub_univ trans_univ trans_univ' trans_sort trans_sort' u v w e1 e2.
   pose proof (@RelationClasses.transitivity _ (@eq_binder_annot name name) _).
-  assert (RelationClasses.subrelation (cmp_universe Conv) (cmp_universe Conv)) by reflexivity.
+  assert (RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl Conv)) by reflexivity.
   induction u in napp, pb, sub_univ, trans_univ', trans_sort', v, w, e1, e2 |- * using term_forall_list_ind.
   all: dependent destruction e1.
   all: try solve [ eauto ].
@@ -886,10 +886,10 @@ Instance compare_term_trans {cf} pb Σ φ : Transitive (compare_term Σ φ pb).
 Proof. apply eq_term_upto_univ_trans; tc. Qed.
 
 #[global]
-Polymorphic Instance eq_term_upto_univ_equiv Σ cmp_universe cmp_sort :
-  RelationClasses.Equivalence (cmp_universe Conv) ->
+Polymorphic Instance eq_term_upto_univ_equiv Σ cmp_ulvl cmp_sort :
+  RelationClasses.Equivalence (cmp_ulvl Conv) ->
   RelationClasses.Equivalence (cmp_sort Conv) ->
-  Equivalence (eq_term_upto_univ Σ cmp_universe cmp_sort Conv).
+  Equivalence (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv).
 Proof.
   constructor. all: exact _.
 Defined.
@@ -915,8 +915,8 @@ Polymorphic Instance leq_term_preorder {cf:checker_flags} Σ φ : PreOrder (leq_
 Proof. split; tc. Qed.
 
 #[global]
-Instance cmp_universe_instance_equiv R (hR : RelationClasses.Equivalence R)
-  : RelationClasses.Equivalence (cmp_universe_instance R).
+Instance cmp_ulvl_instance_equiv R (hR : RelationClasses.Equivalence R)
+  : RelationClasses.Equivalence (cmp_ulvl_instance R).
 Proof.
   split.
   - intro. apply Forall2_same. reflexivity.
@@ -924,9 +924,9 @@ Proof.
   - intros x y z xy yz. eapply Forall2_trans; tea. apply on_rel_trans. apply hR.
 Qed.
 
-Lemma cmp_universe_instance_antisym cmp_universe pb (hE : RelationClasses.Equivalence (cmp_universe Conv)) :
-  RelationClasses.Antisymmetric _ (cmp_universe Conv) (cmp_universe pb) ->
-  RelationClasses.Antisymmetric _ (cmp_universe_instance (cmp_universe Conv)) (cmp_universe_instance (cmp_universe pb)).
+Lemma cmp_ulvl_instance_antisym cmp_ulvl pb (hE : RelationClasses.Equivalence (cmp_ulvl Conv)) :
+  RelationClasses.Antisymmetric _ (cmp_ulvl Conv) (cmp_ulvl pb) ->
+  RelationClasses.Antisymmetric _ (cmp_ulvl_instance (cmp_ulvl Conv)) (cmp_ulvl_instance (cmp_ulvl pb)).
 Proof.
   intros H x y H1 H2.
   eapply Forall2_sym in H2.
@@ -935,8 +935,8 @@ Proof.
 Qed.
 
 #[global]
-Instance cmp_global_instance_equiv Σ cmp_universe (hE : RelationClasses.Equivalence (cmp_universe Conv)) gr napp
-  : RelationClasses.Equivalence (cmp_global_instance Σ cmp_universe Conv gr napp).
+Instance cmp_global_instance_equiv Σ cmp_ulvl (hE : RelationClasses.Equivalence (cmp_ulvl Conv)) gr napp
+  : RelationClasses.Equivalence (cmp_global_instance Σ cmp_ulvl Conv gr napp).
 Proof.
   split.
   - intro. apply cmp_global_instance_refl; typeclasses eauto.
@@ -944,48 +944,48 @@ Proof.
   - intros x y z xy yz. eapply cmp_global_instance_trans; eauto; typeclasses eauto.
 Qed.
 
-Lemma cmp_universe_variance_antisym cmp_universe pb (hRe : RelationClasses.Equivalence (cmp_universe Conv)) v u u' :
-  RelationClasses.Antisymmetric _ (cmp_universe Conv) (cmp_universe pb) ->
-  cmp_universe_variance cmp_universe pb v u u' ->
-  cmp_universe_variance cmp_universe pb v u' u ->
-  cmp_universe_variance cmp_universe Conv v u u'.
+Lemma cmp_ulvl_variance_antisym cmp_ulvl pb (hRe : RelationClasses.Equivalence (cmp_ulvl Conv)) v u u' :
+  RelationClasses.Antisymmetric _ (cmp_ulvl Conv) (cmp_ulvl pb) ->
+  cmp_ulvl_variance cmp_ulvl pb v u u' ->
+  cmp_ulvl_variance cmp_ulvl pb v u' u ->
+  cmp_ulvl_variance cmp_ulvl Conv v u u'.
 Proof.
   intro hAntisym.
   destruct v => //=.
   apply hAntisym.
 Qed.
 
-Lemma cmp_universe_instance_variance_antisym cmp_universe pb (hRe : RelationClasses.Equivalence (cmp_universe Conv)) l u v :
-  RelationClasses.Antisymmetric _ (cmp_universe Conv) (cmp_universe pb) ->
-  cmp_universe_instance_variance cmp_universe pb l u v ->
-  cmp_universe_instance_variance cmp_universe pb l v u ->
-  cmp_universe_instance_variance cmp_universe Conv l u v.
+Lemma cmp_ulvl_instance_variance_antisym cmp_ulvl pb (hRe : RelationClasses.Equivalence (cmp_ulvl Conv)) l u v :
+  RelationClasses.Antisymmetric _ (cmp_ulvl Conv) (cmp_ulvl pb) ->
+  cmp_ulvl_instance_variance cmp_ulvl pb l u v ->
+  cmp_ulvl_instance_variance cmp_ulvl pb l v u ->
+  cmp_ulvl_instance_variance cmp_ulvl Conv l u v.
 Proof.
   intro hAntisym.
   apply Forall3_antisymP. intros ???.
-  now eapply cmp_universe_variance_antisym.
+  now eapply cmp_ulvl_variance_antisym.
 Qed.
 
 #[global]
-Instance cmp_global_instance_antisym Σ cmp_universe pb (hRe : RelationClasses.Equivalence (cmp_universe Conv)) gr napp :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb) ->
-  RelationClasses.Antisymmetric _ (cmp_universe Conv) (cmp_universe pb) ->
-  RelationClasses.Antisymmetric _ (cmp_global_instance Σ cmp_universe Conv gr napp) (cmp_global_instance Σ cmp_universe pb gr napp).
+Instance cmp_global_instance_antisym Σ cmp_ulvl pb (hRe : RelationClasses.Equivalence (cmp_ulvl Conv)) gr napp :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl pb) ->
+  RelationClasses.Antisymmetric _ (cmp_ulvl Conv) (cmp_ulvl pb) ->
+  RelationClasses.Antisymmetric _ (cmp_global_instance Σ cmp_ulvl Conv gr napp) (cmp_global_instance Σ cmp_ulvl pb gr napp).
 Proof.
   intros hsub hR u v.
   unfold cmp_global_instance_gen, cmp_opt_variance.
   destruct global_variance_gen; auto.
   apply cmp_opt_variance_or_impl; auto.
-  eapply cmp_universe_instance_variance_antisym; tea.
+  eapply cmp_ulvl_instance_variance_antisym; tea.
 Qed.
 
-Lemma eq_term_upto_univ_antisym Σ cmp_universe cmp_sort pb
-  (univ_equi : RelationClasses.Equivalence (cmp_universe Conv))
+Lemma eq_term_upto_univ_antisym Σ cmp_ulvl cmp_sort pb
+  (univ_equi : RelationClasses.Equivalence (cmp_ulvl Conv))
   (sort_equi : RelationClasses.Equivalence (cmp_sort Conv)) :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb) ->
-  RelationClasses.Antisymmetric _ (cmp_universe Conv) (cmp_universe pb) ->
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl pb) ->
+  RelationClasses.Antisymmetric _ (cmp_ulvl Conv) (cmp_ulvl pb) ->
   RelationClasses.Antisymmetric _ (cmp_sort Conv) (cmp_sort pb) ->
-  Antisymmetric (eq_term_upto_univ Σ cmp_universe cmp_sort Conv) (eq_term_upto_univ Σ cmp_universe cmp_sort pb).
+  Antisymmetric (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv) (eq_term_upto_univ Σ cmp_ulvl cmp_sort pb).
 Proof.
   intros univ_sub univ_anisym sort_antisym u v. generalize 0; intros n h h'.
   induction u in v, n, h, h' |- * using term_forall_list_ind.
@@ -1023,27 +1023,27 @@ Proof.
 Qed.
 
 #[global]
-Instance cmp_global_instance_impl_same_napp Σ cmp_universe cmp_universe' pb pb' gr napp :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe' Conv) ->
-  RelationClasses.subrelation (cmp_universe pb) (cmp_universe' pb') ->
-  subrelation (cmp_global_instance Σ cmp_universe pb gr napp) (cmp_global_instance Σ cmp_universe' pb' gr napp).
+Instance cmp_global_instance_impl_same_napp Σ cmp_ulvl cmp_ulvl' pb pb' gr napp :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl' Conv) ->
+  RelationClasses.subrelation (cmp_ulvl pb) (cmp_ulvl' pb') ->
+  subrelation (cmp_global_instance Σ cmp_ulvl pb gr napp) (cmp_global_instance Σ cmp_ulvl' pb' gr napp).
 Proof.
   intros sub_conv sub_pb u u'.
   unfold cmp_global_instance_gen, cmp_opt_variance.
   destruct global_variance_gen as [| |v] => //.
-  1: now apply cmp_universe_instance_impl.
+  1: now apply cmp_ulvl_instance_impl.
 
   intros [H | H]; [left | right].
-  1: eapply cmp_universe_instance_impl; tea.
-  eapply cmp_universe_instance_variance_impl; eassumption.
+  1: eapply cmp_ulvl_instance_impl; tea.
+  eapply cmp_ulvl_instance_variance_impl; eassumption.
 Qed.
 
 #[global]
-Instance cmp_global_instance_impl Σ cmp_universe cmp_universe' pb pb' gr napp napp' :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe' Conv) ->
-  RelationClasses.subrelation (cmp_universe pb) (cmp_universe' pb') ->
+Instance cmp_global_instance_impl Σ cmp_ulvl cmp_ulvl' pb pb' gr napp napp' :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl' Conv) ->
+  RelationClasses.subrelation (cmp_ulvl pb) (cmp_ulvl' pb') ->
   napp <= napp' ->
-  subrelation (cmp_global_instance Σ cmp_universe pb gr napp) (cmp_global_instance Σ cmp_universe' pb' gr napp').
+  subrelation (cmp_global_instance Σ cmp_ulvl pb gr napp) (cmp_global_instance Σ cmp_ulvl' pb' gr napp').
 Proof.
   intros sub_conv sub_pb lenapp u u'.
   unfold cmp_global_instance_gen.
@@ -1051,10 +1051,10 @@ Proof.
   destruct global_variance_gen as [| |v] => //.
   all: [> intros _ | intros ->; cbn ..]; auto.
   1: intro H; apply: cmp_instance_opt_variance; move: H => /=.
-  - now apply cmp_universe_instance_impl.
+  - now apply cmp_ulvl_instance_impl.
   - intros [H | H]; [left | right].
-    1: eapply cmp_universe_instance_impl; tea.
-    eapply cmp_universe_instance_variance_impl; eassumption.
+    1: eapply cmp_ulvl_instance_impl; tea.
+    eapply cmp_ulvl_instance_variance_impl; eassumption.
 Qed.
 
 Lemma global_variance_empty gr napp env : env.(declarations) = [] -> global_variance env gr napp = AllEqual.
@@ -1065,15 +1065,15 @@ Qed.
 (** Pure syntactic equality, without cumulative inductive types subtyping *)
 
 #[global]
-Instance cmp_global_instance_empty_impl Σ cmp_universe cmp_universe' pb pb' gr napp napp' :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe' Conv) ->
-  subrelation (cmp_global_instance empty_global_env cmp_universe pb gr napp) (cmp_global_instance Σ cmp_universe' pb' gr napp').
+Instance cmp_global_instance_empty_impl Σ cmp_ulvl cmp_ulvl' pb pb' gr napp napp' :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl' Conv) ->
+  subrelation (cmp_global_instance empty_global_env cmp_ulvl pb gr napp) (cmp_global_instance Σ cmp_ulvl' pb' gr napp').
 Proof.
   intros he t t'.
   unfold cmp_global_instance_gen.
   rewrite global_variance_empty //.
   intro H; apply: cmp_instance_opt_variance; move: H => /=.
-  now apply cmp_universe_instance_impl.
+  now apply cmp_ulvl_instance_impl.
 Qed.
 
 Lemma onctx_eq_ctx_impl P ctx ctx' cmp_term cmp_term' pb pb' :
@@ -1089,18 +1089,18 @@ Proof.
 Qed.
 
 #[global]
-Instance eq_term_upto_univ_impl Σ cmp_universe cmp_universe' cmp_sort cmp_sort' pb pb' napp napp' :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe' Conv) ->
-  RelationClasses.subrelation (cmp_universe pb) (cmp_universe' pb') ->
+Instance eq_term_upto_univ_impl Σ cmp_ulvl cmp_ulvl' cmp_sort cmp_sort' pb pb' napp napp' :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl' Conv) ->
+  RelationClasses.subrelation (cmp_ulvl pb) (cmp_ulvl' pb') ->
   RelationClasses.subrelation (cmp_sort Conv) (cmp_sort' Conv) ->
   RelationClasses.subrelation (cmp_sort pb) (cmp_sort' pb') ->
   napp <= napp' ->
-  subrelation (eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp) (eq_term_upto_univ_napp Σ cmp_universe' cmp_sort' pb' napp').
+  subrelation (eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp) (eq_term_upto_univ_napp Σ cmp_ulvl' cmp_sort' pb' napp').
 Proof.
   intros univ_sub_conv univ_sub_pb sort_sub_conv sort_sub_pb hnapp t t'.
   induction t in napp, napp', hnapp, pb, pb', univ_sub_pb, sort_sub_pb, t' |- * using term_forall_list_ind;
     try (inversion 1; subst; constructor;
-         eauto using cmp_universe_instance_impl'; fail).
+         eauto using cmp_ulvl_instance_impl'; fail).
   - inversion 1; subst; constructor.
     eapply All2_impl'; tea.
     eapply All_impl; eauto.
@@ -1111,7 +1111,7 @@ Proof.
   - inversion 1; subst; constructor.
     eapply cmp_global_instance_impl. 4:eauto. all:eauto.
   - inversion 1; subst; constructor; unfold eq_predicate, eq_branches, eq_branch in *; eauto; solve_all.
-    * eapply cmp_universe_instance_impl'; eauto.
+    * eapply cmp_ulvl_instance_impl'; eauto.
   - inversion 1; subst; constructor.
     eapply All2_impl'; tea.
     eapply All_impl; eauto.
@@ -1125,17 +1125,17 @@ Proof.
 Qed.
 
 #[global]
-Instance eq_term_upto_univ_empty_impl Σ cmp_universe cmp_universe' cmp_sort cmp_sort' pb pb' napp napp' :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe' Conv) ->
-  RelationClasses.subrelation (cmp_universe pb) (cmp_universe' pb') ->
+Instance eq_term_upto_univ_empty_impl Σ cmp_ulvl cmp_ulvl' cmp_sort cmp_sort' pb pb' napp napp' :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl' Conv) ->
+  RelationClasses.subrelation (cmp_ulvl pb) (cmp_ulvl' pb') ->
   RelationClasses.subrelation (cmp_sort Conv) (cmp_sort' Conv) ->
   RelationClasses.subrelation (cmp_sort pb) (cmp_sort' pb') ->
-  subrelation (eq_term_upto_univ_napp empty_global_env cmp_universe cmp_sort pb napp) (eq_term_upto_univ_napp Σ cmp_universe' cmp_sort' pb' napp').
+  subrelation (eq_term_upto_univ_napp empty_global_env cmp_ulvl cmp_sort pb napp) (eq_term_upto_univ_napp Σ cmp_ulvl' cmp_sort' pb' napp').
 Proof.
   intros univ_sub_conv univ_sub_pb sort_sub_conv sort_sub_pb t t'.
   induction t in napp, napp', pb, pb', univ_sub_pb, sort_sub_pb, t' |- * using term_forall_list_ind;
     try (inversion 1; subst; constructor;
-        eauto using cmp_universe_instance_impl'; fail).
+        eauto using cmp_ulvl_instance_impl'; fail).
   - inversion 1; subst; constructor.
     eapply All2_impl'; tea.
     eapply All_impl; eauto.
@@ -1144,7 +1144,7 @@ Proof.
   - inversion 1; subst; constructor.
     eapply cmp_global_instance_empty_impl. 2:eauto. all:eauto.
   - inversion 1; subst; constructor; unfold eq_predicate, eq_branches, eq_branch in *; eauto; solve_all.
-    * eapply cmp_universe_instance_impl'; eauto.
+    * eapply cmp_ulvl_instance_impl'; eauto.
   - inversion 1; subst; constructor.
     eapply All2_impl'; tea.
     eapply All_impl; eauto.
@@ -1158,11 +1158,11 @@ Proof.
 Qed.
 
 #[global]
-Instance eq_term_upto_univ_leq Σ cmp_universe cmp_sort pb napp napp' :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb) ->
+Instance eq_term_upto_univ_leq Σ cmp_ulvl cmp_sort pb napp napp' :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl pb) ->
   RelationClasses.subrelation (cmp_sort Conv) (cmp_sort pb) ->
   napp <= napp' ->
-  subrelation (eq_term_upto_univ_napp Σ cmp_universe cmp_sort Conv napp) (eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp').
+  subrelation (eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort Conv napp) (eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp').
 Proof.
   intros H. eapply eq_term_upto_univ_impl; exact _.
 Qed.
@@ -1193,8 +1193,8 @@ Local Ltac lih :=
     eapply ih
   end.
 
-Lemma eq_term_upto_univ_lift Σ cmp_universe cmp_sort pb n n' k :
-  Proper (eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb n' ==> eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb n') (lift n k).
+Lemma eq_term_upto_univ_lift Σ cmp_ulvl cmp_sort pb n n' k :
+  Proper (eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb n' ==> eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb n') (lift n k).
 Proof.
   intros u v e.
   induction u in n', v, n, k, e, pb |- * using term_forall_list_ind.
@@ -1215,15 +1215,15 @@ Proof.
     solve_all.
 Qed.
 
-Lemma compare_decls_lift_decl Σ cmp_universe cmp_sort pb n k :
-  Proper (compare_decls (fun pb => eq_term_upto_univ Σ cmp_universe cmp_sort pb) pb ==> compare_decls (fun pb => eq_term_upto_univ Σ cmp_universe cmp_sort pb) pb) (lift_decl n k).
+Lemma compare_decls_lift_decl Σ cmp_ulvl cmp_sort pb n k :
+  Proper (compare_decls (fun pb => eq_term_upto_univ Σ cmp_ulvl cmp_sort pb) pb ==> compare_decls (fun pb => eq_term_upto_univ Σ cmp_ulvl cmp_sort pb) pb) (lift_decl n k).
 Proof.
   intros d d' []; constructor; cbn; auto.
   all: now eapply eq_term_upto_univ_lift.
 Qed.
 
-Lemma eq_context_upto_lift_context Σ cmp_universe cmp_sort pb n k :
-  Proper (eq_context_upto Σ cmp_universe cmp_sort pb ==> eq_context_upto Σ cmp_universe cmp_sort pb) (lift_context n k).
+Lemma eq_context_upto_lift_context Σ cmp_ulvl cmp_sort pb n k :
+  Proper (eq_context_upto Σ cmp_ulvl cmp_sort pb ==> eq_context_upto Σ cmp_ulvl cmp_sort pb) (lift_context n k).
 Proof.
   intros Γ Δ.
   induction 1; rewrite -> ?lift_context_snoc0. constructor.
@@ -1269,13 +1269,13 @@ Local Ltac sih :=
     |- eq_term_upto_univ _ _ _ (subst _ _ ?u) _ => eapply ih
   end.
 
-Lemma eq_term_upto_univ_substs Σ cmp_universe cmp_sort pb napp :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb) ->
+Lemma eq_term_upto_univ_substs Σ cmp_ulvl cmp_sort pb napp :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl pb) ->
   RelationClasses.subrelation (cmp_sort Conv) (cmp_sort pb) ->
   forall u v n l l',
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp u v ->
-    All2 (eq_term_upto_univ Σ cmp_universe cmp_sort Conv) l l' ->
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp (subst l n u) (subst l' n v).
+    eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp u v ->
+    All2 (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv) l l' ->
+    eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp (subst l n u) (subst l' n v).
 Proof.
   unfold RelationClasses.subrelation; intros hsub hsub' u v n l l' hu hl.
   induction u in napp, v, n, l, l', hu, hl, pb, hsub, hsub' |- * using term_forall_list_ind.
@@ -1309,13 +1309,13 @@ Proof.
     solve_all.
 Qed.
 
-Lemma eq_term_upto_univ_subst Σ cmp_universe cmp_sort pb :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb) ->
+Lemma eq_term_upto_univ_subst Σ cmp_ulvl cmp_sort pb :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl pb) ->
   RelationClasses.subrelation (cmp_sort Conv) (cmp_sort pb) ->
   forall u v n x y,
-    eq_term_upto_univ Σ cmp_universe cmp_sort pb u v ->
-    eq_term_upto_univ Σ cmp_universe cmp_sort Conv x y ->
-    eq_term_upto_univ Σ cmp_universe cmp_sort pb (u{n := x}) (v{n := y}).
+    eq_term_upto_univ Σ cmp_ulvl cmp_sort pb u v ->
+    eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv x y ->
+    eq_term_upto_univ Σ cmp_ulvl cmp_sort pb (u{n := x}) (v{n := y}).
 Proof.
   intros hsub hsub' u v n x y e1 e2.
   eapply eq_term_upto_univ_substs; eauto.
@@ -1335,32 +1335,32 @@ Lemma subst_leq_term {cf:checker_flags} Σ φ l k T U :
 Proof.
   intros Hleq.
   eapply eq_term_upto_univ_substs; try easy.
-  - intro; apply eq_leq_universe.
-  - intro; apply eq_leq_sort.
+  - intro; apply eq_leq_ulvl.
+  - intro; apply eq_leq_univ.
 Qed.
 
 (** ** Behavior on mkApps and it_mkLambda_or_LetIn **  *)
 
-Lemma eq_term_eq_term_napp Σ cmp_universe cmp_sort pb napp t t' :
-  eq_term_upto_univ Σ cmp_universe cmp_sort pb t t' ->
-  eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp t t'.
+Lemma eq_term_eq_term_napp Σ cmp_ulvl cmp_sort pb napp t t' :
+  eq_term_upto_univ Σ cmp_ulvl cmp_sort pb t t' ->
+  eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp t t'.
 Proof.
   intros. eapply eq_term_upto_univ_impl. 6:eauto.
   5:auto with arith. all:typeclasses eauto.
 Qed.
 
-Lemma leq_term_leq_term_napp Σ cmp_universe cmp_sort pb napp t t' :
-  eq_term_upto_univ Σ cmp_universe cmp_sort pb t t' ->
-  eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp t t'.
+Lemma leq_term_leq_term_napp Σ cmp_ulvl cmp_sort pb napp t t' :
+  eq_term_upto_univ Σ cmp_ulvl cmp_sort pb t t' ->
+  eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp t t'.
 Proof.
   intros. eapply eq_term_upto_univ_impl. 6:eauto.
   5:auto with arith. all:try typeclasses eauto.
 Qed.
 
-Lemma eq_term_upto_univ_napp_mkApps Σ cmp_universe cmp_sort pb u1 l1 u2 l2 napp :
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb (#|l1| + napp) u1 u2 ->
-    All2 (eq_term_upto_univ Σ cmp_universe cmp_sort Conv) l1 l2 ->
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp (mkApps u1 l1) (mkApps u2 l2).
+Lemma eq_term_upto_univ_napp_mkApps Σ cmp_ulvl cmp_sort pb u1 l1 u2 l2 napp :
+    eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb (#|l1| + napp) u1 u2 ->
+    All2 (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv) l1 l2 ->
+    eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp (mkApps u1 l1) (mkApps u2 l2).
 Proof.
   intros hu hl. induction l1 in napp, u1, u2, l2, hu, hl |- *.
   - inversion hl. subst. assumption.
@@ -1370,11 +1370,11 @@ Proof.
     + assumption.
 Qed.
 
-Lemma eq_term_upto_univ_napp_mkApps_l_inv Σ cmp_universe cmp_sort pb napp u l t :
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp (mkApps u l) t ->
+Lemma eq_term_upto_univ_napp_mkApps_l_inv Σ cmp_ulvl cmp_sort pb napp u l t :
+    eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp (mkApps u l) t ->
     ∑ u' l',
-      eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb (#|l| + napp) u u' *
-      All2 (eq_term_upto_univ Σ cmp_universe cmp_sort Conv) l l' *
+      eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb (#|l| + napp) u u' *
+      All2 (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv) l l' *
       (t = mkApps u' l').
 Proof.
   intros h. induction l in napp, u, t, h, pb |- *.
@@ -1389,11 +1389,11 @@ Proof.
     + cbn. reflexivity.
 Qed.
 
-Lemma eq_term_upto_univ_napp_mkApps_r_inv Σ cmp_universe cmp_sort pb napp u l t :
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp t (mkApps u l) ->
+Lemma eq_term_upto_univ_napp_mkApps_r_inv Σ cmp_ulvl cmp_sort pb napp u l t :
+    eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp t (mkApps u l) ->
     ∑ u' l',
-      eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb (#|l| + napp) u' u *
-      All2 (eq_term_upto_univ Σ cmp_universe cmp_sort Conv) l' l *
+      eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb (#|l| + napp) u' u *
+      All2 (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv) l' l *
       (t = mkApps u' l').
 Proof.
   intros h. induction l in napp, u, t, h, pb |- *.
@@ -1408,39 +1408,39 @@ Proof.
     + cbn. reflexivity.
 Qed.
 
-Lemma eq_term_upto_univ_mkApps Σ cmp_universe cmp_sort pb u1 l1 u2 l2 :
-    eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb #|l1| u1 u2 ->
-    All2 (eq_term_upto_univ Σ cmp_universe cmp_sort Conv) l1 l2 ->
-    eq_term_upto_univ Σ cmp_universe cmp_sort pb (mkApps u1 l1) (mkApps u2 l2).
+Lemma eq_term_upto_univ_mkApps Σ cmp_ulvl cmp_sort pb u1 l1 u2 l2 :
+    eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb #|l1| u1 u2 ->
+    All2 (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv) l1 l2 ->
+    eq_term_upto_univ Σ cmp_ulvl cmp_sort pb (mkApps u1 l1) (mkApps u2 l2).
 Proof.
   intros; apply eq_term_upto_univ_napp_mkApps; rewrite ?Nat.add_0_r; auto.
 Qed.
 
-Lemma eq_term_upto_univ_mkApps_l_inv Σ cmp_universe cmp_sort pb u l t :
-    eq_term_upto_univ Σ cmp_universe cmp_sort pb (mkApps u l) t ->
+Lemma eq_term_upto_univ_mkApps_l_inv Σ cmp_ulvl cmp_sort pb u l t :
+    eq_term_upto_univ Σ cmp_ulvl cmp_sort pb (mkApps u l) t ->
     ∑ u' l',
-      eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb #|l| u u' *
-      All2 (eq_term_upto_univ Σ cmp_universe cmp_sort Conv) l l' *
+      eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb #|l| u u' *
+      All2 (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv) l l' *
       (t = mkApps u' l').
 Proof.
   intros H; apply eq_term_upto_univ_napp_mkApps_l_inv in H; rewrite ?Nat.add_0_r in H; auto.
 Qed.
 
-Lemma eq_term_upto_univ_mkApps_r_inv Σ cmp_universe cmp_sort pb u l t :
-    eq_term_upto_univ Σ cmp_universe cmp_sort pb t (mkApps u l) ->
+Lemma eq_term_upto_univ_mkApps_r_inv Σ cmp_ulvl cmp_sort pb u l t :
+    eq_term_upto_univ Σ cmp_ulvl cmp_sort pb t (mkApps u l) ->
     ∑ u' l',
-      eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb #|l| u' u *
-      All2 (eq_term_upto_univ Σ cmp_universe cmp_sort Conv) l' l *
+      eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb #|l| u' u *
+      All2 (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv) l' l *
       (t = mkApps u' l').
 Proof.
   intros H; apply eq_term_upto_univ_napp_mkApps_r_inv in H;
     rewrite Nat.add_0_r in H; auto.
 Qed.
 
-Lemma cmp_universe_instance_eq {u u'} : cmp_universe_instance eq u u' -> u = u'.
+Lemma cmp_ulvl_instance_eq {u u'} : cmp_ulvl_instance eq u u' -> u = u'.
 Proof.
   intros H.
-  unfold cmp_universe_instance, on_rel in H.
+  unfold cmp_ulvl_instance, on_rel in H.
   apply Forall2_map in H.
   apply Forall2_eq in H. apply map_inj in H ; revgoals.
   { intros ?? e. now inv e. }
@@ -1453,12 +1453,12 @@ Proof.
   red. destruct check_univs => //.
 Qed.
 
-Lemma upto_eq_impl Σ cmp_universe cmp_sort pb0 pb :
-  RelationClasses.Reflexive (cmp_universe Conv) ->
-  RelationClasses.Reflexive (cmp_universe pb) ->
+Lemma upto_eq_impl Σ cmp_ulvl cmp_sort pb0 pb :
+  RelationClasses.Reflexive (cmp_ulvl Conv) ->
+  RelationClasses.Reflexive (cmp_ulvl pb) ->
   RelationClasses.Reflexive (cmp_sort Conv) ->
   RelationClasses.Reflexive (cmp_sort pb) ->
-  subrelation (eq_term_upto_univ Σ (fun _ => eq) (fun _ => eq) pb0) (eq_term_upto_univ Σ cmp_universe cmp_sort pb).
+  subrelation (eq_term_upto_univ Σ (fun _ => eq) (fun _ => eq) pb0) (eq_term_upto_univ Σ cmp_ulvl cmp_sort pb).
 Proof.
   intros univ_refl univ_refl' sort_refl sort_refl'. eapply eq_term_upto_univ_impl. 5:auto.
   all: intros ? ? []; eauto.
@@ -1502,12 +1502,12 @@ Qed.
 (*   all: intros u u'; eapply reflect_reflectT, eqb_spec. *)
 (* Qed. *)
 
-Lemma upto_names_impl Σ cmp_universe cmp_sort pb napp :
-  RelationClasses.Reflexive (cmp_universe Conv) ->
-  RelationClasses.Reflexive (cmp_universe pb) ->
+Lemma upto_names_impl Σ cmp_ulvl cmp_sort pb napp :
+  RelationClasses.Reflexive (cmp_ulvl Conv) ->
+  RelationClasses.Reflexive (cmp_ulvl pb) ->
   RelationClasses.Reflexive (cmp_sort Conv) ->
   RelationClasses.Reflexive (cmp_sort pb) ->
-  subrelation upto_names (eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp).
+  subrelation upto_names (eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp).
 Proof.
   intros univ_refl univ_refl' sort_refl sort_refl'.
   eapply eq_term_upto_univ_empty_impl; auto.
@@ -1526,8 +1526,8 @@ Proof.
   eapply upto_names_impl ; exact _.
 Qed.
 
-Lemma eq_term_upto_univ_isApp Σ cmp_universe cmp_sort pb napp u v :
-  eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp u v ->
+Lemma eq_term_upto_univ_isApp Σ cmp_ulvl cmp_sort pb napp u v :
+  eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp u v ->
   isApp u = isApp v.
 Proof.
   induction 1.
@@ -1542,14 +1542,14 @@ Inductive rel_option {A B} (R : A -> B -> Type) : option A -> option B -> Type :
 
 Derive Signature NoConfusion for rel_option.
 
-Definition eq_decl_upto_gen Σ cmp_universe cmp_sort pb d d' : Type :=
+Definition eq_decl_upto_gen Σ cmp_ulvl cmp_sort pb d d' : Type :=
   eq_binder_annot d.(decl_name) d'.(decl_name) *
-  rel_option (eq_term_upto_univ Σ cmp_universe cmp_sort Conv) d.(decl_body) d'.(decl_body) *
-  eq_term_upto_univ Σ cmp_universe cmp_sort pb d.(decl_type) d'.(decl_type).
+  rel_option (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv) d.(decl_body) d'.(decl_body) *
+  eq_term_upto_univ Σ cmp_ulvl cmp_sort pb d.(decl_type) d'.(decl_type).
 
 (* TODO perhaps should be def *)
-Lemma All2_eq_context_upto Σ cmp_universe cmp_sort pb :
-  subrelation (All2 (eq_decl_upto_gen Σ cmp_universe cmp_sort pb)) (eq_context_upto Σ cmp_universe cmp_sort pb).
+Lemma All2_eq_context_upto Σ cmp_ulvl cmp_sort pb :
+  subrelation (All2 (eq_decl_upto_gen Σ cmp_ulvl cmp_sort pb)) (eq_context_upto Σ cmp_ulvl cmp_sort pb).
 Proof.
   intros Γ Δ h.
   induction h.
@@ -1563,12 +1563,12 @@ Proof.
 Qed.
 
 
-Lemma eq_context_upto_impl Σ cmp_universe cmp_universe' cmp_sort cmp_sort' pb pb' :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe' Conv) ->
-  RelationClasses.subrelation (cmp_universe pb) (cmp_universe' pb') ->
+Lemma eq_context_upto_impl Σ cmp_ulvl cmp_ulvl' cmp_sort cmp_sort' pb pb' :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl' Conv) ->
+  RelationClasses.subrelation (cmp_ulvl pb) (cmp_ulvl' pb') ->
   RelationClasses.subrelation (cmp_sort Conv) (cmp_sort' Conv) ->
   RelationClasses.subrelation (cmp_sort pb) (cmp_sort' pb') ->
-  subrelation (eq_context_upto Σ cmp_universe cmp_sort pb) (eq_context_upto Σ cmp_universe' cmp_sort' pb').
+  subrelation (eq_context_upto Σ cmp_ulvl cmp_sort pb) (eq_context_upto Σ cmp_ulvl' cmp_sort' pb').
 Proof.
   intros.
   apply eq_context_gen_impl.
@@ -1576,31 +1576,31 @@ Proof.
   all: auto.
 Qed.
 
-Lemma eq_context_upto_refl Σ cmp_universe cmp_sort pb :
-  RelationClasses.Reflexive (cmp_universe Conv) ->
-  RelationClasses.Reflexive (cmp_universe pb) ->
+Lemma eq_context_upto_refl Σ cmp_ulvl cmp_sort pb :
+  RelationClasses.Reflexive (cmp_ulvl Conv) ->
+  RelationClasses.Reflexive (cmp_ulvl pb) ->
   RelationClasses.Reflexive (cmp_sort Conv) ->
   RelationClasses.Reflexive (cmp_sort pb) ->
-  Reflexive (eq_context_upto Σ cmp_universe cmp_sort pb).
+  Reflexive (eq_context_upto Σ cmp_ulvl cmp_sort pb).
 Proof. exact _. Qed.
 
-Lemma eq_context_upto_sym Σ cmp_universe cmp_sort pb :
-  RelationClasses.Symmetric (cmp_universe Conv) ->
-  RelationClasses.Symmetric (cmp_universe pb) ->
+Lemma eq_context_upto_sym Σ cmp_ulvl cmp_sort pb :
+  RelationClasses.Symmetric (cmp_ulvl Conv) ->
+  RelationClasses.Symmetric (cmp_ulvl pb) ->
   RelationClasses.Symmetric (cmp_sort Conv) ->
   RelationClasses.Symmetric (cmp_sort pb) ->
-  Symmetric (eq_context_upto Σ cmp_universe cmp_sort pb).
+  Symmetric (eq_context_upto Σ cmp_ulvl cmp_sort pb).
 Proof. exact _. Qed.
 
-Lemma eq_context_upto_cat Σ cmp_universe cmp_sort pb Γ Δ Γ' Δ' :
-  eq_context_upto Σ cmp_universe cmp_sort pb Γ Γ' ->
-  eq_context_upto Σ cmp_universe cmp_sort pb Δ Δ' ->
-  eq_context_upto Σ cmp_universe cmp_sort pb (Γ ,,, Δ) (Γ' ,,, Δ').
+Lemma eq_context_upto_cat Σ cmp_ulvl cmp_sort pb Γ Δ Γ' Δ' :
+  eq_context_upto Σ cmp_ulvl cmp_sort pb Γ Γ' ->
+  eq_context_upto Σ cmp_ulvl cmp_sort pb Δ Δ' ->
+  eq_context_upto Σ cmp_ulvl cmp_sort pb (Γ ,,, Δ) (Γ' ,,, Δ').
 Proof. intros. eapply All2_fold_app; eauto. Qed.
 
-Lemma eq_context_upto_rev Σ cmp_universe cmp_sort pb Γ Δ :
-  eq_context_upto Σ cmp_universe cmp_sort pb Γ Δ ->
-  eq_context_upto Σ cmp_universe cmp_sort pb (rev Γ) (rev Δ).
+Lemma eq_context_upto_rev Σ cmp_ulvl cmp_sort pb Γ Δ :
+  eq_context_upto Σ cmp_ulvl cmp_sort pb Γ Δ ->
+  eq_context_upto Σ cmp_ulvl cmp_sort pb (rev Γ) (rev Δ).
 Proof.
   induction 1.
   - constructor.
@@ -1609,11 +1609,11 @@ Proof.
 Qed.
 
 Lemma eq_context_upto_rev' :
-  forall Σ Γ Δ cmp_universe cmp_sort pb,
-    eq_context_upto Σ cmp_universe cmp_sort pb Γ Δ ->
-    eq_context_upto Σ cmp_universe cmp_sort pb (List.rev Γ) (List.rev Δ).
+  forall Σ Γ Δ cmp_ulvl cmp_sort pb,
+    eq_context_upto Σ cmp_ulvl cmp_sort pb Γ Δ ->
+    eq_context_upto Σ cmp_ulvl cmp_sort pb (List.rev Γ) (List.rev Δ).
 Proof.
-  intros Σ Γ Δ cmp_universe cmp_sort pb h.
+  intros Σ Γ Δ cmp_ulvl cmp_sort pb h.
   induction h.
   - constructor.
   - simpl. eapply eq_context_upto_cat.
@@ -1621,20 +1621,20 @@ Proof.
     + assumption.
 Qed.
 
-Lemma eq_context_upto_length {Σ cmp_universe cmp_sort pb Γ Δ} :
-    eq_context_upto Σ cmp_universe cmp_sort pb Γ Δ ->
+Lemma eq_context_upto_length {Σ cmp_ulvl cmp_sort pb Γ Δ} :
+    eq_context_upto Σ cmp_ulvl cmp_sort pb Γ Δ ->
     #|Γ| = #|Δ|.
 Proof.
   apply All2_fold_length.
 Qed.
 
-Lemma eq_context_upto_subst_context Σ cmp_universe cmp_sort pb :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb) ->
+Lemma eq_context_upto_subst_context Σ cmp_ulvl cmp_sort pb :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl pb) ->
   RelationClasses.subrelation (cmp_sort Conv) (cmp_sort pb) ->
   forall u v n l l',
-    eq_context_upto Σ cmp_universe cmp_sort pb u v ->
-    All2 (eq_term_upto_univ Σ cmp_universe cmp_sort Conv) l l' ->
-    eq_context_upto Σ cmp_universe cmp_sort pb (subst_context l n u) (subst_context l' n v).
+    eq_context_upto Σ cmp_ulvl cmp_sort pb u v ->
+    All2 (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv) l l' ->
+    eq_context_upto Σ cmp_ulvl cmp_sort pb (subst_context l n u) (subst_context l' n v).
 Proof.
   intros re u v n l l'.
   induction 1; intros Hl.
@@ -1660,9 +1660,9 @@ Proof.
     all: reflexivity.
 Qed.
 
-Lemma eq_context_upto_nth_error Σ cmp_universe cmp_sort pb ctx ctx' n :
-  eq_context_upto Σ cmp_universe cmp_sort pb ctx ctx' ->
-  rel_option (eq_decl_upto_gen Σ cmp_universe cmp_sort pb) (nth_error ctx n) (nth_error ctx' n).
+Lemma eq_context_upto_nth_error Σ cmp_ulvl cmp_sort pb ctx ctx' n :
+  eq_context_upto Σ cmp_ulvl cmp_sort pb ctx ctx' ->
+  rel_option (eq_decl_upto_gen Σ cmp_ulvl cmp_sort pb) (nth_error ctx n) (nth_error ctx' n).
 Proof.
   induction 1 in n |- *.
   - rewrite nth_error_nil. constructor.
@@ -1672,14 +1672,14 @@ Proof.
 Qed.
 
 Lemma eq_context_impl :
-  forall Σ cmp_universe cmp_universe' cmp_sort cmp_sort' pb pb',
-    RelationClasses.subrelation (cmp_universe Conv) (cmp_universe' Conv) ->
-    RelationClasses.subrelation (cmp_universe pb) (cmp_universe' pb') ->
+  forall Σ cmp_ulvl cmp_ulvl' cmp_sort cmp_sort' pb pb',
+    RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl' Conv) ->
+    RelationClasses.subrelation (cmp_ulvl pb) (cmp_ulvl' pb') ->
     RelationClasses.subrelation (cmp_sort Conv) (cmp_sort' Conv) ->
     RelationClasses.subrelation (cmp_sort pb) (cmp_sort' pb') ->
-    subrelation (eq_context_upto Σ cmp_universe cmp_sort pb) (eq_context_upto Σ cmp_universe' cmp_sort' pb').
+    subrelation (eq_context_upto Σ cmp_ulvl cmp_sort pb) (eq_context_upto Σ cmp_ulvl' cmp_sort' pb').
 Proof.
-  intros Σ cmp_universe cmp_universe' cmp_sort cmp_sort' pb pb' univ_sub_conv univ_sub_pb sort_sub_conv sort_sub_pb Γ Δ h.
+  intros Σ cmp_ulvl cmp_ulvl' cmp_sort cmp_sort' pb pb' univ_sub_conv univ_sub_pb sort_sub_conv sort_sub_pb Γ Δ h.
   induction h.
   - constructor.
   - constructor; auto.
@@ -1687,10 +1687,10 @@ Proof.
     all:eapply eq_term_upto_univ_impl; [ .. | eassumption]; eauto.
 Qed.
 
-Lemma eq_term_upto_univ_it_mkLambda_or_LetIn Σ cmp_universe cmp_sort pb :
-  RelationClasses.subrelation (cmp_universe Conv) (cmp_universe pb) ->
+Lemma eq_term_upto_univ_it_mkLambda_or_LetIn Σ cmp_ulvl cmp_sort pb :
+  RelationClasses.subrelation (cmp_ulvl Conv) (cmp_ulvl pb) ->
   RelationClasses.subrelation (cmp_sort Conv) (cmp_sort pb) ->
-  Proper (eq_context_upto Σ cmp_universe cmp_sort Conv ==> eq_term_upto_univ Σ cmp_universe cmp_sort Conv ==> eq_term_upto_univ Σ cmp_universe cmp_sort pb) it_mkLambda_or_LetIn.
+  Proper (eq_context_upto Σ cmp_ulvl cmp_sort Conv ==> eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv ==> eq_term_upto_univ Σ cmp_ulvl cmp_sort pb) it_mkLambda_or_LetIn.
 Proof.
   intros ?? Γ Δ eq u v h.
   induction eq in u, v, h |- *.
@@ -1700,10 +1700,10 @@ Proof.
     destruct p; cbn; constructor ; tas; try reflexivity.
 Qed.
 
-Lemma eq_term_upto_univ_it_mkLambda_or_LetIn_r Σ cmp_universe cmp_sort Γ :
-  RelationClasses.Reflexive (cmp_universe Conv) ->
+Lemma eq_term_upto_univ_it_mkLambda_or_LetIn_r Σ cmp_ulvl cmp_sort Γ :
+  RelationClasses.Reflexive (cmp_ulvl Conv) ->
   RelationClasses.Reflexive (cmp_sort Conv) ->
-  respectful (eq_term_upto_univ Σ cmp_universe cmp_sort Conv) (eq_term_upto_univ Σ cmp_universe cmp_sort Conv)
+  respectful (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv) (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv)
              (it_mkLambda_or_LetIn Γ) (it_mkLambda_or_LetIn Γ).
 Proof.
   intros univ_refl sort_refl u v h.
@@ -1722,10 +1722,10 @@ Proof.
   apply eq_term_upto_univ_it_mkLambda_or_LetIn_r; exact _.
 Qed.
 
-Lemma eq_term_upto_univ_it_mkProd_or_LetIn Σ cmp_universe cmp_sort Γ :
-  RelationClasses.Reflexive (cmp_universe Conv) ->
+Lemma eq_term_upto_univ_it_mkProd_or_LetIn Σ cmp_ulvl cmp_sort Γ :
+  RelationClasses.Reflexive (cmp_ulvl Conv) ->
   RelationClasses.Reflexive (cmp_sort Conv) ->
-  respectful (eq_term_upto_univ Σ cmp_universe cmp_sort Conv) (eq_term_upto_univ Σ cmp_universe cmp_sort Conv)
+  respectful (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv) (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv)
              (it_mkProd_or_LetIn Γ) (it_mkProd_or_LetIn Γ).
 Proof.
   intros univ_refl sort_refl u v h.
@@ -1756,11 +1756,11 @@ Proof.
     assumption.
 Qed.
 
-Lemma eq_term_upto_univ_mkApps_inv Σ cmp_universe cmp_sort pb u l u' l' :
+Lemma eq_term_upto_univ_mkApps_inv Σ cmp_ulvl cmp_sort pb u l u' l' :
   isApp u = false ->
   isApp u' = false ->
-  eq_term_upto_univ Σ cmp_universe cmp_sort pb (mkApps u l) (mkApps u' l') ->
-  eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb #|l| u u' * All2 (eq_term_upto_univ Σ cmp_universe cmp_sort Conv) l l'.
+  eq_term_upto_univ Σ cmp_ulvl cmp_sort pb (mkApps u l) (mkApps u' l') ->
+  eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb #|l| u u' * All2 (eq_term_upto_univ Σ cmp_ulvl cmp_sort Conv) l l'.
 Proof.
   intros hu hu' h.
   apply eq_term_upto_univ_mkApps_l_inv in h as hh.
@@ -1770,9 +1770,9 @@ Proof.
   destruct h3 as [? ?]. subst. split ; auto.
 Qed.
 
-Lemma isLambda_eq_term_l Σ cmp_universe cmp_sort pb u v :
+Lemma isLambda_eq_term_l Σ cmp_ulvl cmp_sort pb u v :
     isLambda u ->
-    eq_term_upto_univ Σ cmp_universe cmp_sort pb u v ->
+    eq_term_upto_univ Σ cmp_ulvl cmp_sort pb u v ->
     isLambda v.
 Proof.
   intros h e.
@@ -1780,9 +1780,9 @@ Proof.
   depelim e. auto.
 Qed.
 
-Lemma isLambda_eq_term_r Σ cmp_universe cmp_sort pb u v :
+Lemma isLambda_eq_term_r Σ cmp_ulvl cmp_sort pb u v :
     isLambda v ->
-    eq_term_upto_univ Σ cmp_universe cmp_sort pb u v ->
+    eq_term_upto_univ Σ cmp_ulvl cmp_sort pb u v ->
     isLambda u.
 Proof.
   intros h e.
@@ -1790,9 +1790,9 @@ Proof.
   depelim e. auto.
 Qed.
 
-Lemma isConstruct_app_eq_term_l Σ cmp_universe cmp_sort pb u v :
+Lemma isConstruct_app_eq_term_l Σ cmp_ulvl cmp_sort pb u v :
     isConstruct_app u ->
-    eq_term_upto_univ Σ cmp_universe cmp_sort pb u v ->
+    eq_term_upto_univ Σ cmp_ulvl cmp_sort pb u v ->
     isConstruct_app v.
 Proof.
   intros h e.
@@ -1812,12 +1812,12 @@ Proof.
 Qed.
 
 Lemma isConstruct_app_eq_term_r :
-  forall Σ cmp_universe cmp_sort pb u v,
+  forall Σ cmp_ulvl cmp_sort pb u v,
     isConstruct_app v ->
-    eq_term_upto_univ Σ cmp_universe cmp_sort pb u v ->
+    eq_term_upto_univ Σ cmp_ulvl cmp_sort pb u v ->
     isConstruct_app u.
 Proof.
-  intros Σ cmp_universe cmp_sort pb u v h e.
+  intros Σ cmp_ulvl cmp_sort pb u v h e.
   case_eq (decompose_app u). intros t1 l1 e1.
   case_eq (decompose_app v). intros t2 l2 e2.
   unfold isConstruct_app in *.
@@ -1833,65 +1833,65 @@ Proof.
   - reflexivity.
 Qed.
 
-Lemma cmp_universe_variance_flip cmp_universe cmp_universe' pb pb' v u u' :
-  RelationClasses.subrelation (cmp_universe Conv) (flip (cmp_universe' Conv)) ->
-  RelationClasses.subrelation (cmp_universe pb) (flip (cmp_universe' pb')) ->
-  cmp_universe_variance cmp_universe pb v u u' ->
-  cmp_universe_variance cmp_universe' pb' v u' u.
+Lemma cmp_ulvl_variance_flip cmp_ulvl cmp_ulvl' pb pb' v u u' :
+  RelationClasses.subrelation (cmp_ulvl Conv) (flip (cmp_ulvl' Conv)) ->
+  RelationClasses.subrelation (cmp_ulvl pb) (flip (cmp_ulvl' pb')) ->
+  cmp_ulvl_variance cmp_ulvl pb v u u' ->
+  cmp_ulvl_variance cmp_ulvl' pb' v u' u.
 Proof.
   intros conv_sym pb_sym.
   destruct v => //=.
   all: unfold on_rel, flip in *; now auto.
 Qed.
 
-Lemma cmp_universe_instance_variance_flip cmp_universe cmp_universe' pb pb' v u u' :
-  RelationClasses.subrelation (cmp_universe Conv) (flip (cmp_universe' Conv)) ->
-  RelationClasses.subrelation (cmp_universe pb) (flip (cmp_universe' pb')) ->
-  cmp_universe_instance_variance cmp_universe pb v u u' ->
-  cmp_universe_instance_variance cmp_universe' pb' v u' u.
+Lemma cmp_ulvl_instance_variance_flip cmp_ulvl cmp_ulvl' pb pb' v u u' :
+  RelationClasses.subrelation (cmp_ulvl Conv) (flip (cmp_ulvl' Conv)) ->
+  RelationClasses.subrelation (cmp_ulvl pb) (flip (cmp_ulvl' pb')) ->
+  cmp_ulvl_instance_variance cmp_ulvl pb v u u' ->
+  cmp_ulvl_instance_variance cmp_ulvl' pb' v u' u.
 Proof.
   intros conv_sym pb_sym H.
   induction H; constructor; eauto.
-  now eapply cmp_universe_variance_flip.
+  now eapply cmp_ulvl_variance_flip.
 Qed.
 
 
-Lemma cmp_universe_instance_flip eq_universe eq_universe' u u' :
-  RelationClasses.subrelation eq_universe (flip eq_universe') ->
-  cmp_universe_instance eq_universe u u' ->
-  cmp_universe_instance eq_universe' u' u.
+Lemma cmp_ulvl_instance_flip eq_ulvl eq_ulvl' u u' :
+  RelationClasses.subrelation eq_ulvl (flip eq_ulvl') ->
+  cmp_ulvl_instance eq_ulvl u u' ->
+  cmp_ulvl_instance eq_ulvl' u' u.
 Proof.
   intros Hsub H.
   apply Forall2_sym, Forall2_impl with (1 := H).
   intros ??. apply Hsub.
 Qed.
 
-Lemma cmp_global_instance_flip Σ cmp_universe cmp_universe' pb pb' gr napp u u':
-  RelationClasses.subrelation (cmp_universe Conv) (flip (cmp_universe' Conv)) ->
-  RelationClasses.subrelation (cmp_universe pb) (flip (cmp_universe' pb')) ->
-  cmp_global_instance Σ cmp_universe pb gr napp u u' ->
-  cmp_global_instance Σ cmp_universe' pb' gr napp u' u.
+Lemma cmp_global_instance_flip Σ cmp_ulvl cmp_ulvl' pb pb' gr napp u u':
+  RelationClasses.subrelation (cmp_ulvl Conv) (flip (cmp_ulvl' Conv)) ->
+  RelationClasses.subrelation (cmp_ulvl pb) (flip (cmp_ulvl' pb')) ->
+  cmp_global_instance Σ cmp_ulvl pb gr napp u u' ->
+  cmp_global_instance Σ cmp_ulvl' pb' gr napp u' u.
 Proof.
   intros conv_sym pb_sym.
   unfold cmp_global_instance_gen, cmp_opt_variance.
   destruct global_variance_gen as [| |v] => //.
   2: intros [H|H]; [left|right]; move:H.
-  1,2: apply cmp_universe_instance_flip; tas; reflexivity.
-  now apply cmp_universe_instance_variance_flip.
+  1,2: apply cmp_ulvl_instance_flip; tas; reflexivity.
+  now apply cmp_ulvl_instance_variance_flip.
 Qed.
 
-Lemma eq_term_upto_univ_napp_flip Σ cmp_universe cmp_universe' cmp_sort cmp_sort' pb pb' napp u v :
-  RelationClasses.subrelation (cmp_universe Conv) (flip (cmp_universe' Conv)) ->
-  RelationClasses.subrelation (cmp_universe pb) (flip (cmp_universe' pb')) ->
+Lemma eq_term_upto_univ_napp_flip Σ cmp_ulvl cmp_ulvl' cmp_sort cmp_sort' pb pb' napp u v :
+  RelationClasses.subrelation (cmp_ulvl Conv) (flip (cmp_ulvl' Conv)) ->
+  RelationClasses.subrelation (cmp_ulvl pb) (flip (cmp_ulvl' pb')) ->
   RelationClasses.subrelation (cmp_sort Conv) (flip (cmp_sort' Conv)) ->
   RelationClasses.subrelation (cmp_sort pb) (flip (cmp_sort' pb')) ->
-  eq_term_upto_univ_napp Σ cmp_universe cmp_sort pb napp u v ->
-  eq_term_upto_univ_napp Σ cmp_universe' cmp_sort' pb' napp v u.
+  eq_term_upto_univ_napp Σ cmp_ulvl cmp_sort pb napp u v ->
+  eq_term_upto_univ_napp Σ cmp_ulvl' cmp_sort' pb' napp v u.
 Proof.
   intros univ_sub_conv univ_sub_pb sort_sub_conv sort_sub_pb.
   induction u in napp, pb, pb', univ_sub_pb, sort_sub_pb, v |- * using term_forall_list_ind;
     try (inversion 1; subst; constructor;
-         eauto using cmp_universe_instance_flip; try (symmetry; assumption); fail).
+         eauto using cmp_ulvl_instance_flip; try (symmetry; assumption); fail).
   - inversion 1; subst; constructor.
     eapply All2_sym, All2_impl'; tea.
     eapply All_impl; eauto.
@@ -1903,7 +1903,7 @@ Proof.
   - inversion 1; subst; constructor; unfold eq_predicate, eq_branches, eq_branch in *; eauto.
     solve_all.
     * apply All2_sym; solve_all.
-    * eapply cmp_universe_instance_flip; eauto.
+    * eapply cmp_ulvl_instance_flip; eauto.
     * symmetry. solve_all.
     * apply All2_sym. solve_all. symmetry. solve_all.
   - inversion 1; subst; constructor.
@@ -1921,13 +1921,13 @@ Proof.
     apply All2_sym; solve_all.
 Qed.
 
-Lemma eq_context_upto_flip Σ cmp_universe cmp_universe' cmp_sort cmp_sort' pb pb' Γ Δ :
-  RelationClasses.subrelation (cmp_universe Conv) (flip (cmp_universe' Conv)) ->
-  RelationClasses.subrelation (cmp_universe pb) (flip (cmp_universe' pb')) ->
+Lemma eq_context_upto_flip Σ cmp_ulvl cmp_ulvl' cmp_sort cmp_sort' pb pb' Γ Δ :
+  RelationClasses.subrelation (cmp_ulvl Conv) (flip (cmp_ulvl' Conv)) ->
+  RelationClasses.subrelation (cmp_ulvl pb) (flip (cmp_ulvl' pb')) ->
   RelationClasses.subrelation (cmp_sort Conv) (flip (cmp_sort' Conv)) ->
   RelationClasses.subrelation (cmp_sort pb) (flip (cmp_sort' pb')) ->
-  eq_context_upto Σ cmp_universe cmp_sort pb Γ Δ ->
-  eq_context_upto Σ cmp_universe' cmp_sort' pb' Δ Γ.
+  eq_context_upto Σ cmp_ulvl cmp_sort pb Γ Δ ->
+  eq_context_upto Σ cmp_ulvl' cmp_sort' pb' Δ Γ.
 Proof.
   intros univ_sub_conv univ_sub_pb sort_sub_conv sort_sub_pb H.
   eapply All2_fold_flip, All2_fold_impl with (1 := H). clear H.
