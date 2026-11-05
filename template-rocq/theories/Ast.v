@@ -400,7 +400,7 @@ Inductive term : Type :=
 | tRel (n : nat)
 | tVar (id : ident) (* For free variables (e.g. in a goal) *)
 | tEvar (ev : nat) (args : list term)
-| tSort (s : sort)
+| tUniv (s : Universe.t) (* Sort.t in Rocq *)
 | tCast (t : term) (kind : cast_kind) (v : term)
 | tProd (na : aname) (ty : term) (body : term)
 | tLambda (na : aname) (ty : term) (body : term)
@@ -570,7 +570,7 @@ Fixpoint noccur_between k n (t : term) : bool :=
   | tArray u' arr def ty => tArray (subst_instance_level u u') (List.map (subst_instance_constr u) arr)
     (subst_instance_constr u def) (subst_instance_constr u ty)
   | tEvar ev args => tEvar ev (List.map (subst_instance_constr u) args)
-  | tSort s => tSort (subst_instance_sort u s)
+  | tUniv s => tUniv (subst_instance_univ u s)
   | tConst c u' => tConst c (subst_instance_instance u u')
   | tInd i u' => tInd i (subst_instance_instance u u')
   | tConstruct ind k u' => tConstruct ind k (subst_instance_instance u u')
@@ -596,7 +596,7 @@ Fixpoint noccur_between k n (t : term) : bool :=
 (** Tests that the term is closed over [k] universe variables *)
 Fixpoint closedu (k : nat) (t : term) : bool :=
   match t with
-  | tSort univ => closedu_sort k univ
+  | tUniv univ => closedu_universe k univ
   | tInd _ u => closedu_instance k u
   | tConstruct _ _ u => closedu_instance k u
   | tConst _ u => closedu_instance k u
@@ -625,7 +625,7 @@ Module TemplateTerm <: Term.
 Definition term := term.
 
 Definition tRel := tRel.
-Definition tSort := tSort.
+Definition tUniv := tUniv.
 Definition tProd := tProd.
 Definition tLambda := tLambda.
 Definition tLetIn := tLetIn.
@@ -650,7 +650,7 @@ Fixpoint destArity Γ (t : term) :=
   match t with
   | tProd na t b => destArity (Γ ,, vass na t) b
   | tLetIn na b b_ty b' => destArity (Γ ,, vdef na b b_ty) b'
-  | tSort s => Some (Γ, s)
+  | tUniv s => Some (Γ, s)
   | _ => None
   end.
 
@@ -671,7 +671,7 @@ Definition inds := inds.
 End TemplateTermUtils.
 
 Ltac unf_term := unfold TemplateTerm.term in *; unfold TemplateTerm.tRel in *;
-                  unfold TemplateTerm.tSort in *; unfold TemplateTerm.tProd in *;
+                  unfold TemplateTerm.tUniv in *; unfold TemplateTerm.tProd in *;
                   unfold TemplateTerm.tLambda in *; unfold TemplateTerm.tLetIn in *;
                   unfold TemplateTerm.tInd in *; unfold TemplateTerm.tProj in *;
                   unfold TemplateTerm.lift in *; unfold TemplateTerm.subst in *;
@@ -708,12 +708,12 @@ Definition isLambda t :=
 
 Record parameter_entry := {
   parameter_entry_type      : term;
-  parameter_entry_universes : universes_entry }.
+  parameter_entry_ulvls : ulvls_entry }.
 
 Record definition_entry := {
   definition_entry_type      : option term;
   definition_entry_body      : term;
-  definition_entry_universes : universes_entry;
+  definition_entry_ulvls : ulvls_entry;
   definition_entry_opaque    : bool }.
 
 
@@ -755,9 +755,9 @@ Record mutual_inductive_entry := {
   mind_entry_finite    : recursivity_kind;
   mind_entry_params    : context;
   mind_entry_inds      : list one_inductive_entry;
-  mind_entry_universes : universes_entry;
+  mind_entry_ulvls : ulvls_entry;
   mind_entry_template : bool; (* template polymorphism *)
-  mind_entry_variance  : option (list (option Universes.Variance.t));
+  mind_entry_variance  : option (list (option Variance.t));
   mind_entry_private   : option bool
   (* Private flag for sealing an inductive definition in an enclosing
      module. Not handled by Template Rocq yet. *) }.
@@ -779,7 +779,7 @@ Qed.
 
 Definition ind_predicate_context ind mdecl idecl : context :=
   let ictx := (expand_lets_ctx mdecl.(ind_params) idecl.(ind_indices)) in
-  let indty := mkApps (tInd ind (abstract_instance mdecl.(ind_universes)))
+  let indty := mkApps (tInd ind (abstract_instance mdecl.(ind_ulvls)))
     (to_extended_list (smash_context [] mdecl.(ind_params) ,,, ictx)) in
   let inddecl :=
     {| decl_name :=
@@ -802,7 +802,7 @@ Definition case_predicate_context ind mdecl idecl p : context :=
 
 Definition cstr_branch_context ind mdecl cdecl : context :=
   expand_lets_ctx mdecl.(ind_params)
-    (subst_context (inds (inductive_mind ind) (abstract_instance mdecl.(ind_universes))
+    (subst_context (inds (inductive_mind ind) (abstract_instance mdecl.(ind_ulvls))
         mdecl.(ind_bodies)) #|mdecl.(ind_params)|
       cdecl.(cstr_args)).
 

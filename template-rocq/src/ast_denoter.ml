@@ -18,7 +18,7 @@ struct
   type quoted_name = name
   type quoted_aname = name binder_annot
   type quoted_relevance = relevance
-  type quoted_sort = Universes0.Sort.t
+  type quoted_sort = Universes0.Universe.t
   type quoted_cast_kind = cast_kind
   type quoted_kernel_name = kername
   type quoted_inductive = inductive
@@ -26,17 +26,17 @@ struct
   type quoted_global_reference = global_reference
 
   type quoted_sort_quality_or_set = Universes0.allowed_eliminations
-  type quoted_constraint_type = Universes0.ConstraintType.t
-  type quoted_univ_constraint = Universes0.UnivConstraint.t
-  type quoted_univ_constraints = Universes0.ConstraintSet.t
-  type quoted_univ_level = Universes0.Level.t
-  type quoted_univ_instance = Universes0.Instance.t
-  type quoted_univ_context = Universes0.UContext.t
-  type quoted_univ_contextset = Universes0.ContextSet.t
-  type quoted_abstract_univ_context = Universes0.AUContext.t
-  type quoted_variance = Universes0.Variance.t
-  type quoted_universes_decl = Universes0.universes_decl
-  type quoted_universes_entry = Universes0.universes_entry
+  type quoted_constraint_type = Levels.ConstraintType.t
+  type quoted_univ_constraint = Levels.UnivConstraint.t
+  type quoted_univ_constraints = Levels.ConstraintSet.t
+  type quoted_univ_level = Levels.Level.t
+  type quoted_univ_instance = Levels.Instance.t
+  type quoted_univ_context = Levels.UContext.t
+  type quoted_univ_contextset = Levels.ContextSet.t
+  type quoted_abstract_univ_context = Levels.AUContext.t
+  type quoted_variance = Levels.Variance.t
+  type quoted_universes_decl = Levels.ulvls_decl
+  type quoted_universes_entry = Universes0.ulvls_entry
 
   type quoted_ind_entry = quoted_ident * t * quoted_ident list * t list
   type quoted_definition_entry = Ast0.definition_entry
@@ -110,7 +110,7 @@ struct
     | Coq_tRel n -> ACoq_tRel n
     | Coq_tVar v -> ACoq_tVar v
     | Coq_tEvar (x,l) -> ACoq_tEvar (x,l)
-    | Coq_tSort u -> ACoq_tSort u
+    | Coq_tUniv u -> ACoq_tSort u
     | Coq_tCast (t,k,tt) -> ACoq_tCast (t,k,tt)
     | Coq_tProd (a,b,c) -> ACoq_tProd (a,b,c)
     | Coq_tLambda (a,b,c) -> ACoq_tLambda (a,b,c)
@@ -196,10 +196,10 @@ struct
     let { proj_ind = ind; proj_npars = ps; proj_arg = idx } = q in
     (ind, ps, idx)
 
-  let unquote_level (trm : Universes0.Level.t) : Univ.Level.t =
+  let unquote_level (trm : Levels.Level.t) : Univ.Level.t =
     match trm with
-    | Universes0.Level.Coq_lzero -> Univ.Level.set
-    | Universes0.Level.Coq_level s ->
+    | Levels.Level.Coq_lzero -> Univ.Level.set
+    | Levels.Level.Coq_level s ->
       let s = unquote_string s in
       let comps = CString.split_on_char '.' s in
       let last, dp = CList.sep_last comps in
@@ -207,26 +207,26 @@ struct
       let idx = int_of_string last in
       (* TODO handle universes from workers *)
       Univ.Level.make (Univ.UGlobal.make dp "" idx)
-    | Universes0.Level.Coq_lvar n -> Univ.Level.var (unquote_int n)
+    | Levels.Level.Coq_lvar n -> Univ.Level.var (unquote_int n)
 
-  let unquote_level_expr (trm : Universes0.Level.t * quoted_int) : Univ.Universe.t =
+  let unquote_level_expr (trm : Levels.Level.t * quoted_int) : Univ.Universe.t =
     let l = unquote_level (fst trm) in
     let u = Univ.Universe.make l in
     Caml_nat.iter_nat Univ.Universe.super u (snd trm)
 
-  let unquote_universe evm (trm : Universes0.Universe.t) =
-    let u = Universes0.t_set trm in
-    let ux_list = Universes0.LevelExprSet.elements u in
+  let unquote_universe evm (trm : Levels.UnivLvl.t) =
+    let u = Levels.t_set trm in
+    let ux_list = Levels.LevelExprSet.elements u in
     let l = List.map unquote_level_expr ux_list in
     let u = List.fold_left Univ.Universe.sup (List.hd l) (List.tl l) in
     evm, u
 
   let unquote_sort evm trm =
-    match trm with
-    | Universes0.Sort.Coq_sSProp -> evm, Sorts.sprop
-    | Universes0.Sort.Coq_sProp -> evm, Sorts.prop
-    | Universes0.Sort.Coq_sType u ->
-      let evm, u = unquote_universe evm u in
+    match Universes0.Universe.s trm with
+    | Sorts0.Sort.Coq_sSProp -> evm, Sorts.sprop
+    | Sorts0.Sort.Coq_sProp -> evm, Sorts.prop
+    | Sorts0.Sort.Coq_sType ->
+      let evm, u = unquote_universe evm @@ Universes0.Universe.l trm in
       evm, Sorts.sort_of_univ u
 
   let unquote_universe_level evm l = evm, unquote_level l

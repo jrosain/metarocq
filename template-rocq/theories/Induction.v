@@ -16,7 +16,7 @@ Lemma term_forall_list_ind :
     (forall n : nat, P (tRel n)) ->
     (forall i : ident, P (tVar i)) ->
     (forall (n : nat) (l : list term), Forall P l -> P (tEvar n l)) ->
-    (forall s, P (tSort s)) ->
+    (forall s, P (tUniv s)) ->
     (forall t : term, P t -> forall (c : cast_kind) (t0 : term), P t0 -> P (tCast t c t0)) ->
     (forall (n : aname) (t : term), P t -> forall t0 : term, P t0 -> P (tProd n t t0)) ->
     (forall (n : aname) (t : term), P t -> forall t0 : term, P t0 -> P (tLambda n t t0)) ->
@@ -61,7 +61,7 @@ Lemma term_forall_list_rect :
     (forall n : nat, P (tRel n)) ->
     (forall i : ident, P (tVar i)) ->
     (forall (n : nat) (l : list term), All P l -> P (tEvar n l)) ->
-    (forall s, P (tSort s)) ->
+    (forall s, P (tUniv s)) ->
     (forall t : term, P t -> forall (c : cast_kind) (t0 : term), P t0 -> P (tCast t c t0)) ->
     (forall (n : aname) (t : term), P t -> forall t0 : term, P t0 -> P (tProd n t t0)) ->
     (forall (n : aname) (t : term), P t -> forall t0 : term, P t0 -> P (tLambda n t t0)) ->

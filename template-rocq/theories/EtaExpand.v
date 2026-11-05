@@ -79,7 +79,7 @@ Section Eta.
 
   Fixpoint eta_expand (Γ : list (option (nat * term))) (t : term) : term :=
     match t with
-    | tVar _ | tSort _ | tProd _ _ _ | tConst _ _ | tInd _ _ => t
+    | tVar _ | tUniv _ | tProd _ _ _ | tConst _ _ | tInd _ _ => t
     | tRel n => match nth_error Γ n with
                 | Some (Some (c, ty)) => eta_single (tRel n) [] (lift0 (S n) ty) c
                 | _ => tRel n
@@ -145,7 +145,7 @@ End Eta.
 
 Definition eta_global_decl Σ cb :=
   {| cst_type := eta_expand Σ [] cb.(cst_type) ;
-     cst_universes := cb.(cst_universes) ;
+     cst_ulvls := cb.(cst_ulvls) ;
      cst_body := match cb.(cst_body) with
                 | Some b => Some (eta_expand Σ [] b)
                 | None => None
@@ -188,7 +188,7 @@ Definition eta_constructor_decl Σ mdecl cdecl :=
 Definition eta_inductive_decl Σ mdecl idecl :=
   {| ind_name := idecl.(ind_name);
 	   ind_indices := idecl.(ind_indices);
-     ind_sort := idecl.(ind_sort);
+     ind_univ := idecl.(ind_univ);
      ind_type := idecl.(ind_type);
      ind_kelim := idecl.(ind_kelim);
      ind_ctors := map (eta_constructor_decl Σ mdecl) idecl.(ind_ctors);
@@ -200,7 +200,7 @@ Definition eta_minductive_decl Σ mdecl :=
      ind_params := eta_context Σ 0 mdecl.(ind_params);
      ind_npars := mdecl.(ind_npars);
      ind_bodies := map (eta_inductive_decl Σ mdecl) mdecl.(ind_bodies);
-     ind_universes := mdecl.(ind_universes);
+     ind_ulvls := mdecl.(ind_ulvls);
      ind_variance := mdecl.(ind_variance); |}.
 
 Definition eta_global_declaration (Σ : GlobalEnvMap.t) decl : global_decl :=
@@ -213,7 +213,7 @@ Definition eta_global_declarations (Σ : GlobalEnvMap.t) (decls : global_declara
   map (on_snd (eta_global_declaration Σ)) decls.
 
 Definition eta_expand_global_env (Σ : GlobalEnvMap.t) : global_env :=
-  {| universes := Σ.(universes); declarations := eta_global_declarations Σ Σ.(declarations);
+  {| ulvls := Σ.(ulvls); declarations := eta_global_declarations Σ Σ.(declarations);
      retroknowledge := Σ.(retroknowledge) |}.
 
 Definition eta_expand_program (p : template_program_env) : Ast.Env.program :=
@@ -255,7 +255,7 @@ Inductive expanded (Γ : list nat): term -> Prop :=
 | expanded_tRel_app (n : nat) args m : nth_error Γ n = Some m -> m <= #|args| -> Forall (expanded Γ) args -> expanded Γ (tApp (tRel n) args)
 | expanded_tVar (id : ident) : expanded Γ (tVar id)
 | expanded_tEvar (ev : nat) (args : list term) : Forall (expanded Γ) args -> expanded Γ (tEvar ev args)
-| expanded_tSort (s : sort) : expanded Γ (tSort s)
+| expanded_tSort (s : Universe.t) : expanded Γ (tUniv s)
 | expanded_tCast (t : term) (kind : cast_kind) (v : term) : expanded Γ t -> expanded Γ v -> expanded Γ (tCast t kind v)
 | expanded_tProd (na : aname) (ty : term) (body : term) : (* expanded Γ ty -> expanded Γ body -> *) expanded Γ (tProd na ty body)
 | expanded_tLambda (na : aname) (ty : term) (body : term) : (* expanded Γ ty -> *) expanded (0 :: Γ) body -> expanded Γ (tLambda na ty body)
@@ -309,7 +309,7 @@ forall (Σ : global_env) (P : list nat -> term -> Prop),
 (forall Γ, forall n : nat, forall args, forall m, nth_error Γ n = Some m -> forall Heq :  m <= #|args|, Forall (expanded Σ Γ) args -> Forall (P Γ) args -> P Γ (tApp (tRel n) args)) ->
 (forall Γ, forall id : ident, P Γ (tVar id)) ->
 (forall Γ, forall (ev : nat) (args : list term), Forall (expanded Σ Γ) args -> Forall (P Γ) args -> P Γ (tEvar ev args)) ->
-(forall Γ, forall s : sort, P Γ (tSort s)) ->
+(forall Γ, forall s : Universe.t, P Γ (tUniv s)) ->
 (forall Γ, forall (t : term) (kind : cast_kind) (v : term),
  expanded Σ Γ t -> P Γ t -> expanded Σ Γ v -> P Γ v -> P Γ (tCast t kind v)) ->
 (forall Γ, forall (na : aname) (ty body : term), P Γ (tProd na ty body)) ->
@@ -426,11 +426,11 @@ Definition expanded_decl Σ d :=
 Inductive expanded_global_declarations (univs : ContextSet.t) (retro : Environment.Retroknowledge.t) : forall (Σ : Ast.Env.global_declarations), Prop :=
 | expanded_global_nil : expanded_global_declarations univs retro []
 | expanded_global_cons decl Σ : expanded_global_declarations univs retro Σ ->
-  expanded_decl {| Ast.Env.universes := univs; Ast.Env.declarations := Σ; Ast.Env.retroknowledge := retro |} decl.2 ->
+  expanded_decl {| Ast.Env.ulvls := univs; Ast.Env.declarations := Σ; Ast.Env.retroknowledge := retro |} decl.2 ->
   expanded_global_declarations univs retro (decl :: Σ).
 
 Definition expanded_global_env (g : Ast.Env.global_env) :=
-  expanded_global_declarations g.(Ast.Env.universes) g.(Ast.Env.retroknowledge) g.(Ast.Env.declarations).
+  expanded_global_declarations g.(Ast.Env.ulvls) g.(Ast.Env.retroknowledge) g.(Ast.Env.declarations).
 
 Definition expanded_program (p : Ast.Env.program) :=
   expanded_global_env p.1 /\ expanded p.1 [] p.2.
@@ -1417,7 +1417,7 @@ Qed.
 
 Existing Class Typing.wf_ext.
 
-Definition global_env_ext_map := GlobalEnvMap.t × universes_decl.
+Definition global_env_ext_map := GlobalEnvMap.t × ulvls_decl.
 
 Definition global_env_ext_map_global_env_map (Σgext : global_env_ext_map) : GlobalEnvMap.t := Σgext.1.
 
@@ -1459,7 +1459,7 @@ Qed.
 
 Lemma eta_expand_context_sorts {cf} {Σ} {Σg : global_env_ext_map} {ctx ctx' cunivs} {wfΣ : Typing.wf_ext Σ} :
   repr_decls Σg Σ ->
-  sorts_local_ctx (lift_typing typing) Σ ctx ctx' cunivs ->
+  univs_local_ctx (lift_typing typing) Σ ctx ctx' cunivs ->
   expanded_context Σ (repeat 0 #|ctx|) (eta_context Σg #|ctx| ctx').
 Proof.
   intros hrepr hs. constructor.
@@ -1526,7 +1526,7 @@ Qed.
 
 Lemma same_cstr_info_eta {cf:checker_flags} (Σ : global_env) {wfΣ : wf Σ} (Σg: GlobalEnvMap.t) :
   same_cstr_info Σ
-    {| universes := Σ.(universes) ;
+    {| ulvls := Σ.(ulvls) ;
        declarations := List.map (on_snd (eta_global_declaration Σg)) Σ.(declarations);
        retroknowledge := Σ.(retroknowledge) |}.
 Proof.
@@ -1553,7 +1553,7 @@ Proof.
       red in IHΣ.
       assert (wfΣ' : wf
       {|
-        universes := univs;
+        ulvls := univs;
         declarations := Σ;
         retroknowledge := retroknowledge0
       |}).
@@ -1617,7 +1617,7 @@ Proof.
   { cbn. destruct X as [equ [Σ' ext]]. red. split. auto.
     rewrite ext. cbn. unfold snoc. exists (Σ' ++ [(kn, d)])%list. now rewrite -app_assoc.
     apply e. }
-  set (Σ' := {| universes := univs'; declarations := Σ; retroknowledge := retro' |}) in *.
+  set (Σ' := {| ulvls := univs'; declarations := Σ; retroknowledge := retro' |}) in *.
   set (Σg := {| GlobalEnvMap.env := _ |}). Unshelve.
   destruct X as [equ [Σ'' ext]]. cbn in *. destruct env as [univs0 env]. cbn in *. subst univs0.
   subst env. destruct o as [? udecl ? o0].

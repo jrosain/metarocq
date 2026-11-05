@@ -1,11 +1,11 @@
 -R theories MetaRocq.Common
 
 theories/Primitive.v
-theories/Levels.v
-theories/Sorts.v
 theories/uGraph.v
 theories/config.v
 theories/Kernames.v
+theories/Levels.v
+theories/Sorts.v
 theories/Universes.v
 theories/UniversesDec.v
 theories/BasicAst.v

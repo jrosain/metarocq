@@ -264,8 +264,8 @@ Proof.
   solve_all. eapply wf_decl_extends; tea; typeclasses eauto.
 Qed.
 
-Lemma sorts_local_ctx_All_wf_decl {cf:checker_flags} {Σ} {mdecl} {u: list sort} {args} :
-  sorts_local_ctx (fun Σ : global_env_ext => wf_decl_pred Σ) Σ
+Lemma univs_local_ctx_All_wf_decl {cf:checker_flags} {Σ} {mdecl} {u: list Universe.t} {args} :
+  univs_local_ctx (fun Σ : global_env_ext => wf_decl_pred Σ) Σ
     (arities_context (ind_bodies mdecl),,, ind_params mdecl)
     args u ->
   All (wf_decl Σ) args.
@@ -294,7 +294,7 @@ Proof.
   pose proof (onConstructors Hidecl). red in X0.
   solve_all.
   apply on_cargs in X0.
-  eapply sorts_local_ctx_All_wf_decl in X0.
+  eapply univs_local_ctx_All_wf_decl in X0.
   solve_all. eapply wf_decl_extends; tea; typeclasses eauto.
 Qed.
 
@@ -316,7 +316,7 @@ Qed.
 
 Lemma destArity_spec ctx T :
   match destArity ctx T with
-  | Some (ctx', s) => it_mkProd_or_LetIn ctx T = it_mkProd_or_LetIn ctx' (tSort s)
+  | Some (ctx', s) => it_mkProd_or_LetIn ctx T = it_mkProd_or_LetIn ctx' (tUniv s)
   | None => True
   end.
 Proof.
@@ -334,7 +334,7 @@ Proof.
 Qed.
 
 Lemma it_mkProd_or_LetIn_inj ctx s ctx' s' :
-  it_mkProd_or_LetIn ctx (tSort s) = it_mkProd_or_LetIn ctx' (tSort s') ->
+  it_mkProd_or_LetIn ctx (tUniv s) = it_mkProd_or_LetIn ctx' (tUniv s') ->
   ctx = ctx' /\ s = s'.
 Proof.
   move/(f_equal (destArity [])).
@@ -663,7 +663,7 @@ Section WfLookup.
       clear -onConstructors.
       induction onConstructors; constructor; auto.
       apply on_cargs in r.
-      eapply sorts_local_ctx_All_wf_decl; tea. }
+      eapply univs_local_ctx_All_wf_decl; tea. }
     split => //.
     - now destruct onArity.
     - rewrite ind_arity_eq in onArity .

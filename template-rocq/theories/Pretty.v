@@ -25,7 +25,7 @@ Section print_term.
 
   Definition lookup_ind_decl ind i :=
     match lookup_env Σ ind with
-    | Some (InductiveDecl {| ind_bodies := l; ind_universes := uctx |}) =>
+    | Some (InductiveDecl {| ind_bodies := l; ind_ulvls := uctx |}) =>
       match nth_error l i with
       | Some body => Some body
       | None => None
@@ -36,7 +36,7 @@ Section print_term.
   Fixpoint name_from_term (t : term) :=
     match t with
     | tRel _ | tVar _ | tEvar _ _ => "H"
-    | tSort s => "X"
+    | tUniv s => "X"
     | tProd na b t => "f"
     | tLambda na b t => "f"
     | tLetIn na b _ t' => name_from_term t'
@@ -131,14 +131,14 @@ Module PrintTermTree.
     let ctx' := fix_context defs in
     print_list (print_def (print_term Γ true) (print_term (fresh_names Σ Γ ctx') true))
                (nl ^ " with ") defs.
-  Definition print_sort (s : sort) :=
-    match s with
+  Definition print_sort (s : Universe.t) :=
+    match usort s with
     | sProp => "Prop"
     | sSProp => "SProp"
-    | sType l =>
+    | sType =>
       if with_universes then
         ("Type(" ++
-           MRString.string_of_list string_of_level_expr (LevelExprSet.elements l) ++
+           MRString.string_of_list string_of_level_expr (LevelExprSet.elements (ulvl s)) ++
           ")")%bs
        else "Type"
     end.
@@ -153,7 +153,7 @@ Module PrintTermTree.
     end
   | tVar n => "Var(" ^ n ^ ")"
   | tEvar ev args => "Evar(" ^ string_of_nat ev ^ "[]" (* TODO *)  ^ ")"
-  | tSort s => print_sort s
+  | tUniv s => print_sort s
   | tCast c k t => parens top (print_term Γ true c ^ ":"  ^ print_term Γ true t)
   | tProd na dom codom =>
     let na' := (fresh_name Σ Γ na.(binder_name) (Some dom)) in
@@ -287,7 +287,7 @@ Module PrintTermTree.
   Definition print_one_ind (short : bool) Γ (mib : mutual_inductive_body) (oib : one_inductive_body) : t :=
     let '(Γpars, spars) := print_context Γ mib.(ind_params) in
     let '(Γinds, sinds) := print_context Γpars oib.(ind_indices) in
-    oib.(ind_name) ^ spars ^ sinds ^ print_term Γinds true (tSort oib.(ind_sort)) ^ ":=" ^ nl ^
+    oib.(ind_name) ^ spars ^ sinds ^ print_term Γinds true (tUniv oib.(ind_univ)) ^ ":=" ^ nl ^
     if short then "..."
     else print_list (print_one_cstr Γpars mib) nl oib.(ind_ctors).
 
@@ -315,7 +315,7 @@ Module PrintTermTree.
     end.
 
   Definition print_mib Σ with_universes (short : bool) (mib : mutual_inductive_body) : t :=
-    let Σ' := (Σ, mib.(ind_universes)) in
+    let Σ' := (Σ, mib.(ind_ulvls)) in
     let names := fresh_names Σ' [] (arities_context mib.(ind_bodies)) in
       (print_recursivity_kind mib.(ind_finite) ^ " " ^
       print_list (print_one_ind Σ' with_universes short names mib) (nl ^ "with ") mib.(ind_bodies) ^ "." ^ nl).
@@ -326,7 +326,7 @@ Module PrintTermTree.
       mie.(mind_entry_inds).
 
   Definition print_mie Σ with_universes (short : bool) (mie : mutual_inductive_entry) : t :=
-    let Σ' := (Σ, universes_decl_of_universes_entry mie.(mind_entry_universes)) in
+    let Σ' := (Σ, universes_decl_of_universes_entry mie.(mind_entry_ulvls)) in
     let names := fresh_names Σ' [] (mie_arities_context mie) in
       (print_recursivity_kind mie.(mind_entry_finite) ^ " " ^
       print_list (print_one_ind_entry Σ' with_universes short names mie) (nl ^ "with ") mie.(mind_entry_inds) ^ "." ^ nl).
@@ -335,15 +335,15 @@ Module PrintTermTree.
     match prefix with
     | 0 => match Σ.(declarations) with [] => acc | _ => ("..." ^ nl ^ acc) end
     | S n =>
-      let univs := Σ.(Env.universes) in
+      let univs := Σ.(Env.ulvls) in
       let retro := Σ.(Env.retroknowledge) in
       match Σ.(declarations) with
       | [] => acc
       | (kn, InductiveDecl mib) :: Σ =>
-        let Σ := {| Env.universes := univs; declarations := Σ; retroknowledge := retro |} in
+        let Σ := {| Env.ulvls := univs; declarations := Σ; retroknowledge := retro |} in
         print_env_aux with_universes short n Σ (print_mib Σ with_universes short mib ^ acc)
       | (kn, ConstantDecl cb) :: Σ =>
-        let Σ' := ({| Env.universes := univs; declarations := Σ; retroknowledge := retro |}, cb.(cst_universes)) in
+        let Σ' := ({| Env.ulvls := univs; declarations := Σ; retroknowledge := retro |}, cb.(cst_ulvls)) in
         print_env_aux with_universes short n Σ'.1
           ((match cb.(cst_body) with
             | Some _ => "Definition "

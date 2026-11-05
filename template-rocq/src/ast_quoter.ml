@@ -19,7 +19,7 @@ struct
   type quoted_name = BasicAst.name
   type quoted_aname = BasicAst.aname
   type quoted_relevance = BasicAst.relevance
-  type quoted_sort = Universes0.Sort.t
+  type quoted_sort = Universes0.Universe.t
   type quoted_cast_kind = cast_kind
   type quoted_kernel_name = Kernames.kername
   type quoted_inductive = inductive
@@ -27,17 +27,17 @@ struct
   type quoted_global_reference = global_reference
 
   type quoted_sort_quality_or_set = Universes0.allowed_eliminations
-  type quoted_constraint_type = Universes0.ConstraintType.t
-  type quoted_univ_constraint = Universes0.UnivConstraint.t
-  type quoted_univ_constraints = Universes0.ConstraintSet.t
-  type quoted_univ_level = Universes0.Level.t
-  type quoted_univ_instance = Universes0.Instance.t
-  type quoted_univ_context = Universes0.UContext.t
-  type quoted_univ_contextset = Universes0.ContextSet.t
-  type quoted_abstract_univ_context = Universes0.AUContext.t
-  type quoted_variance = Universes0.Variance.t
-  type quoted_universes_decl = Universes0.universes_decl
-  type quoted_universes_entry = Universes0.universes_entry
+  type quoted_constraint_type = Levels.ConstraintType.t
+  type quoted_univ_constraint = Levels.UnivConstraint.t
+  type quoted_univ_constraints = Levels.ConstraintSet.t
+  type quoted_univ_level = Levels.Level.t
+  type quoted_univ_instance = Levels.Instance.t
+  type quoted_univ_context = Levels.UContext.t
+  type quoted_univ_contextset = Levels.ContextSet.t
+  type quoted_abstract_univ_context = Levels.AUContext.t
+  type quoted_variance = Levels.Variance.t
+  type quoted_universes_decl = Levels.ulvls_decl
+  type quoted_universes_entry = Universes0.ulvls_entry
 
   type quoted_ind_entry = quoted_ident * t * quoted_ident list * t list
   type quoted_definition_entry = Ast0.definition_entry
@@ -83,27 +83,27 @@ struct
 
   let quote_pstring x = x
 
-  let quote_level (l : Univ.Level.t) : Universes0.Level.t =
-    if Univ.Level.is_set l then Universes0.Level.Coq_lzero
+  let quote_level (l : Univ.Level.t) : Levels.Level.t =
+    if Univ.Level.is_set l then Levels.Level.Coq_lzero
     else match Univ.Level.var_index l with
-         | Some x -> Universes0.Level.Coq_lvar (quote_int x)
-         | None -> Universes0.Level.Coq_level (quote_string (Univ.Level.to_string l))
+         | Some x -> Levels.Level.Coq_lvar (quote_int x)
+         | None -> Levels.Level.Coq_level (quote_string (Univ.Level.to_string l))
 
-  let quote_level_expr (lvl, shft) : Universes0.LevelExpr.t = quote_level lvl, quote_int shft
+  let quote_level_expr (lvl, shft) : Levels.LevelExpr.t = quote_level lvl, quote_int shft
 
-  let quote_universe u : Universes0.Universe.t =
+  let quote_universe u : Levels.UnivLvl.t =
     match Univ.Universe.level u with
-      Some l -> Universes0.Universe.make' (quote_level l)
+      Some l -> Levels.UnivLvl.make' (quote_level l)
     | _ ->
       let levels = Univ.Universe.repr u |> List.map quote_level_expr in
-      Universes0.Universe.from_kernel_repr (List.hd levels) (List.tl levels)
+      Levels.UnivLvl.from_kernel_repr (List.hd levels) (List.tl levels)
 
   let quote_sort s = match s with
-  | Sorts.Set -> Universes0.Sort.type0
-  | Sorts.SProp -> Universes0.Sort.Coq_sSProp
-  | Sorts.Prop -> Universes0.Sort.Coq_sProp
-  | Sorts.Type u -> Universes0.Sort.Coq_sType (quote_universe u)
-  | Sorts.QSort (_, u) -> Universes0.Sort.Coq_sType (quote_universe u) (* FIXME *)
+  | Sorts.Set -> Universes0.Universe.type0
+  | Sorts.SProp -> Universes0.uSProp
+  | Sorts.Prop -> Universes0.uProp
+  | Sorts.Type u -> Universes0.uType (quote_universe u)
+  | Sorts.QSort (_, u) -> Universes0.uType (quote_universe u) (* FIXME *)
 
   let quote_sort_quality_or_set s =
     let open UnivGen.QualityOrSet in
@@ -138,9 +138,9 @@ struct
   let quote_proj ind p a = { proj_ind = ind; proj_npars = p; proj_arg = a }
 
   let quote_constraint_type = function
-    | Univ.Lt -> Universes0.ConstraintType.Le BinNums.(Zpos Coq_xH)
-    | Univ.Le -> Universes0.ConstraintType.Le BinNums.Z0
-    | Univ.Eq -> Universes0.ConstraintType.Eq
+    | Univ.Lt -> Levels.ConstraintType.Le BinNums.(Zpos Coq_xH)
+    | Univ.Le -> Levels.ConstraintType.Le BinNums.Z0
+    | Univ.Eq -> Levels.ConstraintType.Eq
 
   let is_Lt = function
     | Univ.Lt -> true
@@ -178,13 +178,13 @@ struct
 
   let quote_univ_constraints (c : Univ.Constraints.t) : quoted_univ_constraints =
     let l = constraints_ (Univ.Constraints.elements c) in
-    Universes0.ConstraintSet.(List.fold_right add l empty)
+    Levels.ConstraintSet.(List.fold_right add l empty)
 
   let quote_variance (v : UVars.Variance.t) =
     match v with
-    | Irrelevant -> Universes0.Variance.Irrelevant
-    | Covariant -> Universes0.Variance.Covariant
-    | Invariant -> Universes0.Variance.Invariant
+    | Irrelevant -> Levels.Variance.Irrelevant
+    | Covariant -> Levels.Variance.Covariant
+    | Invariant -> Levels.Variance.Invariant
 
   let quote_univ_context (uctx : UVars.UContext.t) : quoted_univ_context =
     let { UVars.quals = qarr; UVars.univs = uarr} = (UVars.UContext.names uctx) in
@@ -199,7 +199,7 @@ struct
   let quote_univ_contextset (uctx : Univ.ContextSet.t) : quoted_univ_contextset =
     let levels = List.map quote_level (Univ.Level.Set.elements (Univ.ContextSet.levels uctx)) in
     let constraints = Univ.ContextSet.constraints uctx in
-    (Universes0.LevelSetProp.of_list levels, quote_univ_constraints constraints)
+    (Levels.LevelSetProp.of_list levels, quote_univ_constraints constraints)
 
   let quote_abstract_univ_context uctx : quoted_abstract_univ_context =
     let {UVars.quals = qnames; UVars.univs = unames} = UVars.AbstractContext.names uctx in
@@ -232,7 +232,7 @@ struct
   let mkRel n = Coq_tRel n
   let mkVar id = Coq_tVar id
   let mkEvar n args = Coq_tEvar (n,Array.to_list args)
-  let mkSort s = Coq_tSort s
+  let mkSort s = Coq_tUniv s
   let mkCast c k t = Coq_tCast (c,k,t)
 
   let mkConst c u = Coq_tConst (c, u)
@@ -286,8 +286,8 @@ struct
   let mkProj p c = Coq_tProj (p,c)
 
 
-  let mkMonomorphic_ctx () = Universes0.Monomorphic_ctx
-  let mkPolymorphic_ctx tm = Universes0.Polymorphic_ctx tm
+  let mkMonomorphic_ctx () = Levels.Monomorphic_ctx
+  let mkPolymorphic_ctx tm = Levels.Polymorphic_ctx tm
 
   let mk_one_inductive_body (id, indices, sort, ty, kel, ctrs, projs, relevance) =
     let ctrs = List.map (fun (name, args, indices, ty, arity) ->
@@ -300,7 +300,7 @@ struct
         { proj_name; proj_relevance; proj_type }) projs in
     { ind_name = id; ind_type = ty;
       ind_indices = indices;
-      ind_sort = sort;
+      ind_univ = sort;
       ind_kelim = kel;
       ind_ctors = ctrs;
       ind_projs = projs;
@@ -309,10 +309,10 @@ struct
   let mk_mutual_inductive_body finite npars params inds uctx variance =
     {ind_finite = finite;
      ind_npars = npars; ind_params = params; ind_bodies = inds;
-     ind_universes = uctx; ind_variance = variance}
+     ind_ulvls = uctx; ind_variance = variance}
 
   let mk_constant_body ty tm uctx rel =
-    {cst_type = ty; cst_body = tm; cst_universes = uctx; cst_relevance = rel}
+    {cst_type = ty; cst_body = tm; cst_ulvls = uctx; cst_relevance = rel}
 
   let mk_inductive_decl bdy = InductiveDecl bdy
 
@@ -334,7 +334,7 @@ struct
       Environment.Retroknowledge.retro_string = r.retro_string;
       Environment.Retroknowledge.retro_array = r.retro_array }
 
-  let mk_global_env universes declarations retroknowledge = { universes; declarations; retroknowledge }
+  let mk_global_env universes declarations retroknowledge = { ulvls = universes; declarations; retroknowledge }
   let mk_program decls tm = (decls, tm)
 
   let quote_mind_finiteness = function
@@ -354,19 +354,19 @@ struct
       mind_entry_params = mp;
       mind_entry_inds = List.map quote_one_inductive_entry is;
       mind_entry_template = false;
-      mind_entry_universes = univs;
+      mind_entry_ulvls = univs;
       mind_entry_variance = variance;
       mind_entry_private = None }
 
   let quote_definition_entry ty body ctx =
     { definition_entry_type = ty;
       definition_entry_body = body;
-      definition_entry_universes = ctx;
+      definition_entry_ulvls = ctx;
       definition_entry_opaque = false }
 
   let quote_parameter_entry ty ctx =
     { parameter_entry_type = ty;
-      parameter_entry_universes = ctx }
+      parameter_entry_ulvls = ctx }
 
   let quote_constant_entry = function
     | Left ce -> DefinitionEntry ce
