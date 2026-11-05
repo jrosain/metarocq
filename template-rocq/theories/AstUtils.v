@@ -37,7 +37,7 @@ Module string_of_term_tree.
   | tRel n => "Rel(" ^ string_of_nat n ^ ")"
   | tVar n => "Var(" ^ n ^ ")"
   | tEvar ev args => "Evar(" ^ string_of_nat ev ^ "," ^ string_of_list string_of_term args ^ ")"
-  | tSort s => "Sort(" ^ string_of_sort s ^ ")"
+  | tUniv s => "Sort(" ^ string_of_univ s ^ ")"
   | tCast c k t => "Cast(" ^ string_of_term c ^ (* TODO *) ","
                            ^ string_of_term t ^ ")"
   | tProd na b t => "Prod(" ^ string_of_name na.(binder_name) ^ ","
@@ -213,7 +213,7 @@ Proof.
             mind_entry_finite := decl.(ind_finite); (* inductive *)
             mind_entry_params := _ (* Should be ind_params, but translations are broken: for Simon decl.(ind_params) *);
             mind_entry_inds := _;
-            mind_entry_universes := universes_entry_of_decl decl.(ind_universes);
+            mind_entry_ulvls := ulvls_entry_of_decl decl.(ind_ulvls);
             mind_entry_template := false;
             mind_entry_variance := option_map (map Some) decl.(ind_variance);
             mind_entry_private := None |}.
@@ -259,7 +259,7 @@ Fixpoint strip_casts t :=
     tCoFix mfix' idx
   | tArray u arr def ty =>
     tArray u (List.map strip_casts arr) (strip_casts def) (strip_casts ty)
-  | tRel _ | tVar _ | tSort _ | tConst _ _ | tInd _ _ | tConstruct _ _ _ => t
+  | tRel _ | tVar _ | tUniv _ | tConst _ _ | tInd _ _ | tConstruct _ _ _ => t
   | tInt _ | tFloat _ | tString _ => t
   end.
 
@@ -384,8 +384,8 @@ Definition mkCase_old (Σ : global_env) (ci : case_info) (p : term) (c : term) (
       tt oib.(ind_ctors) brs ;;
   ret (tCase ci p' c brs').
 
-Definition default_sort_quality_or_set (s : sort) : allowed_eliminations :=
-  match s with
+Definition default_sort_quality_or_set (s : Universe.t) : allowed_eliminations :=
+  match usort s with
   | sSProp => IntoSProp
   | sProp => IntoPropSProp
   | _ => IntoAny
@@ -413,15 +413,15 @@ Definition make_constructor_body (id : ident) (indrel : nat)
   derived from the universe (i.e. does not handle inductives with singleton elimination, or impredicate set
   eliminations). *)
 Definition make_inductive_body (id : ident) (params : context) (indices : context)
-   (s : sort) (ind_ctors : list constructor_body) : one_inductive_body :=
+   (s : Universe.t) (ind_ctors : list constructor_body) : one_inductive_body :=
   {| ind_name := id;
      ind_indices := indices;
-     ind_sort := s;
-     ind_type := it_mkProd_or_LetIn (params ,,, indices) (tSort s);
+     ind_univ := s;
+     ind_type := it_mkProd_or_LetIn (params ,,, indices) (tUniv s);
      ind_kelim := default_sort_quality_or_set s;
      ind_ctors := ind_ctors;
      ind_projs := [];
-     ind_relevance := relevance_of_sort s |}.
+     ind_relevance := relevance_of_univ s |}.
 
 Ltac change_Sk :=
   repeat match goal with
@@ -489,7 +489,7 @@ Definition map_branch_with_binders (f : A -> term -> term) (b : branch term) : b
     It is not recursive and the order in which subterms are processed is not specified. *)
 Definition map_term_with_binders (f : A -> term -> term) (t : term) : term :=
   match t with
-  | tRel _ | tVar _ | tSort _ | tConst _ _ | tInd _ _ | tConstruct _ _ _ | tInt _ | tFloat _ | tString _ => t
+  | tRel _ | tVar _ | tUniv _ | tConst _ _ | tInd _ _ | tConstruct _ _ _ | tInt _ | tFloat _ | tString _ => t
   | tEvar n ts => tEvar n (List.map (f a) ts)
   | tCast b k t => tCast (f a b) k (f a t)
   | tProd name ty body => tProd name (f a ty) (f (lift name a) body)
@@ -524,7 +524,7 @@ Definition fold_branch_with_binders (f : A -> Acc -> term -> Acc) (acc : Acc) (b
 (** Fold version of [map_term_with_binders]. *)
 Definition fold_term_with_binders (f : A -> Acc -> term -> Acc) (acc : Acc) (t : term) : Acc :=
   match t with
-  | tRel _ | tVar _ | tSort _ | tConst _ _ | tInd _ _
+  | tRel _ | tVar _ | tUniv _ | tConst _ _ | tInd _ _
   | tConstruct _ _ _ | tInt _ | tFloat _ | tString _ => acc
   | tEvar n ts => List.fold_left (f a) ts acc
   | tCast b k t => let acc := f a acc b in f a acc t
@@ -590,7 +590,7 @@ Definition map_branch_with_bindersM (f : A -> term -> M term) (b : branch term) 
 (** Monadic variant of [map_term_with_binders]. *)
 Definition map_term_with_bindersM (f : A -> term -> M term) (t : term) : M term :=
   match t with
-  | tRel _ | tVar _ | tSort _ | tConst _ _ | tInd _ _
+  | tRel _ | tVar _ | tUniv _ | tConst _ _ | tInd _ _
   | tConstruct _ _ _ | tInt _ | tFloat _ | tString _ => ret t
   | tEvar n ts =>
     let* ts := monad_map (f a) ts in
@@ -658,7 +658,7 @@ Definition fold_branch_with_bindersM (f : A -> Acc -> term -> M Acc) (acc : Acc)
 (** Monadic variant of [fold_term_with_binders]. *)
 Definition fold_term_with_bindersM (f : A -> Acc -> term -> M Acc) (acc : Acc) (t : term) : M Acc :=
   match t with
-  | tRel _ | tVar _ | tSort _ | tConst _ _ | tInd _ _
+  | tRel _ | tVar _ | tUniv _ | tConst _ _ | tInd _ _
   | tConstruct _ _ _ | tInt _ | tFloat _ | tString _ => ret acc
   | tEvar n ts => monad_fold_left (f a) ts acc
   | tCast b k t => let* acc := f a acc b in f a acc t
@@ -740,14 +740,14 @@ Section Lookups.
 
   Definition lookup_constant_type cst u :=
     match lookup_env Σ cst with
-    | Some (ConstantDecl {| cst_type := ty; cst_universes := uctx |}) =>
+    | Some (ConstantDecl {| cst_type := ty; cst_ulvls := uctx |}) =>
         Some (subst_instance u ty)
     |  _ => None
     end.
 
   Definition lookup_constant_type_cstrs cst u :=
     match lookup_env Σ cst with
-    | Some (ConstantDecl {| cst_type := ty; cst_universes := uctx |}) =>
+    | Some (ConstantDecl {| cst_type := ty; cst_ulvls := uctx |}) =>
         let cstrs := polymorphic_constraints uctx in
         Some (subst_instance u ty, subst_instance_cstrs u cstrs)
       |  _ => None
@@ -775,7 +775,7 @@ Section Lookups.
     |None => None
     |Some res =>
     let '(mib, body) := res in
-    let uctx := mib.(ind_universes) in
+    let uctx := mib.(ind_ulvls) in
     let cstrs := polymorphic_constraints uctx in
     Some (subst_instance u body.(ind_type), subst_instance_cstrs u cstrs)
     end.
@@ -804,7 +804,7 @@ Section Lookups.
     |None => None
     |Some res =>
     let '(mib, cdecl) := res in
-    let cstrs := polymorphic_constraints mib.(ind_universes) in
+    let cstrs := polymorphic_constraints mib.(ind_ulvls) in
     Some (subst0 (inds ind u mib.(ind_bodies)) (subst_instance u cdecl.(cstr_type)),
         subst_instance_cstrs u cstrs)
     end.

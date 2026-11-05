@@ -1209,7 +1209,7 @@ Definition string_of_level (l : Level.t) : string :=
 Definition string_of_level_expr (e : LevelExpr.t) : string :=
   let '(l, n) := e in string_of_level l ^ (if n is 0 then "" else "+" ^ string_of_nat n).
 
-Definition string_of_sort (u : Universe.t) :=
+Definition string_of_univ (u : Universe.t) :=
   match usort u with
   | sSProp => "SProp"
   | sProp => "Prop"
