@@ -9,7 +9,7 @@ Section Normal.
 
   Inductive normal (Γ : context) : term -> Prop :=
   | nf_ne t : neutral Γ t -> normal Γ t
-  | nf_sort s : normal Γ (tSort s)
+  | nf_sort s : normal Γ (tUniv s)
   | nf_prod na A B : normal Γ A -> normal (Γ ,, vass na A) B ->
                      normal Γ (tProd na A B)
   | nf_lam na A B : normal Γ A -> normal (Γ ,, vass na A) B ->
@@ -39,7 +39,7 @@ Section Normal.
 
   Inductive whnf (Γ : context) : term -> Prop :=
   | whnf_ne t : whne Γ t -> whnf Γ t
-  | whnf_sort s : whnf Γ (tSort s)
+  | whnf_sort s : whnf Γ (tUniv s)
   | whnf_prod na A B : whnf Γ (tProd na A B)
   | whnf_lam na A B : whnf Γ (tLambda na A B)
   | whnf_cstrapp i n u v : whnf Γ (mkApps (tConstruct i n u) v)
