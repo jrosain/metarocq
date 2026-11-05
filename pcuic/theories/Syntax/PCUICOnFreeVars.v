@@ -87,7 +87,7 @@ Fixpoint on_free_vars (p : nat -> bool) (t : term) : bool :=
   | tProj _ c => on_free_vars p c
   | tFix mfix idx | tCoFix mfix idx =>
     List.forallb (test_def (on_free_vars p) (on_free_vars (shiftnP #|mfix| p))) mfix
-  | tVar _ | tSort _ | tConst _ _ | tInd _ _ | tConstruct _ _ _ => true
+  | tVar _ | tUniv _ | tConst _ _ | tInd _ _ | tConstruct _ _ _ => true
   | tPrim pr => test_prim (on_free_vars p) pr
   end.
 
@@ -620,7 +620,7 @@ Definition occ_betweenP k n :=
   fun i => (k <=? i) && (i <? k + n).
 
 Lemma on_free_vars_decl_all_term P d s :
-  on_free_vars_decl P d = on_free_vars P (mkProd_or_LetIn d (tSort s)).
+  on_free_vars_decl P d = on_free_vars P (mkProd_or_LetIn d (tUniv s)).
 Proof.
   rewrite /on_free_vars_decl /= /test_decl.
   destruct d as [na [b|] ty] => /= //; now rewrite andb_true_r.
@@ -635,7 +635,7 @@ Proof.
 Qed.
 
 Lemma on_free_vars_ctx_all_term P ctx s :
-  on_free_vars_ctx P ctx = on_free_vars P (it_mkProd_or_LetIn ctx (tSort s)).
+  on_free_vars_ctx P ctx = on_free_vars P (it_mkProd_or_LetIn ctx (tUniv s)).
 Proof.
   rewrite /on_free_vars_ctx.
   rewrite -{2}[P](shiftnP0 P).
@@ -1127,8 +1127,8 @@ Proof.
   intros hpars hn.
   rewrite /inst_case_context.
   rewrite test_context_k_eq.
-  rewrite (on_free_vars_ctx_all_term _ _ Sort.type0).
-  rewrite -(subst_it_mkProd_or_LetIn _ _ _ (tSort _)).
+  rewrite (on_free_vars_ctx_all_term _ _ Universe.type0).
+  rewrite -(subst_it_mkProd_or_LetIn _ _ _ (tUniv _)).
   intros a.
   apply on_free_vars_subst => //.
   { rewrite forallb_rev //. }
@@ -1240,8 +1240,8 @@ Lemma on_free_vars_ctx_subst_context P s k ctx :
   on_free_vars_ctx (shiftnP k P) (subst_context s k ctx).
 Proof.
   intros onctx ons.
-  rewrite (on_free_vars_ctx_all_term _ _ Sort.type0).
-  rewrite -(subst_it_mkProd_or_LetIn _ _ _ (tSort _)).
+  rewrite (on_free_vars_ctx_all_term _ _ Universe.type0).
+  rewrite -(subst_it_mkProd_or_LetIn _ _ _ (tUniv _)).
   eapply on_free_vars_impl; revgoals.
   - eapply on_free_vars_subst_gen => //; tea.
     rewrite -on_free_vars_ctx_all_term //. exact onctx.
@@ -1261,8 +1261,8 @@ Lemma on_free_vars_ctx_lift_context p k n ctx :
   on_free_vars_ctx p ctx =
   on_free_vars_ctx (strengthenP k n p) (lift_context n k ctx).
 Proof.
-  rewrite !(on_free_vars_ctx_all_term _ _ Sort.type0).
-  rewrite -(lift_it_mkProd_or_LetIn _ _ _ (tSort _)).
+  rewrite !(on_free_vars_ctx_all_term _ _ Universe.type0).
+  rewrite -(lift_it_mkProd_or_LetIn _ _ _ (tUniv _)).
   rewrite on_free_vars_lift => //.
 Qed.
 
@@ -1345,7 +1345,7 @@ Lemma term_on_free_vars_ind :
       All (on_free_vars p) l ->
       All (P p) l ->
       P p (tEvar id l)) ->
-    (forall p s, P p (tSort s)) ->
+    (forall p s, P p (tUniv s)) ->
     (forall p (na : aname) (t : term) dom codom,
       on_free_vars p dom ->
       P p dom ->
