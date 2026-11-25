@@ -58,7 +58,7 @@ Lemma reference_impl_env_iter_pop_eq
   (n : nat)
   (X' := ErasureFunction.iter abstract_pop_decls (S n) wfe)
   : reference_impl_env X'
-    = {| PCUICAst.PCUICEnvironment.universes := PCUICAst.PCUICEnvironment.universes (reference_impl_env wfe)
+    = {| PCUICAst.PCUICEnvironment.ulvls := PCUICAst.PCUICEnvironment.ulvls (reference_impl_env wfe)
       ; PCUICAst.PCUICEnvironment.declarations := skipn (S n) (PCUICAst.PCUICEnvironment.declarations (reference_impl_env wfe))
       ; PCUICAst.PCUICEnvironment.retroknowledge := PCUICAst.PCUICEnvironment.retroknowledge (reference_impl_env wfe) |}.
 Proof.
@@ -85,7 +85,7 @@ Qed.
           Σ
             ∼_ext @abstract_make_wf_env_ext extraction_checker_flags
             (@optimized_abstract_env_impl extraction_checker_flags _) wfe
-            (PCUICAst.PCUICEnvironment.cst_universes cb) pf -> PCUICSN.NormalizationIn Σ)
+            (PCUICAst.PCUICEnvironment.cst_ulvls cb) pf -> PCUICSN.NormalizationIn Σ)
     /\
       (let wfe := build_wf_env_from_env p.1 (map_squash (PCUICTyping.wf_ext_wf _) (wfΣ : ∥ PCUICTyping.wf_ext (H := config.extraction_checker_flags) p ∥)) in
        forall n : nat,
@@ -98,7 +98,7 @@ Qed.
              let Xext :=
                @abstract_make_wf_env_ext extraction_checker_flags
                  (@optimized_abstract_env_impl extraction_checker_flags _) X'
-                 (PCUICAst.PCUICEnvironment.cst_universes cb) pf in
+                 (PCUICAst.PCUICEnvironment.cst_ulvls cb) pf in
              forall Σ : PCUICAst.PCUICEnvironment.global_env_ext,
                PCUICTyping.wf_ext Σ -> Σ ∼_ext Xext -> PCUICSN.NormalizationIn Σ).
 Proof.
@@ -279,7 +279,7 @@ Equations? erase_program_typed guard (p : pcuic_program) (pre : typed_erasure_pr
   let t' := erase_term wfΣ p.2 _ in
   (erase_global_decls_deps_recursive
     (X_type := PCUICWfEnvImpl.optimized_abstract_env_impl (guard := guard))
-    (X := X) (PEnv.declarations p.1) (PEnv.universes p.1) (PEnv.retroknowledge p.1)
+    (X := X) (PEnv.declarations p.1) (PEnv.ulvls p.1) (PEnv.retroknowledge p.1)
     (fun Σ' eq => _)
     (EAstUtils.term_global_deps t') (fun _ => false), t').
 Proof.
@@ -613,7 +613,7 @@ Qed.
 
 Definition extends_global_env (Σ Σ' : global_env_ext_map) :=
   [/\ (forall kn decl, lookup_env Σ kn = Some decl ->lookup_env Σ' kn = Some decl),
-      Σ.(universes) = Σ'.(universes), Σ.2 = Σ'.2 & Σ.(retroknowledge) = Σ'.(retroknowledge)].
+      Σ.(ulvls) = Σ'.(ulvls), Σ.2 = Σ'.2 & Σ.(retroknowledge) = Σ'.(retroknowledge)].
 
 Definition extends_pcuic_program (p p' : pcuic_program) :=
   extends_global_env p.1 p'.1 /\ p.2 = p'.2.

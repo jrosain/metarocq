@@ -698,10 +698,10 @@ Section PCUICInv.
   Proof.
     induction 1 using value_values_ind.
     - destruct t0 => //.
-      + eapply inversion_Sort in wf as [? []]; eauto.
-        now eapply ws_cumul_pb_Sort_Prod_inv in w0.
+      + eapply inversion_Univ in wf as [? []]; eauto.
+        now eapply ws_cumul_pb_Univ_Prod_inv in w0.
       + eapply inversion_Prod in wf as [? [? [? []]]]; eauto.
-        now eapply ws_cumul_pb_Sort_Prod_inv in w.
+        now eapply ws_cumul_pb_Univ_Prod_inv in w.
       +(* Constructor case: due to eta expansion *)
         cbn. intros exp. depelim exp.
         now rewrite nth_error_nil in H0.
@@ -2478,7 +2478,7 @@ Section pipeline_theorem.
   Variable v : PCUICAst.term.
 
   Variable i : Kernames.inductive.
-  Variable u : Universes.Instance.t.
+  Variable u : Levels.Instance.t.
   Variable args : list PCUICAst.term.
 
   Variable Normalisation :  (forall Σ, wf_ext Σ -> PCUICSN.NormalizationIn Σ).

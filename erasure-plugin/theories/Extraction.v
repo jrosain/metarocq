@@ -10,7 +10,7 @@ From MetaRocq.Utils Require Import utils.
 
 Extraction Blacklist Classes config uGraph Universes Ast String List Nat Int
            UnivSubst Typing Checker Retyping OrderedType Logic Common ws_cumul_pb Classes Numeral
-           Uint63 Induction Monad.
+           Uint63 Induction Monad Sorts.
 Set Warnings "-extraction-opaque-accessed".
 Set Warnings "-extraction-reserved-identifier".
 

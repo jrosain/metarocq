@@ -855,7 +855,7 @@ Lemma map_In_length {A B} (l : list A) (f : forall x, In x l -> B) :
 Proof. funelim (map_In l f); cbn; auto; lia. Qed.
 
 Lemma lookup_inductive_erase_global_decls_deps {X_type X} {decls : global_env} {prop incl ignore} {kn} {decl} :
-  ExAst.lookup_inductive (@Erasure.erase_global_decls_deps_recursive X_type X (declarations decls) (universes decls) (retroknowledge decls) prop incl ignore) kn = Some decl ->
+  ExAst.lookup_inductive (@Erasure.erase_global_decls_deps_recursive X_type X (declarations decls) (ulvls decls) (retroknowledge decls) prop incl ignore) kn = Some decl ->
   exists decl', PCUICAst.lookup_inductive decls kn = Some decl' /\ #|ind_ctors decl'.2| = #|ExAst.ind_ctors decl|.
 Proof.
   rewrite /ExAst.lookup_inductive /ExAst.lookup_minductive.
