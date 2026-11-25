@@ -28,12 +28,12 @@ Program Definition infer_template_program {cf : checker_flags} {nor : normalizin
           Σ0 ∼ X ->
           Σ0 =
             {|
-              universes := (trans_program p).1;
+              ulvls := (trans_program p).1;
               declarations := skipn Hdecls' (declarations (trans_program p).1);
               retroknowledge := retroknowledge (trans_program p).1
             |}) ->
       forall X' : X_env_ext_type optimized_abstract_env_impl,
-        check_wf_env_ext_prop optimized_abstract_env_impl X X' (universes_decl_of_decl g) ->
+        check_wf_env_ext_prop optimized_abstract_env_impl X X' (ulvls_decl_of_decl g) ->
         forall Σ0 : global_env_ext, wf_ext Σ0 -> Σ0 ∼_ext X' -> NormalizationIn Σ0}
   {normalization_in'
     : forall x : X_env_ext_type optimized_abstract_env_impl,
@@ -56,12 +56,12 @@ Program Definition infer_and_print_template_program {cf : checker_flags} {nor : 
           Σ0 ∼ X ->
           Σ0 =
             {|
-              universes := (trans_program p).1;
+              ulvls := (trans_program p).1;
               declarations := skipn Hdecls' (declarations (trans_program p).1);
               retroknowledge := retroknowledge (trans_program p).1
             |}) ->
       forall X' : X_env_ext_type optimized_abstract_env_impl,
-        check_wf_env_ext_prop optimized_abstract_env_impl X X' (universes_decl_of_decl g) ->
+        check_wf_env_ext_prop optimized_abstract_env_impl X X' (ulvls_decl_of_decl g) ->
         forall Σ0 : global_env_ext, wf_ext Σ0 -> Σ0 ∼_ext X' -> NormalizationIn Σ0}
   {normalization_in'
     : forall x : X_env_ext_type optimized_abstract_env_impl,
