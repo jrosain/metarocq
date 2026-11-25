@@ -1304,10 +1304,10 @@ Corollary R_Acc_aux :
     intros wf wh ctor fin typ.
     destruct wh.
     - easy.
-    - apply inversion_Sort in typ as (?&?&?); auto.
-      exfalso; eapply invert_cumul_sort_ind; eauto.
+    - apply inversion_Univ in typ as (?&?&?); auto.
+      exfalso; eapply invert_cumul_univ_ind; eauto.
     - apply inversion_Prod in typ as (?&?&?&?&?); auto.
-      exfalso; eapply invert_cumul_sort_ind; eauto.
+      exfalso; eapply invert_cumul_univ_ind; eauto.
     - apply inversion_Lambda in typ as (?&?&?&?); auto.
       exfalso; eapply invert_cumul_prod_ind; eauto.
     - unfold isConstruct_app in ctor.
@@ -1340,10 +1340,10 @@ Corollary R_Acc_aux :
     intros wf wh ctor cof typ.
     destruct wh.
     - easy.
-    - apply inversion_Sort in typ as (?&?&?); auto.
-      exfalso; eapply invert_cumul_sort_ind; eauto.
+    - apply inversion_Univ in typ as (?&?&?); auto.
+      exfalso; eapply invert_cumul_univ_ind; eauto.
     - apply inversion_Prod in typ as (?&?&?&?&?); auto.
-      exfalso; eapply invert_cumul_sort_ind; eauto.
+      exfalso; eapply invert_cumul_univ_ind; eauto.
     - apply inversion_Lambda in typ as (?&?&?&?); auto.
       exfalso; eapply invert_cumul_prod_ind; eauto.
     - unfold isConstruct_app in ctor.
@@ -1504,8 +1504,8 @@ Corollary R_Acc_aux :
           simpl in h. rewrite stack_context_appstack in h.
           destruct h as [T h].
           apply inversion_App in h as (?&?&?&?&?); auto.
-          apply inversion_Sort in t0 as (?&?&?); auto.
-          eapply PCUICConversion.ws_cumul_pb_Sort_Prod_inv; eauto.
+          apply inversion_Univ in t0 as (?&?&?); auto.
+          eapply PCUICConversion.ws_cumul_pb_Univ_Prod_inv; eauto.
       + unfold zipp.
         case_eq (decompose_stack π). intros l ρ e.
         apply decompose_stack_eq in e. subst.
@@ -1519,7 +1519,7 @@ Corollary R_Acc_aux :
           destruct h as [T h].
           apply inversion_App in h as (?&?&?&?&?); auto.
           apply inversion_Prod in t0 as (?&?&?&?&?); auto.
-          eapply PCUICConversion.ws_cumul_pb_Sort_Prod_inv; eauto.
+          eapply PCUICConversion.ws_cumul_pb_Univ_Prod_inv; eauto.
         + unfold zipp.
           case_eq (decompose_stack π). intros l ρ e.
           apply decompose_stack_eq in e. subst.
@@ -1850,15 +1850,15 @@ Section ReduceFns.
     apply reduce_term_complete; eauto.
   Qed.
 
-  Equations? reduce_to_sort (Γ : context) (t : term)
+  Equations? reduce_to_univ (Γ : context) (t : term)
     (h : forall Σ (wfΣ : abstract_env_ext_rel X Σ), welltyped Σ Γ t)
-    : typing_result_comp (∑ u, forall Σ (wfΣ : abstract_env_ext_rel X Σ), ∥ Σ ;;; Γ ⊢ t ⇝ tSort u ∥) :=
-    reduce_to_sort Γ t h with view_sortc t := {
-      | view_sort_sort s => Checked_comp (s; _);
-      | view_sort_other t _ with inspect (hnf Γ t h) :=
-        | exist hnft eq with view_sortc hnft := {
-          | view_sort_sort s => Checked_comp (s; _);
-          | view_sort_other hnft r => TypeError_comp (NotASort hnft) _
+    : typing_result_comp (∑ u, forall Σ (wfΣ : abstract_env_ext_rel X Σ), ∥ Σ ;;; Γ ⊢ t ⇝ tUniv u ∥) :=
+    reduce_to_univ Γ t h with view_univc t := {
+      | view_univ_univ s => Checked_comp (s; _);
+      | view_univ_other t _ with inspect (hnf Γ t h) :=
+        | exist hnft eq with view_univc hnft := {
+          | view_univ_univ s => Checked_comp (s; _);
+          | view_univ_other hnft r => TypeError_comp (NotASort hnft) _
         }
       }.
   Proof using Type.
@@ -1872,17 +1872,17 @@ Section ReduceFns.
       edestruct (@hnf_complete Γ t h) as [wh]; eauto.
       edestruct (@hnf_sound Γ t h) as [r']; eauto.
       eapply PCUICContextConversion.closed_red_confluence in X1 as (?&r1&r2); eauto.
-      apply invert_red_sort in r2 as ->.
+      apply invert_red_univ in r2 as ->.
       eapply whnf_red_inv in r1; eauto.
       depelim r1.
       rewrite H in r.
       now cbn in r.
   Qed.
 
-  Lemma reduce_to_sort_complete {Γ t wt} Σ (wfΣ : abstract_env_ext_rel X Σ)
+  Lemma reduce_to_univ_complete {Γ t wt} Σ (wfΣ : abstract_env_ext_rel X Σ)
     e p :
-    reduce_to_sort Γ t wt = TypeError_comp e p ->
-    (forall s, red Σ Γ t (tSort s) -> False).
+    reduce_to_univ Γ t wt = TypeError_comp e p ->
+    (forall s, red Σ Γ t (tUniv s) -> False).
   Proof using Type.
     intros _ s r.
     apply p.
@@ -2026,9 +2026,9 @@ Section ReduceFns.
   (* Definition of assumption-only arities (without lets) *)
   Definition arity_ass := aname * term.
 
-  Fixpoint mkAssumArity (l : list arity_ass) (s : sort) : term :=
+  Fixpoint mkAssumArity (l : list arity_ass) (s : Universe.t) : term :=
     match l with
-    | [] => tSort s
+    | [] => tUniv s
     | (na, A) :: l => tProd na A (mkAssumArity l s)
     end.
 
@@ -2047,8 +2047,8 @@ Section ReduceFns.
       constructor; auto.
   Qed.
 
-  Lemma mkAssumArity_it_mkProd_or_LetIn (l : list arity_ass) (s : sort) :
-    mkAssumArity l s = it_mkProd_or_LetIn (arity_ass_context l) (tSort s).
+  Lemma mkAssumArity_it_mkProd_or_LetIn (l : list arity_ass) (s : Universe.t) :
+    mkAssumArity l s = it_mkProd_or_LetIn (arity_ass_context l) (tUniv s).
   Proof using Type.
     unfold arity_ass_context.
     rewrite rev_map_spec.
@@ -2067,7 +2067,7 @@ Section ReduceFns.
   Record conv_arity {Γ T} : Type :=
     build_conv_arity {
         conv_ar_context : list arity_ass;
-        conv_ar_univ : sort;
+        conv_ar_univ : Universe.t;
         conv_ar_red : forall Σ (wfΣ : abstract_env_ext_rel X Σ), ∥ Σ ;;; Γ ⊢ T ⇝ mkAssumArity conv_ar_context conv_ar_univ ∥
       }.
 

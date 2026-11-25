@@ -342,57 +342,57 @@ Section infer_irrel.
     rewrite h h' in H. now cbn in H.
   Qed.
 
-  Definition same_sort_comp {cf} {nor : normalizing_flags}
+  Definition same_univ_comp {cf} {nor : normalizing_flags}
     {X_type : abstract_env_impl} {X : X_type.π2.π1}
     {X_type' : abstract_env_impl} {X' : X_type'.π2.π1}
     {Γ : context} {t t'}
     (pf : typing_result_comp
-      (∑ u, forall Σ0 : global_env_ext, abstract_env_ext_rel X Σ0 -> ∥ Σ0 ;;; Γ ⊢ t ⇝ tSort u ∥))
+      (∑ u, forall Σ0 : global_env_ext, abstract_env_ext_rel X Σ0 -> ∥ Σ0 ;;; Γ ⊢ t ⇝ tUniv u ∥))
     (pf' : typing_result_comp
-      (∑ u, forall Σ0 : global_env_ext, abstract_env_ext_rel X' Σ0 -> ∥ Σ0 ;;; Γ ⊢ t' ⇝ tSort u ∥)) :=
+      (∑ u, forall Σ0 : global_env_ext, abstract_env_ext_rel X' Σ0 -> ∥ Σ0 ;;; Γ ⊢ t' ⇝ tUniv u ∥)) :=
     same_typing_result_comp (fun x y => x.π1 = y.π1) pf pf'.
 
-  Lemma reduce_to_sort_irrel {Γ t t'} (e : t = t')
+  Lemma reduce_to_univ_irrel {Γ t t'} (e : t = t')
     (wi : forall Σ : global_env_ext, abstract_env_ext_rel X Σ -> welltyped Σ Γ t)
     (wi' : forall Σ : global_env_ext, abstract_env_ext_rel X' Σ -> welltyped Σ Γ t') :
-    same_sort_comp (reduce_to_sort Γ t wi) (reduce_to_sort Γ t' wi').
+    same_univ_comp (reduce_to_univ Γ t wi) (reduce_to_univ Γ t' wi').
   Proof using hl.
     destruct e.
-    unfold reduce_to_sort.
-    destruct (view_sortc); simp reduce_to_sort.
+    unfold reduce_to_univ.
+    destruct (view_univc); simp reduce_to_univ.
     now cbn.
-    unfold reduce_to_sort_clause_1_clause_2; cbn.
+    unfold reduce_to_univ_clause_1_clause_2; cbn.
     epose proof (same_hnf wi wi').
     do 2 match goal with
     |- context [@eq_refl ?A ?t] => let e := fresh "e" in set(e := @eq_refl A t)
     end.
-    set (v := view_sortc (hnf Γ t wi)). clearbody v.
-    set (v' := view_sortc (hnf Γ t wi')). clearbody v'.
+    set (v := view_univc (hnf Γ t wi)). clearbody v.
+    set (v' := view_univc (hnf Γ t wi')). clearbody v'.
     clearbody e e0.
-    unfold reduce_to_sort_clause_1_clause_2_clause_1.
+    unfold reduce_to_univ_clause_1_clause_2_clause_1.
     destruct v. destruct v'. cbn. now noconf H. cbn.
     noconf H. now cbn in n0.
     destruct v'. cbn. subst t0. now cbn in n0.
     subst t1. cbn. auto.
   Qed.
 
-  Lemma infer_as_sort_irrel {Γ t}
+  Lemma infer_as_univ_irrel {Γ t}
     (wf : forall Σ : global_env_ext, abstract_env_ext_rel X Σ -> ∥ wf_local Σ Γ ∥)
     (wf' : forall Σ : global_env_ext, abstract_env_ext_rel X' Σ -> ∥ wf_local Σ Γ ∥)
     (wi : forall Σ : global_env_ext, abstract_env_ext_rel X Σ -> well_sorted Σ Γ t)
     (wi' : forall Σ : global_env_ext, abstract_env_ext_rel X' Σ -> well_sorted Σ Γ t)
-    hp hp' : hp.π1 = hp'.π1 -> (infer_as_sort X_type X wf wi hp).π1 = (infer_as_sort X_type' X' wf' wi' hp').π1.
+    hp hp' : hp.π1 = hp'.π1 -> (infer_as_univ X_type X wf wi hp).π1 = (infer_as_univ X_type' X' wf' wi' hp').π1.
   Proof using hl.
-    unfold infer_as_sort.
+    unfold infer_as_univ.
     unfold PCUICSafeRetyping.principal_type_type.
-    set (obl := fun Σ wfΣ => PCUICSafeRetyping.infer_as_sort_obligation_1 _ _ _ _ _ _ _ Σ wfΣ).
-    set (obl' := fun Σ wfΣ => PCUICSafeRetyping.infer_as_sort_obligation_1 _ _ _ _ _ _ _ Σ wfΣ).
+    set (obl := fun Σ wfΣ => PCUICSafeRetyping.infer_as_univ_obligation_1 _ _ _ _ _ _ _ Σ wfΣ).
+    set (obl' := fun Σ wfΣ => PCUICSafeRetyping.infer_as_univ_obligation_1 _ _ _ _ _ _ _ Σ wfΣ).
     clearbody obl obl'.
-    destruct reduce_to_sort as [[s hr]|] eqn:h. 2:bang.
-    destruct (reduce_to_sort _ hp'.π1 _) as [[s' hr']|] eqn:h'. 2:bang.
+    destruct reduce_to_univ as [[s hr]|] eqn:h. 2:bang.
+    destruct (reduce_to_univ _ hp'.π1 _) as [[s' hr']|] eqn:h'. 2:bang.
     cbn. destruct hp, hp'; cbn; intros <-.
-    cbn -[reduce_to_sort] in *.
-    epose proof (reduce_to_sort_irrel eq_refl obl obl').
+    cbn -[reduce_to_univ] in *.
+    epose proof (reduce_to_univ_irrel eq_refl obl obl').
     rewrite h h' in H. now cbn in H.
   Qed.
 
@@ -478,13 +478,13 @@ Proof.
   all:try bang.
   - now cbn.
   - simpl.
-    cbn. f_equal. f_equal; unfold PCUICSafeRetyping.principal_sort_sort.
+    cbn. f_equal. f_equal; unfold PCUICSafeRetyping.principal_univ_univ.
     set (obl := fun a b => _).
     set (obl' := fun a b => _).
     set (obl'' := fun a b => _).
     set (obl''' := fun a b => _).
-    cbn. eapply infer_as_sort_irrel => //. now eapply H.
-    eapply infer_as_sort_irrel => //. now eapply H0.
+    cbn. eapply infer_as_univ_irrel => //. now eapply H.
+    eapply infer_as_univ_irrel => //. now eapply H0.
   - cbn. f_equal.
     unfold PCUICSafeRetyping.principal_type_type. apply H; eauto.
   - cbn. f_equal. apply H; eauto.
@@ -635,31 +635,31 @@ Proof.
     destruct y;  simp infer; cbn; congruence.
 Qed.
 
-Lemma sort_of_type_irrel
+Lemma univ_of_type_irrel
   {cf} {nor : normalizing_flags} {X_type : abstract_env_impl} {X : X_type.π2.π1} {normalization_in : forall Σ, wf_ext Σ -> Σ ∼_ext X -> NormalizationIn Σ}
   {X_type' : abstract_env_impl} {X' : X_type'.π2.π1} {normalization_in' : forall Σ, wf_ext Σ -> Σ ∼_ext X' -> NormalizationIn Σ}
   (hl : Hlookup X_type X X_type' X')
   {Γ : context} {t}
   (wt : forall Σ : global_env_ext, abstract_env_ext_rel X Σ -> ∥ isType Σ Γ t ∥)
   (wt' : forall Σ : global_env_ext, abstract_env_ext_rel X' Σ -> ∥ isType Σ Γ t ∥) :
-  (sort_of_type X_type X Γ t wt).π1 = (sort_of_type X_type' X' Γ t wt').π1.
+  (univ_of_type X_type X Γ t wt).π1 = (univ_of_type X_type' X' Γ t wt').π1.
 Proof.
-  simp sort_of_type.
-  set (obl := sort_of_type_obligation_1 _ _ _ _ _).
-  set (obl2 := sort_of_type_obligation_1 _ _ _ _ _ ).
+  simp univ_of_type.
+  set (obl := univ_of_type_obligation_1 _ _ _ _ _).
+  set (obl2 := univ_of_type_obligation_1 _ _ _ _ _ ).
   set(ty := (type_of_typing _ _ _ _ obl)) in *.
   set(ty' := (type_of_typing _ _ _ _ obl2)) in *.
-  set (obl' := sort_of_type_obligation_2 _ _ _ _ _ _).
-  set (obl2' := sort_of_type_obligation_2 _ _ _ _ _ _).
+  set (obl' := univ_of_type_obligation_2 _ _ _ _ _ _).
+  set (obl2' := univ_of_type_obligation_2 _ _ _ _ _ _).
   assert (ty.π1 = ty'.π1).
   { subst ty ty'. unfold type_of_typing.
     eapply infer_irrel => //. }
   clearbody ty. clearbody ty'.
   destruct ty, ty'. cbn in H. subst x0.
-  pose proof (reduce_to_sort_irrel hl eq_refl obl' obl2').
+  pose proof (reduce_to_univ_irrel hl eq_refl obl' obl2').
   destruct (PCUICSafeReduce.inspect) eqn:hi.
-  cbn -[sort_of_type_clause_1_clause_1].
-  destruct (PCUICSafeReduce.inspect (reduce_to_sort _ x obl2')) eqn:hi';
+  cbn -[univ_of_type_clause_1_clause_1].
+  destruct (PCUICSafeReduce.inspect (reduce_to_univ _ x obl2')) eqn:hi';
   rewrite -e -e0 in H.
   destruct x0, x1 => //. cbn in H.
   destruct a, a0. cbn in H; noconf H.

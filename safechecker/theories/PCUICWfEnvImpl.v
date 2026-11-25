@@ -33,7 +33,7 @@ Program Definition reference_pop {cf:checker_flags} (Σ : reference_impl) : refe
 match Σ.(declarations) with
  [] => Σ
  | (d::decls) =>
-   {| reference_impl_env := {| universes := Σ.(universes); declarations := decls; retroknowledge := Σ.(retroknowledge) |} |}
+   {| reference_impl_env := {| ulvls := Σ.(ulvls); declarations := decls; retroknowledge := Σ.(retroknowledge) |} |}
 end.
 Next Obligation.
 destruct Σ.(reference_impl_wf). sq.
@@ -42,7 +42,7 @@ now depelim ond.
 Qed.
 
 Program Definition make_wf_env_ext {cf:checker_flags} {guard : abstract_guard_impl}
-(Σ : reference_impl) (univs : universes_decl)
+(Σ : reference_impl) (univs : ulvls_decl)
 (prf : forall Σ0 : global_env, Σ0 = Σ -> ∥ wf_ext (Σ0, univs) ∥) : reference_impl_ext :=
 {| reference_impl_env_ext := (Σ, univs);|}.
 
@@ -55,7 +55,7 @@ Program Global Instance canonical_abstract_env_struct {cf:checker_flags} {guard 
   abstract_env_guard := fun Σ fix_cofix => guard_impl fix_cofix (reference_impl_env_ext Σ);
   abstract_env_ext_rel := fun X Σ => Σ = reference_impl_env_ext X;
   abstract_env_init := fun cs retro H =>  {|
-     reference_impl_env := {| universes := cs ;
+     reference_impl_env := {| ulvls := cs ;
                                declarations := [];
                                retroknowledge := retro |}; |} ;
   abstract_env_add_decl := fun X kn d H =>
@@ -96,7 +96,7 @@ Record wf_env_ext {cf:checker_flags} {guard : abstract_guard_impl} := {
 }.
 
 Lemma wf_env_eta {cf : checker_flags} (Σ : wf_env) :
- {| universes := Σ.(universes); declarations := Σ.(declarations); retroknowledge := Σ.(retroknowledge) |} = Σ.
+ {| ulvls := Σ.(ulvls); declarations := Σ.(declarations); retroknowledge := Σ.(retroknowledge) |} = Σ.
 Proof.
   destruct Σ => /= //. destruct reference_impl_env => //.
 Qed.
@@ -132,7 +132,7 @@ Lemma reference_pop_decls_correct {cf:checker_flags} (X:reference_impl) decls
   exists d, Σ.(declarations) = d :: decls) :
   let X' := reference_pop X in
   forall Σ Σ', Σ = X -> Σ' = X' ->
-          Σ'.(declarations) = decls /\ Σ.(universes) = Σ'.(universes) /\
+          Σ'.(declarations) = decls /\ Σ.(ulvls) = Σ'.(ulvls) /\
           Σ.(retroknowledge) = Σ'.(retroknowledge).
 Proof.
   cbn; intros; subst. specialize (prf _ eq_refl).

@@ -96,10 +96,10 @@ Qed.
 Lemma inductive_cumulative_indices_smash {cf : checker_flags} {Σ : global_env_ext} {wfΣ : wf Σ} :
   forall {ind mdecl idecl u u' napp},
   declared_inductive Σ ind mdecl idecl ->
-  on_udecl_prop Σ (ind_universes mdecl) ->
-  consistent_instance_ext Σ (ind_universes mdecl) u ->
-  consistent_instance_ext Σ (ind_universes mdecl) u' ->
-  PCUICEquality.cmp_ind_universes Σ ind napp u u' ->
+  on_udecl_prop Σ (ind_ulvls mdecl) ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) u ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) u' ->
+  PCUICEquality.cmp_ind_ulvls Σ ind napp u u' ->
   forall Γ pars pars',
   spine_subst Σ Γ pars (List.rev pars) (smash_context [] (subst_instance u (ind_params mdecl))) ->
   spine_subst Σ Γ pars' (List.rev pars') (smash_context [] (subst_instance u' (ind_params mdecl))) ->
@@ -177,20 +177,20 @@ Qed.
 
   #[local] Definition principal_type Γ t :=
     ∑ T : term, forall Σ (wfΣ : abstract_env_ext_rel X Σ), ∥ Σ ;;; Γ |- t ▹ T ∥.
-  #[local] Definition principal_sort Γ T :=
+  #[local] Definition principal_univ Γ T :=
     ∑ u, forall Σ (wfΣ : abstract_env_ext_rel X Σ), ∥ Σ ;;; Γ |- T ▹□ u ∥.
   #[local] Definition principal_type_type {Γ t} (wt : principal_type Γ t) : term
     := projT1 wt.
-  #[local] Definition principal_sort_sort {Γ T} (ps : principal_sort Γ T) : sort
+  #[local] Definition principal_univ_univ {Γ T} (ps : principal_univ Γ T) : Universe.t
     := projT1 ps.
   #[local] Coercion principal_type_type : principal_type >-> term.
-  #[local] Coercion principal_sort_sort : principal_sort >-> sort.
+  #[local] Coercion principal_univ_univ : principal_univ >-> Universe.t.
 
-  Program Definition infer_as_sort {Γ T}
+  Program Definition infer_as_univ {Γ T}
     (wfΓ : forall Σ (wfΣ : abstract_env_ext_rel X Σ), ∥ wf_local Σ Γ ∥)
     (wf : forall Σ (wfΣ : abstract_env_ext_rel X Σ), well_sorted Σ Γ T)
-    (tx : principal_type Γ T) : principal_sort Γ T :=
-    match @reduce_to_sort cf nor _ X _ Γ tx _ with
+    (tx : principal_type Γ T) : principal_univ Γ T :=
+    match @reduce_to_univ cf nor _ X _ Γ tx _ with
     | Checked_comp (u;_) => (u;_)
     | TypeError_comp e _ => !
     end.
@@ -219,7 +219,7 @@ Qed.
         cbn in *.
     sq.
     destruct wf as [[? i]], (hΣ _ wfΣ) as [wΣ].
-    eapply infering_sort_infering in i ; eauto.
+    eapply infering_univ_infering in i ; eauto.
     eapply wildcard'. exists x0. intros.
     erewrite(abstract_env_ext_irr _ _ wfΣ); eauto.
     Unshelve. all: eauto.
@@ -303,15 +303,15 @@ Qed.
     infer Γ wfΓ (tVar n) wt := !;
     infer Γ wfΓ (tEvar ev args) wt := !;
 
-    infer Γ wfΓ (tSort s) wt := ret (tSort (Sort.super s));
+    infer Γ wfΓ (tUniv s) wt := ret (tUniv (Universe.super s));
 
     infer Γ wfΓ (tProd n ty b) wt :=
       let wfΓ' : forall Σ (wfΣ : abstract_env_ext_rel X Σ), ∥ wf_local Σ (Γ ,, vass n ty) ∥ := _ in
       let ty1 := infer Γ wfΓ ty (fun a b => (welltyped_subterm (wt a b)).1) in
-      let s1 := infer_as_sort wfΓ (fun a b => (welltyped_subterm (wt a b)).1) ty1 in
+      let s1 := infer_as_univ wfΓ (fun a b => (welltyped_subterm (wt a b)).1) ty1 in
       let ty2 := infer (Γ ,, vass n ty) wfΓ' b (fun a b => (welltyped_subterm (wt a b)).2) in
-      let s2 := infer_as_sort wfΓ' (fun a b => (welltyped_subterm (wt a b)).2) ty2 in
-      ret (tSort (Sort.sort_of_product s1 s2));
+      let s2 := infer_as_univ wfΓ' (fun a b => (welltyped_subterm (wt a b)).2) ty2 in
+      ret (tUniv (Universe.univ_of_product s1 s2));
 
     infer Γ wfΓ (tLambda n t b) wt :=
       let t2 := infer (Γ ,, vass n t) _ b (fun a b => (welltyped_subterm (wt a b)).2) in
@@ -402,8 +402,8 @@ Qed.
     sq.
     constructor ; tea.
     inversion X0.
-    apply lift_sorting_forget_univ in X1.
-    now eapply lift_sorting_lift_typing in X1.
+    apply lift_univing_forget_univ in X1.
+    now eapply lift_univing_lift_typing in X1.
   Defined.
   Next Obligation.
     cbn ; intros. destruct s1, s2.
@@ -413,19 +413,19 @@ Qed.
     sq.
     constructor; eauto.
     inversion wfΓ''; subst.
-    apply lift_typing_lift_sorting in X1; tas.
-    pose proof (lift_sorting_extract X1).
+    apply lift_typing_lift_univing in X1; tas.
+    pose proof (lift_univing_extract X1).
     assert (X1.2.π1 = x) as <-; tas.
     clear X2.
     destruct X1 as (? & x' & X1 & ?); cbn.
-    eapply infering_sort_sort; tea.
+    eapply infering_univ_univ; tea.
   Defined.
 
   Next Obligation.
     pose (hΣ _ wfΣ). specialize_Σ wfΣ. inversion wt. sq.
     inversion X0 ; subst.
     constructor ; tea.
-    now eapply lift_sorting_lift_typing.
+    now eapply lift_univing_lift_typing.
   Defined.
   Next Obligation.
     case t2 as []. intros; cbn.  specialize_Σ wfΣ.
@@ -439,7 +439,7 @@ Qed.
     pose (hΣ _ wfΣ). specialize_Σ wfΣ. inversion wt. sq.
     inversion X0 ; subst.
     constructor ; tea.
-    now eapply lift_sorting_lift_typing.
+    now eapply lift_univing_lift_typing.
   Defined.
   Next Obligation.
    cbn; intros; case b'_ty as []. cbn.
@@ -836,12 +836,12 @@ Qed.
   Proof using Type. intros. destruct H. now eapply isType_welltyped. Qed.
 
   Opaque type_of_typing.
-  Equations? sort_of_type (Γ : context) (t : PCUICAst.term)
+  Equations? univ_of_type (Γ : context) (t : PCUICAst.term)
     (wt : forall Σ : global_env_ext, abstract_env_ext_rel X Σ -> ∥ isType Σ Γ t ∥) :
-    (∑ u : sort, forall Σ : global_env_ext, abstract_env_ext_rel X Σ ->
-      ∥ Σ ;;; Γ |- t : tSort u ∥) :=
-    sort_of_type Γ t wt with (@type_of_typing Γ t _) :=
-      { | T with inspect (reduce_to_sort (X:=X) Γ T.π1 _) :=
+    (∑ u : Universe.t, forall Σ : global_env_ext, abstract_env_ext_rel X Σ ->
+      ∥ Σ ;;; Γ |- t : tUniv u ∥) :=
+    univ_of_type Γ t wt with (@type_of_typing Γ t _) :=
+      { | T with inspect (reduce_to_univ (X:=X) Γ T.π1 _) :=
         { | exist (Checked_comp (u; Hu)) hr => (u; _)
           | exist (TypeError_comp _ _) ns => False_rect _ _ } }.
   Proof.
@@ -861,13 +861,13 @@ Qed.
       sq. eapply type_reduction_closed; tea.
     - epose proof (abstract_env_ext_exists X) as [[Σ wfΣ]].
       epose proof (abstract_env_ext_wf X wfΣ) as [hwfΣ].
-      symmetry in ns. pose proof (reduce_to_sort_complete _ wfΣ _ _ ns).
+      symmetry in ns. pose proof (reduce_to_univ_complete _ wfΣ _ _ ns).
       cbn in ns. clear ns.
       specialize (wt _ wfΣ). destruct T as [T HT].
       cbn in *. destruct (HT _ wfΣ) as [[hty hp]].
       eapply validity in hty. destruct wt as [(_ & s & Hs & _)].
       red in hp. specialize (hp _ Hs).
-      eapply ws_cumul_pb_Sort_r_inv in hp as [s' [hs' _]].
+      eapply ws_cumul_pb_Univ_r_inv in hp as [s' [hs' _]].
       eapply (H s' hs').
   Defined.
   Transparent type_of_typing.

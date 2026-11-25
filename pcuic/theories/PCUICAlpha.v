@@ -508,7 +508,7 @@ Section Alpha.
     - intros l ih hl Δ v e eqctx; invs e.
       specialize (ih _ eqctx).
       eapply eq_context_conversion; tea.
-      eapply type_Sort; assumption.
+      eapply type_Univ; assumption.
     - intros na A B s1 s2 ih hA ihA hB ihB Δ v e eqctx; invs e.
       assert (lift_typing typing Σ Δ (j_vass_s na' a' s1)).
       + rewrite -H3.

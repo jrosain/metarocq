@@ -1754,7 +1754,7 @@ Section WfEnv.
     Σ ;;; Γ ,,, Δ |- t : tUniv s.
   Proof using wfΣ.
     move/type_it_mkProd_or_LetIn_inv => [Δs [ts [hΔ ht hs leq]]].
-    eapply type_Cumul; tea. eapply type_Sort; pcuic.
+    eapply type_Cumul; tea. eapply type_Univ; pcuic.
     eapply cumul_Univ.
     transitivity (univ_of_products Δs ts); auto using leq_univ_product.
     apply leq_univ_univ_of_products.

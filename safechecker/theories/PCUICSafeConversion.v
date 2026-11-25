@@ -523,11 +523,11 @@ Section Conversion.
     eapply R_aux_stateR. all: simpl. all: auto.
   Qed.
 
-  Definition abstract_env_compare_global_instance := compare_global_instance (abstract_env_lookup X) (abstract_env_compare_universe X).
+  Definition abstract_env_compare_global_instance := compare_global_instance (abstract_env_lookup X) (abstract_env_compare_ulvl X).
 
-  Notation eqb_ctx := (eqb_ctx_upto (abstract_env_compare_universe X) (abstract_env_compare_sort X) abstract_env_compare_global_instance Conv).
-  Notation cmpb_term_napp := (eqb_term_upto_univ_napp (abstract_env_compare_universe X) (abstract_env_compare_sort X) abstract_env_compare_global_instance).
-  Notation cmpb_term pb := (eqb_term_upto_univ (abstract_env_compare_universe X) (abstract_env_compare_sort X) abstract_env_compare_global_instance pb).
+  Notation eqb_ctx := (eqb_ctx_upto (abstract_env_compare_ulvl X) (abstract_env_compare_univ X) abstract_env_compare_global_instance Conv).
+  Notation cmpb_term_napp := (eqb_term_upto_univ_napp (abstract_env_compare_ulvl X) (abstract_env_compare_univ X) abstract_env_compare_global_instance).
+  Notation cmpb_term pb := (eqb_term_upto_univ (abstract_env_compare_ulvl X) (abstract_env_compare_univ X) abstract_env_compare_global_instance pb).
   Notation eqb_term := (cmpb_term Conv).
   Notation leqb_term := (cmpb_term Cumul).
 
@@ -543,16 +543,16 @@ Section Conversion.
     - destruct b; intuition.
   Qed.
 
-  Definition wf_universe_iff  Σ u :
-    wf_universeb Σ u <-> wf_universe Σ u.
+  Definition wf_ulvl_iff  Σ u :
+    wf_ulvlb Σ u <-> wf_ulvl Σ u.
   Proof using Type.
-    symmetry; apply reflect_iff. eapply wf_universe_reflect.
+    symmetry; apply reflect_iff. eapply wf_ulvl_reflect.
   Qed.
 
-  Definition wf_sort_iff Σ s :
-    wf_sortb Σ s <-> wf_sort Σ s.
+  Definition wf_univ_iff Σ s :
+    wf_univb Σ s <-> wf_univ Σ s.
   Proof using Type.
-    symmetry; apply reflect_iff. eapply wf_sort_reflect.
+    symmetry; apply reflect_iff. eapply wf_univ_reflect.
   Qed.
 
   Definition wf_instance_iff Σ u :
@@ -1346,86 +1346,86 @@ Section Conversion.
     eapply typing_wf_local in X0; eauto.
   Qed.
 
-  Definition eqb_universe_instance :=
-    compare_universe_instance (abstract_env_compare_universe X Conv).
+  Definition eqb_ulvl_instance :=
+    compare_ulvl_instance (abstract_env_compare_ulvl X Conv).
 
-  Lemma eqb_universe_instance_spec :
+  Lemma eqb_ulvl_instance_spec :
     forall u v Σ (wfΣ : abstract_env_ext_rel X Σ),
-      forallb (wf_universeb Σ) (map Universe.make' u) ->
-      forallb (wf_universeb Σ) (map Universe.make' v) ->
-      eqb_universe_instance u v ->
-      cmp_universe_instance (eq_universe (global_ext_constraints Σ)) u v.
+      forallb (wf_ulvlb Σ) (map UnivLvl.make' u) ->
+      forallb (wf_ulvlb Σ) (map UnivLvl.make' v) ->
+      eqb_ulvl_instance u v ->
+      cmp_ulvl_instance (eq_ulvl (global_ext_constraints Σ)) u v.
   Proof using Type.
     intros u v Σ wfΣ Hu Hv.
     eapply elimT.
-    eapply reflect_reflectT, reflect_cmp_universe_instance; tea.
+    eapply reflect_reflectT, reflect_cmp_ulvl_instance; tea.
     intros.
     apply iff_reflect.
-    eapply abstract_env_compare_universe_correct with (conv_pb := Conv); tas.
-    all: now eapply wf_universe_iff.
+    eapply abstract_env_compare_ulvl_correct with (conv_pb := Conv); tas.
+    all: now eapply wf_ulvl_iff.
   Qed.
 
   Arguments LevelSet.mem : simpl never.
 
-  Lemma compare_universeb_complete Σ (wfΣ : abstract_env_ext_rel X Σ) pb u u' :
-    wf_universe Σ u ->
-    wf_universe Σ u' ->
-    compare_universe (global_ext_constraints Σ) pb u u' ->
-    abstract_env_compare_universe X pb u u'.
+  Lemma compare_ulvlb_complete Σ (wfΣ : abstract_env_ext_rel X Σ) pb u u' :
+    wf_ulvl Σ u ->
+    wf_ulvl Σ u' ->
+    compare_ulvl (global_ext_constraints Σ) pb u u' ->
+    abstract_env_compare_ulvl X pb u u'.
   Proof using Type.
     intros all1 all2 conv.
     destruct (heΣ _ wfΣ).
-    eapply abstract_env_compare_universe_correct; eauto.
+    eapply abstract_env_compare_ulvl_correct; eauto.
 Qed.
 
   Lemma get_level_make l :
     LevelExpr.get_level (LevelExpr.make l) = l.
   Proof using Type. now destruct l. Qed.
 
-  Lemma compare_universeb_make_complete Σ (wfΣ : abstract_env_ext_rel X Σ) pb x y :
+  Lemma compare_ulvlb_make_complete Σ (wfΣ : abstract_env_ext_rel X Σ) pb x y :
     wf_level Σ x ->
     wf_level Σ y ->
-    compare_universe (global_ext_constraints Σ) pb (Universe.make' x) (Universe.make' y) ->
-    abstract_env_compare_universe X pb (Universe.make' x) (Universe.make' y).
+    compare_ulvl (global_ext_constraints Σ) pb (UnivLvl.make' x) (UnivLvl.make' y) ->
+    abstract_env_compare_ulvl X pb (UnivLvl.make' x) (UnivLvl.make' y).
   Proof using Type.
     intros wfx wfy r.
-    eapply compare_universeb_complete; eauto.
+    eapply compare_ulvlb_complete; eauto.
     - intros ? ->%LevelExprSet.singleton_spec; auto.
     - intros ? ->%LevelExprSet.singleton_spec; auto.
   Qed.
 
-  Lemma eqb_universe_instance_complete Σ (wfΣ : abstract_env_ext_rel X Σ) u u' :
+  Lemma eqb_ulvl_instance_complete Σ (wfΣ : abstract_env_ext_rel X Σ) u u' :
     wf_instance Σ u ->
     wf_instance Σ u' ->
-    cmp_universe_instance (eq_universe (global_ext_constraints Σ)) u u' ->
-    eqb_universe_instance u u'.
+    cmp_ulvl_instance (eq_ulvl (global_ext_constraints Σ)) u u' ->
+    eqb_ulvl_instance u u'.
   Proof using Type.
     intros memu memu'.
     eapply introT.
     unfold wf_instance in *.
-    eapply reflect_reflectT, reflect_cmp_universe_instance with (p := wf_universeb Σ); tea.
-    1: intros ????; eapply iff_reflect, abstract_env_compare_universe_correct with (conv_pb := Conv); tea.
-    1,2: now eapply wf_universe_iff.
-    all: solve_all; eapply wf_universe_iff; intros ? ->%LevelExprSet.singleton_spec; auto.
+    eapply reflect_reflectT, reflect_cmp_ulvl_instance with (p := wf_ulvlb Σ); tea.
+    1: intros ????; eapply iff_reflect, abstract_env_compare_ulvl_correct with (conv_pb := Conv); tea.
+    1,2: now eapply wf_ulvl_iff.
+    all: solve_all; eapply wf_ulvl_iff; intros ? ->%LevelExprSet.singleton_spec; auto.
   Qed.
 
-  Lemma compare_universe_variance_complete Σ (wfΣ : abstract_env_ext_rel X Σ) pb v u u' :
+  Lemma compare_ulvl_variance_complete Σ (wfΣ : abstract_env_ext_rel X Σ) pb v u u' :
     wf_level Σ u ->
     wf_level Σ u' ->
-    cmp_universe_variance (compare_universe Σ) pb v u u' ->
-    compare_universe_variance (abstract_env_compare_universe X) pb v u u'.
+    cmp_ulvl_variance (compare_ulvl Σ) pb v u u' ->
+    compare_ulvl_variance (abstract_env_compare_ulvl X) pb v u u'.
   Proof using Type.
     intros memu memu' r.
     destruct v; cbn in *; eauto.
-    - eapply compare_universeb_make_complete; eauto.
-    - eapply compare_universeb_make_complete with (pb := Conv); eauto.
+    - eapply compare_ulvlb_make_complete; eauto.
+    - eapply compare_ulvlb_make_complete with (pb := Conv); eauto.
   Qed.
 
-  Lemma compare_universe_instance_variance_complete Σ (wfΣ : abstract_env_ext_rel X Σ) pb v u u' :
+  Lemma compare_ulvl_instance_variance_complete Σ (wfΣ : abstract_env_ext_rel X Σ) pb v u u' :
     wf_instance Σ u ->
     wf_instance Σ u' ->
-    cmp_universe_instance_variance (compare_universe Σ) pb v u u' ->
-    compare_universe_instance_variance (abstract_env_compare_universe X) pb v u u'.
+    cmp_ulvl_instance_variance (compare_ulvl Σ) pb v u u' ->
+    compare_ulvl_instance_variance (abstract_env_compare_ulvl X) pb v u u'.
   Proof using Type.
     intros memu memu' r.
     induction r in memu, memu' |- *; cbnr.
@@ -1433,7 +1433,7 @@ Qed.
       depelim memu'.
       apply Bool.andb_true_iff.
       split.
-      + eapply compare_universe_variance_complete; eauto.
+      + eapply compare_ulvl_variance_complete; eauto.
       + now apply IHr.
   Qed.
 
@@ -1458,7 +1458,7 @@ Qed.
     welltyped Σ Γ (zipc (tConst c u) π) ->
     exists cst,
       declared_constant Σ c cst
-      × consistent_instance_ext Σ (cst_universes cst) u.
+      × consistent_instance_ext Σ (cst_ulvls cst) u.
   Proof using Type.
     intros h.
     zip fold in h.
@@ -1499,7 +1499,7 @@ Qed.
             (h1 : wtp Γ (tConst c u) π1)
             (c' : kername) (u' : Instance.t) (π2 : stack)
             (h2 : wtp Γ (tConst c' u') π2)
-            (ne : c <> c' \/ (c = c' /\ ~eqb_universe_instance u u'))
+            (ne : c <> c' \/ (c = c' /\ ~eqb_ulvl_instance u u'))
             (hx : conv_stack_ctx Γ π1 π2)
             (aux : Aux Term Γ (tConst c u) π1 (tConst c' u') π2 h2)
     : ConversionResult (conv_term leq Γ (tConst c u) π1 (tConst c' u') π2) :=
@@ -1657,7 +1657,7 @@ Qed.
     eapply declared_constant_inj in decl1; eauto; subst.
     apply consistent_instance_ext_wf in cons1.
     apply consistent_instance_ext_wf in cons2.
-    eapply eqb_universe_instance_complete in c1; auto.
+    eapply eqb_ulvl_instance_complete in c1; auto.
   Qed.
   (* Why Solve All Obligations is not working here ??? *)
   Next Obligation. solve_unfold_constants aux eq1 eq2 Σ wfΣ. Defined.
@@ -2641,13 +2641,13 @@ Qed.
     apply PCUICValidity.inversion_mkApps in typ as (?&[typ_prod typ_args]).
     apply inversion_Prod in typ_prod as (?&?&h1&?&?); [|easy].
     eapply PCUICSpine.typing_spine_strengthen in typ_args; eauto.
-    2:{ eapply PCUICArities.isType_Sort. 2:pcuic.
+    2:{ eapply PCUICArities.isType_Univ. 2:pcuic.
         eapply unlift_TypUniv in h1.
-        eapply wf_sort_product; now eapply typing_wf_sort. }
+        eapply wf_univ_product; now eapply typing_wf_univ. }
     clear -typ_args.
     depelim typ_args.
     - easy.
-    - now apply ws_cumul_pb_Sort_Prod_inv in w.
+    - now apply ws_cumul_pb_Univ_Prod_inv in w.
   Qed.
 
   Lemma welltyped_zipc_tProd_appstack_nil Σ (wfΣ : abstract_env_ext_rel X Σ) {Γ na A B l ρ} :
@@ -2671,23 +2671,25 @@ Qed.
     (wfΣ : abstract_env_ext_rel X Σ) pb ref n l l' :
       wf_instance Σ l ->
       wf_instance Σ l' ->
-      cmp_global_instance Σ (compare_universe Σ) pb ref n l l' <->
+      cmp_global_instance Σ (compare_ulvl Σ) pb ref n l l' <->
       abstract_env_compare_global_instance pb ref n l l'.
   Proof.
     intros hl hl'. apply reflect_iff. eapply reflect_cmp_global_instance; eauto.
     all: try rewrite -> wf_universeb_instance_forall.
-    - intros ? ? Hu Hu'; apply iff_reflect; apply (abstract_env_compare_universe_correct _ wfΣ).
-      all: now apply wf_universe_iff.
-    - intros ? ? Hu Hu'; apply iff_reflect; apply (abstract_env_compare_universe_correct _ wfΣ).
-      all: now apply wf_universe_iff.
+    - intros ? ? Hu Hu'; apply iff_reflect; apply (abstract_env_compare_ulvl_correct _ wfΣ).
+      all: now apply wf_ulvl_iff.
+    - intros ? ? Hu Hu'; apply iff_reflect; apply (abstract_env_compare_ulvl_correct _ wfΣ).
+      all: now apply wf_ulvl_iff.
     - intros; now eapply abstract_env_lookup_correct'.
-    - revert hl. apply reflect_iff, wf_instanceP.
-    - revert hl'. apply reflect_iff, wf_instanceP.
+    - rewrite wf_ulvlb_instance_forall.
+      revert hl. apply reflect_iff, wf_instanceP.
+    - rewrite wf_ulvlb_instance_forall.
+      revert hl'. apply reflect_iff, wf_instanceP.
   Qed.
 
   Lemma cmpb_term_correct Σ (wfΣ : abstract_env_ext_rel X Σ) pb napp t u :
-    wf_universes Σ t ->
-    wf_universes Σ u ->
+    wf_ulvls Σ t ->
+    wf_ulvls Σ u ->
     cmpb_term_napp pb napp t u <~>
     compare_term_napp Σ Σ pb napp t u.
   Proof.
@@ -2695,10 +2697,10 @@ Qed.
     eassert _ as H.
     2: split; [eapply elimT|eapply introT]; apply H.
     eapply reflect_eq_term_upto_univ; tea.
-    1,2: intros ????; apply iff_reflect, abstract_env_compare_universe_correct; tea; now apply wf_universe_iff.
-    1,2: intros ????; apply iff_reflect, abstract_env_compare_sort_correct; tea; now apply wf_sort_iff.
+    1,2: intros ????; apply iff_reflect, abstract_env_compare_ulvl_correct; tea; now apply wf_ulvl_iff.
+    1,2: intros ????; apply iff_reflect, abstract_env_compare_univ_correct; tea; now apply wf_univ_iff.
     1,2: intros ??????; apply iff_reflect, compare_global_instance_correct; tea.
-    all: rewrite -> wf_universeb_instance_forall in *; now eapply wf_instance_iff.
+    all: rewrite -> wf_ulvlb_instance_forall in *; now eapply wf_instance_iff.
   Qed.
 
   Lemma reduced_case_discriminee_whne Σ (wfΣ : abstract_env_ext_rel X Σ) Γ π ci p c brs h :
@@ -2723,9 +2725,9 @@ Qed.
       specialize_Σ wfΣ. pose proof (h _ wfΣ) as [C hc]. sq.
       apply closed_red_red in Hreduce. eapply PCUICSR.subject_reduction in hc; eauto.
       Opaque reduce_term.
-      eapply typing_wf_universes in hc as [? ?]%andb_and; eauto.
+      eapply typing_wf_ulvls in hc as [? ?]%andb_and; eauto.
     - clear eq. specialize_Σ wfΣ. sq. destruct h as [? h].
-      eapply typing_wf_universes in h as [h h']%andb_and; eauto.
+      eapply typing_wf_ulvls in h as [h h']%andb_and; eauto.
     Unshelve. all:eauto.
   Qed.
 
@@ -2746,9 +2748,9 @@ Qed.
     apply welltyped_zipp_inv in Ht; eauto.
   Defined.
 
-  Lemma welltyped_wf Σ Γ t : wf Σ -> welltyped Σ Γ t -> wf_universes Σ t.
+  Lemma welltyped_wf Σ Γ t : wf Σ -> welltyped Σ Γ t -> wf_ulvls Σ t.
   Proof using Type.
-    intros ? [? Ht]. apply typing_wf_universes in Ht; eauto.
+    intros ? [? Ht]. apply typing_wf_ulvls in Ht; eauto.
     cbn in Ht. rtoProp; intuition.
   Qed.
 
@@ -2814,9 +2816,9 @@ Qed.
       specialize_Σ wfΣ. pose proof (h _ wfΣ) as [C hc]. sq.
       apply closed_red_red in Hreduce. eapply PCUICSR.subject_reduction in hc; eauto.
       Opaque reduce_term.
-      eapply typing_wf_universes in hc as [? ?]%andb_and; eauto.
+      eapply typing_wf_ulvls in hc as [? ?]%andb_and; eauto.
     - clear eq. specialize_Σ wfΣ. sq. destruct h as [? h].
-    eapply typing_wf_universes in h as [h h']%andb_and; eauto.
+    eapply typing_wf_ulvls in h as [h h']%andb_and; eauto.
     Unshelve. all:eauto.
   Qed.
 
@@ -3040,8 +3042,8 @@ Qed.
   (hp : ∥ ws_cumul_pb_terms Σ (Γ,,, stack_context π) (pparams p) (pparams p') ∥) :
   ∥ ∑ mdecl idecl,
     [× declared_inductive Σ ci mdecl idecl,
-      forallb (wf_universeb Σ) (map Universe.make' (puinst p)),
-      forallb (wf_universeb Σ) (map Universe.make' (puinst p')),
+      forallb (wf_ulvlb Σ) (map UnivLvl.make' (puinst p)),
+      forallb (wf_ulvlb Σ) (map UnivLvl.make' (puinst p')),
        #|pparams p| = ind_npars mdecl,
        #|pparams p'| = ind_npars mdecl,
        eq_context_upto_names p.(pcontext) p'.(pcontext),
@@ -3082,10 +3084,10 @@ Qed.
     exists mdecl, idecl.
     destruct hcase. destruct hcase'.
     split; tea.
-    - eapply Forall_forallb; try eapply consistent_instance_wf_sort; eauto.
-      intros; apply wf_universe_iff; eauto.
-    - eapply Forall_forallb; try eapply consistent_instance_wf_sort; eauto.
-      intros; apply wf_universe_iff; eauto.
+    - eapply Forall_forallb; try eapply consistent_instance_wf_ulvl; eauto.
+      intros; apply wf_ulvl_iff; eauto.
+    - eapply Forall_forallb; try eapply consistent_instance_wf_ulvl; eauto.
+      intros; apply wf_ulvl_iff; eauto.
     - eapply (wf_predicate_length_pars wf_pred).
     - eapply (wf_predicate_length_pars wf_pred0).
     - etransitivity; tea.
@@ -3149,7 +3151,7 @@ Qed.
       | Error ce not_conv_params => no ce;
 
       | Success conv_params
-        with inspect (eqb_universe_instance p1.(puinst) p2.(puinst)) := {
+        with inspect (eqb_ulvl_instance p1.(puinst) p2.(puinst)) := {
 
         | exist false not_eq_insts => no (CasePredUnequalUniverseInstances
                                             (Γ,,, stack_context π1) ci1 p1 c1 brs1
@@ -3188,7 +3190,7 @@ Qed.
   Next Obligation.
     rename H into wfΣ.
     destruct (hΣ _ wfΣ).
-    eapply eq_sym, eqb_universe_instance_spec in eq_insts; eauto.
+    eapply eq_sym, eqb_ulvl_instance_spec in eq_insts; eauto.
     - destruct (case_conv_preds_inv _ wfΣ h1 _ _ _ h2 hx (conv_params _ wfΣ)) as []; tea.
       specialize_Σ wfΣ.    destruct hx as [hx].
     destruct conv_params as [conv_params].
@@ -3211,7 +3213,7 @@ Qed.
   Next Obligation.
     unfold zipp in conv_ret; simpl in conv_ret.
     destruct (case_conv_preds_inv _ wfΣ h1 _ _ _ h2 hx (conv_params Σ wfΣ)) as []; tea.
-    eapply eq_sym, eqb_universe_instance_spec in eq_insts; eauto.
+    eapply eq_sym, eqb_ulvl_instance_spec in eq_insts; eauto.
     - specialize_Σ wfΣ. destruct hx as [hx]. destruct conv_params as [conv_params].
     destruct conv_ret as [h].
     split. split; auto.
@@ -3239,7 +3241,7 @@ Qed.
     apply consistent_instance_ext_wf in cons.
     apply consistent_instance_ext_wf in cons0.
     specialize_Σ wfΣ; destruct H as [[]].
-    apply eqb_universe_instance_complete in c; eauto.
+    apply eqb_ulvl_instance_complete in c; eauto.
     congruence.
   Qed.
   Next Obligation.
@@ -3388,7 +3390,7 @@ Equations (noeqns) isconv_array_values_aux
     | prog_view_App _ _ _ _ := False_rect _ _;
 
     | prog_view_Const c u c' u' with eq_dec c c' := {
-      | left eq1 with inspect (eqb_universe_instance u u') := {
+      | left eq1 with inspect (eqb_ulvl_instance u u') := {
         | @exist true eq2 with isconv_args_raw leq (tConst c u) π1 (tConst c' u') π2 aux := {
           | Success h := yes ;
           (* Unfold both constants at once *)
@@ -3590,7 +3592,7 @@ Equations (noeqns) isconv_array_values_aux
           { | @exist true eqf := yes
             | @exist false neqf := no (DistinctPrimValues (Γ ,,, stack_context π1) p (Γ ,,, stack_context π2) p') }
         | (primArray; primArrayModel a) | (primArray; primArrayModel a')
-          with inspect (abstract_env_compare_universe X Conv (Universe.make' (array_level a)) (Universe.make' (array_level a'))) :=
+          with inspect (abstract_env_compare_ulvl X Conv (UnivLvl.make' (array_level a)) (UnivLvl.make' (array_level a'))) :=
           { | @exist false neql := no (ArrayNotConvertibleLevels (Γ ,,, stack_context π1) a (Γ ,,, stack_context π2) a')
             | @exist true eql with isconv_red_raw Conv (array_type a) (PrimArray_ty a.(array_level) a.(array_value) a.(array_default) :: π1)
                 (array_type a') (PrimArray_ty a'.(array_level) a'.(array_value) a'.(array_default) :: π2) aux := {
@@ -3629,13 +3631,13 @@ Equations (noeqns) isconv_array_values_aux
     constructor. eapply ws_cumul_eq_pb.
     constructor. all:fvs.
     - destruct h. eapply welltyped_zipc_zipp in h1; auto. fvs.
-    - constructor. eapply eqb_universe_instance_spec; eauto.
+    - constructor. eapply eqb_ulvl_instance_spec; eauto.
       + eapply welltyped_zipc_tConst_inv in h1 as (?&?&?); eauto;
-        eapply Forall_forallb; try eapply consistent_instance_wf_sort; eauto.
-        intros; apply wf_universe_iff; eauto.
+        eapply Forall_forallb; try eapply consistent_instance_wf_ulvl; eauto.
+        intros; apply wf_ulvl_iff; eauto.
       + eapply welltyped_zipc_tConst_inv in h2 as (?&?&?); eauto;
-        eapply Forall_forallb; try eapply consistent_instance_wf_sort; eauto.
-        intros; apply wf_universe_iff; eauto.
+        eapply Forall_forallb; try eapply consistent_instance_wf_ulvl; eauto.
+        intros; apply wf_ulvl_iff; eauto.
   Qed.
   Next Obligation.
     pose (heΣ _ wfΣ). specialize_Σ wfΣ. sq.
@@ -3985,7 +3987,7 @@ Qed.
       Transparent reduce_term.
       unfold reduce_term.
       rewrite e'. cbn.
-      assert (wf_universes Σ c').
+      assert (wf_ulvls Σ c').
       2: eapply cmpb_term_correct; tea; cbnr.
       - pose proof h2 as Hc. specialize_Σ wfΣ. pose proof (hΣ _  wfΣ); sq.
         apply welltyped_zipc_inv in Hc; eauto.
@@ -3999,7 +4001,7 @@ Qed.
       unfold reduce_term.
       rewrite <- H2.
       cbn.
-      assert (wf_universes Σ c').
+      assert (wf_ulvls Σ c').
       2: eapply cmpb_term_correct; tea; cbnr.
       - pose proof h2 as Hc. specialize_Σ wfΣ. pose proof (hΣ _  wfΣ); sq.
         apply welltyped_zipc_inv in Hc; eauto.
@@ -4072,7 +4074,7 @@ Qed.
       unfold reduce_term.
       rewrite e'.
       cbn.
-      assert (wf_universes Σ c).
+      assert (wf_ulvls Σ c).
       2: eapply cmpb_term_correct; tea; cbnr.
       - pose proof h1 as Hc. specialize_Σ wfΣ. pose proof (hΣ _  wfΣ); sq.
         apply welltyped_zipc_inv in Hc; eauto.
@@ -4086,7 +4088,7 @@ Qed.
       unfold reduce_term.
       rewrite <- H2.
       cbn.
-      assert (wf_universes Σ c).
+      assert (wf_ulvls Σ c).
       2: eapply cmpb_term_correct; tea; cbnr.
       - pose proof h1 as Hc. specialize_Σ wfΣ. pose proof (hΣ _  wfΣ); sq.
         apply welltyped_zipc_inv in Hc; eauto.
@@ -4206,7 +4208,7 @@ Qed.
       unfold reduce_term.
       rewrite e'.
       cbn.
-      assert (wf_universes Σ c').
+      assert (wf_ulvls Σ c').
       2: eapply cmpb_term_correct; tea; cbnr.
       - pose proof h2 as Hc. specialize_Σ wfΣ. pose proof (hΣ _  wfΣ); sq.
         apply welltyped_zipc_inv in Hc; eauto.
@@ -4219,7 +4221,7 @@ Qed.
       unfold reduce_term.
       rewrite <- H2.
       cbn.
-      assert (wf_universes Σ c').
+      assert (wf_ulvls Σ c').
       2: eapply cmpb_term_correct; tea; cbnr.
       - pose proof h2 as Hc. specialize_Σ wfΣ. pose proof (hΣ _  wfΣ); sq.
         apply welltyped_zipc_inv in Hc; eauto.
@@ -4294,7 +4296,7 @@ Qed.
       unfold reduce_term.
       rewrite e'.
       cbn.
-      assert (wf_universes Σ c).
+      assert (wf_ulvls Σ c).
       2: eapply cmpb_term_correct; tea; cbnr.
       - pose proof h1 as Hc. specialize_Σ wfΣ. pose proof (hΣ _  wfΣ); sq.
         apply welltyped_zipc_inv in Hc; eauto.
@@ -4307,7 +4309,7 @@ Qed.
       unfold reduce_term.
       rewrite <- H2.
       cbn.
-      assert (wf_universes Σ c).
+      assert (wf_ulvls Σ c).
       2: eapply cmpb_term_correct; tea; cbnr.
       - pose proof h1 as Hc. specialize_Σ wfΣ. pose proof (hΣ _  wfΣ); sq.
         apply welltyped_zipc_inv in Hc; eauto.
@@ -4858,15 +4860,15 @@ Qed.
     specialize (convdiscrval _ H) as [convval].
     cbn in convty, convdef.
     symmetry in eql.
-    eapply abstract_env_compare_universe_correct with (conv_pb := Conv) in eql; eauto.
-    2:{ destruct h1 as [? ty]; eapply typing_wf_universes in ty; eauto.
-        move/andP: ty => []. rewrite H0 /=. cbn -[wf_universeb].
+    eapply abstract_env_compare_ulvl_correct with (conv_pb := Conv) in eql; eauto.
+    2:{ destruct h1 as [? ty]; eapply typing_wf_ulvls in ty; eauto.
+        move/andP: ty => []. rewrite H0 /=. cbn -[wf_ulvlb].
         rtoProp; intuition auto.
-        now move/wf_universe_reflect: H3. }
-    2:{ destruct h2 as [? ty]; eapply typing_wf_universes in ty; eauto.
-        move/andP: ty => []. rewrite H1 /=. cbn -[wf_universeb].
+        now move/wf_ulvl_reflect: H3. }
+    2:{ destruct h2 as [? ty]; eapply typing_wf_ulvls in ty; eauto.
+        move/andP: ty => []. rewrite H1 /=. cbn -[wf_ulvlb].
         rtoProp; intuition auto.
-        now move/wf_universe_reflect: H3. }
+        now move/wf_ulvl_reflect: H3. }
     constructor. eapply ws_cumul_pb_Prim; eauto; fvs.
     constructor; eauto.
   Qed.
@@ -4944,15 +4946,15 @@ Qed.
     symmetry in neql.
     destruct H as [H]; eapply invert_cumul_Prim in H; depelim H.
     enough false by auto. rewrite <- neql.
-    unshelve eapply (abstract_env_compare_universe_correct _ _ Conv) in e0; eauto.
+    unshelve eapply (abstract_env_compare_ulvl_correct _ _ Conv) in e0; eauto.
     - rewrite H0 in h1. destruct h1 as [? wt].
-      eapply typing_wf_universes in wt; eauto.
-      move/andP: wt => []. cbn -[wf_universeb wf_universe]. rtoProp; intuition auto.
-      now move/wf_universe_reflect: H2.
+      eapply typing_wf_ulvls in wt; eauto.
+      move/andP: wt => []. cbn -[wf_ulvlb wf_ulvl]. rtoProp; intuition auto.
+      now move/wf_ulvl_reflect: H2.
     - rewrite H1 in h2. destruct h2 as [? wt].
-      eapply typing_wf_universes in wt; eauto.
-      move/andP: wt => []. cbn -[wf_universeb wf_universe]. rtoProp; intuition auto.
-      now move/wf_universe_reflect: H2.
+      eapply typing_wf_ulvls in wt; eauto.
+      move/andP: wt => []. cbn -[wf_ulvlb wf_ulvl]. rtoProp; intuition auto.
+      now move/wf_ulvl_reflect: H2.
   Qed.
 
   Next Obligation.
@@ -5581,7 +5583,7 @@ Qed.
       split; eauto with pcuic.
       apply whnf_mkApps.
       depelim w; solve_discr; eauto with pcuic.
-    - apply whnf_mkApps_tSort_inv in wh as ->.
+    - apply whnf_mkApps_tUniv_inv in wh as ->.
       constructor; eexists _, [].
       eauto using whnf_red with pcuic.
     - apply whnf_mkApps_tProd_inv in wh as ->.
@@ -6062,9 +6064,9 @@ Qed.
       clear aux.
       eapply welltyped_context in h2 as [s2 h2]; eauto.
       simpl in h2.
-      apply inversion_Sort in h2 as (_&h2&_); auto.
-      apply inversion_Sort in h1 as (_&h1&_); auto.
-      eapply abstract_env_compare_sort_correct in H0; eauto.
+      apply inversion_Univ in h2 as (_&h2&_); auto.
+      apply inversion_Univ in h1 as (_&h1&_); auto.
+      eapply abstract_env_compare_univ_correct in H0; eauto.
       destruct leq; cbn in *; easy.
       Unshelve. all:eauto.
   Qed.

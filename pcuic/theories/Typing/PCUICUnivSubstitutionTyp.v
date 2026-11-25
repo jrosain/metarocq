@@ -476,7 +476,7 @@ Lemma wf_local_instantiate_poly {Σ ctx Γ u} :
   wf_local Σ (subst_instance u Γ).
 Proof using Type.
   intros wfΣ Huniv wf.
-  epose proof (type_Sort _ _ uSProp wf) as ty. forward ty.
+  epose proof (type_Univ _ _ uSProp wf) as ty. forward ty.
   - apply wf_uSProp.
   - eapply typing_subst_instance_ctx in ty;
     cbn; eauto using typing_wf_local.
@@ -492,7 +492,7 @@ Lemma wf_local_instantiate {Σ} {decl : global_decl} {Γ u c} :
   wf_local Σ (subst_instance u Γ).
 Proof using Type.
   intros wfΣ Hdecl Huniv wf.
-  epose proof (type_Sort _ _ uSProp wf) as ty. forward ty.
+  epose proof (type_Univ _ _ uSProp wf) as ty. forward ty.
   - apply wf_uSProp.
   - eapply typing_subst_instance_decl in ty;
     cbn; eauto using typing_wf_local.

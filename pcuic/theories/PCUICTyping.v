@@ -201,7 +201,7 @@ Inductive typing `{checker_flags} (Σ : global_env_ext) (Γ : context) : term ->
     nth_error Γ n = Some decl ->
     Σ ;;; Γ |- tRel n : lift0 (S n) decl.(decl_type)
 
-| type_Sort : forall s,
+| type_Univ : forall s,
     wf_local Σ Γ ->
     wf_univ Σ s ->
     Σ ;;; Γ |- tUniv s : tUniv (Universe.super s)
