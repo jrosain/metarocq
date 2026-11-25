@@ -31,7 +31,7 @@ Definition global_erased_with_deps (Σ : global_env) (Σ' : EAst.global_declarat
   (exists cst, declared_constant Σ kn cst /\
    exists cst' : EAst.constant_body,
     EGlobalEnv.declared_constant Σ' kn cst' /\
-    erases_constant_body (Σ, cst_universes cst) cst cst' /\
+    erases_constant_body (Σ, cst_ulvls cst) cst cst' /\
     (forall body : EAst.term,
      EAst.cst_body cst' = Some body -> erases_deps Σ Σ' body)) \/
   (exists mib mib', declared_minductive Σ kn mib /\
@@ -345,8 +345,8 @@ Proof.
     specialize (H3 _ eq_refl).
     eapply on_declared_constant in H_; auto.
     red in H_. rewrite cbe in H_. apply unlift_TermTyp in H_.
-    eapply (erases_weakening_env (Σ := (Σ, cst_universes cb))
-       (Σ' := (add_global_decl Σ (kn, d), cst_universes cb))); eauto.
+    eapply (erases_weakening_env (Σ := (Σ, cst_ulvls cb))
+       (Σ' := (add_global_decl Σ (kn, d), cst_ulvls cb))); eauto.
     simpl. econstructor; eauto. econstructor; eauto.
     split => //; eexists [(kn, d)]; intuition eauto.
   - econstructor; eauto. eapply weakening_env_declared_constructor; eauto; tc.
@@ -431,7 +431,7 @@ Proof.
   red in ebody. unfold erases_constant_body.
   destruct (cst_body cst) eqn:bod; destruct (E.cst_body cst') eqn:bod' => //.
   intuition auto.
-  eapply (erases_weakening_env (Σ  := (_, cst_universes cst)) (Σ' := (add_global_decl Σ (kn', d), cst_universes cst))); eauto.
+  eapply (erases_weakening_env (Σ  := (_, cst_ulvls cst)) (Σ' := (add_global_decl Σ (kn', d), cst_ulvls cst))); eauto.
   constructor; eauto. constructor; eauto.
   split => //. exists [(kn', d)]; intuition eauto.
   eapply on_declared_constant in declc_; auto.
@@ -477,7 +477,7 @@ Proof.
   red in ebody. unfold erases_constant_body.
   destruct (cst_body cst) eqn:bod; destruct (E.cst_body cst') eqn:bod' => //.
   intuition auto.
-  eapply (erases_weakening_env (Σ  := (Σ, cst_universes cst)) (Σ' := (add_global_decl Σ (kn', d), cst_universes cst))). 5:eauto.
+  eapply (erases_weakening_env (Σ  := (Σ, cst_ulvls cst)) (Σ' := (add_global_decl Σ (kn', d), cst_ulvls cst))). 5:eauto.
   split; auto. constructor; eauto. constructor; eauto.
   split; auto; exists [(kn', d)]; intuition eauto.
   eapply on_declared_constant in declc; auto.
@@ -521,7 +521,7 @@ Proof.
     * destruct d as [|]; [left|right].
       { cbn. set (Xpop := abstract_pop_decls X).
         unfold erase_constant_decl.
-        set (Xmake :=  abstract_make_wf_env_ext Xpop (cst_universes c) _).
+        set (Xmake :=  abstract_make_wf_env_ext Xpop (cst_ulvls c) _).
         epose proof (abstract_env_exists Xpop) as [[Σpop wfpop]].
         epose proof (abstract_env_ext_exists Xmake) as [[Σmake wfmake]].
         exists c. split; auto.
@@ -537,7 +537,7 @@ Proof.
         rewrite eq_kername_refl. reflexivity.
         cut (strictly_extends_decls Σpop Σ) => [?|].
         eapply (erase_constant_body_correct _ _ _ _ (Σpop , _)); eauto.
-        rewrite <- (abstract_make_wf_env_ext_correct Xpop (cst_universes c) _ Σpop Σmake wfpop wfmake); eauto.
+        rewrite <- (abstract_make_wf_env_ext_correct Xpop (cst_ulvls c) _ Σpop Σmake wfpop wfmake); eauto.
         { now eapply strictly_extends_decls_wf. }
         red. simpl. unshelve epose (abstract_pop_decls_correct X decls _ Σ Σpop wfΣ wfpop).
         { intros. now eexists. }
@@ -554,8 +554,8 @@ Proof.
 
         pose proof (erase_constant_body_correct' H0). specialize_Σ wfmake.
         sq. destruct H1 as [bod [bodty [[Hbod Hebod] Heqdeps]]].
-        rewrite (abstract_make_wf_env_ext_correct Xpop (cst_universes c) _ Σpop Σmake wfpop wfmake) in Hbod, Hebod.
-        eapply (erase_global_erases_deps (Σ := (Σpop, cst_universes c))); simpl; auto.
+        rewrite (abstract_make_wf_env_ext_correct Xpop (cst_ulvls c) _ Σpop Σmake wfpop wfmake) in Hbod, Hebod.
+        eapply (erase_global_erases_deps (Σ := (Σpop, cst_ulvls c))); simpl; auto.
         { constructor; simpl; auto. depelim wf. rewrite Hpop' Hpop'' in o0.
           cbn in o0, o. rewrite prf' in o0. rewrite  <- Hpop in o0. rewrite Hpop' in o. clear -o o0.
           now depelim o0.
@@ -593,7 +593,7 @@ Proof.
       ++ simpl. destruct (KernameSet.mem kn deps) eqn:eqkn.
         unfold erase_constant_decl.
         set (Xpop := abstract_pop_decls X).
-        set (Xmake :=  abstract_make_wf_env_ext Xpop (cst_universes c) _).
+        set (Xmake :=  abstract_make_wf_env_ext Xpop (cst_ulvls c) _).
         epose proof (abstract_env_exists Xpop) as [[Σp wfpop]].
         pose proof (abstract_env_wf _ wfpop) as [wfΣp].
         unshelve epose proof (abstract_pop_decls_correct X decls _ _ _ wfΣ wfpop) as [Hpop [Hpop' Hpop'']].
@@ -689,32 +689,32 @@ Proof.
 Qed.
 
 Lemma global_env_ind (P : global_env -> Type)
-  (Pnil : forall univs retro, P {| universes := univs; declarations := []; retroknowledge := retro |})
+  (Pnil : forall univs retro, P {| ulvls := univs; declarations := []; retroknowledge := retro |})
   (Pcons : forall (Σ : global_env) d, P Σ -> P (add_global_decl Σ d))
   (Σ : global_env) : P Σ.
 Proof.
   destruct Σ as [univs Σ].
   induction Σ; cbn. apply Pnil.
-  now apply (Pcons {| universes := univs; declarations := Σ |} a).
+  now apply (Pcons {| ulvls := univs; declarations := Σ |} a).
 Qed.
 
 Lemma on_global_env_ind (P : forall Σ : global_env, wf Σ -> Type)
-  (Pnil : forall univs retro (onu : on_global_univs univs), P {| universes := univs; declarations := []; retroknowledge := retro |}
+  (Pnil : forall univs retro (onu : on_global_univs univs), P {| ulvls := univs; declarations := []; retroknowledge := retro |}
     (onu, globenv_nil _ _ _ _))
   (Pcons : forall (Σ : global_env) kn d (wf : wf Σ)
     (Hfresh : fresh_global kn Σ.(declarations))
-    (udecl := PCUICLookup.universes_decl_of_decl d)
-    (onud : on_udecl Σ.(universes) udecl)
+    (udecl := PCUICLookup.ulvls_decl_of_decl d)
+    (onud : on_udecl Σ.(ulvls) udecl)
     (pd : on_global_decl cumulSpec0 (lift_typing typing)
-    ({| universes := Σ.(universes); declarations := Σ.(declarations); retroknowledge := Σ.(retroknowledge) |}, udecl) kn d),
+    ({| ulvls := Σ.(ulvls); declarations := Σ.(declarations); retroknowledge := Σ.(retroknowledge) |}, udecl) kn d),
     P Σ wf -> P (add_global_decl Σ (kn, d))
-    (fst wf, globenv_decl _ _ Σ.(universes) Σ.(retroknowledge) Σ.(declarations) kn d (snd wf)
+    (fst wf, globenv_decl _ _ Σ.(ulvls) Σ.(retroknowledge) Σ.(declarations) kn d (snd wf)
             {| kn_fresh := Hfresh ; on_udecl_udecl := onud ; on_global_decl_d := pd |}))
   (Σ : global_env) (wfΣ : wf Σ) : P Σ wfΣ.
 Proof.
   destruct Σ as [univs Σ]. destruct wfΣ; cbn in *.
   induction o0. apply Pnil. destruct o1.
-  apply (Pcons {| universes := univs; declarations := Σ |} kn d (o, o0)).
+  apply (Pcons {| ulvls := univs; declarations := Σ |} kn d (o, o0)).
   exact IHo0.
 Qed.
 
@@ -723,15 +723,15 @@ Ltac inv_eta :=
   | [ H : PCUICEtaExpand.expanded _ _ |- _ ] => depelim H
   end.
 
-Lemma leq_term_propositional_sorted_l {Σ Γ v v' u u'} :
+Lemma leq_term_propositional_unived_l {Σ Γ v v' u u'} :
    wf_ext Σ ->
    PCUICEquality.leq_term Σ (global_ext_constraints Σ) v v' ->
-   Σ;;; Γ |- v : tSort u ->
-   Σ;;; Γ |- v' : tSort u' -> Sort.is_propositional u ->
-   leq_sort (global_ext_constraints Σ) u' u.
+   Σ;;; Γ |- v : tUniv u ->
+   Σ;;; Γ |- v' : tUniv u' -> Universe.is_propositional u ->
+   leq_univ (global_ext_constraints Σ) u' u.
 Proof.
   intros wfΣ leq hv hv' isp.
-  eapply leq_term_prop_sorted_l; eauto.
+  eapply leq_term_prop_unived_l; eauto.
 Qed.
 
 Lemma map_erase_irrel X_type X {normalization_in1 normalization_in2 : forall Σ, wf_ext Σ -> Σ ∼_ext X -> NormalizationIn Σ} Γ t H1 H2 :
@@ -1388,7 +1388,7 @@ Proof.
   destruct d as []; simpl; destruct KernameSet.mem;
   unfold erase_constant_decl;
   set (Xpop := abstract_pop_decls X);
-    try (set (Xmake :=  abstract_make_wf_env_ext Xpop (cst_universes c) _);
+    try (set (Xmake :=  abstract_make_wf_env_ext Xpop (cst_ulvls c) _);
          assert (normalization_in_Xmake : forall Σ : global_env_ext, wf_ext Σ -> Σ ∼_ext Xmake -> NormalizationIn Σ)
            by (subst Xmake; unshelve eapply (normalization_in 0); revgoals; try reflexivity; cbn; lia)).
   + cbn [EGlobalEnv.closed_env forallb]. cbn.
@@ -1509,16 +1509,16 @@ Proof.
     destruct a as [kn []].
     * constructor. cbn.
       unfold erase_constant_decl.
-      set (Σd := {| universes := _ |}).
+      set (Σd := {| ulvls := _ |}).
       assert (Σd = Σpop).
       { subst Σd. rewrite -H H0 H1. now destruct Σpop. }
       subst Σd.
       set (ext := abstract_make_wf_env_ext _ _ _).
       pose proof (abstract_env_ext_exists ext) as [[Σ' wf']].
-      epose proof (abstract_make_wf_env_ext_correct (abstract_pop_decls X) (cst_universes c) _ _ _ hpop wf').
+      epose proof (abstract_make_wf_env_ext_correct (abstract_pop_decls X) (cst_ulvls c) _ _ _ hpop wf').
       subst Σ'.
       cbn. pose proof (abstract_env_wf _ hpop) as [].
-      eapply (erase_constant_body_correct _ _ _ _ (Σpop, cst_universes c)) => //.
+      eapply (erase_constant_body_correct _ _ _ _ (Σpop, cst_ulvls c)) => //.
       now rewrite H2. rewrite H2. split => //. now exists [].
       rewrite H0 H1.
       now eapply IHdecls.
@@ -1609,7 +1609,7 @@ Proof.
   {|
   cst_type := name;
   cst_body := Some bod;
-  cst_universes := udecl |} onc bod eq_refl)). clearbody obl.
+  cst_ulvls := udecl |} onc bod eq_refl)). clearbody obl.
   destruct (obl _ wfΣ'). sq.
   have er : (Σ, univs);;; [] |- bod ⇝ℇ erase X_type X' [] bod obl.
   { eapply (erases_erase (X:=X')).
@@ -1623,7 +1623,7 @@ Qed.
 
 Lemma erase_global_cst_decl_wf_glob X_type X deps decls normalization_in heq :
   forall cb wfΣ hcb,
-  let X' :=  abstract_make_wf_env_ext X (cst_universes cb) wfΣ in
+  let X' :=  abstract_make_wf_env_ext X (cst_ulvls cb) wfΣ in
   forall normalization_in' : forall Σ, wf_ext Σ -> Σ ∼_ext X' -> NormalizationIn Σ,
   let ecb := erase_constant_body X_type X' cb hcb in
   let Σ' := erase_global_deps X_type (KernameSet.union deps ecb.2) X decls normalization_in heq in
@@ -1640,7 +1640,7 @@ Proof.
 Qed.
 
 Lemma erase_global_ind_decl_wf_glob {X_type X} {deps decls normalization_in kn m} heq :
-  (forall Σ : global_env, abstract_env_rel X Σ -> on_inductive cumulSpec0 (lift_typing typing) (Σ, ind_universes m) kn m) ->
+  (forall Σ : global_env, abstract_env_rel X Σ -> on_inductive cumulSpec0 (lift_typing typing) (Σ, ind_ulvls m) kn m) ->
   let m' := erase_mutual_inductive_body m in
   let Σ' := erase_global_deps X_type deps X decls normalization_in heq in
   @wf_global_decl all_env_flags Σ'.1 (EAst.InductiveDecl m').
@@ -1652,7 +1652,7 @@ Proof.
   pose proof (abstract_env_wf _ wf) as [wfΣ].
   assert (erases_mutual_inductive_body m (erase_mutual_inductive_body m)).
   { eapply (erases_mutual (mdecl:=kn)); tea. }
-  eapply (erases_mutual_inductive_body_wf (univs := Σ.(universes)) (retro := Σ.(retroknowledge)) (Σ := decls) (kn := kn) (Σ' := Σ'.1)) in H; tea.
+  eapply (erases_mutual_inductive_body_wf (univs := Σ.(ulvls)) (retro := Σ.(retroknowledge)) (Σ := decls) (kn := kn) (Σ' := Σ'.1)) in H; tea.
   rewrite -(heq _ wf). now destruct Σ.
 Qed.
 
@@ -1706,7 +1706,7 @@ Proof.
   {|
   cst_type := name;
   cst_body := Some bod;
-  cst_universes := udecl |} onc bod eq_refl)). clearbody obl.
+  cst_ulvls := udecl |} onc bod eq_refl)). clearbody obl.
   destruct (obl _ wfΣ'). sq.
   have er : (Σ, univs);;; [] |- bod ⇝ℇ erase X_type X' [] bod obl.
   { eapply (erases_erase (X:=X')).
@@ -1720,7 +1720,7 @@ Qed.
 
 Lemma erase_global_cst_wf_glob X_type X decls normalization_in heq :
   forall cb wfΣ hcb,
-  let X' :=  abstract_make_wf_env_ext X (cst_universes cb) wfΣ in
+  let X' :=  abstract_make_wf_env_ext X (cst_ulvls cb) wfΣ in
   forall normalization_in' : forall Σ, wf_ext Σ -> Σ ∼_ext X' -> NormalizationIn Σ,
   let ecb := erase_constant_body X_type X' cb hcb in
   let Σ' := @erase_global X_type X decls normalization_in heq in
@@ -1737,7 +1737,7 @@ Proof.
 Qed.
 
 Lemma erase_global_ind_decl_wf_glob' {X_type X} {decls normalization_in kn m} heq :
-  (forall Σ : global_env, abstract_env_rel X Σ -> on_inductive cumulSpec0 (lift_typing typing) (Σ, ind_universes m) kn m) ->
+  (forall Σ : global_env, abstract_env_rel X Σ -> on_inductive cumulSpec0 (lift_typing typing) (Σ, ind_ulvls m) kn m) ->
   let m' := erase_mutual_inductive_body m in
   let Σ' := @erase_global X_type X decls normalization_in heq in
   @wf_global_decl all_env_flags Σ' (EAst.InductiveDecl m').
@@ -1749,7 +1749,7 @@ Proof.
   pose proof (abstract_env_wf _ wf) as [wfΣ].
   assert (erases_mutual_inductive_body m (erase_mutual_inductive_body m)).
   { eapply (erases_mutual (mdecl:=kn)); tea. }
-  eapply (erases_mutual_inductive_body_wf (univs := Σ.(universes)) (retro := Σ.(retroknowledge)) (Σ := decls) (kn := kn) (Σ' := Σ')) in H; tea.
+  eapply (erases_mutual_inductive_body_wf (univs := Σ.(ulvls)) (retro := Σ.(retroknowledge)) (Σ := decls) (kn := kn) (Σ' := Σ')) in H; tea.
   rewrite -(heq _ wf). now destruct Σ.
 Qed.
 
@@ -2336,7 +2336,7 @@ Notation NormalizationIn_erase_global_deps_fast X decls
           n < List.length decls ->
           forall kn cb pf,
             List.hd_error (List.skipn n decls) = Some (kn, ConstantDecl cb) ->
-            let Xext := abstract_make_wf_env_ext X (cst_universes cb) pf in
+            let Xext := abstract_make_wf_env_ext X (cst_ulvls cb) pf in
             forall Σ, wf_ext Σ -> Σ ∼_ext Xext -> NormalizationIn Σ
       end)
        (only parsing).
@@ -2359,7 +2359,7 @@ Proof using Type.
 Qed.
 
 Lemma decls_prefix_wf {decls Σ} :
-  decls_prefix decls Σ -> wf Σ -> wf {| universes := Σ.(universes); declarations := decls; retroknowledge := Σ.(retroknowledge) |}.
+  decls_prefix decls Σ -> wf Σ -> wf {| ulvls := Σ.(ulvls); declarations := decls; retroknowledge := Σ.(retroknowledge) |}.
 Proof using Type.
   intros [Σ' hd] wfΣ.
   split. apply wfΣ.
@@ -2375,8 +2375,8 @@ Qed.
 Lemma weaken_prefix {decls Σ kn decl} :
   decls_prefix decls Σ ->
   wf Σ ->
-  lookup_env {| universes := Σ; declarations := decls; retroknowledge := Σ.(retroknowledge) |} kn = Some decl ->
-  on_global_decl cumulSpec0 (lift_typing typing) (Σ, universes_decl_of_decl decl) kn decl.
+  lookup_env {| ulvls := Σ; declarations := decls; retroknowledge := Σ.(retroknowledge) |} kn = Some decl ->
+  on_global_decl cumulSpec0 (lift_typing typing) (Σ, ulvls_decl_of_decl decl) kn decl.
 Proof using Type.
   intros prefix wfΣ.
   have wfdecls := decls_prefix_wf prefix wfΣ.
@@ -2400,7 +2400,7 @@ Program Fixpoint erase_global_deps_fast (deps : KernameSet.t)
   | [] => ([],deps)
   | (kn, ConstantDecl cb) :: decls =>
     if KernameSet.mem kn deps then
-      let Xext' :=  abstract_make_wf_env_ext X (cst_universes cb) _ in
+      let Xext' :=  abstract_make_wf_env_ext X (cst_ulvls cb) _ in
       let normalization_in' : @id Prop _ := _ in (* hack to avoid program erroring out on unresolved tc *)
       let cb' := @erase_constant_body X_type Xext' normalization_in' cb _ in
       let deps := KernameSet.union deps (snd cb') in
@@ -2434,7 +2434,7 @@ Next Obligation.
   pose proof (prop' := prop _ wf).
   sq. eapply (weaken_prefix (kn := kn)) in prop'; tea.
   2:{ cbn. rewrite eqb_refl //. }
-  epose proof (abstract_make_wf_env_ext_correct X (cst_universes cb) _ _ _ wf H). subst.
+  epose proof (abstract_make_wf_env_ext_correct X (cst_ulvls cb) _ _ _ wf H). subst.
   apply prop'.
 Qed.
 Next Obligation.
@@ -2618,7 +2618,7 @@ Qed.
 
 Lemma erase_global_deps_fast_spec_gen {deps}
   {X_type X X'} {decls normalization_in normalization_in' hprefix hprefix'} :
-  (forall Σ Σ', abstract_env_rel X Σ -> abstract_env_rel X' Σ' -> universes Σ = universes Σ' /\ retroknowledge Σ = retroknowledge Σ') ->
+  (forall Σ Σ', abstract_env_rel X Σ -> abstract_env_rel X' Σ' -> ulvls Σ = ulvls Σ' /\ retroknowledge Σ = retroknowledge Σ') ->
   erase_global_deps_fast deps X_type X decls (normalization_in:=normalization_in) hprefix =
   erase_global_deps X_type deps X' decls normalization_in' hprefix'.
 Proof using Type.
@@ -2646,8 +2646,8 @@ Proof using Type.
       eapply erase_constant_body_irrel; cbn => //.
       eapply equiv_env_inter_hlookup.
       intros ? ? H2 H3.
-      epose proof (abstract_make_wf_env_ext_correct X (cst_universes c) _ _ _ wfΣ H2).
-      epose proof (abstract_make_wf_env_ext_correct (abstract_pop_decls X') (cst_universes c) _ _ _ wfpop H3).
+      epose proof (abstract_make_wf_env_ext_correct X (cst_ulvls c) _ _ _ wfΣ H2).
+      epose proof (abstract_make_wf_env_ext_correct (abstract_pop_decls X') (cst_ulvls c) _ _ _ wfpop H3).
       subst. eapply equiv_env_inter_sym.
       eapply extends_global_env_equiv_env.
       pose proof (abstract_env_wf _ wfΣ) as [].
@@ -2734,7 +2734,7 @@ Lemma iter_abstract_pop_decls_correct {cf} {abstract_env_impl abstract_env_ext_i
   forall Σ Σ' : global_env,
   Σ ∼ X ->
   Σ' ∼ X' ->
-  declarations Σ' = decls /\ universes Σ = universes Σ' /\ retroknowledge Σ = retroknowledge Σ'.
+  declarations Σ' = decls /\ ulvls Σ = ulvls Σ' /\ retroknowledge Σ = retroknowledge Σ'.
 Proof.
   intros ap X decls.
   induction n in X, decls |- *. cbn.
@@ -2788,12 +2788,12 @@ Proof using Type.
     red. rewrite H2 H3 H4. split => //. exists (firstn (S n) (Σ'' ++ decls)).
     now rewrite firstn_skipn. }
   specialize (normalization_in n H kn cb).
-  assert (wf_ext (Σ', cst_universes cb)).
+  assert (wf_ext (Σ', cst_ulvls cb)).
   { split => //. cbn. rewrite H3. apply X0. }
-  assert (forall Σ : global_env, Σ ∼ X -> ∥ wf_ext (Σ, cst_universes cb) ∥).
+  assert (forall Σ : global_env, Σ ∼ X -> ∥ wf_ext (Σ, cst_ulvls cb) ∥).
   { intros. pose proof (abstract_env_irr _ H' H5). now subst Σ'. }
   unshelve eapply normalization_in; tea.
-  set (foo := abstract_make_wf_env_ext X (cst_universes cb) H5).
+  set (foo := abstract_make_wf_env_ext X (cst_ulvls cb) H5).
   pose proof (abstract_env_ext_exists foo) as [[Σext hext]].
   epose proof (abstract_make_wf_env_ext_correct _ _ _ _ _ H' hext). now subst Σext.
   erewrite erase_global_deps_fast_spec; tea. reflexivity.

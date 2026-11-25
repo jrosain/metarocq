@@ -173,7 +173,7 @@ Lemma eq_eta_global_env (cf := config.extraction_checker_flags) Σ' Σ :
   abstract_env_rel (abstract_env_impl := (@optimized_abstract_env_impl config.extraction_checker_flags fake_guard_impl_instance).π1) (build_wf_env_from_env (cf := config.extraction_checker_flags) Σ' (assume_env_wellformed Σ')) Σ ->
   Σ =
   {|
-    PEnv.universes := PEnv.universes Σ';
+    PEnv.ulvls := PEnv.ulvls Σ';
     PEnv.declarations := PEnv.declarations Σ';
     PEnv.retroknowledge := PEnv.retroknowledge Σ'
   |}.
@@ -192,7 +192,7 @@ Definition eta_global_env
       erase_global_decls_deps_recursive
         (X_type := optimized_abstract_env_impl (guard := fake_guard_impl_instance))
         (X := build_wf_env_from_env Σp (assume_env_wellformed _))
-        (PEnv.declarations Σp) (PEnv.universes Σp) (PEnv.retroknowledge Σp) (eq_eta_global_env _)
+        (PEnv.declarations Σp) (PEnv.ulvls Σp) (PEnv.retroknowledge Σp) (eq_eta_global_env _)
         seeds erasure_ignore in
   let (const_masks, ind_masks) := analyze_env overridden_masks Σe in
   let const_masks := (if trim_consts then trim_const_masks else id) const_masks in
@@ -203,12 +203,12 @@ Definition eta_global_env
                                                            const_masks := const_masks |} in
                   {| cst_type := cb.(cst_type);
                      cst_body := Some (eta_expand ctors consts Σ b);
-                     cst_universes := cb.(cst_universes);
+                     cst_ulvls := cb.(cst_ulvls);
                      cst_relevance := cb.(cst_relevance)|}
       | None => cb
       end in
   let Σ' := restrict_env (declarations Σ) (map (fun '(kn, _, _) => kn) Σe) in
-  map_constants_global_env id f {| universes := universes Σ; declarations := Σ'; retroknowledge := retroknowledge Σ |}.
+  map_constants_global_env id f {| ulvls := ulvls Σ; declarations := Σ'; retroknowledge := retroknowledge Σ |}.
 
 Definition eta_global_env_template
            (overridden_masks : kername -> option bitmask)

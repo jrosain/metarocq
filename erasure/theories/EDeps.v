@@ -383,7 +383,7 @@ Lemma erases_deps_forall_ind Σ Σ'
   (Hconst : forall (kn : kername) (cb : PCUICAst.PCUICEnvironment.constant_body) (cb' : EAst.constant_body),
       PCUICAst.declared_constant Σ kn cb ->
       EGlobalEnv.declared_constant Σ' kn cb' ->
-      erases_constant_body (Σ, cst_universes cb) cb cb' ->
+      erases_constant_body (Σ, cst_ulvls cb) cb cb' ->
       (forall body : Extract.E.term, Extract.E.cst_body cb' = Some body -> erases_deps Σ Σ' body) ->
       (forall body : Extract.E.term, Extract.E.cst_body cb' = Some body -> P body) ->
         P (Extract.E.tConst kn))
@@ -490,8 +490,8 @@ Proof.
 Qed. *)
 
 Lemma erases_deps_cons Σ Σ' kn decl decl' t :
-  on_global_univs Σ.(universes) ->
-  on_global_decls cumulSpec0 (lift_typing typing) Σ.(universes) Σ.(retroknowledge) ((kn, decl) :: Σ.(declarations)) ->
+  on_global_univs Σ.(ulvls) ->
+  on_global_decls cumulSpec0 (lift_typing typing) Σ.(ulvls) Σ.(retroknowledge) ((kn, decl) :: Σ.(declarations)) ->
   erases_deps Σ Σ' t ->
   erases_deps (add_global_decl Σ (kn, decl)) ((kn, decl') :: Σ') t.
 Proof.
@@ -525,7 +525,7 @@ Proof.
       red in H4.
       rewrite body in *.
       cbn in *.
-      eapply (erases_extends (_, cst_universes cb)); cbn. 5:tea.
+      eapply (erases_extends (_, cst_ulvls cb)); cbn. 5:tea.
       1,3,5,6:constructor; auto.
       2:{ split; auto. eexists [_]; reflexivity. }
       eapply declared_constant_inv in H.
@@ -596,7 +596,7 @@ Definition globals_erased_with_deps Σ Σ' :=
     PCUICAst.declared_constant Σ k cst ->
     exists cst',
       EGlobalEnv.declared_constant Σ' k cst' /\
-      erases_constant_body (Σ, cst_universes cst) cst cst' /\
+      erases_constant_body (Σ, cst_ulvls cst) cst cst' /\
       (forall body, cst_body cst' = Some body -> erases_deps Σ Σ' body)) /\
   (forall k mdecl idecl,
       PCUICAst.declared_inductive Σ k mdecl idecl ->
@@ -760,12 +760,12 @@ Proof.
         destruct ?; [|easy].
         destruct ?; [|easy].
         depelim wf. depelim o0. destruct o1. cbn in *.
-        eapply (erases_extends ({| universes := univs; declarations := Σ |}, cst_universes cst')); eauto.
+        eapply (erases_extends ({| ulvls := univs; declarations := Σ |}, cst_ulvls cst')); eauto.
         cbn. 4:{ split; eauto; cbn; try reflexivity. eexists [_]; cbn; reflexivity. }
         constructor; auto. cbn. red in on_global_decl_d. rewrite E in on_global_decl_d. apply unlift_TermTyp in on_global_decl_d. exact on_global_decl_d.
         split; auto.
       * intros.
-        eapply (erases_deps_cons {| universes := univs; declarations := Σ |} _ kn (PCUICEnvironment.ConstantDecl cst')); auto.
+        eapply (erases_deps_cons {| ulvls := univs; declarations := Σ |} _ kn (PCUICEnvironment.ConstantDecl cst')); auto.
         unfold erases_constant_body in *.
         rewrite H1 in *.
         destruct ?; [|easy].
@@ -777,7 +777,7 @@ Proof.
         depelim wf. depelim o0. destruct o1. do 2 red in on_global_decl_d. rewrite E in on_global_decl_d.
         now apply unlift_TermTyp in on_global_decl_d.
         apply IH; eauto. depelim wf. now depelim o0.
-    + set (Σu := {| universes := univs; declarations := Σ; retroknowledge := retro |}).
+    + set (Σu := {| ulvls := univs; declarations := Σ; retroknowledge := retro |}).
       assert (wfΣu : PCUICTyping.wf Σu).
       { depelim wf. now depelim o0. }
       assert (exists decl' Σ'', Σ' = (kn, decl') :: Σ'' /\ erases_global Σu Σ'')
@@ -802,7 +802,7 @@ Proof.
         destruct ?; [|easy].
         destruct ?; [|easy].
         apply unlift_TermTyp in decl_ext.
-        eapply (erases_extends (Σu, cst_universes cst')).
+        eapply (erases_extends (Σu, cst_ulvls cst')).
         4:{ split; cbn; auto. eexists [_]; cbn; reflexivity. }
         all: cbn; eauto.
       * intros.

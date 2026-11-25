@@ -72,14 +72,14 @@ Section inlining.
 
   Definition inline_in_constant_body cst :=
     {| cst_type := inline (cst_type cst);
-       cst_universes := cst_universes cst;
+       cst_ulvls := cst_ulvls cst;
        cst_body := option_map inline (cst_body cst);
        cst_relevance := cst.(cst_relevance) |}.
 
   Definition inline_oib (npars arities : nat) (oib : one_inductive_body) :=
     {| ind_name := oib.(ind_name);
        ind_indices := oib.(ind_indices);
-       ind_sort := oib.(ind_sort);
+       ind_univ := oib.(ind_univ);
        ind_type := inline oib.(ind_type);
        ind_kelim := oib.(ind_kelim);
        ind_ctors := map (map_constructor_body npars arities (fun _ => inline )) oib.(ind_ctors);
@@ -104,7 +104,7 @@ Section inlining.
              let arities := #|arities_context mib.(ind_bodies)| in
              let npars := (context_assumptions mib.(ind_params)) in
              map (inline_oib npars arities) mib.(ind_bodies);
-           ind_universes := mib.(ind_universes);
+           ind_ulvls := mib.(ind_ulvls);
            ind_variance := mib.(ind_variance) |}
     end.
 
@@ -118,7 +118,7 @@ Definition inline_globals (should_inline : kername -> bool)
                   (** Universes play no role in inlining, but carrying
                       universes is expensive if the set is big. However, all
                       the lookup functions take [global_env]. *)
-                  let Σ0 := {| universes := ContextSet.empty;
+                  let Σ0 := {| ulvls := ContextSet.empty;
                               declarations := decls;
                               retroknowledge := MetaRocq.Common.Environment.Retroknowledge.empty |} in
                   (kn, inline_in_decl should_inline Σ0 decl) :: decls) [] Σ in
@@ -152,7 +152,7 @@ Definition inline_def {A}
 
 Definition template_inline (should_inline : kername -> bool) : TemplateTransform :=
   fun Σ => Ok (timed "Inlining"
-    (fun _ => (mk_global_env (universes Σ)
+    (fun _ => (mk_global_env (ulvls Σ)
                              (inline_globals should_inline (declarations Σ))
                              (retroknowledge Σ)))).
 (*

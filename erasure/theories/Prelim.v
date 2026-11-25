@@ -54,14 +54,14 @@ Qed.
 
 Lemma cumul_Sort_Prod_discr {Σ Γ T s na A B} :
   wf_ext Σ ->
-  Σ ;;; Γ ⊢ T ≤ tSort s ->
+  Σ ;;; Γ ⊢ T ≤ tUniv s ->
   Σ ;;; Γ ⊢ T ≤ tProd na A B -> False.
 Proof.
   intros wfΣ hs hs'.
-  eapply ws_cumul_pb_Sort_r_inv in hs as [s' []].
+  eapply ws_cumul_pb_Univ_r_inv in hs as [s' []].
   eapply ws_cumul_pb_Prod_r_inv in hs' as [dom' [codom' [T' []]]].
   destruct (closed_red_confluence c c1) as [nf []].
-  eapply invert_red_sort in c2; subst.
+  eapply invert_red_univ in c2; subst.
   eapply invert_red_prod in c3 as [? [? []]]. discriminate.
 Qed.
 
@@ -308,9 +308,9 @@ Import PCUICGlobalEnv PCUICSpine.
 Lemma subslet_cstr_branch_context {cf : checker_flags} {Σ : global_env_ext} {wfΣ : wf Σ}
   {Γ pars parsubst parsubst' s' inst' ind n mdecl idecl cdecl u p br napp} :
   declared_constructor Σ (ind, n) mdecl idecl cdecl ->
-  consistent_instance_ext Σ (ind_universes mdecl) u ->
-  consistent_instance_ext Σ (ind_universes mdecl) (puinst p) ->
-  PCUICEquality.cmp_ind_universes Σ ind napp u (puinst p) ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) u ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) (puinst p) ->
+  PCUICEquality.cmp_ind_ulvls Σ ind napp u (puinst p) ->
   spine_subst Σ Γ pars parsubst (ind_params mdecl)@[u] ->
   spine_subst Σ Γ (pparams p) parsubst' (ind_params mdecl)@[puinst p] ->
   assumption_context cdecl.(cstr_args) ->

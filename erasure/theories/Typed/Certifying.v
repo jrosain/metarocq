@@ -30,7 +30,7 @@ Definition change_modpath (mpath : modpath) (suffix : string) (to_rename : kerna
     match t with
     | tRel n => t
     | tVar id => t
-    | tSort s => t
+    | tUniv s => t
     | tEvar ev args => tEvar ev (map go args)
     | tCast t kind v => tCast (go t) kind (go v)
     | tProd na ty body => tProd na (go ty) (go body)
@@ -63,7 +63,7 @@ Fixpoint map_constants_global_decls (k : kername -> kername) (f : constant_body 
   end.
 
 Definition map_constants_global_env (k : kername -> kername) (f : constant_body -> constant_body) (Σ : global_env) : global_env :=
-  {| universes := Σ.(universes);
+  {| ulvls := Σ.(ulvls);
      declarations := map_constants_global_decls k f Σ.(declarations);
      retroknowledge := Σ.(retroknowledge) |}.
 
@@ -73,7 +73,7 @@ Definition add_suffix_global_env (mpath : modpath) (suffix : string) (expansion_
     (fun cb => {| cst_type := change_modpath mpath suffix expansion_ignore cb.(cst_type);
                 cst_body := b <- cb.(cst_body);;
                            Some (change_modpath mpath suffix expansion_ignore b);
-              cst_universes := cb.(cst_universes);
+              cst_ulvls := cb.(cst_ulvls);
               cst_relevance := cb.(cst_relevance) |}) Σ.
 
 Definition generate_proof_term (ty : term) (kn1 kn2 : kername) : term × term :=
@@ -110,7 +110,7 @@ Definition is_none {A} (o : option A) :=
 
 Definition map_global_env_decls (f : global_declarations -> global_declarations)
            (Σ : global_env) : global_env :=
-  {| universes := Σ.(universes);
+  {| ulvls := Σ.(ulvls);
      declarations := f Σ.(declarations);
      retroknowledge := Σ.(retroknowledge) |}.
 

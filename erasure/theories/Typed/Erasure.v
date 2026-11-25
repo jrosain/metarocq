@@ -94,7 +94,7 @@ Lemma isType_red_sq Σ0 (wf : ∥ wf_ext Σ0 ∥) Γ t t' :
 Proof.
   intros [(_ & s & typ & _)] [r].
   sq.
-  eapply has_sort_isType.
+  eapply has_univ_isType.
   eapply subject_reduction; eauto.
 Qed.
 
@@ -107,7 +107,7 @@ Proof.
   intros [(_ & s & typ & _)].
   sq.
   apply inversion_Prod in typ as (s' & ? & ? & ? & ?); [|now eauto].
-  now eapply lift_sorting_forget_univ, lift_sorting_forget_rel.
+  now eapply lift_univing_forget_univ, lift_univing_forget_rel.
 Qed.
 
 Hint Resolve isType_prod_dom : erase.
@@ -119,7 +119,7 @@ Proof.
   intros [(_ & s & typ & _)].
   sq.
   apply inversion_Prod in typ as (s' & ? & ? & ? & ?); [|now eauto].
-  now eapply has_sort_isType.
+  now eapply has_univ_isType.
 Qed.
 
 Hint Resolve isType_prod_cod : erase.
@@ -131,7 +131,7 @@ Hint Resolve reduce_term_sound sq existT pair : erase.
 Definition is_prod_or_sort (t : term) : bool :=
   match t with
   | tProd _ _ _
-  | tSort _ => true
+  | tUniv _ => true
   | _ => false
   end.
 
@@ -157,7 +157,7 @@ Proof.
     rewrite H in nar.
     now cbn in nar.
   - eapply closed_red_confluence in r' as (?&r1&r2); eauto.
-    apply invert_red_sort in r2 as ->; auto.
+    apply invert_red_univ in r2 as ->; auto.
     destruct wh as [wh].
     eapply whnf_red_inv in wh; eauto.
     depelim wh.
@@ -406,12 +406,12 @@ Hint Constructors term_sub_ctx : erase.
 
 Inductive fot_view : term -> Type :=
 | fot_view_prod na A B : fot_view (tProd na A B)
-| fot_view_sort univ : fot_view (tSort univ)
+| fot_view_sort univ : fot_view (tUniv univ)
 | fot_view_other t : negb (is_prod_or_sort t) -> fot_view t.
 
 Equations fot_viewc (t : term) : fot_view t :=
 fot_viewc (tProd na A B) := fot_view_prod na A B;
-fot_viewc (tSort univ) := fot_view_sort univ;
+fot_viewc (tUniv univ) := fot_view_sort univ;
 fot_viewc t := fot_view_other t _.
 
 Lemma tywt {Γ T Σ0} (isT : ∥isType Σ0 Γ T∥) : welltyped Σ0 Γ T.
@@ -420,9 +420,9 @@ Proof. destruct isT. now apply isType_welltyped. Qed.
 (** Definition of normalized arities *)
 Definition arity_ass := aname * term.
 
-Fixpoint mkNormalArity (l : list arity_ass) (s : sort) : term :=
+Fixpoint mkNormalArity (l : list arity_ass) (s : Universe.t) : term :=
   match l with
-  | []%list => tSort s
+  | []%list => tUniv s
   | ((na, A) :: l)%list => tProd na A (mkNormalArity l s)
   end.
 
@@ -434,7 +434,7 @@ Qed.
 
 Record conv_arity {Σ Γ T} : Type := build_conv_arity {
   conv_ar_context : list arity_ass;
-  conv_ar_univ : sort;
+  conv_ar_univ : Universe.t;
   conv_ar_red : ∥closed_red Σ Γ T (mkNormalArity conv_ar_context conv_ar_univ)∥
 }.
 
@@ -443,10 +443,10 @@ Global Arguments conv_arity : clear implicits.
 Definition conv_arity_or_not Σ Γ T : Type :=
   (conv_arity Σ Γ T) + (~∥conv_arity Σ Γ T∥).
 
-Definition Is_conv_to_Sort Σ Γ T : Prop :=
-  exists univ, ∥red Σ Γ T (tSort univ)∥.
+Definition Is_conv_to_Univ Σ Γ T : Prop :=
+  exists univ, ∥red Σ Γ T (tUniv univ)∥.
 
-Definition is_sort {Σ Γ T} (c : conv_arity_or_not Σ Γ T) : option (Is_conv_to_Sort Σ Γ T).
+Definition is_sort {Σ Γ T} (c : conv_arity_or_not Σ Γ T) : option (Is_conv_to_Univ Σ Γ T).
 Proof.
   destruct c as [c|not_conv_ar].
   - destruct c as [[|(na & A) ctx] univ r].
@@ -520,9 +520,9 @@ Proof.
     apply PCUICLiftSubst.destArity_spec_Some in dar.
     cbn in dar.
     subst.
-    replace (mkNormalArity ctx' univ) with (it_mkProd_or_LetIn (smash_context [] ctx) (tSort univ)).
+    replace (mkNormalArity ctx' univ) with (it_mkProd_or_LetIn (smash_context [] ctx) (tUniv univ)).
     { destruct r.
-      assert (PCUICOnFreeVars.on_free_vars (PCUICOnFreeVars.shiftnP #|Γ| (fun _ : nat => false)) (it_mkProd_or_LetIn ctx (tSort univ))) by (eapply PCUICClosedTyp.red_on_free_vars;eauto;
+      assert (PCUICOnFreeVars.on_free_vars (PCUICOnFreeVars.shiftnP #|Γ| (fun _ : nat => false)) (it_mkProd_or_LetIn ctx (tUniv univ))) by (eapply PCUICClosedTyp.red_on_free_vars;eauto;
         now rewrite PCUICOnFreeVars.on_free_vars_ctx_on_ctx_free_vars).
       constructor;auto.
       apply red_it_mkProd_or_LetIn_smash_context. }
@@ -594,15 +594,15 @@ flag_of_type Γ T isT with inspect (hnf (X_type := X_type) Γ T (fun Σ h => (ty
                                   end
                     |}
       };
-    | fot_view_sort univ := {| is_logical := Sort.is_prop univ;
+    | fot_view_sort univ := {| is_logical := Universe.is_prop univ;
                                conv_ar := inl {| conv_ar_context := [];
                                                  conv_ar_univ := univ; |} |} ;
     | fot_view_other T0 discr
         with infer X_type X Γ _ T0 _ :=
         {
-      | @existT K princK with inspect (reduce_to_sort Γ K _) := {
+      | @existT K princK with inspect (reduce_to_univ Γ K _) := {
         | exist (Checked_comp (existT _ univ red_univ)) eq :=
-          {| is_logical := Sort.is_prop univ;
+          {| is_logical := Universe.is_prop univ;
              conv_ar := inr _ |};
         | exist (TypeError_comp t) eq := !
         };
@@ -669,7 +669,7 @@ Next Obligation.
   { sq. eapply isType_red;eauto.
     now apply PCUICWellScopedCumulativity.closed_red_red. }
   sq.
-  now apply BDFromPCUIC.isType_infering_sort.
+  now apply BDFromPCUIC.isType_infering_univ.
 Defined.
 Next Obligation.
   remember (hnf Γ T _) as nf. symmetry in Heqnf.
@@ -698,7 +698,7 @@ Next Obligation.
   apply conv_arity_Is_conv_to_Arity in car;eauto.
 Qed.
 Next Obligation.
-  pose proof (PCUICSafeReduce.reduce_to_sort_complete _ wfrΣ _ _ eq).
+  pose proof (PCUICSafeReduce.reduce_to_univ_complete _ wfrΣ _ _ eq).
   clear eq.
   apply (@not_prod_or_sort_hnf rΣ wfrΣ) in discr.
   remember (hnf Γ T _) as nf. symmetry in Heqnf.
@@ -716,15 +716,15 @@ Next Obligation.
   apply typing_wf_local in tyT.
   apply BDToPCUIC.infering_typing in HH;sq;eauto.
   specialize (PCUICPrincipality.common_typing _ _ HH tyNf) as [x[x_le_K[x_le_sort?]]].
-  apply ws_cumul_pb_Sort_r_inv in x_le_sort as (? & x_red & ?).
+  apply ws_cumul_pb_Univ_r_inv in x_le_sort as (? & x_red & ?).
   specialize (ws_cumul_pb_red_l_inv _ x_le_K x_red) as K_ge_sort.
-  apply ws_cumul_pb_Sort_l_inv in K_ge_sort as (? & K_red & ?).
+  apply ws_cumul_pb_Univ_l_inv in K_ge_sort as (? & K_red & ?).
   exact (H _ K_red).
 Qed.
 
 Equations erase_type_discr (t : term) : Prop := {
   | tRel _ := False;
-  | tSort _ := False;
+  | tUniv _ := False;
   | tProd _ _ _ := False;
   | tApp _ _ := False;
   | tConst _ _ := False;
@@ -734,7 +734,7 @@ Equations erase_type_discr (t : term) : Prop := {
 
 Inductive erase_type_view : term -> Type :=
 | et_view_rel i : erase_type_view (tRel i)
-| et_view_sort u : erase_type_view (tSort u)
+| et_view_sort u : erase_type_view (tUniv u)
 | et_view_prod na A B : erase_type_view (tProd na A B)
 | et_view_app hd arg : erase_type_view (tApp hd arg)
 | et_view_const kn u : erase_type_view (tConst kn u)
@@ -743,7 +743,7 @@ Inductive erase_type_view : term -> Type :=
 
 Equations erase_type_viewc (t : term) : erase_type_view t := {
   | tRel i := et_view_rel i;
-  | tSort u := et_view_sort u;
+  | tUniv u := et_view_sort u;
   | tProd na A B := et_view_prod na A B;
   | tApp hd arg := et_view_app hd arg;
   | tConst kn u := et_view_const kn u;
@@ -958,7 +958,7 @@ Next Obligation.
   apply BDToPCUIC.infering_typing in inf_aT;eauto with erase.
   destruct conv_sort as (univ & reduniv).
   sq.
-  eapply has_sort_isType.
+  eapply has_univ_isType.
   eapply type_reduction;eauto.
 Qed.
 Next Obligation.
@@ -1005,7 +1005,7 @@ Equations (noeqns) erase_type_scheme_eta
           (erΓ : Vector.t tRel_kind #|Γ|)
           (t : term)
           (ar_ctx : list arity_ass)
-          (ar_univ : sort)
+          (ar_univ : Universe.t)
           (typ : ∥rΣ;;; Γ |- t : mkNormalArity ar_ctx ar_univ∥)
           (next_tvar : nat) : list type_var_info × box_type :=
 erase_type_scheme_eta Γ erΓ t [] univ typ next_tvar => ([], (erase_type_aux Γ erΓ t _ None).2);
@@ -1030,7 +1030,7 @@ Next Obligation.
   destruct typ.
   assert (wf_local rΣ Γ) by (eapply typing_wf_local; eauto).
   assert (∥ wf rΣ ∥) by now apply HΣ .
-  constructor; eapply has_sort_isType;eassumption.
+  constructor; eapply has_univ_isType;eassumption.
 Qed.
 Next Obligation.
   destruct typ as [typ].
@@ -1066,7 +1066,7 @@ Equations? (noeqns) erase_type_scheme
           (erΓ : Vector.t tRel_kind #|Γ|)
           (t : term)
           (ar_ctx : list arity_ass)
-          (ar_univ : sort)
+          (ar_univ : Universe.t)
           (typ : forall Σ0 (wfΣ : PCUICWfEnv.abstract_env_ext_rel X Σ0), ∥Σ0;;; Γ |- t : mkNormalArity ar_ctx ar_univ∥)
           (next_tvar : nat) : list type_var_info × box_type :=
 erase_type_scheme Γ erΓ t [] univ typ next_tvar => ([], (erase_type_aux Γ erΓ t _ None).2);
@@ -1090,7 +1090,7 @@ erase_type_scheme Γ erΓ t ((na', A') :: ar_ctx) univ typ next_tvar
   }.
 Proof.
   - destruct (typ _ wfΣ).
-    constructor; eapply has_sort_isType; eauto.
+    constructor; eapply has_univ_isType; eauto.
   - destruct (typ _ wfΣ) as [typ0].
     reduce_term_sound.
     assert (∥ wf Σ0 ∥) by now apply HΣ.
@@ -1170,7 +1170,7 @@ Proof.
     assert (∥ wf Σ0 ∥) by now apply HΣ.
     unfold on_constant_decl in wt.
     sq.
-    now apply lift_sorting_forget_body, lift_sorting_forget_rel in wt.
+    now apply lift_univing_forget_body, lift_univing_forget_rel in wt.
   - assert (rΣ = Σ).
     { eapply abstract_env_ext_irr;eauto. }
     easy.
@@ -1180,7 +1180,7 @@ Proof.
     assert (∥ wf Σ ∥) by now apply HΣ.
     unfold on_constant_decl in wt.
     sq.
-    now apply lift_sorting_forget_body, lift_sorting_forget_rel in wt.
+    now apply lift_univing_forget_body, lift_univing_forget_rel in wt.
 Qed.
 
 Import P.
@@ -1305,7 +1305,7 @@ Proof.
   unshelve refine (
   let is_propositional :=
       match destArity [] (ind_type oib) with
-      | Some (_, u) => Sort.is_propositional u
+      | Some (_, u) => Universe.is_propositional u
       | None => false
       end in
   let oib_tvars := erase_ind_arity [] (PCUICEnvironment.ind_type oib) _ in
@@ -1354,7 +1354,7 @@ Proof.
       destruct (on_ctype r) as (_ & s & typ & _);
       rewrite <- (arities_contexts_1 mind) in typ;
       cbn in *;
-      now eapply has_sort_isType).
+      now eapply has_univ_isType).
 Defined.
 
 Program Definition erase_ind
@@ -1474,8 +1474,8 @@ Qed.
 Lemma wf_pop_decl Σ kn decl decls :
   wf Σ ->
   Σ.(declarations) = (kn, decl) :: decls ->
-  wf_ext ({| universes := Σ.(universes); retroknowledge := Σ.(retroknowledge);
-             declarations := decls |}, universes_decl_of_decl decl).
+  wf_ext ({| ulvls := Σ.(ulvls); retroknowledge := Σ.(retroknowledge);
+             declarations := decls |}, ulvls_decl_of_decl decl).
 Proof.
   intros [] h. rewrite h in o0.
   depelim o0.
@@ -1487,8 +1487,8 @@ Qed.
 Lemma sq_wf_pop_decl Σ kn decl decls :
   ∥ wf Σ ∥ ->
   Σ.(declarations) = (kn, decl) :: decls ->
-  ∥ wf_ext ({| universes := Σ.(universes); retroknowledge := Σ.(retroknowledge);
-             declarations := decls |}, universes_decl_of_decl decl) ∥.
+  ∥ wf_ext ({| ulvls := Σ.(ulvls); retroknowledge := Σ.(retroknowledge);
+             declarations := decls |}, ulvls_decl_of_decl decl) ∥.
 Proof.
   intros [[]] h; sq. rewrite h in o0.
   depelim o0.
@@ -1505,16 +1505,16 @@ Program Fixpoint erase_global_decls_deps_recursive
   (decls : PCUICEnvironment.global_declarations)
   (univs : ContextSet.t)
   (retro : Retroknowledge.t)
-  (prop : forall Σ', abstract_env_rel X Σ' -> Σ' = {| declarations := decls; universes := univs; retroknowledge := retro |})
+  (prop : forall Σ', abstract_env_rel X Σ' -> Σ' = {| declarations := decls; ulvls := univs; retroknowledge := retro |})
   (include : KernameSet.t)
   (ignore_deps : kername -> bool) : global_env :=
   match decls with
   | [] => []
   | (kn, decl) :: Σ =>
-    let Σext := (Σ, universes_decl_of_decl decl) in
+    let Σext := (Σ, ulvls_decl_of_decl decl) in
     let X' := abstract_pop_decls X in
-    let Xext := abstract_make_wf_env_ext (X_type := X_type) X' (universes_decl_of_decl decl) _ in
-    let env := (mk_global_env univs Σ retro, universes_decl_of_decl decl) in
+    let Xext := abstract_make_wf_env_ext (X_type := X_type) X' (ulvls_decl_of_decl decl) _ in
+    let env := (mk_global_env univs Σ retro, ulvls_decl_of_decl decl) in
     if KernameSet.mem kn include then
       (** We still erase ignored inductives and constants for two reasons:
           - For inductives, we want to allow pattern matches on them and we need
@@ -1553,13 +1553,13 @@ Next Obligation.
   clearbody prf.
   specialize (prop _ hΣr). subst.
   pose proof (abstract_env_ext_exists (abstract_make_wf_env_ext (abstract_pop_decls X)
-  (universes_decl_of_decl decl) prf)).
+  (ulvls_decl_of_decl decl) prf)).
   pose proof (abstract_env_exists (abstract_pop_decls X)) as [[Σpop hΣpop]].
   eapply (abstract_pop_decls_correct X Σ) in hΣr; tea.
   2:{ intros. pose proof (abstract_env_irr _ H0 hΣr). subst. now eexists. }
   destruct hΣr as [? []]. subst.
   destruct H as [[Σext hΣext]].
-  epose proof (abstract_make_wf_env_ext_correct (abstract_pop_decls X) (universes_decl_of_decl decl) prf _ _ hΣpop hΣext).
+  epose proof (abstract_make_wf_env_ext_correct (abstract_pop_decls X) (ulvls_decl_of_decl decl) prf _ _ hΣpop hΣext).
   subst Σext. destruct Σpop. cbn in *. now subst.
 Qed.
 Next Obligation.
@@ -1591,15 +1591,15 @@ Program Fixpoint erase_global_decls_recursive
   (decls : PCUICEnvironment.global_declarations)
   (univs : ContextSet.t)
   (retro : Retroknowledge.t)
-  (prop : forall Σ', abstract_env_rel X Σ' -> Σ' = {| declarations := decls; universes := univs; retroknowledge := retro |})
+  (prop : forall Σ', abstract_env_rel X Σ' -> Σ' = {| declarations := decls; ulvls := univs; retroknowledge := retro |})
   : global_env :=
   match decls with
   | [] => []
   | (kn, decl) :: Σ =>
-    let Σext := (Σ, universes_decl_of_decl decl) in
+    let Σext := (Σ, ulvls_decl_of_decl decl) in
     let X' := abstract_pop_decls X in
-    let Xext := abstract_make_wf_env_ext (X_type := X_type) X' (universes_decl_of_decl decl) _ in
-    let env := (mk_global_env univs Σ retro, universes_decl_of_decl decl) in
+    let Xext := abstract_make_wf_env_ext (X_type := X_type) X' (ulvls_decl_of_decl decl) _ in
+    let env := (mk_global_env univs Σ retro, ulvls_decl_of_decl decl) in
     (** We still erase ignored inductives and constants for two reasons:
       - For inductives, we want to allow pattern matches on them and we need
         information about them to print names.

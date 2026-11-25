@@ -17,7 +17,7 @@ Local Existing Instance extraction_checker_flags.
   - is of propositional type *)
 Definition isErasable Σ Γ t :=
   ∑ T, Σ ;;; Γ |- t : T ×
-  (isArity T + (∑ u, (Σ ;;; Γ |- T : tSort u) * Sort.is_propositional u))%type.
+  (isArity T + (∑ u, (Σ ;;; Γ |- T : tUniv u) * Universe.is_propositional u))%type.
 
 (* A more positive notion of relevant terms.
   Showing that a term is not erasable requires quantification over all its possible typings.
@@ -29,8 +29,8 @@ Definition nisErasable Σ Γ t :=
     [× Σ;;; Γ |- t : T,
       nf Σ Γ T,
     ~ isArity T,
-    Σ;;; Γ |- T : tSort u &
-    ~ Sort.is_propositional u].
+    Σ;;; Γ |- T : tUniv u &
+    ~ Universe.is_propositional u].
 
 Lemma nisErasable_spec Σ Γ t :
   wf_ext Σ -> wf_local Σ Γ ->
@@ -50,9 +50,9 @@ Proof.
     destruct s as [u' [hs isp]].
     pose proof (hprinc _ t2) as [].
     destruct (PCUICValidity.validity t3) as (_ & s & Hs & _).
-    eapply PCUICElimination.unique_sorting_equality_propositional in hs; tea; eauto.
+    eapply PCUICElimination.unique_univing_equality_propositional in hs; tea; eauto.
     pose proof (hprinc _ t0) as [].
-    eapply PCUICElimination.unique_sorting_equality_propositional in t1; tea; eauto.
+    eapply PCUICElimination.unique_univing_equality_propositional in t1; tea; eauto.
     congruence.
 Qed.
 
@@ -284,7 +284,7 @@ Definition erases_mutual_inductive_body (mib : mutual_inductive_body) (mib' : E.
 Inductive erases_global_decls (univs : ContextSet.t) retro : global_declarations -> E.global_declarations -> Prop :=
 | erases_global_nil : erases_global_decls univs retro [] []
 | erases_global_cnst Σ cb cb' kn Σ' :
-    erases_constant_body ({| universes := univs; declarations := Σ; retroknowledge := retro |}, cst_universes cb) cb cb' ->
+    erases_constant_body ({| ulvls := univs; declarations := Σ; retroknowledge := retro |}, cst_ulvls cb) cb cb' ->
     erases_global_decls univs retro Σ Σ' ->
     erases_global_decls univs retro ((kn, ConstantDecl cb) :: Σ) ((kn, E.ConstantDecl cb') :: Σ')
 | erases_global_ind Σ mib mib' kn Σ' :
@@ -292,7 +292,7 @@ Inductive erases_global_decls (univs : ContextSet.t) retro : global_declarations
     erases_global_decls univs retro Σ Σ' ->
     erases_global_decls univs retro ((kn, InductiveDecl mib) :: Σ) ((kn, E.InductiveDecl mib') :: Σ').
 
-Definition erases_global Σ Σ' := erases_global_decls Σ.(universes) Σ.(retroknowledge) Σ.(declarations) Σ'.
+Definition erases_global Σ Σ' := erases_global_decls Σ.(ulvls) Σ.(retroknowledge) Σ.(declarations) Σ'.
 
 Definition inductive_arity (t : term) :=
   match fst (decompose_app t) with
@@ -324,7 +324,7 @@ Inductive erases_deps (Σ : global_env) (Σ' : E.global_declarations) : E.term -
 | erases_deps_tConst kn cb cb' :
     declared_constant Σ kn cb ->
     EGlobalEnv.declared_constant Σ' kn cb' ->
-    erases_constant_body (Σ, cst_universes cb) cb cb' ->
+    erases_constant_body (Σ, cst_ulvls cb) cb cb' ->
     (forall body, E.cst_body cb' = Some body -> erases_deps Σ Σ' body) ->
     erases_deps Σ Σ' (E.tConst kn)
 | erases_deps_tConstruct ind c mdecl idecl cdecl mdecl' idecl' cdecl' :
@@ -390,7 +390,7 @@ Definition computational_ind Σ ind :=
     match List.nth_error decl.(ind_bodies) n with
     | Some body =>
       match destArity [] body.(ind_type) with
-      | Some arity => negb (Sort.is_prop (snd arity))
+      | Some arity => negb (Universe.is_prop (snd arity))
       | None => false
       end
     | None => false

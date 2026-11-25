@@ -111,7 +111,7 @@ Proof.
     assert (Σ |-p tLetIn na b0 t b1 ⇓ res) by eauto.
     eapply inversion_LetIn in Hty' as (? & h1 & ? & ?); auto.
     assert (wf_rel : lift_typing0 (typing Σ []) (j_vdef na b0' t)).
-    { apply lift_sorting_it_impl_gen with h1 => // HT. eapply subject_reduction_eval; eauto. }
+    { apply lift_univing_it_impl_gen with h1 => // HT. eapply subject_reduction_eval; eauto. }
     apply unlift_TermTyp in h1 as h1'.
     invs He.
     + depelim Hed.
@@ -1261,9 +1261,9 @@ Import EWellformed.
 
 Lemma erases_mutual_inductive_body_wf (efl := all_env_flags) {Σ univs retro Σ' kn mib mib'} :
   erases_mutual_inductive_body mib mib' ->
-  let udecl := PCUICLookup.universes_decl_of_decl (InductiveDecl mib) in
+  let udecl := PCUICLookup.ulvls_decl_of_decl (InductiveDecl mib) in
   on_global_decl cumulSpec0 (PCUICEnvTyping.lift_typing typing)
-    ({| universes := univs; declarations := Σ; retroknowledge := retro |}, udecl) kn
+    ({| ulvls := univs; declarations := Σ; retroknowledge := retro |}, udecl) kn
        (InductiveDecl mib) ->
   wf_global_decl Σ' (E.InductiveDecl mib').
 Proof.
@@ -1308,7 +1308,7 @@ Proof.
     destruct (cst_body cb).
     eapply unlift_TermTyp in on_global_decl_d.
     destruct (E.cst_body cb') => //. cbn.
-    set (Σ'' := ({| universes := _ |}, _)) in *.
+    set (Σ'' := ({| ulvls := _ |}, _)) in *.
     assert (PCUICTyping.wf_ext Σ'').
     { split => //. }
     epose proof (erases_wellformed (Σ:=Σ'') (Γ := []) (a:=t)).

@@ -132,8 +132,8 @@ Proof.
   rewrite no_ignores;cbn.
   destruct KernameSet.mem eqn:mem; cycle 1.
   - intros kn' isin.
-    change {| P.universes := univs; P.declarations := (kn, wfdecl) :: Σ0; P.retroknowledge := retro |} with
-      (add_global_decl {| P.universes := univs; P.declarations := Σ0; P.retroknowledge := retro|} (kn, wfdecl)).
+    change {| P.ulvls := univs; P.declarations := (kn, wfdecl) :: Σ0; P.retroknowledge := retro |} with
+      (add_global_decl {| P.ulvls := univs; P.declarations := Σ0; P.retroknowledge := retro|} (kn, wfdecl)).
     pose proof (abstract_env_ext_wf _ wfΣext) as [].
     pose proof (abstract_env_exists X) as [[Σfull hfull]].
     pose proof (abstract_env_wf _ hfull) as [wffull].
@@ -151,8 +151,8 @@ Proof.
   - cbn in *.
     intros k isin.
     destruct (Kername.eq_dec k kn) as [->|]; cycle 1.
-    { change {| P.universes := univs; P.declarations := (kn, wfdecl) :: Σ0; P.retroknowledge := retro |} with
-      (add_global_decl {| P.universes := univs; P.declarations := Σ0; P.retroknowledge := retro |} (kn, wfdecl)).
+    { change {| P.ulvls := univs; P.declarations := (kn, wfdecl) :: Σ0; P.retroknowledge := retro |} with
+      (add_global_decl {| P.ulvls := univs; P.declarations := Σ0; P.retroknowledge := retro |} (kn, wfdecl)).
       pose proof (abstract_env_ext_wf _ wfΣext) as [].
       pose proof (abstract_env_exists X) as [[Σfull hfull]].
       pose proof (abstract_env_wf _ hfull) as [wffull].
@@ -209,7 +209,7 @@ Proof.
         eapply @type_reduction with (B := mkNormalArity ctx univ) in clrel_rel; eauto.
         cbn in *.
         constructor.
-        eapply (Is_type_extends (({| P.universes := univs; P.declarations := Σ0; P.retroknowledge := retro |}, _))).
+        eapply (Is_type_extends (({| P.ulvls := univs; P.declarations := Σ0; P.retroknowledge := retro |}, _))).
         constructor. eapply X0. clear wfΣext. specialize (wfΣ _ hfull). now subst Σfull.
         { eapply extends_decls_extends_subrel, strictly_extends_decls_extends_decls.
            unfold strictly_extends_decls; trea. eexists. cbn; auto. eexists [_].
@@ -257,7 +257,7 @@ Proof.
         -- intros.
            noconf H.
            assert (unfold_add_gd : forall univs decls (decl : kername × global_decl),
-                      add_global_decl (mk_global_env univs decls retro) decl = {| P.universes := univs; P.declarations := decl :: decls; P.retroknowledge := retro |}) by reflexivity.
+                      add_global_decl (mk_global_env univs decls retro) decl = {| P.ulvls := univs; P.declarations := decl :: decls; P.retroknowledge := retro |}) by reflexivity.
            rewrite -{1}unfold_add_gd.
            repeat invert_wf.
            pose proof (abstract_env_ext_wf _ wfΣext) as [].

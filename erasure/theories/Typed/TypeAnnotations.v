@@ -298,7 +298,7 @@ Proof.
     apply isTypeRel_isType in h1.
     econstructor; eauto.
   - apply inversion_LetIn in X as (?&h1&?&?); auto.
-    now apply lift_sorting_forget_body, isTypeRel_isType in h1.
+    now apply lift_univing_forget_body, isTypeRel_isType in h1.
   - apply inversion_LetIn in X as (?&?&?&?); auto.
     econstructor; eapply unlift_TermTyp; eauto.
   - apply inversion_LetIn in X as (?&?&?&?); auto.

@@ -280,11 +280,11 @@ Proof.
   - destruct t => //.
 Qed.
 
-Lemma isType_tSort {cf:checker_flags} {Σ : global_env_ext} {Γ l A} {wfΣ : wf Σ} :
-  Σ ;;; Γ |- tSort (sType (Universe.make l)) : A -> isType Σ Γ (tSort (sType (Universe.make l))).
+Lemma isType_tUniv {cf:checker_flags} {Σ : global_env_ext} {Γ l A} {wfΣ : wf Σ} :
+  Σ ;;; Γ |- tUniv (uType (UnivLvl.make l)) : A -> isType Σ Γ (tUniv (uType (UnivLvl.make l))).
 Proof.
   intros HT.
-  eapply inversion_Sort in HT as [l' [wfΓ Hs]]; auto.
+  eapply inversion_Univ in HT as [l' [wfΓ Hs]]; auto.
   eexists; econstructor; eauto. cbn. split; eauto. econstructor; eauto.
 Qed.
 

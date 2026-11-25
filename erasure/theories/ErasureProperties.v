@@ -34,7 +34,7 @@ Lemma isLambda_subst_instance t u : isLambda t -> isLambda t@[u].
 Proof. destruct t => //. Qed.
 
 Lemma wf_local_rel_conv:
-  forall Σ : global_env × universes_decl,
+  forall Σ : global_env × ulvls_decl,
     wf Σ.1 ->
     forall Γ Γ' : context,
       All2_fold (conv_decls cumulAlgo_gen Σ) Γ Γ' ->
@@ -412,9 +412,9 @@ Qed.
 Lemma erases_subst_instance_decl Σ Γ t T c decl u t' :
   wf Σ.1 ->
   lookup_env Σ.1 c = Some decl ->
-  (Σ.1, universes_decl_of_decl decl) ;;; Γ |- t : T ->
-  consistent_instance_ext Σ (universes_decl_of_decl decl) u ->
-  (Σ.1, universes_decl_of_decl decl) ;;; Γ |- t ⇝ℇ t' ->
+  (Σ.1, ulvls_decl_of_decl decl) ;;; Γ |- t : T ->
+  consistent_instance_ext Σ (ulvls_decl_of_decl decl) u ->
+  (Σ.1, ulvls_decl_of_decl decl) ;;; Γ |- t ⇝ℇ t' ->
    Σ ;;; subst_instance u Γ
             |- subst_instance u t ⇝ℇ  t'.
 Proof.
@@ -503,7 +503,7 @@ Section wellscoped.
   | tConstruct ind c _ => isSome (lookup_constructor Σ ind c)
   | tVar _ => false
   | tInd ind _  => isSome (lookup_inductive Σ ind)
-  | tSort _ => true
+  | tUniv _ => true
   | tProd na ty1 ty2 => wellformed ty1 && wellformed ty2
   end.
   End Def.

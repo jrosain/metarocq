@@ -47,7 +47,7 @@ Section OnInductives.
 
   Lemma on_minductive_wf_params_weaken {ind mdecl Γ} {u} :
     declared_minductive Σ.1 ind mdecl ->
-    consistent_instance_ext Σ (ind_universes mdecl) u ->
+    consistent_instance_ext Σ (ind_ulvls mdecl) u ->
     wf_local Σ Γ ->
     wf_local Σ (Γ ,,, (ind_params mdecl)@[u]).
   Proof using wfΣ.
@@ -60,7 +60,7 @@ Section OnInductives.
     (decli : declared_inductive Σ ind mdecl idecl).
 
   Lemma on_minductive_wf_params_indices_inst_weaken {Γ} (u : Instance.t) :
-    consistent_instance_ext Σ (ind_universes mdecl) u ->
+    consistent_instance_ext Σ (ind_ulvls mdecl) u ->
     wf_local Σ Γ ->
     wf_local Σ (Γ ,,, (ind_params mdecl ,,, ind_indices idecl)@[u]).
   Proof using decli wfΣ.
@@ -785,7 +785,7 @@ Section fix_sigma.
     (HT : forall Σ : global_env_ext, abstract_env_ext_rel X Σ -> welltyped Σ Γ T) : bool
     by wf ((Γ;T;HT) : (∑ Γ t, forall Σ : global_env_ext, abstract_env_ext_rel X Σ -> welltyped Σ Γ t)) term_rel :=
       {
-        is_arity Γ HΓ T HT with inspect (@reduce_to_sort _ _ X_type X _ Γ T HT) => {
+        is_arity Γ HΓ T HT with inspect (@reduce_to_univ _ _ X_type X _ Γ T HT) => {
         | exist (Checked_comp H) rsort => true ;
         | exist (TypeError_comp _) rsort with
             inspect (@reduce_to_prod _ _ X_type X _ Γ T HT) => {
@@ -834,7 +834,7 @@ Section fix_sigma.
       pose proof (abstract_env_ext_exists X) as [[Σ wfΣ]].
       specialize (Hs _ wfΣ) as [Hs].
       intros. rewrite (abstract_env_ext_irr _ H wfΣ).
-      exists (tSort s); split => //.
+      exists (tUniv s); split => //.
     - clear H0 H1.
       destruct X0; constructor; clear rprod rsort.
       * red.
@@ -896,8 +896,8 @@ Equations? is_erasableb X_type X {normalization_in : forall Σ, wf_ext Σ -> Σ 
   is_erasableb X_type X Γ t wt with @type_of_typing extraction_checker_flags _ X_type X _ Γ t wt :=
     { | T with is_arity X_type X Γ _ T.π1 _ :=
       { | true => true
-        | false => let s := @sort_of_type extraction_checker_flags _ X_type X _ Γ T.π1 _ in
-          Sort.is_propositional s.π1 } }.
+        | false => let s := @univ_of_type extraction_checker_flags _ X_type X _ Γ T.π1 _ in
+          Universe.is_propositional s.π1 } }.
   Proof.
     - intros. specialize_Σ H. destruct wt; sq.
       pcuic.
@@ -919,14 +919,14 @@ Lemma is_erasableP {X_type X} {normalization_in : forall Σ, wf_ext Σ -> Σ ∼
 Proof.
   funelim (is_erasableb X_type X Γ t wt).
   - constructor. intros. pose proof (abstract_env_ext_wf _ H) as [wf].
-    destruct type_of_typing as [x Hx]. cbn -[is_arity sort_of_type] in *.
+    destruct type_of_typing as [x Hx]. cbn -[is_arity univ_of_type] in *.
     destruct (Hx _ H) as [[HT ?]].
     move/is_arityP: Heq => / (_ _ H) [T' [redT' isar]]. specialize_Σ H.
     sq. red. exists T'. eapply type_reduction_closed in HT.
     2: eassumption. eauto.
-  - destruct type_of_typing as [x Hx]. cbn -[sort_of_type is_arity] in *.
-    destruct (sort_of_type _ _ _ _). cbn.
-    destruct (Sort.is_propositional x0) eqn:isp; constructor.
+  - destruct type_of_typing as [x Hx]. cbn -[univ_of_type is_arity] in *.
+    destruct (univ_of_type _ _ _ _). cbn.
+    destruct (Universe.is_propositional x0) eqn:isp; constructor.
     * clear Heq; try clear Heqcall. intros.
       pose proof (abstract_env_ext_wf _ H) as [wf].
       specialize_Σ H.
@@ -945,7 +945,7 @@ Proof.
       { apply nisa. intros. rewrite (abstract_env_ext_irr _ H wfΣ).
         eapply invert_cumul_arity_r; tea. }
       { destruct s as [Hs].
-        unshelve epose proof (H := unique_sorting_equality_propositional _ wf Hs Hu' p) => //. congruence. }
+        unshelve epose proof (H := unique_univing_equality_propositional _ wf Hs Hu' p) => //. congruence. }
   Qed.
 
 Equations? is_erasable {X_type X} {normalization_in : forall Σ, wf_ext Σ -> Σ ∼_ext X -> NormalizationIn Σ} (Γ : context) (t : PCUICAst.term)
@@ -995,7 +995,7 @@ Section Erase.
       | tRel i := E.tRel i
       | tVar n := E.tVar n
       | tEvar m l := E.tEvar m (erase_terms Γ l _)
-      | tSort u := !%prg
+      | tUniv u := !%prg
       | tConst kn u := E.tConst kn
       | tInd kn u := !%prg
       | tConstruct kn k u := E.tConstruct kn k []
@@ -1328,7 +1328,7 @@ Definition erase_one_inductive_body (oib : one_inductive_body) : E.one_inductive
   let projs := map (fun pdecl => EAst.mkProjection pdecl.(proj_name)) oib.(ind_projs) in
   let is_propositional :=
     match destArity [] oib.(ind_type) with
-    | Some (_, u) => Sort.is_propositional u
+    | Some (_, u) => Universe.is_propositional u
     | None => false (* dummy, impossible case *)
     end
   in
@@ -1353,17 +1353,17 @@ Lemma is_arity_irrel {X_type : abstract_env_impl} {X : X_type.π2.π1} {normaliz
 Proof.
   intros hl.
   funelim (is_arity X_type X _ _ _ _).
-  - epose proof (reduce_to_sort_irrel hl eq_refl HT wt').
+  - epose proof (reduce_to_univ_irrel hl eq_refl HT wt').
     rewrite -rsort in H1.
     simp is_arity.
-    epose proof (reduce_to_sort_irrel hl eq_refl HT wt').
+    epose proof (reduce_to_univ_irrel hl eq_refl HT wt').
     destruct (PCUICSafeReduce.inspect) eqn:hi.
     rewrite -e in H1.
     destruct x => //.
-  - epose proof (reduce_to_sort_irrel hl eq_refl HT wt').
+  - epose proof (reduce_to_univ_irrel hl eq_refl HT wt').
     rewrite -rsort in H3.
     rewrite [is_arity X_type' X' _ _ _ _]is_arity_equation_1.
-    epose proof (reduce_to_sort_irrel hl eq_refl HT wt').
+    epose proof (reduce_to_univ_irrel hl eq_refl HT wt').
     destruct (PCUICSafeReduce.inspect) eqn:hi.
     rewrite -rsort -e in H4.
     destruct x => //.
@@ -1375,7 +1375,7 @@ Proof.
     destruct a1 as [na' [A' [B' ?]]]. cbn in H5. noconf H5.
     rewrite is_arity_clause_1_clause_2_equation_1.
     now apply H0.
-  - epose proof (reduce_to_sort_irrel hl eq_refl HT wt').
+  - epose proof (reduce_to_univ_irrel hl eq_refl HT wt').
     rewrite -rsort in H1.
     simp is_arity.
     destruct (PCUICSafeReduce.inspect) eqn:hi.
@@ -1415,7 +1415,7 @@ Proof.
   destruct is_arity  => //. simp is_erasableb.
   set (obl2 := is_erasableb_obligation_3 _ _ _ _ _).
   set (obl2' := is_erasableb_obligation_3 _ _ _ _ _).
-  simpl. f_equal. now apply sort_of_type_irrel.
+  simpl. f_equal. now apply univ_of_type_irrel.
 Qed.
 
 Ltac iserasableb_irrel_env :=
@@ -1492,7 +1492,7 @@ Notation NormalizationIn_erase_global_deps X decls
           let X' := iter abstract_pop_decls (S n) X in
           forall kn cb pf,
             List.hd_error (List.skipn n decls) = Some (kn, ConstantDecl cb) ->
-            let Xext := abstract_make_wf_env_ext X' (cst_universes cb) pf in
+            let Xext := abstract_make_wf_env_ext X' (cst_ulvls cb) pf in
             forall Σ, wf_ext Σ -> Σ ∼_ext Xext -> NormalizationIn Σ
       end)
        (only parsing).
@@ -1509,10 +1509,10 @@ Defined.
 Program Definition erase_constant_decl {X_type : abstract_env_impl} (X : X_type.π1)
   (cb : constant_body)
   (normalization_in : forall pf,
-    let Xext := abstract_make_wf_env_ext X (cst_universes cb) pf in
+    let Xext := abstract_make_wf_env_ext X (cst_ulvls cb) pf in
     forall Σ, wf_ext Σ -> Σ ∼_ext Xext -> NormalizationIn Σ)
-  (oncb : forall Σ : global_env, Σ ∼ X -> ∥ wf_ext (Σ, cst_universes cb) * on_constant_decl (lift_typing typing) (Σ, cst_universes cb) cb ∥) :=
-  let Xext := abstract_make_wf_env_ext X (cst_universes cb) _ in
+  (oncb : forall Σ : global_env, Σ ∼ X -> ∥ wf_ext (Σ, cst_ulvls cb) * on_constant_decl (lift_typing typing) (Σ, cst_ulvls cb) cb ∥) :=
+  let Xext := abstract_make_wf_env_ext X (cst_ulvls cb) _ in
   let normalization_in' : @id Prop _ := _ in (* hack to avoid program erroring out on unresolved tc *)
   @erase_constant_body X_type Xext normalization_in' cb _.
 Next Obligation.
@@ -1529,7 +1529,7 @@ Next Obligation.
   destruct Σ as [Σ ext].
   pose proof (abstract_env_exists X) as [[? HX]].
   pose proof (abstract_env_wf _ HX) as [wfX].
-  pose proof (abstract_make_wf_env_ext_correct X (cst_universes cb) _ _ _ HX H).
+  pose proof (abstract_make_wf_env_ext_correct X (cst_ulvls cb) _ _ _ HX H).
   noconf H0.
   clear H; specialize (oncb _ HX). destruct oncb as [[]]; sq; auto.
 Qed.
@@ -1586,8 +1586,8 @@ Proof.
   pose proof (abstract_env_exists X') as [[env' wf']].
   red. intros.
   specialize (hl _ wf _ wf') as [hl hp].
-  pose proof (abstract_make_wf_env_ext_correct X (cst_universes cb) _ _ _ wf H).
-  pose proof (abstract_make_wf_env_ext_correct X' (cst_universes cb) _ _ _ wf' H0).
+  pose proof (abstract_make_wf_env_ext_correct X (cst_ulvls cb) _ _ _ wf H).
+  pose proof (abstract_make_wf_env_ext_correct X' (cst_ulvls cb) _ _ _ wf' H0).
   split => //.
   { intros.
     rewrite -(abstract_env_lookup_correct' _ _ H).
@@ -1758,8 +1758,8 @@ Proof.
       unfold erase_constant_decl.
       erewrite erase_constant_body_irrel. reflexivity.
       red. intros.
-      pose proof (abstract_make_wf_env_ext_correct (abstract_pop_decls X) (cst_universes c) _ _ _ wf H0).
-      pose proof (abstract_make_wf_env_ext_correct (abstract_pop_decls X') (cst_universes c) _ _ _ wf' H1).
+      pose proof (abstract_make_wf_env_ext_correct (abstract_pop_decls X) (cst_ulvls c) _ _ _ wf H0).
+      pose proof (abstract_make_wf_env_ext_correct (abstract_pop_decls X') (cst_ulvls c) _ _ _ wf' H1).
       split => //.
       { intros.
         rewrite -(abstract_env_lookup_correct' _ _ H0).
@@ -1827,8 +1827,8 @@ induction decls; eauto. intros. destruct a as [kn []].
     unfold erase_constant_decl.
     erewrite erase_constant_body_irrel. reflexivity.
     red. intros.
-    pose proof (abstract_make_wf_env_ext_correct (abstract_pop_decls X) (cst_universes c) _ _ _ wf H0).
-    pose proof (abstract_make_wf_env_ext_correct (abstract_pop_decls X') (cst_universes c) _ _ _ wf' H1).
+    pose proof (abstract_make_wf_env_ext_correct (abstract_pop_decls X) (cst_ulvls c) _ _ _ wf H0).
+    pose proof (abstract_make_wf_env_ext_correct (abstract_pop_decls X') (cst_ulvls c) _ _ _ wf' H1).
     split => //.
     { intros.
       rewrite -(abstract_env_lookup_correct' _ _ H0).
@@ -1907,13 +1907,13 @@ Proof.
   {|
   cst_type := name;
   cst_body := Some bod;
-  cst_universes := univs |} onc bod eq_refl)). clearbody obl. cbn in *.
+  cst_ulvls := univs |} onc bod eq_refl)). clearbody obl. cbn in *.
   specialize_Σ H0. destruct (obl _ H0). sq.
   exists bod, A; intuition auto. now eapply erases_erase.
 Qed.
 
 Lemma erases_mutual {Σ mdecl m} :
-  on_inductive cumulSpec0 (lift_typing typing) (Σ, ind_universes m) mdecl m ->
+  on_inductive cumulSpec0 (lift_typing typing) (Σ, ind_ulvls m) mdecl m ->
   erases_mutual_inductive_body m (erase_mutual_inductive_body m).
 Proof.
   intros oni.

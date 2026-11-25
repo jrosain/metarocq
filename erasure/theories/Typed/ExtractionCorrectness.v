@@ -191,8 +191,8 @@ Proof.
           destruct (Erasure.flag_of_type), conv_ar; try congruence.
           { cbn in c.
             epose proof (Erasure.conv_arity_Is_conv_to_Arity c).
-            set (Σ := {| PEnv.universes := _ |}) in *.
-            set (Σ' := {| PEnv.universes := _ ; PEnv.declarations := decls |}) in *.
+            set (Σ := {| PEnv.ulvls := _ |}) in *.
+            set (Σ' := {| PEnv.ulvls := _ ; PEnv.declarations := decls |}) in *.
             rewrite erase_erasable.
             intros ? HΣ.
             destruct H as [ar [[] isar]].
@@ -292,11 +292,11 @@ Lemma wf_erase_global_decl :
         X_type X
         (k : kername) (g : PCUICAst.PCUICEnvironment.global_decl)
          (decls : list (kername * PCUICAst.PCUICEnvironment.global_decl))
-         (univs : Universes.ContextSet.t) retros prf w wt (Σex : global_env) prf' seeds ignored,
+         (univs : Levels.ContextSet.t) retros prf w wt (Σex : global_env) prf' seeds ignored,
     let eg := (@Erasure.erase_global_decl X_type
-    (abstract_make_wf_env_ext X (PCUICAst.PCUICLookup.universes_decl_of_decl g) prf)
-    ({| PEnv.universes := univs; PEnv.declarations := decls; PEnv.retroknowledge := retros |},
-      PCUICAst.PCUICLookup.universes_decl_of_decl g)
+    (abstract_make_wf_env_ext X (PCUICAst.PCUICLookup.ulvls_decl_of_decl g) prf)
+    ({| PEnv.ulvls := univs; PEnv.declarations := decls; PEnv.retroknowledge := retros |},
+      PCUICAst.PCUICLookup.ulvls_decl_of_decl g)
     w k g wt) in
     (forall kn, ignored kn = false) ->
     Σex = @Erasure.erase_global_decls_deps_recursive X_type X decls univs retros prf'
@@ -356,7 +356,7 @@ Lemma expanded_erase (cf := config.extraction_checker_flags)
   forall normalization_in' : forall Σ, wf_ext Σ -> Σ ∼_ext X' -> PCUICSN.NormalizationIn Σ,
   let et := (@erase X_type X' normalization_in' [] t wtp) in
   let deps := EAstUtils.term_global_deps et in
-  expanded (trans_env (@Erasure.erase_global_decls_deps_recursive X_type X Σ.(PEnv.declarations) Σ.(PEnv.universes) Σ.(PEnv.retroknowledge) prf' deps ignored)) [] et.
+  expanded (trans_env (@Erasure.erase_global_decls_deps_recursive X_type X Σ.(PEnv.declarations) Σ.(PEnv.ulvls) Σ.(PEnv.retroknowledge) prf' deps ignored)) [] et.
 Proof.
   intros hign Σ heq wf hexp X' normalization_in'.
   pose proof (abstract_env_wf _ wf) as [wf'].
@@ -381,10 +381,10 @@ Lemma expanded_erase_global_decl :
         (k : kername) (g : PCUICAst.PCUICEnvironment.global_decl)
          env prf w wt (Σex : global_env) prf' seeds ignored,
     let eg := (@Erasure.erase_global_decl X_type
-    (abstract_make_wf_env_ext X (PCUICAst.PCUICLookup.universes_decl_of_decl g) prf) (env, PCUICAst.PCUICLookup.universes_decl_of_decl g)
+    (abstract_make_wf_env_ext X (PCUICAst.PCUICLookup.ulvls_decl_of_decl g) prf) (env, PCUICAst.PCUICLookup.ulvls_decl_of_decl g)
     w k g wt) in
     (forall kn, ignored kn = false) ->
-    Σex = @Erasure.erase_global_decls_deps_recursive X_type X env.(PEnv.declarations) env.(PEnv.universes) env.(PEnv.retroknowledge) prf'
+    Σex = @Erasure.erase_global_decls_deps_recursive X_type X env.(PEnv.declarations) env.(PEnv.ulvls) env.(PEnv.retroknowledge) prf'
       (KernameSet.union (Erasure.decl_deps eg) seeds) ignored ->
     expanded_global_env (trans_env Σex) ->
     PCUICEtaExpand.expanded_decl env g ->
@@ -392,7 +392,7 @@ Lemma expanded_erase_global_decl :
 Proof.
   intros H X_type X k g [univs decls retros] prf w wt Σex prf' seeds ignored eg hign eqex wf_global; cbn in *.
   revert eqex. subst eg.
-  set (Σ := {| PEnv.universes := _ |}) in *.
+  set (Σ := {| PEnv.ulvls := _ |}) in *.
   pose proof (abstract_env_exists X) as [[Σ' hΣ]].
   pose proof (prf' _ hΣ). subst Σ'. destruct (prf _ hΣ) as [wfΣ].
   unfold Erasure.erase_global_decl.
@@ -465,7 +465,7 @@ Proof.
       apply OptimizePropDiscr.trans_env_fresh_global.
       apply fresh_globals_erase_global_decl_rec.
       change decls with (PEnv.declarations
-        {| PEnv.universes := univs; PEnv.declarations := decls; PEnv.retroknowledge := retros |}).
+        {| PEnv.ulvls := univs; PEnv.declarations := decls; PEnv.retroknowledge := retros |}).
       eapply Erasure.abstract_eq_wf in w as [? []].
       apply PCUICWfEnvImpl.wf_fresh_globals; eauto.
       eapply Erasure.wf_pop_decl in X0; trea. eapply X0.
@@ -549,7 +549,7 @@ Proof.
   destruct wfΣ.
   eapply erases_correct with
     (Σ' := trans_env (Erasure.erase_global_decls_deps_recursive (PCUICAst.PCUICEnvironment.declarations Σ)
-               (PCUICAst.PCUICEnvironment.universes Σ) _ _
+               (PCUICAst.PCUICEnvironment.ulvls Σ) _ _
                (KernameSet.singleton kn) ignored)) in ev as (erv&erase_to&[erev]);eauto.
   + depelim erase_to;[|easy].
     constructor.
@@ -602,7 +602,7 @@ Program Definition make_env {Σ} (wfΣ : ∥wf_ext Σ∥) :=
 Program Definition erase_env {Σ} wfΣ seeds ignore :=
   Erasure.erase_global_decls_deps_recursive (X_type := PCUICWfEnvImpl.optimized_abstract_env_impl (guard := Erasure.fake_guard_impl_instance))
     (X := PCUICWfEnvImpl.build_wf_env_from_env Σ wfΣ)
-    (declarations Σ) (universes Σ) (retroknowledge Σ) _ seeds ignore.
+    (declarations Σ) (ulvls Σ) (retroknowledge Σ) _ seeds ignore.
   Next Obligation.
     destruct Σ => //.
   Qed.
@@ -704,7 +704,7 @@ Proof.
   * eapply erase_global_erases_deps; tea.
     subst er. unfold erase_env.
     set (obl := fun (Σ' : global_env) => _).
-    destruct Σ; cbn [declarations retroknowledge universes] in *.
+    destruct Σ; cbn [declarations retroknowledge ulvls] in *.
     eapply (erase_global_decls_deps_recursive_correct _ _ _ obl); eauto.
     intros k hin.
     eapply term_global_deps_spec in hin; tea. red in hin. destruct hin as [[decl eq]].

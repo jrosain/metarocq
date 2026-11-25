@@ -92,7 +92,7 @@ Program Definition extract_pcuic_env
   let Σ := timed "Erasure"
     (fun _ => erase_global_decls_deps_recursive (X_type := PCUICWfEnvImpl.optimized_abstract_env_impl (guard := fake_guard_impl_instance))
       (X := PCUICWfEnvImpl.build_wf_env_from_env Σ wfΣ)
-      (declarations Σ) (universes Σ) (retroknowledge Σ) _ seeds ignore) in
+      (declarations Σ) (ulvls Σ) (retroknowledge Σ) _ seeds ignore) in
   if optimize_prop_discr params then
     let Σ := timed "Removal of prop discrimination" (fun _ => OptimizePropDiscr.remove_match_on_box_env Σ _) in
     compose_transforms (extract_transforms params) Σ

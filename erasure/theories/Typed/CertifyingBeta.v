@@ -35,7 +35,7 @@ Section betared.
 
   Definition betared_in_constant_body cst :=
     {| cst_type := cst_type cst;
-       cst_universes := cst_universes cst;
+       cst_ulvls := cst_ulvls cst;
        cst_body := option_map betared (cst_body cst);
        cst_relevance := cst.(cst_relevance) |}.
 
@@ -73,7 +73,7 @@ Definition betared_def {A}
   betared_globals_template mpath (declarations p.1) (KernameSet.singleton kn).
 
 Definition template_betared : TemplateTransform :=
-  fun Σ => Ok (timed "Inlining" (fun _ => mk_global_env (universes Σ) (betared_globals (declarations Σ)) (retroknowledge Σ))).
+  fun Σ => Ok (timed "Inlining" (fun _ => mk_global_env (ulvls Σ) (betared_globals (declarations Σ)) (retroknowledge Σ))).
 (*
 Module Ex1.
 
