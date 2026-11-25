@@ -56,7 +56,7 @@ Section with_tc.
       let '{| Ast.Env.ind_name := ind_name;
              Ast.Env.ind_relevance := ind_relevance;
              Ast.Env.ind_indices := ind_indices;
-             Ast.Env.ind_sort := ind_sort;
+             Ast.Env.ind_univ := ind_sort;
              Ast.Env.ind_type := ind_type;
              Ast.Env.ind_kelim := ind_kelim;
              Ast.Env.ind_ctors := ind_ctors;
@@ -68,7 +68,7 @@ Section with_tc.
       ret {| ind_name := ind_name;
             ind_relevance := ind_relevance;
             ind_indices := ind_indices;
-            ind_sort := ind_sort;
+            ind_univ := ind_sort;
             ind_type := ind_type;
             ind_kelim := ind_kelim;
             ind_ctors := ind_ctors;
@@ -77,13 +77,13 @@ Section with_tc.
     Definition monad_trans_constant_body' bd :=
       let '{| Ast.Env.cst_type := cst_type;
              Ast.Env.cst_body := cst_body;
-             Ast.Env.cst_universes := cst_universes;
+             Ast.Env.cst_ulvls := cst_universes;
              Ast.Env.cst_relevance := cst_relevance |} := bd in
       cst_type <- monad_trans cst_type;;
       cst_body <- monad_option_map@{t u t t} monad_trans cst_body;;
       ret {| cst_type := cst_type;
             cst_body := cst_body;
-            cst_universes := cst_universes;
+            cst_ulvls := cst_universes;
             cst_relevance := cst_relevance |}.
 
     Definition monad_trans_minductive_body' md :=
@@ -91,7 +91,7 @@ Section with_tc.
              Ast.Env.ind_npars := ind_npars;
              Ast.Env.ind_params := ind_params;
              Ast.Env.ind_bodies := ind_bodies;
-             Ast.Env.ind_universes := ind_universes;
+             Ast.Env.ind_ulvls := ind_universes;
              Ast.Env.ind_variance := ind_variance |} := md in
       ind_params <- monad_trans_local' ind_params;;
       ind_bodies <- monad_map@{t u t t} monad_trans_one_ind_body' ind_bodies;;
@@ -99,7 +99,7 @@ Section with_tc.
             ind_npars := ind_npars;
             ind_params := ind_params;
             ind_bodies := ind_bodies;
-            ind_universes := ind_universes;
+            ind_ulvls := ind_universes;
             ind_variance := ind_variance |}.
 
     Definition monad_trans_global_decl' (d : Ast.Env.global_decl) :=
@@ -132,7 +132,7 @@ Section with_tc.
          | Ast.tRel n => ret (tRel n)
          | Ast.tVar n => ret (tVar n)
          | Ast.tEvar ev args => args <- monad_map@{t u t t} monad_trans' args;; ret (tEvar ev args)
-         | Ast.tSort u => ret (tSort u)
+         | Ast.tUniv u => ret (tUniv u)
          | Ast.tConst c u => ret (tConst c u)
          | Ast.tInd c u => ret (tInd c u)
          | Ast.tConstruct c k u => ret (tConstruct c k u)

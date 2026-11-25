@@ -650,7 +650,7 @@ Definition wt {cf} Σ Γ t := ∑ T, Σ ;;; Γ |- t : T.
 
 Lemma isType_wt {cf} Σ Γ T : isType Σ Γ T -> wt Σ Γ T.
 Proof.
-  intros (_ & s & hs & _); now exists (PCUICAst.tSort s).
+  intros (_ & s & hs & _); now exists (PCUICAst.tUniv s).
 Qed.
 Coercion isType_wt : isType >-> wt.
 
@@ -672,7 +672,7 @@ Section wtsub.
       ∑ mdecl idecl,
       [× declared_inductive Σ ci mdecl idecl,
          ci.(ci_npar) = mdecl.(ind_npars),
-         consistent_instance_ext Σ (PCUICEnvironment.ind_universes mdecl) (PCUICAst.puinst p),
+         consistent_instance_ext Σ (PCUICEnvironment.ind_ulvls mdecl) (PCUICAst.puinst p),
          wf_predicate mdecl idecl p,
          eq_context_upto_names (PCUICCases.ind_predicate_context ci mdecl idecl) (PCUICAst.pcontext p),
          wf_local_rel Σ (Γ ,,, smash_context [] (ind_params mdecl)@[p.(puinst)]) p.(pcontext)@[p.(puinst)],
@@ -1178,7 +1178,7 @@ Qed.
 Lemma trans_case_predicate_context {cf} {Σ : PCUICEnvironment.global_env_ext}
   {wfΣ : PCUICTyping.wf Σ} Γ ci mdecl idecl p :
   S.declared_inductive Σ ci mdecl idecl ->
-  S.consistent_instance_ext Σ (PCUICEnvironment.ind_universes mdecl) (PCUICAst.puinst p) →
+  S.consistent_instance_ext Σ (PCUICEnvironment.ind_ulvls mdecl) (PCUICAst.puinst p) →
   let parctx := (PCUICEnvironment.ind_params mdecl)@[PCUICAst.puinst p] in
   PCUICSpine.spine_subst Σ Γ (PCUICAst.pparams p)
       (List.rev (PCUICAst.pparams p))
@@ -1541,7 +1541,7 @@ Lemma trans_lift_typing_it {P Q} {tm tm' t t'} {u r} :
   forall tu: ST.lift_typing0 P (Judge tm t u r),
   let s := tu.2.π1 in
   match tm', tm with None, _ => unit | Some tm', Some tm => P tm t -> Q tm' t' | _, _ => False end ->
-  (P t (PCUICAst.tSort s) -> Q t' (tSort s)) ->
+  (P t (PCUICAst.tUniv s) -> Q t' (tUniv s)) ->
   TT.lift_typing0 Q (Judge tm' t' u r).
 Proof.
   intros (? & ? & Hs & e) s HPQc HPQs.
@@ -1594,13 +1594,13 @@ Lemma trans_branches {cf} Σ Γ brs btys ps:
     (fun br bty : nat × PCUICAst.term =>
       (((br.1 = bty.1 × ST.typing Σ Γ br.2 bty.2)
         × TT.typing (trans_global Σ) (trans_local Γ) (trans br.2) (trans bty.2))
-      × ST.typing Σ Γ bty.2 (PCUICAst.tSort ps))
+      × ST.typing Σ Γ bty.2 (PCUICAst.tUniv ps))
       × TT.typing (trans_global Σ) (trans_local Γ) (trans bty.2)
-        (trans (PCUICAst.tSort ps))) brs btys ->
+        (trans (PCUICAst.tUniv ps))) brs btys ->
   All2
     (fun br bty : nat × term =>
     (br.1 = bty.1 × TT.typing (trans_global Σ) (trans_local Γ) br.2 bty.2)
-    × TT.typing (trans_global Σ) (trans_local Γ) bty.2 (tSort ps))
+    × TT.typing (trans_global Σ) (trans_local Γ) bty.2 (tUniv ps))
     (map (on_snd trans) brs) (map (fun '(x, y) => (x, trans y)) btys).
 Proof.
   induction 1;cbn.
@@ -1676,7 +1676,7 @@ Proof.
   intros H.
   induction H;cbn.
   all: constructor; eauto.
-  all: apply lift_sorting_it_impl with tu => //.
+  all: apply lift_univing_it_impl with tu => //.
 Qed.
 
 Lemma trans_decompose_prod_assum :
@@ -1971,7 +1971,7 @@ Qed.
 
 (** Likewise, in.Common-Rocq, we can append without re-typing the result *)
 Lemma TT_typing_spine_app {cf:checker_flags} Σ Γ ty T' args na A B arg s :
-  TT.typing Σ Γ (T.tProd na A B) (T.tSort s) ->
+  TT.typing Σ Γ (T.tProd na A B) (T.tUniv s) ->
   TT.typing_spine Σ Γ ty args T' ->
   TT.cumul_gen Σ Γ Cumul T' (T.tProd na A B) ->
   TT.typing Σ Γ arg A ->
@@ -2017,7 +2017,7 @@ Proof.
     exists fty, d'.
     split. lia.
     destruct hd' as [sp' Hsp].
-    destruct (typing_spine_app _ _ _ _ _ _ _ _ wfΣ (has_sort_isType s d1) sp' d3) as [appsp Happ].
+    destruct (typing_spine_app _ _ _ _ _ _ _ _ wfΣ (has_univ_isType s d1) sp' d3) as [appsp Happ].
     simpl in Happ.
     move: appsp Happ. rewrite equ firstn_skipn.
     intros app happ. exists app. lia.
@@ -2026,7 +2026,7 @@ Proof.
     rewrite PCUICAstUtils.atom_decompose_app. destruct t => /= //.
     eexists _, d2. split. lia.
     unshelve eexists.
-    econstructor. eapply has_sort_isType; eauto. reflexivity. assumption. constructor.
+    econstructor. eapply has_univ_isType; eauto. reflexivity. assumption. constructor.
     simpl. lia.
 
   - destruct (isApp t) eqn:isapp => //.
@@ -2038,10 +2038,10 @@ Proof.
     destruct s0 as [sp Hsp].
     unshelve eexists. eapply typing_spine_weaken_concl; eauto. exact (PCUICValidity.validity d').
     eapply cumulSpec_cumulAlgo_curry in c; eauto; fvs.
-    eapply (has_sort_isType s d2).
+    eapply (has_univ_isType s d2).
     epose proof (typing_spine_weaken_concl_size wfΣ sp (validity_term wfΣ d')
       (cumulSpec_cumulAlgo_curry Σ wfΣ Γ A B (typing_closed_context d') (type_is_open_term d1) (subject_is_open_term d2) c)
-      (has_sort_isType s d2)). simpl in H0. simpl. lia.
+      (has_univ_isType s d2)). simpl in H0. simpl. lia.
 Qed.
 
 (** Finally, for each typing spine built above, assuming we can apply the induction hypothesis
@@ -2060,7 +2060,7 @@ Lemma make_typing_spine {cf} {Σ : global_env_ext} {wfΣ : wf Σ} {Γ fty l T}
   ∑ T', TT.typing_spine (trans_global Σ) (trans_local Γ) (trans fty) (map trans l) T' *
     ((T' = trans T) +
       (TT.cumul_gen (trans_global Σ) (trans_local Γ) Cumul T' (trans T) *
-       ∑ s, TT.typing (trans_global Σ) (trans_local Γ) (trans T) (T.tSort s)))%type.
+       ∑ s, TT.typing (trans_global Σ) (trans_local Γ) (trans T) (T.tUniv s)))%type.
 Proof.
   induction sp; simpl; intros.
   - exists (trans ty); split.
@@ -2149,7 +2149,7 @@ Qed.
 
 Lemma trans_case_branch_type {cf} {Σ : global_env_ext} {wfΣ : wf Σ} ci mdecl idecl cdecl i p br :
   declared_inductive Σ ci mdecl idecl ->
-  consistent_instance_ext Σ (ind_universes mdecl) (puinst p) ->
+  consistent_instance_ext Σ (ind_ulvls mdecl) (puinst p) ->
   wf_branch cdecl br ->
   eq_context_upto_names (bcontext br) (cstr_branch_context ci mdecl cdecl) ->
   let ptm := it_mkLambda_or_LetIn (case_predicate_context ci mdecl idecl p) (preturn p) in
@@ -2247,8 +2247,8 @@ Proof.
     intros [fty [d' [hd' [sp hsp]]]].
     assert (hd'' : typing_size d' ≤ max (typing_size Ht) (typing_size Hp)) by lia.
     assert (hsp' : typing_spine_size sp ≤ max (typing_size Ht) (typing_size Hp)) by lia.
-    assert (IHt := X2 _ _ d' hd'').
-    epose proof (make_typing_spine sp (max (typing_size Ht) (typing_size Hp)) X2 (validity d') hsp') as [T' [IH []]].
+    assert (IHbt := X2 _ _ _ d' hd'').
+    epose proof (make_typing_spine sp (max (typing_size Ht) (typing_size Hp)) (X2 Γ) (validity d') hsp') as [T' [IH []]].
     * subst T'. rewrite (PCUICAstUtils.decompose_app_inv da).
       rewrite trans_mkApps mkApp_mkApps -AstUtils.mkApps_app.
       pose proof (AstUtils.mkApps_app (trans t0) (map trans l) [trans u]).
@@ -2394,7 +2394,7 @@ Proof.
       eapply ws_cumul_pb_forget in X4.
       eapply cumul_decorate in X4; tea.
       2:eapply validity; tea.
-      2:now eapply has_sort_isType.
+      2:now eapply has_univ_isType.
       now eapply trans_cumul.
 Qed.
 

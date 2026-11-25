@@ -36,7 +36,7 @@ Fixpoint trans (t : PCUICAst.term) : Ast.term :=
   | PCUICAst.tRel n => tRel n
   | PCUICAst.tVar n => tVar n
   | PCUICAst.tEvar ev args => tEvar ev (List.map trans args)
-  | PCUICAst.tSort u => tSort u
+  | PCUICAst.tUniv u => tUniv u
   | PCUICAst.tConst c u => tConst c u
   | PCUICAst.tInd c u => tInd c u
   | PCUICAst.tConstruct c k u => tConstruct c k u
@@ -79,14 +79,14 @@ Definition trans_one_ind_body (d : PCUICEnvironment.one_inductive_body) :=
      ind_relevance := d.(PCUICEnvironment.ind_relevance);
      ind_indices := trans_local d.(PCUICEnvironment.ind_indices);
      ind_type := trans d.(PCUICEnvironment.ind_type);
-     ind_sort := d.(PCUICEnvironment.ind_sort);
+     ind_univ := d.(PCUICEnvironment.ind_univ);
      ind_kelim := d.(PCUICEnvironment.ind_kelim);
      ind_ctors := List.map trans_constructor_body d.(PCUICEnvironment.ind_ctors);
      ind_projs := List.map trans_projection_body d.(PCUICEnvironment.ind_projs) |}.
 
 Definition trans_constant_body bd :=
   {| cst_type := trans bd.(PCUICEnvironment.cst_type); cst_body := option_map trans bd.(PCUICEnvironment.cst_body);
-     cst_universes := bd.(PCUICEnvironment.cst_universes);
+     cst_ulvls := bd.(PCUICEnvironment.cst_ulvls);
      cst_relevance := bd.(PCUICEnvironment.cst_relevance) |}.
 
 
@@ -95,7 +95,7 @@ Definition trans_minductive_body md :=
      ind_npars := md.(PCUICEnvironment.ind_npars);
      ind_params := trans_local md.(PCUICEnvironment.ind_params);
      ind_bodies := map trans_one_ind_body md.(PCUICEnvironment.ind_bodies);
-     ind_universes := md.(PCUICEnvironment.ind_universes);
+     ind_ulvls := md.(PCUICEnvironment.ind_ulvls);
      ind_variance := md.(PCUICEnvironment.ind_variance)
   |}.
 
@@ -109,7 +109,7 @@ Definition trans_global_decls (d : PCUICEnvironment.global_declarations) : globa
   List.map (on_snd trans_global_decl) d.
 
 Definition trans_global_env (d : PCUICEnvironment.global_env) : global_env :=
-  {| universes := d.(PCUICEnvironment.universes);
+  {| ulvls := d.(PCUICEnvironment.ulvls);
      declarations := trans_global_decls d.(PCUICEnvironment.declarations);
      retroknowledge := d.(PCUICEnvironment.retroknowledge) |}.
 
@@ -126,7 +126,7 @@ Definition trans_mutual_inductive_entry (mie : PCUICAst.mutual_inductive_entry) 
   := {| mind_entry_record := mie.(PCUICAst.mind_entry_record);
        mind_entry_finite := mie.(PCUICAst.mind_entry_finite);
        mind_entry_private := mie.(PCUICAst.mind_entry_private);
-       mind_entry_universes := universes_entry_of_decl mie.(PCUICAst.mind_entry_universes);
+       mind_entry_ulvls := ulvls_entry_of_decl mie.(PCUICAst.mind_entry_universes);
        mind_entry_inds := List.map trans_one_inductive_entry mie.(PCUICAst.mind_entry_inds);
        mind_entry_params := trans_local mie.(PCUICAst.mind_entry_params);
        mind_entry_variance := None (* TODO: support universe variance in PCUIC *);

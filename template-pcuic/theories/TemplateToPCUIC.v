@@ -46,7 +46,7 @@ Section Trans.
   Context (Σ : global_env_map).
 
   Definition dummy_decl : context_decl :=
-    vass {| binder_name := nAnon; binder_relevance := Relevant |} (tSort Sort.type0).
+    vass {| binder_name := nAnon; binder_relevance := Relevant |} (tUniv Universe.type0).
 
   Definition trans_predicate ind mdecl idecl pparams puinst pcontext preturn :=
     let pctx := map2_bias_left set_binder_name dummy_decl pcontext (ind_predicate_context ind mdecl idecl) in
@@ -65,7 +65,7 @@ Section Trans.
   | Ast.tRel n => tRel n
   | Ast.tVar n => tVar n
   | Ast.tEvar ev args => tEvar ev (List.map trans args)
-  | Ast.tSort u => tSort u
+  | Ast.tUniv u => tUniv u
   | Ast.tConst c u => tConst c u
   | Ast.tInd c u => tInd c u
   | Ast.tConstruct c k u => tConstruct c k u
@@ -90,7 +90,7 @@ Section Trans.
           still work. *)
       tCase ci {| pparams := p'.(Ast.pparams);
                   puinst := p'.(Ast.puinst);
-                  pcontext := map (fun na => vass na (tSort Sort.type0)) p'.(Ast.pcontext);
+                  pcontext := map (fun na => vass na (tUniv Universe.type0)) p'.(Ast.pcontext);
                   preturn := p'.(Ast.preturn) |}
           (trans c) []
     end
@@ -133,7 +133,7 @@ Section Trans.
     {| ind_name := d.(Ast.Env.ind_name);
       ind_relevance := d.(Ast.Env.ind_relevance);
       ind_indices := trans_local d.(Ast.Env.ind_indices);
-      ind_sort := d.(Ast.Env.ind_sort);
+      ind_univ := d.(Ast.Env.ind_univ);
       ind_type := trans d.(Ast.Env.ind_type);
       ind_kelim := d.(Ast.Env.ind_kelim);
       ind_ctors := List.map trans_constructor_body d.(Ast.Env.ind_ctors);
@@ -142,7 +142,7 @@ Section Trans.
   Definition trans_constant_body bd :=
     {| cst_type := trans bd.(Ast.Env.cst_type);
        cst_body := option_map trans bd.(Ast.Env.cst_body);
-       cst_universes := bd.(Ast.Env.cst_universes);
+       cst_ulvls := bd.(Ast.Env.cst_ulvls);
        cst_relevance := bd.(Ast.Env.cst_relevance) |}.
 
   Definition trans_minductive_body md :=
@@ -150,7 +150,7 @@ Section Trans.
       ind_npars := md.(Ast.Env.ind_npars);
       ind_params := trans_local md.(Ast.Env.ind_params);
       ind_bodies := map trans_one_ind_body md.(Ast.Env.ind_bodies);
-      ind_universes := md.(Ast.Env.ind_universes);
+      ind_ulvls := md.(Ast.Env.ind_ulvls);
       ind_variance := md.(Ast.Env.ind_variance) |}.
 
   Definition trans_global_decl (d : Ast.Env.global_decl) :=
@@ -174,13 +174,13 @@ Definition trans_global_decls env (d : Ast.Env.global_declarations) : global_env
     add_global_decl Σ' decl') env d.
 
 Definition empty_trans_env univs retro :=
-  let init_global_env := {| universes := univs; declarations := []; retroknowledge := retro |} in
+  let init_global_env := {| ulvls := univs; declarations := []; retroknowledge := retro |} in
     {| trans_env_env := init_global_env;
        trans_env_map := EnvMap.empty;
        trans_env_repr := fun y => eq_refl |}.
 
 Definition trans_global_env (d : Ast.Env.global_env) : global_env_map :=
-  let init := empty_trans_env d.(Ast.Env.universes) d.(Ast.Env.retroknowledge) in
+  let init := empty_trans_env d.(Ast.Env.ulvls) d.(Ast.Env.retroknowledge) in
   trans_global_decls init d.(Ast.Env.declarations).
 
 Definition trans_global (Σ : Ast.Env.global_env_ext) : global_env_ext_map :=

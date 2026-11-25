@@ -170,7 +170,7 @@ Proof.
   destruct expm as [hp hb]. destruct expc as [hargs].
   unfold cstr_branch_context.
   epose proof (expanded_let_expansion hp (t:=(subst_context
-  (inds (inductive_mind ind) (abstract_instance (ind_universes mdecl))
+  (inds (inductive_mind ind) (abstract_instance (ind_ulvls mdecl))
      (ind_bodies mdecl)) #|ind_params mdecl|
   (cstr_args cdecl)))).
   rewrite !app_nil_r in H. forward H.
@@ -249,12 +249,12 @@ Proof.
 Qed.
 
 Lemma template_wf_cons_inv {cf} univs retro (Σ : Ast.Env.global_declarations) d :
-  Typing.wf {| Ast.Env.universes := univs; Ast.Env.declarations := d :: Σ;
+  Typing.wf {| Ast.Env.ulvls := univs; Ast.Env.declarations := d :: Σ;
     Ast.Env.retroknowledge := retro |} ->
-  let Σ' := {| Ast.Env.universes := univs; Ast.Env.declarations := Σ;
+  let Σ' := {| Ast.Env.ulvls := univs; Ast.Env.declarations := Σ;
     Ast.Env.retroknowledge := retro |} in
-  Typing.wf Σ' × Typing.on_global_decl Typing.cumul_gen (WfAst.wf_decl_pred) (Σ', Ast.universes_decl_of_decl d.2) d.1 d.2
-  × ST.on_udecl univs (Ast.universes_decl_of_decl d.2).
+  Typing.wf Σ' × Typing.on_global_decl Typing.cumul_gen (WfAst.wf_decl_pred) (Σ', Ast.ulvls_decl_of_decl d.2) d.1 d.2
+  × ST.on_udecl univs (Ast.ulvls_decl_of_decl d.2).
 Proof.
   intros wf; split.
   destruct wf. split => //. now depelim o0.
@@ -263,8 +263,8 @@ Proof.
 Qed.
 
 Lemma trans_global_env_cons univs retro (Σ : Ast.Env.global_declarations) decl :
-  trans_global_env {| S.Env.universes := univs; S.Env.declarations := decl :: Σ; S.Env.retroknowledge := retro |} =
-  let Σ' := trans_global_env {| S.Env.universes := univs; S.Env.declarations := Σ; S.Env.retroknowledge := retro |} in
+  trans_global_env {| S.Env.ulvls := univs; S.Env.declarations := decl :: Σ; S.Env.retroknowledge := retro |} =
+  let Σ' := trans_global_env {| S.Env.ulvls := univs; S.Env.declarations := Σ; S.Env.retroknowledge := retro |} in
   add_global_decl Σ' (decl.1, trans_global_decl Σ' decl.2).
 Proof. reflexivity. Qed.
 
@@ -304,7 +304,7 @@ Proof.
 Qed.
 
 Lemma wf_context_sorts {cf} {Σ ctx ctx' cunivs} {wfΣ : Typing.wf_ext Σ} :
-  Typing.sorts_local_ctx WfAst.wf_decl_pred Σ ctx ctx' cunivs ->
+  Typing.univs_local_ctx WfAst.wf_decl_pred Σ ctx ctx' cunivs ->
   All (WfAst.wf_decl Σ) ctx'.
 Proof.
   induction ctx' in cunivs |- *; cbn; auto.
