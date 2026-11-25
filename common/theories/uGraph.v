@@ -2101,7 +2101,7 @@ Section CheckLeq.
     : check_eqb_univ_gen leqb_level_n_gen u1 u2 <-> gc_eq_univ uctx.2 u1 u2.
   Proof.
     unfold check_eqb_univ_gen, gc_eq_univ.
-    destruct u1 as [[| |] u1], u2 as [[| |] u2]; cbnr; split; intuition auto.
+    destructu u1; destructu u2; cbnr; split; intuition auto.
     - intuition.
     - now destruct prop_sub_type.
     - intuition.
@@ -2488,7 +2488,7 @@ Section CheckLeq2.
   Lemma levels_univ_gc_declared_declared (s : Universe.t)
     : levels_declared_univ s -> gc_levels_declared_univ uctx' s.
   Proof using HG levels_declared.
-    destruct s as [[| |] u]; cbnr.
+    destructu s; cbnr.
     apply levels_gc_declared_declared.
   Qed.
 
@@ -2501,7 +2501,7 @@ Section CheckLeq2.
     intros Hu1 Hu2. move => /orP [H | H].
     - apply eqb_true_iff in H as ->.
       reflexivity.
-    - destruct s1 as [[| |] u1], s2 as [[| |] u2]; cbn in *; trivial; try discriminate H.
+    - destructu s1; destructu s2; cbn in *; trivial; try discriminate H.
       now eapply check_leqb_ulvl_spec_gen'.
   Qed.
 

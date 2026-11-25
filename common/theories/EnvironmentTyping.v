@@ -300,7 +300,7 @@ Module Lookup (T : Term) (E : EnvironmentSig T).
 
   Definition wf_univ_dec Σ s : {@wf_univ Σ s} + {~@wf_univ Σ s}.
   Proof.
-    destruct s as [[| |] u]; try (left; exact I).
+    destructu s; try (left; exact I).
     all: apply wf_ulvl_dec.
   Defined.
 

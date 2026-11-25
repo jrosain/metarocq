@@ -137,7 +137,7 @@ Proof.
   { clear -wfΣ allowed_elim H1.
     apply wf_ext_consistent in wfΣ as (val&sat).
     unfold is_allowed_elimination, is_lSet in *.
-    destruct (ind_kelim idecl); auto; destruct ps as [[| |] ps]; cbn in *; try discriminate;
+    destruct (ind_kelim idecl); auto; destructu ps; cbn in *; try discriminate;
     intuition congruence. }
   intros Huf. apply H0.
   red. exists (mkApps ptm (indices ++ [c])); intuition auto.
@@ -283,23 +283,23 @@ Lemma leq_univ_propositional_l {cf:checker_flags} ϕ u1 u2 :
   prop_sub_type = false ->
   leq_univ ϕ u1 u2 -> Universe.is_propositional u1 -> eq_univ ϕ u1 u2.
 Proof.
-  destruct u1 as [[| |] u1] => //=.
-  all: destruct u2 as [[| |] u2] => //=.
+  destructu u1 => //=.
+  all: destructu u2 => //=.
   all: cbn in *.
   now intros ->.
 Qed.
 
 Lemma leq_univ_prop {cf:checker_flags} ϕ u1 u2 :
   leq_univ ϕ u1 (Universe.mk sProp u2) -> usort u1 = sProp.
-Proof. destruct u1 as [[| |] u1] => //=. Qed.
+Proof. destructu u1 => //=. Qed.
 
 Lemma leq_univ_sprop {cf:checker_flags} ϕ u1 u2 :
   leq_univ ϕ u1 (Universe.mk sSProp u2) -> usort u1 = sSProp.
-Proof. destruct u1 as [[| |] u1] => //=. Qed.
+Proof. destructu u1 => //=. Qed.
 
 Lemma eq_univ_is_propositional {cf:checker_flags} ϕ u1 u2 :
   eq_univ ϕ u1 u2 -> Universe.is_propositional u1 -> Universe.is_propositional u2.
-Proof. destruct u1 as [[| |] u1], u2 as [[| |] u2] => //=. Qed.
+Proof. destructu u1; destructu u2 => //=. Qed.
 
 Lemma isType_ws_cumul_ctx_pb {cf Σ Γ Δ T} {wfΣ : wf Σ}:
   isType Σ Γ T ->
@@ -349,7 +349,7 @@ Proof.
         eapply typing_spine_it_mkProd_or_LetIn_full_inv in sp; auto.
         split.
         -- revert sp.
-           destruct s as [[| |] l] => //=; destruct ind_univ => //.
+           destructu s => //=; destruct ind_univ => //.
            all: intros; cbn.
            ** now apply leq_univ_prop in sp; cbn in sp; rewrite sp.
            ** now apply leq_univ_sprop in sp; cbn in sp; rewrite sp.
@@ -358,7 +358,7 @@ Proof.
            apply leq_univ_propositional_l in sp; eauto.
            etransitivity; [symmetry; eauto|].
            rewrite /subst_instance_univ.
-           now destruct (ind_univ idecl) as [[| |] l].
+           now destructu (ind_univ idecl).
       + now eapply isTypeRel_isType, declared_inductive_valid_type.
 
     * now eapply invert_cumul_ind_prod in e.
@@ -460,9 +460,9 @@ Lemma check_ind_sorts_is_propositional {cf:checker_flags} (Σ : global_env_ext) 
 Proof.
   intros kelim isp.
   unfold check_ind_sorts.
-  destruct ind_univ as [[| |] u] => //=.
+  destructu ind_univ => //=.
   + induction (ind_cunivs onib); simpl; auto; try discriminate.
-    destruct l; simpl. intros; split; eauto. constructor; [|constructor].
+    destruct l0; simpl. intros; split; eauto. constructor; [|constructor].
     destruct forallb eqn:fo. eapply forallb_All in fo.
     eapply All_impl; eauto; simpl.
     destruct (ind_kelim idecl); intuition cbn in H; try congruence.
@@ -687,9 +687,9 @@ Lemma eq_univ_prop_compare_univ_propositional Σ pb (s s' : Universe.t) :
   eq_univ_prop s s' ->
   compare_univ Σ pb s s'.
 Proof using Hcf.
-  destruct s' as [[| |] u'] => //.
+  destructu s' => //.
   all: unfold eq_univ_prop, compare_univ.
-  all: destruct s as [[| |] u], pb => //=.
+  all: destructu s; destruct pb => //=.
   all: now rewrite Hcf.
 Qed.
 
@@ -698,9 +698,9 @@ Lemma eq_univ_prop_compare_univ_propositional_r Σ pb (s s' : Universe.t) :
   eq_univ_prop s s' ->
   compare_univ Σ pb s s'.
 Proof using Hcf.
-  destruct s as [[| |] u] => //.
+  destructu s => //.
   all: unfold eq_univ_prop, compare_univ.
-  all: destruct s' as [[| |] u'], pb => //=.
+  all: destructu s'; destruct pb => //=.
   all: now rewrite Hcf.
 Qed.
 
@@ -769,7 +769,7 @@ Proof using Hcf.
   eapply typing_cumul_term_prop in cum; tea.
   apply cumul_prop_univ in cum.
   move: cum.
-  destruct s as [[| |] u], s' as [[| |] u'] => //=; cbn.
+  destructu s; destructu s' => //=; cbn.
   all: now rewrite Hcf //.
 Qed.
 
@@ -782,7 +782,7 @@ Lemma unique_univing_equality_prop {pb} {Σ : global_env_ext} {Γ T U s s'} :
 Proof using Hcf.
   intros wfΣ HT HU cum.
   eapply unique_univing_family in cum; tea.
-  now destruct s as [[| |] u], s' as [[| |] u'].
+  now destructu s; destructu s'.
 Qed.
 
 Lemma unique_univing_equality_prop_l {pb} {Σ : global_env_ext} {Γ T U s s'} :
@@ -816,7 +816,7 @@ Lemma unique_univing_equality_sprop {pb} {Σ : global_env_ext} {Γ T U s s'} :
 Proof using Hcf.
   intros wfΣ HT HU cum.
   eapply unique_univing_family in cum; tea.
-  now destruct s as [[| |] u], s' as [[| |] u'].
+  now destructu s; destructu s'.
 Qed.
 
 Lemma unique_univing_equality_sprop_l {pb} {Σ : global_env_ext} {Γ T U s s'} :
@@ -850,7 +850,7 @@ Lemma unique_univing_equality_propositional {pb} {Σ : global_env_ext} {Γ T U s
 Proof using Hcf.
   intros wfΣ HT HU cum.
   eapply unique_univing_family in cum; tea.
-  now destruct s as [[| |] u], s' as [[| |] u'].
+  now destructu s; destructu s'.
 Qed.
 
 Lemma cumul_prop1 (Σ : global_env_ext) Γ A B u :

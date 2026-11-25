@@ -147,7 +147,7 @@ Lemma weakening_env_is_allowed_elimination {cf} Σ Σ' φ u allowed :
 Proof.
   destruct allowed; cbnr; trivial.
   intros ext [ | al]; auto.
-  destruct u as [[| |] u]; cbn in *; try now right.
+  destructu u; cbn in *; try now right.
   right.
   unfold_univ_rel.
   apply al.
@@ -207,7 +207,7 @@ Qed.
 Lemma extends_wf_univ {Σ : global_env_ext} Σ' s : extends Σ Σ' ->
   wf_univ Σ s -> wf_univ (Σ', Σ.2) s.
 Proof.
-  destruct s as [[| |] u] => //=.
+  destructu s => //=.
   all: apply extends_wf_ulvl.
 Qed.
 

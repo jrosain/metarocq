@@ -54,11 +54,11 @@ Section CheckerFlags.
 
   Lemma wf_univ_super {Σ u} : wf_univ Σ u -> wf_univ Σ (Universe.super u).
   Proof using Type.
-    destruct u as [[| |] u]; cbn.
-    1-2:intros _ l hin%LevelExprSet.singleton_spec; subst l; apply wf_univ_type1;
+    destructu u; cbn.
+    1-2:intros _ l' hin%LevelExprSet.singleton_spec; subst l'; apply wf_univ_type1;
      now apply LevelExprSet.singleton_spec.
     intros Hl.
-    intros l hin.
+    intros l' hin.
     eapply Universes.spec_map_succ in hin as [x' [int ->]].
     simpl. now specialize (Hl _ int).
   Qed.
@@ -66,10 +66,10 @@ Section CheckerFlags.
   Lemma wf_univ_sup {Σ u u'} : wf_univ Σ u -> wf_univ Σ u' ->
     wf_univ Σ (Universe.sup u u').
   Proof using Type.
-    destruct u as [[| |] u], u' as [[| |] u']; cbn; auto.
+    destructu u; destructu u'; cbn; auto.
     all: unfold wf_univ; cbn.
     all: try (intros ??; apply wf_ulvl_type0).
-    intros Hu Hu' l [Hl|Hl]%LevelExprSet.union_spec.
+    intros Hu Hu' l' [Hl|Hl]%LevelExprSet.union_spec.
     now apply (Hu _ Hl).
     now apply (Hu' _ Hl).
   Qed.
@@ -78,7 +78,7 @@ Section CheckerFlags.
     wf_univ Σ (Universe.univ_of_product s s').
   Proof using Type.
     intros Hu Hu'.
-    destruct s' as [[| |] u'] => //=.
+    destructu s' => //=.
     now apply wf_univ_sup.
   Qed.
 
@@ -154,7 +154,7 @@ Section CheckerFlags.
     wf_instance (Σ.1, ulvls) u ->
     wf_univ (Σ.1, ulvls) (subst_instance u s).
   Proof using Type.
-    destruct s as [[| |] t]; cbnr.
+    destructu s; cbnr.
     all: apply wf_ulvl_subst_instance_univ_lvl.
   Qed.
 
@@ -336,7 +336,7 @@ Section CheckerFlags.
     Lemma wf_univ_reflect {s : Universe.t} :
       reflect (wf_univ Σ s) (wf_univb s).
     Proof using Type.
-      destruct s as [[| |] u] => //=; repeat constructor; cbn;apply wf_ulvl_reflect.
+      destructu s => //=; repeat constructor; cbn;apply wf_ulvl_reflect.
     Qed.
 
     Lemma wf_ulvlb_instance_forall u :

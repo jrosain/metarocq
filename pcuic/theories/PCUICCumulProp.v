@@ -92,7 +92,7 @@ Proof using Hcf.
   intros wfΣ hs hs'.
   destruct (cumul_univ_confluence hs hs') as [x' [conv [leq leq']]].
   move: leq leq'.
-  destruct x' as [[| |] x'], s as [[| |] u], s' as [[| |] u'] => //=; cbn in *.
+  destructu x'; destructu s; destructu s' => //=; cbn in *.
   now rewrite Hcf.
 Qed.
 
@@ -105,7 +105,7 @@ Proof using Hcf.
   intros wfΣ hs hs'.
   destruct (cumul_univ_confluence hs hs') as [x' [conv [leq leq']]].
   move: leq leq'.
-  destruct x' as [[| |] x'], s as [[| |] u], s' as [[| |] u'] => //=; cbn in *.
+  destructu x'; destructu s; destructu s' => //=; cbn in *.
   now rewrite Hcf.
 Qed.
 
@@ -118,14 +118,14 @@ Proof using Type.
   intros wfΣ hs hs'.
   destruct (cumul_univ_confluence hs hs') as [x' [conv [leq leq']]].
   move: leq leq'.
-  destruct x' as [[| |] x'], s as [[| |] u], s' as [[| |] u'] => //=.
+  destructu x'; destructu s; destructu s' => //=.
 Qed.
 
 Lemma prop_univ_eq {Σ Γ u u'} : Universe.is_prop u -> Universe.is_prop u' ->
   is_closed_context Γ ->
   Σ ;;; Γ ⊢ tUniv u = tUniv u'.
 Proof using Type.
-  destruct u as [[| |] u], u' as [[| |] u'];
+  destructu u; destructu u';
   move=> //_ //_.
   constructor => //. constructor.
   red. red. constructor.
@@ -135,7 +135,7 @@ Lemma sprop_univ_eq {Σ Γ u u'} : Universe.is_sprop u -> Universe.is_sprop u' -
   is_closed_context Γ ->
   Σ ;;; Γ ⊢ tUniv u = tUniv u'.
 Proof using Type.
-  destruct u as [[| |] u], u' as [[| |] u'];
+  destructu u; destructu u';
   move=> //_ //_.
   constructor => //. constructor.
   do 2 red. constructor.
@@ -154,22 +154,22 @@ Qed.
 
 Lemma is_prop_superE {l} : Universe.is_prop (Universe.super l) -> False.
 Proof using Type.
-  destruct l as [[| |] l] => //.
+  destructu l => //.
 Qed.
 
 Lemma is_sprop_superE {l} : Universe.is_sprop (Universe.super l) -> False.
 Proof using Type.
-  destruct l as [[| |] l] => //.
+  destructu l => //.
 Qed.
 
 Lemma is_prop_prod {s s'} : Universe.is_prop s' -> Universe.is_prop (Universe.univ_of_product s s').
 Proof using Type.
-  destruct s' as [[| |] s'] => //.
+  destructu s' => //.
 Qed.
 
 Lemma is_sprop_prod {s s'} : Universe.is_sprop s' -> Universe.is_sprop (Universe.univ_of_product s s').
 Proof using Type.
-  destruct s' as [[| |] s'] => //.
+  destructu s' => //.
 Qed.
 
 Definition eq_univ_prop (u v : Universe.t) :=
@@ -224,7 +224,7 @@ Instance subrelation_compare_sort_eq_prop φ pb :
   RelationClasses.subrelation (compare_univ φ pb) eq_univ_prop.
 Proof using Type.
   intros s s'.
-  destruct pb, s as [[| |] s], s' as [[| |] s'] => //=.
+  destruct pb; destructu s; destructu s' => //=.
 Qed.
 
 Lemma eq_term_eq_term_prop_impl Σ φ pb napp t u :
@@ -292,7 +292,7 @@ Lemma cumul_prop_props {Σ Γ u u'} {wfΣ : wf Σ}:
   Universe.is_prop u'.
 Proof using Hcf.
   move => isp /cumul_prop_univ. move: isp.
-  destruct u as [[| |] u], u' as [[| |] u'] => //=. cbn. rewrite Hcf //.
+  destructu u; destructu u' => //=. cbn. rewrite Hcf //.
 Qed.
 
 Lemma cumul_sprop_props {Σ Γ u u'} {wfΣ : wf Σ} :
@@ -301,7 +301,7 @@ Lemma cumul_sprop_props {Σ Γ u u'} {wfΣ : wf Σ} :
   Universe.is_sprop u'.
 Proof using Type.
   move => isp /cumul_prop_univ. move: isp.
-  destruct u as [[| |] u], u' as [[| |] u'] => //.
+  destructu u; destructu u' => //.
 Qed.
 
 Instance refl_eq_univ_prop : RelationClasses.Reflexive eq_univ_prop.
@@ -775,7 +775,7 @@ Proof using Type.
   induction T using PCUICInduction.term_forall_list_ind; cbn; intros;
     try solve [constructor; eauto; solve_all].
   - cbn. constructor.
-    destruct s as [[| |] l]; split; reflexivity.
+    destructu s; split; reflexivity.
   - constructor. eapply PCUICEquality.eq_term_upto_univ_impl in IHT1; eauto.
     all:try typeclasses eauto.
     apply IHT2.
@@ -1053,8 +1053,8 @@ Proof using Type Hcf cf.
     constructor; fvs. constructor.
     apply cumul_prop_univ in X1, X3. move: X1 X3. clear.
     unfold eq_univ_prop.
-    destruct s2 as [[| |] l2], s2' as [[| |] l2'] => //=.
-    all: destruct s1 as [[| |] l1], s1' as [[| |] l1'] => //=.
+    destructu s2; destructu s2' => //=.
+    all: destructu s1; destructu s1' => //=.
 
   - eapply inversion_Lambda in X4 as (B & dom & bod & cum); tas.
     specialize (X3 t0 B H).

@@ -249,47 +249,49 @@ Notation ulvl := Universe.l.
 
 Notation "⟦ u ⟧_ v" := (Universe.to_csort v u) (at level 0, format "⟦ u ⟧_ v", v name) : univ_scope.
 
+Ltac destructu u :=
+  let l := fresh "l" in destruct u as [[| |] l].
 
 Lemma val_sort_sup v u1 u2 :
   Universe.to_csort v (Universe.sup u1 u2) =
   Universe.csup (Universe.to_csort v u1) (Universe.to_csort v u2).
 Proof.
-  destruct u1 as [[| |] l1], u2 as [[| |] l2]; cbv[Universe.to_csort]; cbnr; f_equal.
+  destructu u1; destructu u2; cbv[Universe.to_csort]; cbnr; f_equal.
   all: apply val_sup.
 Qed.
 
 Lemma is_prop_val u :
   Universe.is_prop u -> forall v, Universe.to_csort v u = Universe.mk sProp (val v (ulvl u)).
-Proof. destruct u as [[| |] l] => //. Qed.
+Proof. destructu u => //. Qed.
 
 Lemma is_sprop_val u :
   Universe.is_sprop u -> forall v, Universe.to_csort v u = Universe.mk sSProp (val v (ulvl u)).
-Proof. destruct u as [[| |] l] => //. Qed.
+Proof. destructu u => //. Qed.
 
 Lemma val_is_prop u v :
   Universe.to_csort v u = Universe.mk sProp (val v (ulvl u)) <-> Universe.is_prop u.
-Proof. destruct u as [[| |] l] => //. Qed.
+Proof. destructu u => //. Qed.
 
 Lemma val_is_sprop u v :
   Universe.to_csort v u = Universe.mk sSProp (val v (ulvl u)) <-> Universe.is_sprop u.
-Proof. destruct u as [[| |] l] => //. Qed.
+Proof. destructu u => //. Qed.
 
 Lemma is_prop_and_is_sprop_val_false u :
   Universe.is_prop u = false -> Universe.is_sprop u = false ->
   forall v, ∑ n, Universe.to_csort v u = Universe.mk sType n.
 Proof.
   intros Hp Hsp v.
-  destruct u as [[| |] l] => //; cbv[Universe.to_csort]. eexists; eauto.
+  destructu u => //; cbv[Universe.to_csort]. eexists; eauto.
 Qed.
 
 Lemma val_is_prop_false u v n :
   Universe.to_csort v u = Universe.mk sType n -> Universe.is_prop u = false.
-Proof. destruct u as [[| |] l] => //. Qed.
+Proof. destructu u => //. Qed.
 
 Lemma get_is_level_correct u l :
   Universe.get_is_level u = Some l -> u = Universe.mk sType (UnivLvl.make' l).
 Proof.
-  intro H; destruct u as [[| |] l'] => //.
+  intro H; destructu u => //.
   f_equal; now apply ulvl_get_is_level_correct.
 Qed.
 
@@ -302,7 +304,7 @@ Qed.
 Lemma sup_comm u1 u2 :
   Universe.sup u1 u2 = Universe.sup u2 u1.
 Proof.
-  destruct u1 as [[| |] l1], u2 as [[| |] l2]; cbnr.
+  destructu u1; destructu u2; cbnr.
   all: f_equal; apply sup0_comm.
 Qed.
 
@@ -311,55 +313,55 @@ Lemma is_not_prop_and_is_not_sprop {univ} (u : Universe.t_ Sort.t univ) :
   ∑ l, u = Universe.mk sType l.
 Proof.
   intros Hp Hsp.
-  destruct u as [[| |] l] => //. now eexists.
+  destructu u => //. now eexists.
 Qed.
 
 Lemma is_prop_sort_sup u1 u2 :
   Universe.is_prop (Universe.sup u1 u2)
   -> Universe.is_prop u2 \/ Universe.is_sprop u2 .
-Proof. destruct u1 as [[| |] l1], u2 as [[| |] l2]; auto. Qed.
+Proof. destructu u1; destructu u2; auto. Qed.
 
 Lemma is_prop_sort_sup' u1 u2 :
   Universe.is_prop (Universe.sup u1 u2)
   -> Universe.is_prop u1 \/ Universe.is_sprop u1 .
-Proof. destruct u1 as [[| |] l1], u2 as [[| |] l2]; auto. Qed.
+Proof. destructu u1; destructu u2; auto. Qed.
 
 Lemma is_prop_or_sprop_sort_sup u1 u2 :
   Universe.is_sprop (Universe.sup u1 u2) -> Universe.is_sprop u2.
-Proof. destruct u1 as [[| |] l1], u2 as [[| |] l2]; auto. Qed.
+Proof. destructu u1; destructu u2; auto. Qed.
 
 Lemma is_prop_sort_sup_prop u1 u2 :
   Universe.is_prop u1 && Universe.is_prop u2 ->
   Universe.is_prop (Universe.sup u1 u2).
-Proof. destruct u1 as [[| |] l1], u2 as [[| |] l2]; auto. Qed.
+Proof. destructu u1; destructu u2; auto. Qed.
 
 Lemma is_prop_or_sprop_sort_sup_prop u1 u2 :
   Universe.is_sprop u1 && Universe.is_sprop u2 ->
   Universe.is_sprop (Universe.sup u1 u2).
-Proof. destruct u1 as [[| |] l1], u2 as [[| |] l2]; auto. Qed.
+Proof. destructu u1; destructu u2; auto. Qed.
 
 Lemma is_prop_sup u1 u2 :
   Universe.is_prop (Universe.sup u1 u2) ->
   Universe.is_propositional u1 /\ Universe.is_propositional u2.
-Proof. destruct u1 as [[| |] l1], u2 as [[| |] l2]; auto. Qed.
+Proof. destructu u1; destructu u2; auto. Qed.
 
 Lemma is_sprop_sup_iff u1 u2 :
   Universe.is_sprop (Universe.sup u1 u2) <->
   (Universe.is_sprop u1 /\ Universe.is_sprop u2).
-Proof. split; destruct u1 as [[| |] l1], u2 as [[| |] l2] => //=; intuition. Qed.
+Proof. split; destructu u1; destructu u2 => //=; intuition. Qed.
 
 Lemma is_type_sup_r u1 u2 :
   Universe.is_type_sort u2 ->
   Universe.is_type_sort (Universe.sup u1 u2).
-Proof. destruct u2 as [[| |] l2]; try absurd; destruct u1 as [[| |] l1]; cbnr; intros; absurd. Qed.
+Proof. destructu u2; try absurd; destructu u1; cbnr; intros; absurd. Qed.
 
 Lemma is_prop_univ_prod u1 u2 :
   Universe.is_prop (Universe.univ_of_product u1 u2)
   -> Universe.is_prop u2.
 Proof.
   unfold Universe.univ_of_product.
-  destruct u2 as [[| |] l2]; cbn; auto.
-  intros; simpl in *; destruct u1 as [[| |] l1]; auto.
+  destructu u2; cbn; auto.
+  intros; simpl in *; destructu u1; auto.
 Qed.
 
 Lemma is_sprop_univ_prod u1 u2 :
@@ -367,8 +369,8 @@ Lemma is_sprop_univ_prod u1 u2 :
   -> Universe.is_sprop u2.
 Proof.
   unfold Universe.univ_of_product.
-  destruct u2 as [[| |] l2]; cbn; auto.
-  intros; simpl in *; destruct u1 as [[| |] l1]; auto.
+  destructu u2; cbn; auto.
+  intros; simpl in *; destructu u1; auto.
 Qed.
 
 Section UnivCompare.
@@ -439,21 +441,21 @@ Section UnivCompare.
     Notation "x <= y" := (leq_univ x y).
 
     Lemma univ_le_prop_inv u l : u <= Universe.mk sProp l -> usort u = sProp.
-    Proof using Type. destruct u as [[| |] l'] => //. Qed.
+    Proof using Type. destructu u => //. Qed.
 
     Lemma univ_le_sprop_inv u l : u <= Universe.mk sSProp l -> usort u = sSProp.
-    Proof using Type. destruct u as [[| |] l'] => //. Qed.
+    Proof using Type. destructu u => //. Qed.
 
     Lemma univ_prop_le_inv u l : Universe.mk sProp l <= u ->
       (usort u = sProp \/ (prop_sub_type /\ exists n, u = Universe.mk sType n)).
     Proof using Type.
-      destruct u as [[| |] l'] => //= Hle.
+      destructu u => //= Hle.
       - now left.
       - right; split => //; now eexists.
     Qed.
 
     Lemma univ_sprop_le_inv u l : Universe.mk sSProp l <= u -> usort u = sSProp.
-    Proof using Type. destruct u as [[| |] l'] => //. Qed.
+    Proof using Type. destructu u => //. Qed.
 
     Global Instance leq_univ_refl `{Reflexive univ (leq_universe_n 0)} : Reflexive leq_univ.
     Proof using Type. intros [[| |] l]; cbnr. Qed.
@@ -541,20 +543,20 @@ Section UnivCompare.
 
   Lemma cuniv_sup_comm u u' : Universe.csup u u' = Universe.csup u' u.
   Proof using Type.
-    destruct u as [[| |] n], u' as [[| |] m] => //=; cbnr; f_equal; lia.
+    destructu u; destructu u' => //=; cbnr; f_equal; lia.
   Qed.
 
   Lemma cuniv_sup_not_uproplevel u u' :
     ~ Universe.is_propositional u -> ∑ n, Universe.csup u u' = Universe.mk sType n.
   Proof using Type.
-    destruct u as [[| |] n] => //=.
-    destruct u' as [[| |] m]; now eexists.
+    destructu u => //=.
+    destructu u'; now eexists.
   Qed.
 
   Lemma cuniv_sup_mon u0 u' l l' : (u0 <= u')%u -> (Universe.mk sType l <= Universe.mk sType l')%u ->
     (Universe.csup u0 (Universe.mk sType l) <= Universe.csup u' (Universe.mk sType l'))%u.
   Proof using Type.
-    destruct u0 as [[| |] l0], u' as [[| |] l0'] => //=; cbn; intros Hle Hle'; lia.
+    destructu u0; destructu u' => //=; cbn; intros Hle Hle'; lia.
   Qed.
 
   Lemma leq_cuniv_of_product_mon u u' v v' :
@@ -563,21 +565,21 @@ Section UnivCompare.
     (Universe.cuniv_of_product u v <= Universe.cuniv_of_product u' v')%u.
   Proof using Type.
     intros Hle1 Hle2.
-    destruct v as [[| |] l], v' as [[| |] l']; cbn in Hle2 |- *; auto.
-    - destruct u' as [[| |] l'']; cbn; assumption.
+    destructu v; destructu v'; cbn in Hle2 |- *; auto.
+    - destructu u'; cbn; assumption.
     - apply cuniv_sup_mon; assumption.
   Qed.
 
   Lemma impredicative_cuniv_product {ulvl} {type0} {univ_sup} {l u} :
     Universe.is_propositional u ->
     Universe.univ_of_product_ (ulvl := ulvl) type0 univ_sup l u = u.
-  Proof using Type. now destruct u as [[| |] l0]. Qed.
+  Proof using Type. now destructu u. Qed.
 
   Lemma leq_univ_sup_l φ u1 s2 :
     let s1 := Universe.mk sType u1 in
     leq_univ φ s1 (Universe.sup s1 s2).
   Proof using Type.
-    destruct s2 as [[| |] u2]; cbnr.
+    destructu s2; cbnr.
     apply leq_ulvl_sup_l.
   Qed.
 
@@ -585,14 +587,14 @@ Section UnivCompare.
     let s2 := Universe.mk sType u2 in
     leq_univ φ s2 (Universe.sup s1 s2).
   Proof using Type.
-    destruct s1 as [[| |] u1]; cbnr.
+    destructu s1; cbnr.
     apply leq_ulvl_sup_r.
   Qed.
 
   Lemma leq_univ_product φ (s1 s2 : Universe.t)
     : leq_univ φ s2 (Universe.univ_of_product s1 s2).
   Proof using Type.
-    destruct s2 as [[| |] u2] => //.
+    destructu s2 => //.
     apply leq_univ_sup_r.
   Qed.
   (* Rk: [leq_universe φ s1 (univ_of_product s1 s2)] does not hold due to
@@ -642,7 +644,7 @@ Section UnivCompare.
       -> compare_univ φ pb t u -> compare_univ φ' pb t u.
   Proof using Type.
     intros Hctrs.
-    destruct pb, t as [[| |] l], u as [[| |] l']; cbnr; trivial.
+    destruct pb; destructu t; destructu u; cbnr; trivial.
     all: intros H; unfold_ulvl_rel;
     apply H.
     all: eapply satisfies_subset; eauto.
@@ -724,14 +726,14 @@ Lemma allowed_eliminations_subset_impl {cf} φ a a' s
     is_allowed_elimination φ a s -> is_allowed_elimination φ a' s.
 Proof using Type.
   destruct a, a'; cbnr; trivial;
-  destruct s as [[| |] l]; cbnr; trivial;
+  destructu s; cbnr; trivial;
   intros H1 H2; try absurd; constructor; trivial.
 Qed.
 
 Lemma is_allowed_elimination_monotone `{cf : checker_flags} Σ s1 s2 a :
   leq_univ Σ s1 s2 -> is_allowed_elimination Σ a s2 -> is_allowed_elimination Σ a s1.
 Proof.
-  destruct a, s2 as [[| |] u2], s1 as [[| |] u1] => //=. 1: now left.
+  destruct a; destructu s2; destructu s1 => //=. 1: now left.
   intros Hle [H|]; right => //.
   unfold_ulvl_rel; cbn in H, Hle |- *; rewrite H in Hle;
   unfold eq_ulvl; unfold leq_ulvl_n, leq0_ulvl_n in Hle; destruct check_univs; auto.
@@ -772,7 +774,7 @@ Section UnivCF2.
       -> @compare_univ cf1 ctrs pb t u -> @compare_univ cf2 ctrs pb t u.
   Proof using Type.
     unfold compare_univ, leq_univ, eq_univ, eq_univ_, leq_univ_n, leq_univ_n_, is_true.
-    destruct pb, t as [[| |] t1], u as [[| |] u1] => //=.
+    destruct pb; destructu t; destructu u => //=.
     - apply eq_ulvl_config_impl.
     - unfold config.impl. do 2 destruct check_univs, prop_sub_type; cbn => //=.
     - apply leq_ulvl_config_impl.
@@ -794,7 +796,7 @@ Section UnivCF2.
     : config.impl cf1 cf2 ->
       @is_allowed_elimination cf1 φ a s -> @is_allowed_elimination cf2 φ a s.
   Proof using Type.
-    destruct a, s as [[| |] l]; cbnr; trivial.
+    destruct a; destructu s; cbnr; trivial.
     unfold eq_ulvl, config.impl, is_true.
     do 2 destruct check_univs; cbnr; auto => //.
   Qed.
@@ -827,30 +829,30 @@ Ltac cong := intuition congruence.
 Lemma leq_relevance_eq {cf φ} {s s'} :
   leq_univ φ s s' -> relevance_of_univ s = relevance_of_univ s'.
 Proof.
-  now destruct s as [[| |] l], s' as [[| |] l'].
+  now destructu s; destructu s'.
 Qed.
 
 Lemma leq_relevance_opt {cf φ} {s s' rel} :
   leq_univ φ s s' -> isUnivRelOpt s rel -> isUnivRelOpt s' rel.
 Proof.
-  now destruct s as [[| |] l], s' as [[| |] l'].
+  now destructu s; destructu s'.
 Qed.
 
 Lemma leq_relevance {cf φ} {s s' rel} :
   leq_univ φ s s' -> isUnivRel s rel -> isUnivRel s' rel.
 Proof.
-    now destruct s as [[| |] l], s' as [[| |] l'].
+    now destructu s; destructu s'.
 Qed.
 
 Lemma geq_relevance {cf φ} {s s' rel} :
   leq_univ φ s' s -> isUnivRel s rel -> isUnivRel s' rel.
 Proof.
-  now destruct s as [[| |] l], s' as [[| |] l'].
+  now destructu s; destructu s'.
 Qed.
 
 Lemma relevance_super s : relevance_of_univ (Universe.super s) = rel_of_Type.
 Proof using Type.
-  now destruct s as [[| |] l].
+  now destructu s.
 Qed.
 
 Lemma leq_univ_product_mon {cf} ϕ s1 s1' s2 s2' :
@@ -858,8 +860,8 @@ Lemma leq_univ_product_mon {cf} ϕ s1 s1' s2 s2' :
   leq_univ ϕ s2 s2' ->
   leq_univ ϕ (Universe.univ_of_product s1 s2) (Universe.univ_of_product s1' s2').
 Proof.
-  destruct s2 as [[| |] u2], s2' as [[| |] u2']; cbnr; try absurd;
-  destruct s1 as [[| |] u1], s1' as [[| |] u1']; cbnr; try absurd; trivial.
+  destructu s2; destructu s2'; cbnr; try absurd;
+  destructu s1; destructu s1'; cbnr; try absurd; trivial.
   - intros _ H2; etransitivity; [apply H2 | apply leq_ulvl_sup_r].
   - apply leq_universe_sup_mon.
 Qed.
@@ -868,7 +870,7 @@ Lemma impredicative_product {cf} {ϕ l u} :
   Universe.is_propositional u ->
   leq_univ ϕ (Universe.univ_of_product l u) u.
 Proof.
-  destruct u as [[| |] v] => //; reflexivity.
+  destructu u => //; reflexivity.
 Qed.
 
 Section UniverseLemmas.
@@ -877,21 +879,21 @@ Section UniverseLemmas.
   (* we need to use quotiented equality as Universe.sup uses quotienting *)
   Lemma univ_sup_idem Φ s : eq_univ Φ (Universe.sup s s) s.
   Proof using Type.
-    destruct s as [[| |] l]; cbn; auto.
+    destructu s; cbn; auto.
     rewrite ulvl_sup_idem; reflexivity.
   Qed.
 
   Lemma univ_of_product_idem Φ s
     : eq_univ Φ (Universe.univ_of_product s s) s.
   Proof using Type.
-    unfold Universe.univ_of_product; destruct s as [[| |] l]; try reflexivity.
+    unfold Universe.univ_of_product; destructu s; try reflexivity.
     cbn; rewrite ulvl_sup_idem. reflexivity.
   Qed.
 
   Lemma univ_sup_assoc Φ s1 s2 s3 :
     eq_univ Φ (Universe.sup s1 (Universe.sup s2 s3)) (Universe.sup (Universe.sup s1 s2) s3).
   Proof using Type.
-    destruct s1 as [[| |] l1], s2 as [[| |] l2], s3 as [[| |] l3]; cbn; try reflexivity.
+    destructu s1; destructu s2; destructu s3; cbn; try reflexivity.
     rewrite ulvl_sup_assoc; reflexivity.
   Qed.
 
@@ -913,7 +915,7 @@ Section UniverseLemmas.
   Lemma univ_of_product_twice Φ u s :
     eq_univ Φ (Universe.univ_of_product u (Universe.univ_of_product u s)) (Universe.univ_of_product u s).
   Proof using Type.
-    destruct u as [[| |] u], s as [[| |] s]; cbnr.
+    destructu u; destructu s; cbnr.
     rewrite ulvl_sup_assoc ulvl_sup_idem; reflexivity.
   Qed.
 End UniverseLemmas.
@@ -959,7 +961,7 @@ Section no_prop_leq_type.
     leq_univ ϕ s s' ->
     leq_univ ϕ (Universe.super s) (Universe.super s').
   Proof using Type.
-    destruct s as [[| |] u1], s' as [[| |] u1']; cbnr; try absurd;
+    destructu s; destructu s'; cbnr; try absurd;
     intros H; unfold_univ_rel;
     rewrite !val_map_succ; lia.
   Qed.
@@ -970,9 +972,9 @@ Section no_prop_leq_type.
     Universe.is_prop s1 -> Universe.is_prop s2.
   Proof using Type.
     intros ps.
-    destruct s1 as [[| |] u1]; cbn; [ | absurd | absurd].
+    destructu s1; cbn; [ | absurd | absurd].
     rewrite ps.
-    destruct s2 as [[| |] u2]; cbn; [ auto | absurd | absurd].
+    destructu s2; cbn; [ auto | absurd | absurd].
   Qed.
 
   Hint Resolve leq_univ_prop_no_prop_sub_type : univ_lemmas.
@@ -983,7 +985,7 @@ Section no_prop_leq_type.
     Universe.is_propositional s1 <-> Universe.is_propositional s2.
   Proof using Type.
     intros ps.
-    destruct s1 as [[| |] u1], s2 as [[| |] u2]; cbn; try absurd; intros H; split; trivial.
+    destructu s1; destructu s2; cbn; try absurd; intros H; split; trivial.
     now rewrite ps in H.
   Qed.
 End no_prop_leq_type.
@@ -1125,7 +1127,7 @@ Section UniverseClosedSubst.
   Proof.
     intro hclosed.
     have e : (ulvl s)@[u] = ulvl s by apply closedu_subst_instance_univ_lvl.
-    unfold subst_instance_univ; destruct s as [[| |] l]; apply f_equal; cbn; auto.
+    unfold subst_instance_univ; destructu s; apply f_equal; cbn; auto.
   Qed.
 
   Lemma closedu_subst_instance u t
@@ -1184,7 +1186,7 @@ Section SubstInstanceClosed.
     : closedu_universe #|u| s -> closedu_universe 0 (subst_instance_univ u s).
   Proof using Hcl.
     intro H.
-    destruct s as [[| |] t]; cbnr;
+    destructu s; cbnr;
       apply subst_instance_ulvl_closedu; auto.
   Qed.
 

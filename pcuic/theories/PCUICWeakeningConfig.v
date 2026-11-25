@@ -25,7 +25,7 @@ Proof.
          | [ |- context[match ?x with _ => _ end] ] => is_var x; destruct x
          end; cbn => //=; try reflexivity.
   all: repeat move => /andP[]; cbv [is_true]; intros; repeat (cbn in *; subst).
-  all: destruct u1 as [[| |] u1], u2 as [[| |] u2]; cbn in *; auto.
+  all: destructu u1; destructu u2; cbn in *; auto.
   all: subst; auto.
 Qed.
 

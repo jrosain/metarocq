@@ -280,7 +280,7 @@ Instance compare_sort_substu {cf:checker_flags} φ pb :
   SubstUnivPreserving (eq_ulvl φ) (compare_univ φ pb).
 Proof.
   intros s u1 u2 hu.
-  destruct s as [[| |] u]; cbnr.
+  destructu s; cbnr.
   1,2: by destruct pb; cbn.
   rewrite compare_univ_type.
   now eapply Build_SubstUnivPreserving.
@@ -334,7 +334,7 @@ Lemma subst_instance_univ_two u1 u2 s :
   subst_instance_univ u1 (subst_instance_univ u2 s)
   = subst_instance_univ (subst_instance u1 u2) s.
 Proof.
-  destruct s as [[| |] u]; cbnr; unfold subst_instance_univ; cbn; f_equal.
+  destructu s; cbnr; unfold subst_instance_univ; cbn; f_equal.
   all: apply subst_instance_ulvl0_two.
 Qed.
 
@@ -488,7 +488,7 @@ Lemma sup_subst_instance_ulvl u s1 s2 :
   subst_instance_univ u (Universe.sup s1 s2)
   = Universe.sup (subst_instance_univ u s1) (subst_instance_univ u s2).
 Proof.
-  destruct s1 as [[| |] u1], s2 as [[| |] u2]; cbnr; unfold subst_instance_univ; cbn; f_equal.
+  destructu s1; destructu s2; cbnr; unfold subst_instance_univ; cbn; f_equal.
   apply sup_subst_instance_ulvl0.
 Qed.
 
@@ -964,7 +964,7 @@ Qed.
 Lemma subst_instance_univ_super l u
   : subst_instance_univ u (Universe.super l) = Universe.super (subst_instance u l).
 Proof.
-  destruct l as [[| |] l]; cbnr; unfold subst_instance_univ; cbn. f_equal.
+  destructu l; cbnr; unfold subst_instance_univ; cbn. f_equal.
   apply eq_univ'.
   intros x.
   rewrite In_subst_instance.
@@ -1017,8 +1017,8 @@ Lemma product_subst_instance u s1 s2
  : subst_instance_univ u (Universe.univ_of_product s1 s2)
    = Universe.univ_of_product (subst_instance_univ u s1) (subst_instance_univ u s2).
 Proof.
-  destruct s2 as [[| |] l2]; cbn; try reflexivity.
-  destruct s1 as [[| |] l1]; cbn; try reflexivity.
+  destructu s2; cbn; try reflexivity.
+  destructu s1; cbn; try reflexivity.
   unfold subst_instance_univ; cbn; f_equal.
   apply sup_subst_instance_ulvl0.
 Qed.
@@ -1535,7 +1535,7 @@ Lemma is_allowed_elimination_subst_instance {cf : checker_flags} (Σ : global_en
   is_allowed_elimination Σ al u ->
   is_allowed_elimination (global_ext_constraints (Σ.1, univs)) al (subst_instance_univ inst u).
 Proof.
-  destruct al, u as [[| |] u]; trivial.
+  destruct al; destructu u; trivial.
   intros val [H|isal] => //; right. cbn in isal |- *.
   unfold_univ_rel eqn:H.
   eapply satisfies_subst_instance_ctr in val; eauto.
@@ -1735,7 +1735,7 @@ Lemma wf_univ_subst_instance {cf : checker_flags} (Σ : global_env_ext) univs ui
    consistent_instance_ext (Σ.1, univs) Σ.2 ui ->
    wf_univ (Σ.1, univs) (subst_instance ui s).
 Proof.
-  destruct s as [[| |] u]; cbnr.
+  destructu s; cbnr.
   all: apply wf_ulvl_subst_instance.
 Qed.
 
@@ -1991,7 +1991,7 @@ Section SubstIdentity.
     subst_instance_univ (abstract_instance Σ.2) u = u.
   Proof using Type.
     intros wf cu.
-    destruct u as [[| |] u]; simpl; auto; unfold subst_instance_univ; cbn; f_equal.
+    destructu u; simpl; auto; unfold subst_instance_univ; cbn; f_equal.
     all: apply consistent_instance_ext_subst_abs_ulvl; auto.
     all: rewrite /wf_univ in cu; cbn in cu; auto.
   Qed.
@@ -2018,11 +2018,11 @@ Section SubstIdentity.
 
   Lemma wf_univ_super {Σ u} : wf_univ Σ u -> wf_univ Σ (Universe.super u).
   Proof using Type.
-    destruct u as [[| |] u]; cbn.
-    1-2:intros _ l hin%LevelExprSet.singleton_spec; subst l; apply wf_univ_type1;
+    destructu u; cbn.
+    1-2:intros _ l' hin%LevelExprSet.singleton_spec; subst l'; apply wf_univ_type1;
      now apply LevelExprSet.singleton_spec.
     intros Hl.
-    intros l hin.
+    intros l' hin.
     eapply Universes.spec_map_succ in hin as [x' [int ->]].
     simpl. now specialize (Hl _ int).
   Qed.
