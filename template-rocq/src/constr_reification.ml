@@ -10,7 +10,8 @@ struct
   type quoted_name = Constr.t (* of type BasicAst.name *)
   type quoted_aname = Constr.t (* of type BasicAst.aname (names with relevance) *)
   type quoted_relevance = Constr.t (* of type BasicAst.relevance *)
-  type quoted_sort = Constr.t (* of type Ast.universe *)
+  type quoted_sort = Constr.t (* of type Ast.sort *)
+  type quoted_univ = Constr.t (* of type Ast.universe *)
   type quoted_cast_kind = Constr.t  (* of type Ast.cast_kind *)
   type quoted_kernel_name = Constr.t (* of type Ast.kername *)
   type quoted_inductive = Constr.t (* of type Ast.inductive *)
@@ -150,10 +151,10 @@ struct
   let tbranchTy = ast "branch"
   let tmk_branch = ast "mk_branch"
   let tmkdecl = ast "mkdecl"
-  let (tTerm,tRel,tVar,tEvar,tSort,tCast,tProd,
+  let (tTerm,tRel,tVar,tEvar,tUniv,tCast,tProd,
        tLambda,tLetIn,tApp,tCase,tFix,tConstructor,tConst,tInd,tCoFix,tProj,tInt,tFloat,tString,tArray) =
     (ast "term", ast "tRel", ast "tVar", ast "tEvar",
-     ast "tSort", ast "tCast", ast "tProd", ast "tLambda",
+     ast "tUniv", ast "tCast", ast "tProd", ast "tLambda",
      ast "tLetIn", ast "tApp", ast "tCase", ast "tFix",
      ast "tConstruct", ast "tConst", ast "tInd", ast "tCoFix", ast "tProj", ast "tInt", ast "tFloat",
      ast "tString", ast "tArray")

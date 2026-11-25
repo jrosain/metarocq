@@ -261,23 +261,23 @@ struct
       | _ -> bad_term_verb trm "unquote_universe 1")
     else not_supported_verb trm "unquote_universe 2"
 
-  let unquote_sort evm trm (* of type sort *) =
+  let unquote_univ evm trm (* of type sort *) =
     let (h,args) = app_full trm [] in
     if constr_equall h sSProp then
       match args with
          | [_univ] -> evm, Sorts.sprop
-         | _ -> bad_term_verb trm "unquote_sort_sprop_args"
+         | _ -> bad_term_verb trm "unquote_univ_sprop_args"
     else if constr_equall h sProp then
       match args with
          | [_univ] -> evm, Sorts.prop
-         | _ -> bad_term_verb trm "unquote_sort_prop_args"
+         | _ -> bad_term_verb trm "unquote_univ_prop_args"
     else if constr_equall h sType then
       match args with
       | [_univ; x] ->
           let evm, u = unquote_universe evm x in
           evm, Sorts.sort_of_univ u
-      | _ -> bad_term_verb trm "unquote_sort_type_too_many_args"
-    else bad_term_verb trm "unquote_sort_type_no_args"
+      | _ -> bad_term_verb trm "unquote_univ_type_too_many_args"
+    else bad_term_verb trm "unquote_univ_type_no_args"
 
   let unquote_universe_instance evm trm (* of type universe_instance *) =
     let l = unquote_list trm in
@@ -398,9 +398,9 @@ struct
       match args with
       | [x; y] -> ACoq_tEvar (x, unquote_list y)
       | _ -> CErrors.user_err (print_term t ++ Pp.str ("has bad structure"))
-    else if constr_equall h tSort then
+    else if constr_equall h tUniv then
       match args with
-        x :: _ -> ACoq_tSort x
+        x :: _ -> ACoq_tUniv x
       | _ -> CErrors.user_err (print_term t ++ Pp.str ("has bad structure"))
     else if constr_equall h tCast then
       match args with

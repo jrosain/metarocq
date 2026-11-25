@@ -106,7 +106,7 @@ Proof.
      cur_modpath <- tmCurrentModPath tt;;
      match qt return TemplateMonad Ast.term with
      | tRel _
-     | tSort _
+     | tUniv _
      | tInt _
      | tFloat _
      | tString _
@@ -212,7 +212,7 @@ Proof.
      then ((if debug then tmPrint qt else ret tt);; tmFail "bound argument is not ground")
      else
        match qt return TemplateMonad Ast.term with
-       | tSort _
+       | tUniv _
        | tConst _ _
        | tConstruct _ _ _
        | tInt _

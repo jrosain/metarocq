@@ -110,7 +110,7 @@ Proof.
      cur_modpath <- tmCurrentModPath tt;;
      match qt return TemplateMonad PCUICAst.term with
      | tRel _
-     | tSort _
+     | tUniv _
      | tPrim _
      | tConst _ _
        => if head_term_is_bound cur_modpath qt
@@ -212,7 +212,7 @@ Proof.
      then ((if debug then tmPrint qt else ret tt);; tmFail "bound argument is not ground")
      else
        match qt return TemplateMonad PCUICAst.term with
-       | tSort _
+       | tUniv _
        | tConst _ _
        | tConstruct _ _ _
        | tPrim _

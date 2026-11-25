@@ -24,10 +24,10 @@ sig
   (* val unquote_universe : Evd.evar_map -> quoted_universe -> Evd.evar_map * Univ.Universe.t *)
   val unquote_universe_level : Evd.evar_map -> quoted_univ_level -> Evd.evar_map * Univ.Level.t
   val unquote_universe_instance: Evd.evar_map -> quoted_univ_instance -> Evd.evar_map * UVars.Instance.t
-  val unquote_sort : Evd.evar_map -> quoted_sort -> Evd.evar_map * Sorts.t
+  val unquote_univ : Evd.evar_map -> quoted_univ -> Evd.evar_map * Sorts.t
   (* val unquote_sort_family : quoted_sort_family -> Sorts.family *)
   (* val representsIndConstuctor : quoted_inductive -> Term.constr -> bool *)
-  val inspect_term : t -> (t, quoted_int, quoted_ident, quoted_aname, quoted_sort, quoted_cast_kind,
+  val inspect_term : t -> (t, quoted_int, quoted_ident, quoted_aname, quoted_univ, quoted_cast_kind,
     quoted_kernel_name, quoted_inductive, quoted_relevance, quoted_univ_level, quoted_univ_instance, quoted_proj,
     quoted_int63, quoted_float64, quoted_pstring) structure_of_term
 
@@ -66,14 +66,14 @@ struct
   let denote_term (env : Environ.env) (evm : Evd.evar_map) (trm: D.t) : Evd.evar_map * Constr.t =
     let open Context.Rel.Declaration in
     let rec aux env evm (trm: D.t) : _ * Constr.t =
-      (* debug (fun () -> Pp.(str "denote_term" ++ spc () ++ Printer.pr_econstr_env env evm trm)) ;  *)
+      (* debug (fun () -> Pp.(str "denote_term" ++ spc () ++ Printer.pr_econstr_env env evm trm)) ; *)
       match D.inspect_term trm with
       | ACoq_tRel x -> evm, Constr.mkRel (D.unquote_int x + 1)
       | ACoq_tVar x -> evm, Constr.mkVar (D.unquote_ident x)
       | ACoq_tEvar (n, l) ->
         let evm, l' = map_evm (aux env) evm l in
         D.unquote_evar env evm n l'
-      | ACoq_tSort x -> let evm, s = D.unquote_sort evm x in evm, Constr.mkSort s
+      | ACoq_tUniv x -> let evm, s = D.unquote_univ evm x in evm, Constr.mkSort s
       | ACoq_tCast (t,c,ty) -> let evm, t = aux env evm t in
         let evm, ty = aux env evm ty in
         evm, Constr.mkCast (t, D.unquote_cast_kind c, ty)

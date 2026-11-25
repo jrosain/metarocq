@@ -19,7 +19,9 @@ struct
   type quoted_name = BasicAst.name
   type quoted_aname = BasicAst.aname
   type quoted_relevance = BasicAst.relevance
-  type quoted_sort = Universes0.Universe.t
+  type quoted_sort = Sorts0.Sort.t
+  type quoted_ulvl = Levels.UnivLvl.t
+  type quoted_univ = Universes0.Universe.t
   type quoted_cast_kind = cast_kind
   type quoted_kernel_name = Kernames.kername
   type quoted_inductive = inductive
@@ -232,7 +234,7 @@ struct
   let mkRel n = Coq_tRel n
   let mkVar id = Coq_tVar id
   let mkEvar n args = Coq_tEvar (n,Array.to_list args)
-  let mkSort s = Coq_tUniv s
+  let mkUniv s = Coq_tUniv s
   let mkCast c k t = Coq_tCast (c,k,t)
 
   let mkConst c u = Coq_tConst (c, u)

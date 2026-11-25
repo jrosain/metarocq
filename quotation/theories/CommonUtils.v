@@ -124,14 +124,14 @@ Module WithTemplate.
   Import MetaRocq.Template.TemplateMonad.Core.
 
   (* versions that can be the same for both template and PCUIC, bypassing translation, for performance *)
-  Polymorphic Definition tmQuoteConstantUniversesAndRelevance@{t u} (kn : kername) (bypass_opacity : bool) : TemplateMonad@{t u} (universes_decl * relevance)
+  Polymorphic Definition tmQuoteConstantUniversesAndRelevance@{t u} (kn : kername) (bypass_opacity : bool) : TemplateMonad@{t u} (ulvls_decl * relevance)
     := cb <- tmQuoteConstant kn bypass_opacity;;
-       let '{| cst_universes := cst_universes ; cst_relevance := cst_relevance |} := cb in
+       let '{| cst_ulvls := cst_universes ; cst_relevance := cst_relevance |} := cb in
        ret (cst_universes, cst_relevance).
 
-  Polymorphic Definition tmQuoteInductiveUniverses@{t u} (kn : kername) : TemplateMonad@{t u} universes_decl
+  Polymorphic Definition tmQuoteInductiveUniverses@{t u} (kn : kername) : TemplateMonad@{t u} ulvls_decl
     := mib <- tmQuoteInductive kn;;
-       let '{| ind_universes := ind_universes |} := mib in
+       let '{| ind_ulvls := ind_universes |} := mib in
        ret ind_universes.
 
   (* unfolding Qed'd definitions for the benefit of quotation *)
@@ -178,7 +178,7 @@ Module WithTemplate.
        end.
 
   Section with_monad.
-    Context {M} {M_monad : Monad M} (in_domain : bool) (U : sort -> M term).
+    Context {M} {M_monad : Monad M} (in_domain : bool) (U : Universe.t -> M term).
 
     #[local]
       Fixpoint tmRelaxSortsM (t : term) {struct t} : M term
@@ -232,24 +232,24 @@ Module WithTemplate.
          | tCoFix mfix idx
            => mfix <- monad_map (monad_map_def tmRelaxSortsM tmRelaxSortsM) mfix;;
               ret (tCoFix mfix idx)
-         | tSort s => U s
+         | tUniv s => U s
          end.
   End with_monad.
 
-  #[local] Definition is_set (s : sort) : bool
-    := match option_map Level.is_set (Sort.get_is_level s) with
+  #[local] Definition is_set (s : Universe.t) : bool
+    := match option_map Level.is_set (Universe.get_is_level s) with
        | Some true => true
        | _ => false
        end.
 
-  #[local] Definition is_type (s : sort) : bool
-    := match Sort.get_is_level s with
+  #[local] Definition is_type (s : Universe.t) : bool
+    := match Universe.get_is_level s with
        | Some _ => true
        | _ => false
        end.
 
-  #[local] Definition is_only_type (s : sort) : bool
-    := match option_map Level.is_set (Sort.get_is_level s) with
+  #[local] Definition is_only_type (s : Universe.t) : bool
+    := match option_map Level.is_set (Universe.get_is_level s) with
        | Some false => true
        | _ => false
        end.
@@ -257,7 +257,7 @@ Module WithTemplate.
   Definition tmRelaxSet (in_domain : bool) (prefix : string) (t : term) : term
     := tmRelaxSortsM
          (M:=fun T => T) in_domain
-         (fun u => tSort (if is_set u then Sort.of_levels (inr (Level.level (prefix ++ "._Set.0")%bs)) else u))
+         (fun u => tUniv (if is_set u then Universe.of_levels (inr (Level.level (prefix ++ "._Set.0")%bs)) else u))
          t.
 
   Module Import PrefixUniverse.
@@ -303,13 +303,13 @@ Module WithTemplate.
            ; t_ne := eq_trans LevelExprSet.is_empty_prefix_with l.(t_ne) |}.
     End nonEmptyLevelExprSet.
 
-    Module Universe := nonEmptyLevelExprSet.
+    Module ULvl := nonEmptyLevelExprSet.
 
     Module Sort.
-      Definition prefix_with (prefix : string) (u : sort) : sort
-        := match u with
+      Definition prefix_with (prefix : string) (u : Universe.t) : Universe.t
+        := match Universe.s u with
            | sProp | sSProp => u
-           | sType u => sType (Universe.prefix_with prefix u)
+           | sType => uType (ULvl.prefix_with prefix (Universe.l u))
            end.
     End Sort.
   End PrefixUniverse.
@@ -317,7 +317,7 @@ Module WithTemplate.
   Definition tmRelaxOnlyType (in_domain : bool) (prefix : string) (t : term) : term
     := tmRelaxSortsM
          (M:=fun T => T) in_domain
-         (fun u => tSort (PrefixUniverse.Sort.prefix_with prefix u))
+         (fun u => tUniv (PrefixUniverse.Sort.prefix_with prefix u))
          t.
 
   Polymorphic Definition tmRetypeMagicRelaxSetInCodomain@{a b t u} (prefix : string) {A : Type@{a}} (B : Type@{b}) (x : A) : TemplateMonad@{t u} B

@@ -65,7 +65,7 @@ sig
   val mkRel : quoted_int -> t
   val mkVar : quoted_ident -> t
   val mkEvar : quoted_int -> t array -> t
-  val mkSort : quoted_sort -> t
+  val mkUniv : quoted_univ -> t
   val mkCast : t -> quoted_cast_kind -> t -> t
   val mkProd : quoted_aname -> t -> t -> t
   val mkLambda : quoted_aname -> t -> t -> t
@@ -95,7 +95,7 @@ sig
   val quote_relevance : Sorts.relevance -> quoted_relevance
   val quote_int : int -> quoted_int
   val quote_bool : bool -> quoted_bool
-  val quote_sort : Sorts.t -> quoted_sort
+  val quote_sort : Sorts.t -> quoted_univ
   val quote_sort_quality_or_set : UnivGen.QualityOrSet.t -> quoted_sort_quality_or_set
   val quote_cast_kind : Constr.cast_kind -> quoted_cast_kind
   val quote_kn : KerName.t -> quoted_kernel_name
@@ -141,7 +141,7 @@ sig
   val mk_one_inductive_body :
     quoted_ident *
     quoted_context (* ind indices context *) *
-    quoted_sort (* ind sort *) *
+    quoted_univ (* ind sort *) *
     t (* ind type *) *
     quoted_sort_quality_or_set *
     (quoted_ident * quoted_context (* arguments context *) *
@@ -284,7 +284,7 @@ struct
         let args = Evd.expand_existential0 sigma (n, args) in
 	      let (args',acc) = quote_terms quote_term acc env sigma (Array.of_list args) in
          (Q.mkEvar (Q.quote_int (Evar.repr n)) args', acc)
-      | Constr.Sort s -> (Q.mkSort (Q.quote_sort s), acc)
+      | Constr.Sort s -> (Q.mkUniv (Q.quote_sort s), acc)
       | Constr.Cast (c,k,t) ->
               let (c',acc) = quote_term acc env sigma c in
               let (t',acc) = quote_term acc env sigma t in

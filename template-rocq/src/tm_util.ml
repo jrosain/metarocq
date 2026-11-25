@@ -308,11 +308,11 @@ type ('nat, 'inductive, 'relevance) acase_info =
     aci_npar : 'nat;
     aci_relevance : 'relevance }
 
-type ('term, 'nat, 'ident, 'name, 'quoted_sort, 'cast_kind, 'kername, 'inductive, 'relevance, 'universe_level, 'universe_instance, 'projection, 'int63, 'float64, 'pstring) structure_of_term =
+type ('term, 'nat, 'ident, 'name, 'quoted_univ, 'cast_kind, 'kername, 'inductive, 'relevance, 'universe_level, 'universe_instance, 'projection, 'int63, 'float64, 'pstring) structure_of_term =
   | ACoq_tRel of 'nat
   | ACoq_tVar of 'ident
   | ACoq_tEvar of 'nat * 'term list
-  | ACoq_tSort of 'quoted_sort
+  | ACoq_tUniv of 'quoted_univ
   | ACoq_tCast of 'term * 'cast_kind * 'term
   | ACoq_tProd of 'name * 'term * 'term
   | ACoq_tLambda of 'name * 'term * 'term

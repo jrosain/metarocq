@@ -10,6 +10,7 @@ sig
   type quoted_aname
   type quoted_relevance
   type quoted_sort
+  type quoted_univ
   type quoted_cast_kind
   type quoted_kernel_name
   type quoted_inductive

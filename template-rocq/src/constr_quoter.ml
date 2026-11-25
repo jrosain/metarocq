@@ -34,7 +34,7 @@ struct
   let mkRel i = constr_mkApp (tRel, [| i |])
   let mkVar id = constr_mkApp (tVar, [| id |])
   let mkEvar n args = constr_mkApp (tEvar, [| n; to_coq_listl tTerm (Array.to_list args) |])
-  let mkSort s = constr_mkApp (tSort, [| s |])
+  let mkUniv s = constr_mkApp (tUniv, [| s |])
   let mkCast c k t = constr_mkApp (tCast, [| c ; k ; t |])
   let mkConst kn u = constr_mkApp (tConst, [| kn ; u |])
   let mkProd na t b =

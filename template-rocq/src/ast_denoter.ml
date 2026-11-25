@@ -18,7 +18,9 @@ struct
   type quoted_name = name
   type quoted_aname = name binder_annot
   type quoted_relevance = relevance
-  type quoted_sort = Universes0.Universe.t
+  type quoted_sort = Sorts0.Sort.t
+  type quoted_univ_lvl = Levels.UnivLvl.t
+  type quoted_univ = Universes0.Universe.t
   type quoted_cast_kind = cast_kind
   type quoted_kernel_name = kername
   type quoted_inductive = inductive
@@ -64,7 +66,7 @@ struct
   let mkRel = mkRel
   let mkVar = mkVar
   let mkEvar = mkEvar
-  let mkSort = mkSort
+  let mkUniv = mkSort
   let mkCast = mkCast
   let mkProd = mkProd
 
@@ -103,14 +105,14 @@ struct
       aci_npar = x.ci_npar;
       aci_relevance = x.ci_relevance }
 
-  let inspect_term (tt: t):(t, quoted_int, quoted_ident, quoted_aname, quoted_sort, quoted_cast_kind,
+  let inspect_term (tt: t):(t, quoted_int, quoted_ident, quoted_aname, quoted_univ, quoted_cast_kind,
     quoted_kernel_name, quoted_inductive, quoted_relevance, quoted_univ_level, quoted_univ_instance, quoted_proj,
     quoted_int63, quoted_float64, quoted_pstring) structure_of_term =
     match tt with
     | Coq_tRel n -> ACoq_tRel n
     | Coq_tVar v -> ACoq_tVar v
     | Coq_tEvar (x,l) -> ACoq_tEvar (x,l)
-    | Coq_tUniv u -> ACoq_tSort u
+    | Coq_tUniv u -> ACoq_tUniv u
     | Coq_tCast (t,k,tt) -> ACoq_tCast (t,k,tt)
     | Coq_tProd (a,b,c) -> ACoq_tProd (a,b,c)
     | Coq_tLambda (a,b,c) -> ACoq_tLambda (a,b,c)
@@ -165,7 +167,7 @@ struct
 
   let unquote_pstring s = s
 
-  (* val unquote_sort : quoted_sort -> Sorts.t *)
+  (* val unquote_univ : quoted_univ -> Sorts.t *)
   (* val unquote_sort_family : quoted_sort_family -> Sorts.family *)
   let unquote_cast_kind (q : quoted_cast_kind) : Constr.cast_kind =
     match q with
@@ -221,7 +223,7 @@ struct
     let u = List.fold_left Univ.Universe.sup (List.hd l) (List.tl l) in
     evm, u
 
-  let unquote_sort evm trm =
+  let unquote_univ evm trm =
     match Universes0.Universe.s trm with
     | Sorts0.Sort.Coq_sSProp -> evm, Sorts.sprop
     | Sorts0.Sort.Coq_sProp -> evm, Sorts.prop
